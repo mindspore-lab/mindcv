@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""loss"""
 
-from .cross_entropy_smooth import CrossEntropySmooth
-from .loss_factory import create_loss
+DEFAULT_CROP_PCT = 0.875
+IMAGENET_DEFAULT_MEAN = [0.485 * 255, 0.456 * 255, 0.406 * 255]
+IMAGENET_DEFAULT_STD = [0.229 * 255, 0.224 * 255, 0.225 * 255]
