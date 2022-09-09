@@ -38,8 +38,8 @@ def train(args):
                                      parallel_mode='data_parallel',
                                      gradients_mean=True)
     else:
-        device_num = 1
-        rank_id = 0
+        device_num = None
+        rank_id = None
 
     # create dataset
     dataset_train = create_dataset(
