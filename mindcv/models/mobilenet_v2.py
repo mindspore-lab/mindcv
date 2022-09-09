@@ -99,7 +99,7 @@ class InvertedResidual(nn.Cell):
             ])
         layers.extend([
             # dw
-            nn.Conv2d(hidden_dim, hidden_dim, 3, stride, pad_mode="pad", padding=1, groups=hidden_dim, has_bias=False),
+            nn.Conv2d(hidden_dim, hidden_dim, 3, stride, pad_mode="pad", padding=1, group=hidden_dim, has_bias=False),
             nn.BatchNorm2d(hidden_dim),
             nn.ReLU6(),
             # pw-linear
