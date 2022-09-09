@@ -28,4 +28,4 @@ from .squeezenet import *
 from .utils import *
 from .vit import *
 from .vgg import *
-
+from .layers import *
