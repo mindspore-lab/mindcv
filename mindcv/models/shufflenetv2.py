@@ -107,6 +107,7 @@ class ShuffleV2Block(nn.Cell):
             x_proj = old_x
             x = old_x
             return ops.concat((self.branch_proj(x_proj), self.branch_main(x)), axis=1)
+        return None
 
     @staticmethod
     def channel_shuffle(x: Tensor) -> Tuple[Tensor, Tensor]:
