@@ -54,7 +54,7 @@ MindSpore Computer Vision, a MindSpore base Python package, provides high-level 
 The following instructions assume that you have desired dependency installed and working. 
 
 ```shell
-pip install https://github.com/mindlab-ai/mindcv/releases/download/0.0.1-alpha/mindcv-0.0.1a0-py3-none-any.whl
+pip install https://github.com/mindlab-ai/mindcv/releases/download/v0.0.1-alpha/mindcv-0.0.1a0-py3-none-any.whl
 ```
 
 - From source:
