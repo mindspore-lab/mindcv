@@ -47,20 +47,21 @@ def create_loader(
                           python_multiprocessing=python_multiprocessing)
     if target_transform is None:
         target_transform = transforms.TypeCast(ms.int32)
+    target_input_columns = 'label' if 'label' in dataset.get_col_name() else 'fine_label'
     dataset = dataset.map(operations=target_transform,
-                          input_columns='label',
+                          input_columns=target_input_columns,
                           num_parallel_workers=num_parallel_workers,
                           python_multiprocessing=python_multiprocessing)
 
     if is_training and mixup > 0:
         one_hot_encode = transforms.OneHot(num_classes)
-        dataset = dataset.map(operations=one_hot_encode, input_columns=["label"])
+        dataset = dataset.map(operations=one_hot_encode, input_columns=[target_input_columns])
 
     dataset = dataset.batch(batch_size=batch_size, drop_remainder=drop_remainder)
 
     if is_training and mixup > 0:
         trans_mixup = vision.MixUpBatch(alpha=mixup)
-        dataset = dataset.map(input_columns=["image", "label"], num_parallel_workers=num_parallel_workers,
+        dataset = dataset.map(input_columns=["image", target_input_columns], num_parallel_workers=num_parallel_workers,
                               operations=trans_mixup)
 
     return dataset
