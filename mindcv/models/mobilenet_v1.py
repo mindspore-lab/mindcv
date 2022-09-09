@@ -20,7 +20,6 @@ from mindspore import Tensor
 
 from .utils import load_pretrained
 from .registry import register_model
-from .layers.conv_norm_act import Conv2dNormActivation
 from .layers.pooling import GlobalAvgPooling
 
 __all__ = [
@@ -50,116 +49,63 @@ default_cfgs = {
 }
 
 
-class DepthwiseSeparable(nn.Cell):
-    def __init__(self,
-                 in_channels: int,
+def conv_bn_relu(in_channels: int,
                  out_channels: int,
-                 stride: int
-                 ) -> None:
-        super(DepthwiseSeparable, self).__init__()
-
-        self.dw_conv = Conv2dNormActivation(
-            in_channels,
-            in_channels,
-            kernel_size=3,
-            stride=stride,
-            groups=in_channels)
-
-        self.pw_conv = Conv2dNormActivation(
-            in_channels,
-            out_channels,
-            kernel_size=1,
-            stride=1)
-
-    def construct(self, x: Tensor) -> Tensor:
-        x = self.dw_conv(x)
-        x = self.pw_conv(x)
-        return x
+                 kernel_size: int,
+                 stride: int,
+                 depthwise: bool,
+                 activation: str = 'relu6') -> nn.SequentialCell:
+    output = []
+    output.append(nn.Conv2d(in_channels, out_channels, kernel_size, stride, pad_mode="same",
+                            group=1 if not depthwise else in_channels))
+    output.append(nn.BatchNorm2d(out_channels))
+    if activation:
+        output.append(nn.get_activation(activation))
+    return nn.SequentialCell(output)
 
 
 class MobileNetV1(nn.Cell):
-
     def __init__(self,
-                 alpha: float = 1.0,
+                 alpha: float = 1.,
                  num_classes: int = 1000,
-                 in_channels: int = 3):
+                 in_channels: int = 3) -> None:
         super(MobileNetV1, self).__init__()
-        layers = list()
+        self.layers = [
+            conv_bn_relu(in_channels, int(32 * alpha), 3, 2, False),  # Conv0
+            conv_bn_relu(int(32 * alpha), int(32 * alpha), 3, 1, True),  # Conv1_depthwise
+            conv_bn_relu(int(32 * alpha), int(64 * alpha), 1, 1, False),  # Conv1_pointwise
+            conv_bn_relu(int(64 * alpha), int(64 * alpha), 3, 2, True),  # Conv2_depthwise
+            conv_bn_relu(int(64 * alpha), int(128 * alpha), 1, 1, False),  # Conv2_pointwise
 
-        layers.append(
-            Conv2dNormActivation(
-                in_channels=in_channels,
-                out_channels=int(32 * alpha),
-                kernel_size=3,
-                stride=2
-            )
-        )
-        layers.append(
-            DepthwiseSeparable(
-                in_channels=int(32 * alpha),
-                out_channels=int(64 * alpha),
-                stride=1
-            )
-        )
-        layers.append(
-            DepthwiseSeparable(
-                in_channels=int(64 * alpha),
-                out_channels=int(128 * alpha),
-                stride=2
-            )
-        )
-        layers.append(
-            DepthwiseSeparable(
-                in_channels=int(128 * alpha),
-                out_channels=int(128 * alpha),
-                stride=1
-            )
-        )
-        layers.append(
-            DepthwiseSeparable(
-                in_channels=int(128 * alpha),
-                out_channels=int(256 * alpha),
-                stride=2
-            )
-        )
-        layers.append(
-            DepthwiseSeparable(
-                in_channels=int(256 * alpha),
-                out_channels=int(256 * alpha),
-                stride=1
-            )
-        )
-        layers.append(
-            DepthwiseSeparable(
-                in_channels=int(256 * alpha),
-                out_channels=int(512 * alpha),
-                stride=2
-            )
-        )
-        for i in range(5):
-            layers.append(
-                DepthwiseSeparable(
-                    in_channels=int(512 * alpha),
-                    out_channels=int(512 * alpha),
-                    stride=1
-                )
-            )
-        layers.append(
-            DepthwiseSeparable(
-                in_channels=int(512 * alpha),
-                out_channels=int(1024 * alpha),
-                stride=2
-            )
-        )
-        layers.append(
-            DepthwiseSeparable(
-                in_channels=int(1024 * alpha),
-                out_channels=int(1024 * alpha),
-                stride=1
-            )
-        )
+            conv_bn_relu(int(128 * alpha), int(128 * alpha), 3, 1, True),  # Conv3_depthwise
+            conv_bn_relu(int(128 * alpha), int(128 * alpha), 1, 1, False),  # Conv3_pointwise
+            conv_bn_relu(int(128 * alpha), int(128 * alpha), 3, 2, True),  # Conv4_depthwise
+            conv_bn_relu(int(128 * alpha), int(256 * alpha), 1, 1, False),  # Conv4_pointwise
 
-        self.features = nn.SequentialCell(layers)
+            conv_bn_relu(int(256 * alpha), int(256 * alpha), 3, 1, True),  # Conv5_depthwise
+            conv_bn_relu(int(256 * alpha), int(256 * alpha), 1, 1, False),  # Conv5_pointwise
+            conv_bn_relu(int(256 * alpha), int(256 * alpha), 3, 2, True),  # Conv6_depthwise
+            conv_bn_relu(int(256 * alpha), int(512 * alpha), 1, 1, False),  # Conv6_pointwise
+
+            conv_bn_relu(int(512 * alpha), int(512 * alpha), 3, 1, True),  # Conv7_depthwise
+            conv_bn_relu(int(512 * alpha), int(512 * alpha), 1, 1, False),  # Conv7_pointwise
+            conv_bn_relu(int(512 * alpha), int(512 * alpha), 3, 1, True),  # Conv8_depthwise
+            conv_bn_relu(int(512 * alpha), int(512 * alpha), 1, 1, False),  # Conv8_pointwise
+            conv_bn_relu(int(512 * alpha), int(512 * alpha), 3, 1, True),  # Conv9_depthwise
+            conv_bn_relu(int(512 * alpha), int(512 * alpha), 1, 1, False),  # Conv9_pointwise
+            conv_bn_relu(int(512 * alpha), int(512 * alpha), 3, 1, True),  # Conv10_depthwise
+            conv_bn_relu(int(512 * alpha), int(512 * alpha), 1, 1, False),  # Conv10_pointwise
+            conv_bn_relu(int(512 * alpha), int(512 * alpha), 3, 1, True),  # Conv11_depthwise
+            conv_bn_relu(int(512 * alpha), int(512 * alpha), 1, 1, False),  # Conv11_pointwise
+
+            conv_bn_relu(int(512 * alpha), int(512 * alpha), 3, 2, True),  # Conv12_depthwise
+            conv_bn_relu(int(512 * alpha), int(1024 * alpha), 1, 1, False),  # Conv12_pointwise
+            conv_bn_relu(int(1024 * alpha), int(1024 * alpha), 3, 1, True),  # Conv13_depthwise
+            conv_bn_relu(int(1024 * alpha), int(1024 * alpha), 1, 1, False),  # Conv13_pointwise
+
+        ]
+
+        self.features = nn.SequentialCell(self.layers)
         self.pool = GlobalAvgPooling()
         self.classifier = nn.Dense(int(1024 * alpha), num_classes)
         self._initialize_weights()
