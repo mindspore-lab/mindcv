@@ -51,18 +51,10 @@ MindSpore Computer Vision, a MindSpore base Python package, provides high-level 
 
 ## Installation
 
-The following instructions assume that you have desired dependency installed and working.
-
-- Anaconda:
+The following instructions assume that you have desired dependency installed and working. 
 
 ```shell
-conda install mindcv
-```
-
-- pip:
-
-```shell
-pip install mindcv
+pip install https://github.com/mindlab-ai/mindcv/releases/download/0.0.1-alpha/mindcv-0.0.1a0-py3-none-any.whl
 ```
 
 - From source:
@@ -70,14 +62,14 @@ pip install mindcv
 ```shell
 # Clone the mindcv repository.
 git clone https://github.com/mindlab-ai/mindcv.git
-cd mindspore-classification
+cd mindcv
 
 # Install
 python setup.py install
 ```
 
 ## Get Started
-See [Get Started With Mindcv](quick_tour.ipynb)  to learn about basic usage.
+See [Get Started With MindCV](quick_tour.ipynb)  to learn about basic usage.
 
 ## License
 
