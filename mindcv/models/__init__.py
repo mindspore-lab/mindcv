@@ -12,6 +12,5 @@ from .shufflenetv1 import *
 from .shufflenetv2 import *
 from .squeezenet import *
 from .utils import *
-from .vit import *
 from .vgg import *
 from .layers import *
