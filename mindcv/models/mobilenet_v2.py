@@ -1,13 +1,15 @@
+"""
+MindSpore implementation of MobileNetV2.
+Refer to MobileNetV2: Inverted Residuals and Linear Bottlenecks.
+"""
+
 import math
-from typing import Optional, List
 
 import mindspore.nn as nn
-import mindspore.ops as ops
 import mindspore.common.initializer as init
 from mindspore import Tensor
 
 from .layers.pooling import GlobalAvgPooling
-from .layers.conv_norm_act import Conv2dNormActivation
 from .utils import make_divisible, load_pretrained
 from .registry import register_model
 
@@ -74,120 +76,105 @@ default_cfgs = {
 
 
 class InvertedResidual(nn.Cell):
+    """Inverted Residual Block of MobileNetV2"""
 
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
                  stride: int,
                  expand_ratio: int,
-                 norm: Optional[nn.Cell] = None,
-                 last_relu: bool = False
                  ) -> None:
         super(InvertedResidual, self).__init__()
         assert stride in [1, 2]
-
-        if not norm:
-            norm = nn.BatchNorm2d
-
         hidden_dim = round(in_channels * expand_ratio)
         self.use_res_connect = stride == 1 and in_channels == out_channels
 
-        layers: List[nn.Cell] = []
+        layers = []
         if expand_ratio != 1:
             # pw
-            layers.append(
-                Conv2dNormActivation(in_channels, hidden_dim, kernel_size=1, norm=norm, activation=nn.ReLU6)
-            )
+            layers.extend([
+                nn.Conv2d(in_channels, hidden_dim, 1, 1, pad_mode="pad", padding=0, has_bias=False),
+                nn.BatchNorm2d(hidden_dim),
+                nn.ReLU6()
+            ])
         layers.extend([
             # dw
-            Conv2dNormActivation(
-                hidden_dim,
-                hidden_dim,
-                stride=stride,
-                groups=hidden_dim,
-                norm=norm,
-                activation=nn.ReLU6
-            ),
+            nn.Conv2d(hidden_dim, hidden_dim, 3, stride, pad_mode="pad", padding=1, groups=hidden_dim, has_bias=False),
+            nn.BatchNorm2d(hidden_dim),
+            nn.ReLU6(),
             # pw-linear
-            nn.Conv2d(hidden_dim, out_channels, kernel_size=1,
-                      stride=1, has_bias=False),
-            norm(out_channels)
+            nn.Conv2d(hidden_dim, out_channels, 1, 1, pad_mode="pad", padding=0, has_bias=False),
+            nn.BatchNorm2d(out_channels),
         ])
-        self.conv = nn.SequentialCell(layers)
-        self.last_relu = last_relu
-        self.relu = nn.ReLU6()
+        self.layers = nn.SequentialCell(layers)
 
     def construct(self, x: Tensor) -> Tensor:
-        identity = x
-        x = self.conv(x)
         if self.use_res_connect:
-            x = ops.add(identity, x)
-        if self.last_relu:
-            x = self.relu(x)
-        return x
+            return x + self.layers(x)
+        else:
+            return self.layers(x)
 
 
 class MobileNetV2(nn.Cell):
+    r"""MobileNetV2 model class, based on
+    `"MobileNetV2: Inverted Residuals and Linear Bottlenecks" <https://arxiv.org/abs/1801.04381>`_
+
+    Args:
+        alpha (float) : scale factor of model width. Default: 3.
+        in_channels(int): number the channels of the input. Default: 3.
+        num_classes (int) : number of classification classes. Default: 1000.
+        round_nearest (int) : divisor of make divisible function. Default: 8.
+    """
 
     def __init__(self,
                  alpha: float = 1.0,
-                 inverted_residual_setting: Optional[List[List[int]]] = None,
                  round_nearest: int = 8,
-                 block: Optional[nn.Cell] = None,
-                 norm: Optional[nn.Cell] = None,
                  num_classes: int = 1000,
                  in_channels: int = 3
                  ) -> None:
         super(MobileNetV2, self).__init__()
-
-        if not block:
-            block = InvertedResidual
-        if not norm:
-            norm = nn.BatchNorm2d
-
-        input_channel = make_divisible(32 * alpha, round_nearest)
-        last_channel = make_divisible(1280 * max(1.0, alpha), round_nearest)
-
+        input_channels = make_divisible(32 * alpha, round_nearest)
+        last_channels = make_divisible(1280 * max(1.0, alpha), round_nearest)
         # Setting of inverted residual blocks.
-        if inverted_residual_setting is None:
-            inverted_residual_setting = [
-                # t, c, n, s
-                [1, 16, 1, 1],
-                [6, 24, 2, 2],
-                [6, 32, 3, 2],
-                [6, 64, 4, 2],
-                [6, 96, 3, 1],
-                [6, 160, 3, 2],
-                [6, 320, 1, 1],
-            ]
-
-        # Building first layer.
-        features: List[nn.Cell] = [
-            Conv2dNormActivation(in_channels, input_channel, stride=2, norm=norm, activation=nn.ReLU6)
-        ]
-
-        # Building inverted residual blocks.
         # t: The expansion factor.
         # c: Number of output channel.
         # n: Number of block.
         # s: First block stride.
+        inverted_residual_setting = [
+            # t, c, n, s
+            [1, 16, 1, 1],
+            [6, 24, 2, 2],
+            [6, 32, 3, 2],
+            [6, 64, 4, 2],
+            [6, 96, 3, 1],
+            [6, 160, 3, 2],
+            [6, 320, 1, 1],
+        ]
+
+        # Building stem conv layer.
+        features = [
+            nn.Conv2d(in_channels, input_channels, 3, 2, pad_mode="pad", padding=1, has_bias=False),
+            nn.BatchNorm2d(input_channels),
+            nn.ReLU6()
+        ]
+        # Building inverted residual blocks.
         for t, c, n, s in inverted_residual_setting:
             output_channel = make_divisible(c * alpha, round_nearest)
             for i in range(n):
                 stride = s if i == 0 else 1
-                features.append(block(input_channel, output_channel, stride, expand_ratio=t, norm=norm))
-                input_channel = output_channel
-
+                features.append(InvertedResidual(input_channels, output_channel, stride, expand_ratio=t))
+                input_channels = output_channel
         # Building last several layers.
-        features.append(
-            Conv2dNormActivation(input_channel, last_channel, kernel_size=1, norm=norm, activation=nn.ReLU6)
-        )
-        # Make it nn.CellList.
+        features.extend([
+            nn.Conv2d(input_channels, last_channels, 1, 1, pad_mode="pad", padding=0, has_bias=False),
+            nn.BatchNorm2d(last_channels),
+            nn.ReLU6()
+        ])
         self.features = nn.SequentialCell(features)
 
-        self.pool = GlobalAvgPooling(keep_dims=True)
-
-        self.classifier = nn.Conv2d(last_channel, num_classes, kernel_size=1, has_bias=True)
+        self.pool = GlobalAvgPooling()
+        self.dropout = nn.Dropout(keep_prob=0.8)  # confirmed by paper authors
+        self.classifier = nn.Dense(last_channels, num_classes)
         self._initialize_weights()
 
     def _initialize_weights(self) -> None:
@@ -196,32 +183,17 @@ class MobileNetV2(nn.Cell):
                 n = cell.kernel_size[0] * cell.kernel_size[1] * cell.out_channels
                 cell.weight.set_data(
                     init.initializer(init.Normal(sigma=math.sqrt(2. / n), mean=0.0),
-                                     cell.weight.shape,
-                                     cell.weight.dtype
-                                     ),
-                )
+                                     cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(
-                        init.initializer('zeros', cell.bias.shape, cell.bias.dtype)
-                    )
+                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(
-                    init.initializer('ones', cell.gamma.shape, cell.gamma.dtype)
-                )
-                cell.beta.set_data(
-                    init.initializer('zeros', cell.beta.shape, cell.beta.dtype)
-                )
+                cell.gamma.set_data(init.initializer('ones', cell.gamma.shape, cell.gamma.dtype))
+                cell.beta.set_data(init.initializer('zeros', cell.beta.shape, cell.beta.dtype))
             elif isinstance(cell, nn.Dense):
                 cell.weight.set_data(
-                    init.initializer(init.Normal(sigma=0.01, mean=0.0),
-                                     cell.weight.shape,
-                                     cell.weight.dtype
-                                     )
-                )
+                    init.initializer(init.Normal(sigma=0.01, mean=0.0), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(
-                        init.initializer('zeros', cell.bias.shape, cell.bias.dtype)
-                    )
+                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)
@@ -229,8 +201,8 @@ class MobileNetV2(nn.Cell):
 
     def forward_head(self, x: Tensor) -> Tensor:
         x = self.pool(x)
+        x = self.dropout(x)
         x = self.classifier(x)
-        x = ops.squeeze(x, axis=(2, 3))
         return x
 
     def construct(self, x: Tensor) -> Tensor:
