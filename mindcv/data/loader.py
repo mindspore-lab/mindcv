@@ -47,7 +47,7 @@ def create_loader(
                           python_multiprocessing=python_multiprocessing)
     if target_transform is None:
         target_transform = transforms.TypeCast(ms.int32)
-    target_input_columns = 'label' if 'label' in dataset.get_col_name() else 'fine_label'
+    target_input_columns = 'label' if 'label' in dataset.get_col_names() else 'fine_label'
     dataset = dataset.map(operations=target_transform,
                           input_columns=target_input_columns,
                           num_parallel_workers=num_parallel_workers,
