@@ -48,7 +48,7 @@ def create_scheduler(
                                           decay_steps,
                                           is_stair=True
                                           )
-    elif scheduler == 'const':
+    elif scheduler == 'constant':
         lr_scheduler = lr
     else:
         raise ValueError(f'Invalid scheduler: {scheduler}')
