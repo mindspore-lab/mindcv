@@ -299,6 +299,8 @@ class InceptionV3(nn.Cell):
 
         if self.training and self.aux_logits:
             aux_logits = self.AuxLogits(x)
+        else:
+            aux_logits = None
 
         x = self.forward_postaux(x)
         x = self.pool(x)

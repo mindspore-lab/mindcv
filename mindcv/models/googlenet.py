@@ -205,16 +205,18 @@ class GoogleNet(nn.Cell):
         x = self.maxpool3(x)
 
         x = self.block4a(x)
-        if self.aux1 is not None:
-            if self.training:
-                aux1 = self.aux1(x)
+        if self.aux1 and self.training:
+            aux1 = self.aux1(x)
+        else:
+            aux1 = None
 
         x = self.block4b(x)
         x = self.block4c(x)
         x = self.block4d(x)
-        if self.aux2 is not None:
-            if self.training:
-                aux2 = self.aux2(x)
+        if self.aux2 and self.training:
+            aux2 = self.aux2(x)
+        else:
+            aux2 = None
 
         x = self.block4e(x)
         x = self.maxpool4(x)
