@@ -1,9 +1,10 @@
-# MindSpore分类套件
+# MindSpore Computer Vision
 
-#### Changes 
+MindSpore Computer Vision is an open source computer vision research toolbox based on MindSpore in computer vision direction. It is mainly used for the development of image tasks and includes a large number of classic and cutting-edge deep learning classification models, such as ResNet, ViT, and SwinTransformer.
 
+## Changes 
 
-###### 2022/09/06
+### 2022/09/06
 
 * loss factory 
 1. Remove args param, use detailed loss-related params
@@ -27,40 +28,82 @@
 3. label smoothing support for BCE
 4. label data type changed to float for using BCE loss
 
-#### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+## Major Features
 
-#### 软件架构
-软件架构说明
+- Various backbones based on CNN and Transformer and pretrained models
+- High efficiency, extensibility and compatibility(GPU/CPU/Ascend)
+- Easy-to-use API
 
+## Base Structure
 
-#### 安装教程
+MindSpore Computer Vision, a MindSpore base Python package, provides high-level features:
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+- Base backbone of models like resnet and mobilenet series.
+- Deep neural networks' workflows which contain loss, optimizers, lr_scheduler.
+- Domain oriented rich dataset interface.
 
-#### 使用说明
+## Dependency
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+- mindspore >= 1.8.1
+- numpy >= 1.17.0
+- pyyaml >= 5.3
+- tqdm
 
-#### 参与贡献
+## Installation
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request!
+The following instructions assume that you have desired dependency installed and working.
 
+- Anaconda:
 
-#### 特技
+```shell
+conda install mindcv
+```
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+- pip:
+
+```shell
+pip install mindcv
+```
+
+- From source:
+
+```shell
+# Clone the mindcv repository.
+git clone https://github.com/mindlab-ai/mindcv.git
+cd mindspore-classification
+
+# Install
+python setup.py install
+```
+
+## Get Started
+See [Get Started With Mindcv](quick_tour.ipynb)  to learn about basic usage.
+
+## License
+
+This project is released under the [Eclipse Public License 1.0](LICENSE).
+
+## Feedbacks and Contact
+
+The dynamic version is still under development, if you find any issue or have an idea on new features, please don't hesitate to contact us via [issue](https://github.com/mindlab-ai/mindcv/issues).
+
+## Acknowledgement
+
+MindSpore is an open source project that welcome any contribution and feedback. We wish that the toolbox and benchmark could serve the growing research community by providing a flexible as well as standardized toolkit to reimplement existing methods and develop their own new computer vision methods.
+
+## Contributing
+
+We appreciate all contributions to improve MindSpore Vision. Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline.
+
+## Citation
+
+If you find this project useful in your research, please consider citing:
+
+```latex
+@misc{MindSpore Computer Vision 2022,
+    title={{MindSpore Computer  Vision}:MindSpore Computer Vision Toolbox and Benchmark},
+    author={MindSpore Vision Contributors},
+    howpublished = {\url{https://github.com/mindlab-ai/mindcv/}},
+    year={2022}
+}
+```
