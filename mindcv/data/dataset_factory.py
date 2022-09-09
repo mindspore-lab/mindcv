@@ -48,6 +48,8 @@ def create_dataset(
         dataset_download = _MINDSPORE_BASIC_DATASET[name][1]
         dataset_new_path = None
         if download:
+            if shard_id is not None:
+                root = os.path.join(root, 'dataset_{}'.format(str(shard_id)))
             dataset_download = dataset_download(root)
             dataset_download.download()
             dataset_new_path = dataset_download.path
