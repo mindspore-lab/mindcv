@@ -125,9 +125,9 @@ def create_parser():
 
     # Scheduler parameters
     group = parser.add_argument_group('Scheduler parameters')
-    group.add_argument('--scheduler', type=str, default='const',
-                       choices=['const', 'warmup_cosine_decay', 'exponential_decay', 'step_decay'],
-                       help='Type of scheduler (default="const")')
+    group.add_argument('--scheduler', type=str, default='constant',
+                       choices=['constant', 'warmup_cosine_decay', 'exponential_decay', 'step_decay'],
+                       help='Type of scheduler (default="constant")')
     group.add_argument('--lr', type=float, default=0.01,
                        help='learning rate (default=0.01)')
     group.add_argument('--min_lr', type=float, default=None,
