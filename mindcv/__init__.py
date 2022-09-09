@@ -12,5 +12,10 @@
 # limitations under the License.
 # ============================================================================
 
+from .data import *
+from .loss import *
+from .models import *
+from .optim import *
+from .scheduler import *
+from .utils import *
 from .version import __version__
-from .models import list_models, is_model, list_modules, model_entrypoint, is_model_in_modules, is_model_pretrained
