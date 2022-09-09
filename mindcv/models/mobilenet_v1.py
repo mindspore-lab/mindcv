@@ -1,16 +1,7 @@
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ============================================================================
+"""
+MindSpore implementation of MobileNetV1.
+Refer to MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications.
+"""
 
 import math
 
@@ -49,63 +40,61 @@ default_cfgs = {
 }
 
 
-def conv_bn_relu(in_channels: int,
-                 out_channels: int,
-                 kernel_size: int,
-                 stride: int,
-                 depthwise: bool,
-                 activation: str = 'relu6') -> nn.SequentialCell:
-    output = []
-    output.append(nn.Conv2d(in_channels, out_channels, kernel_size, stride, pad_mode="same",
-                            group=1 if not depthwise else in_channels))
-    output.append(nn.BatchNorm2d(out_channels))
-    if activation:
-        output.append(nn.get_activation(activation))
-    return nn.SequentialCell(output)
+def conv_bn_relu(inp: int, oup: int, stride: int, alpha: float = 1) -> nn.SequentialCell:
+    oup = int(oup * alpha)  # Note: since conv_bn_relu is used as stem, only out_channels is scaled.
+    return nn.SequentialCell([
+        nn.Conv2d(inp, oup, 3, stride, pad_mode="pad", padding=1, has_bias=False),
+        nn.BatchNorm2d(oup),
+        nn.ReLU()
+    ])
+
+
+def depthwise_separable_conv(inp: int, oup: int, stride: int, alpha: float = 1) -> nn.SequentialCell:
+    inp = int(inp * alpha)
+    oup = int(oup * alpha)
+    return nn.SequentialCell(
+        # dw
+        nn.Conv2d(inp, inp, 3, stride, pad_mode="pad", padding=1, groups=inp, has_bias=False),
+        nn.BatchNorm2d(inp),
+        nn.ReLU(),
+        # pw
+        nn.Conv2d(inp, oup, 1, 1, pad_mode="pad", padding=0, has_bias=False),
+        nn.BatchNorm2d(oup),
+        nn.ReLU(),
+    )
 
 
 class MobileNetV1(nn.Cell):
+    r"""MobileNetV1 model class, based on
+    `"MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications" <https://arxiv.org/abs/1704.04861>`_
+
+    Args:
+        alpha (int) : scale factor of model width. Default: 3.
+        in_channels(int): number the channels of the input. Default: 3.
+        num_classes (int) : number of classification classes. Default: 1000.
+    """
+
     def __init__(self,
                  alpha: float = 1.,
                  num_classes: int = 1000,
                  in_channels: int = 3) -> None:
         super(MobileNetV1, self).__init__()
-        self.layers = [
-            conv_bn_relu(in_channels, int(32 * alpha), 3, 2, False),  # Conv0
-            conv_bn_relu(int(32 * alpha), int(32 * alpha), 3, 1, True),  # Conv1_depthwise
-            conv_bn_relu(int(32 * alpha), int(64 * alpha), 1, 1, False),  # Conv1_pointwise
-            conv_bn_relu(int(64 * alpha), int(64 * alpha), 3, 2, True),  # Conv2_depthwise
-            conv_bn_relu(int(64 * alpha), int(128 * alpha), 1, 1, False),  # Conv2_pointwise
-
-            conv_bn_relu(int(128 * alpha), int(128 * alpha), 3, 1, True),  # Conv3_depthwise
-            conv_bn_relu(int(128 * alpha), int(128 * alpha), 1, 1, False),  # Conv3_pointwise
-            conv_bn_relu(int(128 * alpha), int(128 * alpha), 3, 2, True),  # Conv4_depthwise
-            conv_bn_relu(int(128 * alpha), int(256 * alpha), 1, 1, False),  # Conv4_pointwise
-
-            conv_bn_relu(int(256 * alpha), int(256 * alpha), 3, 1, True),  # Conv5_depthwise
-            conv_bn_relu(int(256 * alpha), int(256 * alpha), 1, 1, False),  # Conv5_pointwise
-            conv_bn_relu(int(256 * alpha), int(256 * alpha), 3, 2, True),  # Conv6_depthwise
-            conv_bn_relu(int(256 * alpha), int(512 * alpha), 1, 1, False),  # Conv6_pointwise
-
-            conv_bn_relu(int(512 * alpha), int(512 * alpha), 3, 1, True),  # Conv7_depthwise
-            conv_bn_relu(int(512 * alpha), int(512 * alpha), 1, 1, False),  # Conv7_pointwise
-            conv_bn_relu(int(512 * alpha), int(512 * alpha), 3, 1, True),  # Conv8_depthwise
-            conv_bn_relu(int(512 * alpha), int(512 * alpha), 1, 1, False),  # Conv8_pointwise
-            conv_bn_relu(int(512 * alpha), int(512 * alpha), 3, 1, True),  # Conv9_depthwise
-            conv_bn_relu(int(512 * alpha), int(512 * alpha), 1, 1, False),  # Conv9_pointwise
-            conv_bn_relu(int(512 * alpha), int(512 * alpha), 3, 1, True),  # Conv10_depthwise
-            conv_bn_relu(int(512 * alpha), int(512 * alpha), 1, 1, False),  # Conv10_pointwise
-            conv_bn_relu(int(512 * alpha), int(512 * alpha), 3, 1, True),  # Conv11_depthwise
-            conv_bn_relu(int(512 * alpha), int(512 * alpha), 1, 1, False),  # Conv11_pointwise
-
-            conv_bn_relu(int(512 * alpha), int(512 * alpha), 3, 2, True),  # Conv12_depthwise
-            conv_bn_relu(int(512 * alpha), int(1024 * alpha), 1, 1, False),  # Conv12_pointwise
-            conv_bn_relu(int(1024 * alpha), int(1024 * alpha), 3, 1, True),  # Conv13_depthwise
-            conv_bn_relu(int(1024 * alpha), int(1024 * alpha), 1, 1, False),  # Conv13_pointwise
-
-        ]
-
-        self.features = nn.SequentialCell(self.layers)
+        self.features = nn.SequentialCell([
+            conv_bn_relu(in_channels, 32, 2, alpha),
+            depthwise_separable_conv(32, 64, 1, alpha),
+            depthwise_separable_conv(64, 128, 2, alpha),
+            depthwise_separable_conv(128, 128, 1, alpha),
+            depthwise_separable_conv(128, 256, 2, alpha),
+            depthwise_separable_conv(256, 256, 1, alpha),
+            depthwise_separable_conv(256, 512, 2, alpha),
+            depthwise_separable_conv(512, 512, 1, alpha),
+            depthwise_separable_conv(512, 512, 1, alpha),
+            depthwise_separable_conv(512, 512, 1, alpha),
+            depthwise_separable_conv(512, 512, 1, alpha),
+            depthwise_separable_conv(512, 512, 1, alpha),
+            depthwise_separable_conv(512, 1024, 2, alpha),
+            depthwise_separable_conv(1024, 1024, 1, alpha),
+        ])
         self.pool = GlobalAvgPooling()
         self.classifier = nn.Dense(int(1024 * alpha), num_classes)
         self._initialize_weights()
@@ -116,32 +105,17 @@ class MobileNetV1(nn.Cell):
                 n = cell.kernel_size[0] * cell.kernel_size[1] * cell.out_channels
                 cell.weight.set_data(
                     init.initializer(init.Normal(sigma=math.sqrt(2. / n), mean=0.0),
-                                     cell.weight.shape,
-                                     cell.weight.dtype
-                                     ),
-                )
+                                     cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(
-                        init.initializer('zeros', cell.bias.shape, cell.bias.dtype)
-                    )
+                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(
-                    init.initializer('ones', cell.gamma.shape, cell.gamma.dtype)
-                )
-                cell.beta.set_data(
-                    init.initializer('zeros', cell.beta.shape, cell.beta.dtype)
-                )
+                cell.gamma.set_data(init.initializer('ones', cell.gamma.shape, cell.gamma.dtype))
+                cell.beta.set_data(init.initializer('zeros', cell.beta.shape, cell.beta.dtype))
             elif isinstance(cell, nn.Dense):
                 cell.weight.set_data(
-                    init.initializer(init.Normal(sigma=0.01, mean=0.0),
-                                     cell.weight.shape,
-                                     cell.weight.dtype
-                                     )
-                )
+                    init.initializer(init.Normal(sigma=0.01, mean=0.0), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(
-                        init.initializer('zeros', cell.bias.shape, cell.bias.dtype)
-                    )
+                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)
