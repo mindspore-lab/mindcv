@@ -165,7 +165,7 @@ class TransformerEncoder(nn.Cell):
                  activation: nn.Cell = nn.GELU,
                  norm: nn.Cell = nn.LayerNorm) -> None:
         super(TransformerEncoder, self).__init__()
-        dpr = [i for i in ops.linspace(0., drop_path_rate, num_layers)]
+        dpr = [i for i in ops.linspace(Tensor(0.), Tensor(drop_path_rate), num_layers)]
 
         layers = []
         for i in range(num_layers):
