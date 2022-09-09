@@ -69,7 +69,7 @@ class MobileNetV1(nn.Cell):
     `"MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications" <https://arxiv.org/abs/1704.04861>`_
 
     Args:
-        alpha (int) : scale factor of model width. Default: 3.
+        alpha (float) : scale factor of model width. Default: 3.
         in_channels(int): number the channels of the input. Default: 3.
         num_classes (int) : number of classification classes. Default: 1000.
     """
