@@ -54,7 +54,7 @@ def depthwise_separable_conv(inp: int, oup: int, stride: int, alpha: float = 1) 
     oup = int(oup * alpha)
     return nn.SequentialCell(
         # dw
-        nn.Conv2d(inp, inp, 3, stride, pad_mode="pad", padding=1, groups=inp, has_bias=False),
+        nn.Conv2d(inp, inp, 3, stride, pad_mode="pad", padding=1, group=inp, has_bias=False),
         nn.BatchNorm2d(inp),
         nn.ReLU(),
         # pw
