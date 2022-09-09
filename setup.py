@@ -76,7 +76,7 @@ setup(
     description="An open source computer vision research tool box.",
     license='Eclipse Public License 1.0',
     include_package_data=True,
-    packages = [package_name],
+    packages = find_packages(exclude=("mindcv")),
     cmdclass={
         'egg_info': EggInfo,
         'build_py': BuildPy,
