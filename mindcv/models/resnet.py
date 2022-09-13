@@ -1,4 +1,19 @@
-from typing import Optional, Type, List, Union
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+from typing import Optional, Type, List, Union, Dict
 
 import mindspore.nn as nn
 from mindspore import Tensor
@@ -51,7 +66,8 @@ class BasicBlock(nn.Cell):
                  groups: int = 1,
                  base_width: int = 64,
                  norm: Optional[nn.Cell] = None,
-                 down_sample: Optional[nn.Cell] = None
+                 down_sample: Optional[nn.Cell] = None,
+                 block_kwargs: Optional[Dict] = None
                  ) -> None:
         super(BasicBlock, self).__init__()
         if norm is None:
@@ -67,6 +83,7 @@ class BasicBlock(nn.Cell):
                                stride=1, padding=1, pad_mode='pad')
         self.bn2 = norm(out_channels)
         self.down_sample = down_sample
+        self.block_kwargs = block_kwargs
 
     def construct(self, x: Tensor) -> Tensor:
         identity = x
@@ -97,7 +114,8 @@ class Bottleneck(nn.Cell):
                  groups: int = 1,
                  base_width: int = 64,
                  norm: Optional[nn.Cell] = None,
-                 down_sample: Optional[nn.Cell] = None
+                 down_sample: Optional[nn.Cell] = None,
+                 block_kwargs: Optional[Dict] = None
                  ) -> None:
         super(Bottleneck, self).__init__()
         if norm is None:
@@ -115,6 +133,7 @@ class Bottleneck(nn.Cell):
         self.bn3 = norm(out_channels * self.expansion)
         self.relu = nn.ReLU()
         self.down_sample = down_sample
+        self.block_kwargs = block_kwargs
 
     def construct(self, x: Tensor) -> Tensor:
 
@@ -149,7 +168,8 @@ class ResNet(nn.Cell):
                  in_channels: int = 3,
                  groups: int = 1,
                  base_width: int = 64,
-                 norm: Optional[nn.Cell] = None
+                 norm: Optional[nn.Cell] = None,
+                 block_kwargs: Optional[Dict] = None
                  ) -> None:
         super(ResNet, self).__init__()
         if norm is None:
@@ -160,6 +180,7 @@ class ResNet(nn.Cell):
         self.input_channels = 64
         self.groups = groups
         self.base_with = base_width
+        self.block_kwargs = block_kwargs
 
         self.conv1 = nn.Conv2d(in_channels, self.input_channels, kernel_size=7,
                                stride=2, pad_mode='pad', padding=3)
@@ -198,7 +219,8 @@ class ResNet(nn.Cell):
                 down_sample=down_sample,
                 groups=self.groups,
                 base_width=self.base_with,
-                norm=self.norm
+                norm=self.norm,
+                block_kwargs=self.block_kwargs
             )
         )
         self.input_channels = channels * block.expansion
@@ -210,7 +232,8 @@ class ResNet(nn.Cell):
                     channels,
                     groups=self.groups,
                     base_width=self.base_with,
-                    norm=self.norm
+                    norm=self.norm,
+                    block_kwargs=self.block_kwargs
                 )
             )
 
