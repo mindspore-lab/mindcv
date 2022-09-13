@@ -13,8 +13,8 @@ _MINDSPORE_BASIC_DATASET = dict(
 
 
 def create_dataset(
-        name,
-        root,
+        name: str = '',
+        root: str = './',
         split: str = 'train',
         shuffle: Optional[bool] = None,
         sampler=None,
@@ -24,6 +24,34 @@ def create_dataset(
         download: bool = False,
         **kwargs
 ):
+    '''
+    name: dataset name, if empty '' or non-standard dataset name, then process as customized dataset.    
+    root: dataset root dir. 
+    split: subfolder of root dir, e.g., train, val, test
+
+    
+    For custom datasets and imagenet, the dataset dir should follow the structure like: 
+    .dataset_name/
+    ├── train/  
+    │  ├── class1/
+    │  │   ├── 000001.jpg
+    │  │   ├── 000002.jpg
+    │  │   └── ....
+    │  └── class2/
+    │      ├── 000001.jpg
+    │      ├── 000002.jpg
+    │      └── ....
+    └── val/   
+       ├── class1/
+       │   ├── 000001.jpg
+       │   ├── 000002.jpg
+       │   └── ....
+       └── class2/
+           ├── 000001.jpg
+           ├── 000002.jpg
+           └── ....
+
+    '''
     name = name.lower()
     mindspore_kwargs = dict(shuffle=shuffle, sampler=sampler, num_shards=num_shards, shard_id=shard_id,
                             num_parallel_workers=num_parallel_workers, **kwargs)
@@ -41,14 +69,12 @@ def create_dataset(
         dataset = dataset_class(dataset_dir=dataset_new_path if dataset_new_path else root,
                                 usage=split,
                                 **mindspore_kwargs)
+    else:
+        if name == "imagenet" and download:
+            raise ValueError("Imagenet dataset download is not supported.")
 
-    elif name == 'image_folder' or name == 'folder' or name == 'imagenet':
-        if download:
-            raise ValueError("Dataset download is not supported.")
         if os.path.isdir(root):
             root = os.path.join(root, split)
         dataset = ImageFolderDataset(dataset_dir=root, **mindspore_kwargs)
-    else:
-        assert False, "Unknown dataset"
 
     return dataset
