@@ -120,21 +120,20 @@ class MobileNetV2(nn.Cell):
     `"MobileNetV2: Inverted Residuals and Linear Bottlenecks" <https://arxiv.org/abs/1801.04381>`_
 
     Args:
-        alpha (float) : scale factor of model width. Default: 3.
+        alpha (float) : scale factor of model width. Default: 1.
+        round_nearest (int) : divisor of make divisible function. Default: 8.
         in_channels(int): number the channels of the input. Default: 3.
         num_classes (int) : number of classification classes. Default: 1000.
-        round_nearest (int) : divisor of make divisible function. Default: 8.
     """
 
     def __init__(self,
                  alpha: float = 1.0,
                  round_nearest: int = 8,
-                 num_classes: int = 1000,
-                 in_channels: int = 3
+                 in_channels: int = 3,
+                 num_classes: int = 1000
                  ) -> None:
         super(MobileNetV2, self).__init__()
         input_channels = make_divisible(32 * alpha, round_nearest)
-        last_channels = make_divisible(1280 * max(1.0, alpha), round_nearest)
         # Setting of inverted residual blocks.
         # t: The expansion factor.
         # c: Number of output channel.
@@ -150,6 +149,7 @@ class MobileNetV2(nn.Cell):
             [6, 160, 3, 2],
             [6, 320, 1, 1],
         ]
+        last_channels = make_divisible(1280 * max(1.0, alpha), round_nearest)
 
         # Building stem conv layer.
         features = [
@@ -164,7 +164,7 @@ class MobileNetV2(nn.Cell):
                 stride = s if i == 0 else 1
                 features.append(InvertedResidual(input_channels, output_channel, stride, expand_ratio=t))
                 input_channels = output_channel
-        # Building last several layers.
+        # Building last point-wise layers.
         features.extend([
             nn.Conv2d(input_channels, last_channels, 1, 1, pad_mode="pad", padding=0, has_bias=False),
             nn.BatchNorm2d(last_channels),
@@ -173,8 +173,10 @@ class MobileNetV2(nn.Cell):
         self.features = nn.SequentialCell(features)
 
         self.pool = GlobalAvgPooling()
-        self.dropout = nn.Dropout(keep_prob=0.8)  # confirmed by paper authors
-        self.classifier = nn.Dense(last_channels, num_classes)
+        self.classifier = nn.SequentialCell([
+            nn.Dropout(keep_prob=0.8),  # confirmed by paper authors
+            nn.Dense(last_channels, num_classes)
+        ])
         self._initialize_weights()
 
     def _initialize_weights(self) -> None:
@@ -201,7 +203,6 @@ class MobileNetV2(nn.Cell):
 
     def forward_head(self, x: Tensor) -> Tensor:
         x = self.pool(x)
-        x = self.dropout(x)
         x = self.classifier(x)
         return x
 
