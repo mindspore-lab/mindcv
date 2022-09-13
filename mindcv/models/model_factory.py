@@ -10,7 +10,7 @@ def create_model(
         checkpoint_path: str = '',
         **kwargs):
 
-    if checkpoint_path is not '' and pretrained:
+    if checkpoint_path != '' and pretrained:
         raise ValueError('checkpoint_path is mutually exclusive with pretrained')
 
     model_args = dict(num_classes=num_classes, pretrained=pretrained, in_channels=in_channels)
