@@ -1,5 +1,6 @@
 import mindspore.nn as nn
 from typing import Optional
+from .adan import Adan 
 
 
 def init_group_params(params, weight_decay):
@@ -28,6 +29,9 @@ def create_optimizer(
         filter_bias_and_bn: bool = True,
         loss_scale: float = 1.0,
         **kwargs):
+    '''
+    opt: optimizer name, default 'adam' for covolution-based networks. 'AdamW' is recommended for ViT-based networks.
+    '''
 
     opt = opt.lower()
 
@@ -72,6 +76,12 @@ def create_optimizer(
                                        learning_rate=lr,
                                        weight_decay=weight_decay,
                                        **opt_args)
+    elif opt == 'adan':
+        optimizer = Adan(params=params,
+                            learning_rate=lr,
+                            weight_decay=weight_decay,
+                            loss_scale=loss_scale,
+                            **opt_args)
     elif opt == 'rmsprop':
         optimizer = nn.RMSProp(params=params,
                                learning_rate=lr,
