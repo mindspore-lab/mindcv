@@ -1,0 +1,57 @@
+# system config
+mode: 0
+distribute: True
+num_parallel_workers: 8
+
+# dataset config
+dataset: 'imagenet'
+data_dir: ''
+shuffle: True
+dataset_download: False
+batch_size: 32
+drop_remainder: True
+
+# Augmentation config
+image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+interpolation: 'bilinear'
+crop_pct: 0.875
+color_jitter: [0.4, 0.4, 0.4]
+re_prob: 0.5
+
+# model config
+model: 'squeezenet1_1'
+num_classes: 1000
+pretrained: False
+ckpt_path: ''
+keep_checkpoint_max: 10
+ckpt_save_dir: './'
+epoch_size: 200
+dataset_sink_mode: True
+amp_level: 'O0'
+
+# loss config
+loss: 'CE'
+label_smoothing: 0.1
+
+# lr scheduler config
+scheduler: 'warmup_cosine_decay' # model_zoo中是polynomial
+min_lr: 0.0
+lr: 0.01
+warmup_epochs: 0
+decay_epochs: 200
+
+# optimizer config
+opt: 'momentum'
+filter_bias_and_bn: True
+momentum: 0.9
+weight_decay: 0.00007
+loss_scale: 1024
+use_nesterov: False
+
+
+
+
+
