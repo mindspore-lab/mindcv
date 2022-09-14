@@ -1,4 +1,4 @@
-from mindspore.nn import ExponentialDecayLR
+from mindspore.nn import ExponentialDecayLR, PolynomialDecayLR
 
 from .warmup_cosine_decay_lr import WarmupCosineDecayLR
 
@@ -15,12 +15,13 @@ def create_scheduler(
     r"""
     Args:
         steps_per_epoch: number of steps per epoch
-        scheduler: 'constant' constant lr, 'warmup_consine_decay', 'step_decay', 'exponential_decay'  
+        scheduler: 'constant' for constant lr, 'warmup_consine_decay', 'step_decay', 'exponential_decay', 'polynomial_decay' 
         lr: learning rate value. 
-        min_lr: lower lr bound for cyclic/cosine schedulers that hit 0 (1e-5)
+        min_lr: lower lr bound for cyclic/cosine/polynomial schedulers
         warmup_epochs: epochs to warmup LR, if scheduler supports 
-        decay_epochs: epochs to decay LR to min_lr for cyclic schedulers. decay LR by decay_rate every `decay_epochs` for exponential scheduler and step LR scheduler
+        decay_epochs: epochs to decay LR to min_lr for cyclic and polynomial schedulers. decay LR by a factor of decay_rate every `decay_epochs` for exponential scheduler and step LR scheduler
         decay_rate: LR decay rate (default: 0.9) 
+
     
     Returns: 
         Cell object for computing LR with input of current global steps 
@@ -40,6 +41,14 @@ def create_scheduler(
                                           decay_steps,
                                           is_stair=False
                                           )
+    elif scheduler == 'polynomial_decay':
+        decay_steps = decay_epochs * steps_per_epoch
+        lr_scheduler = PolynomialDecayLR(lr, 
+                                         min_lr, # end_learning_rate 
+                                         decay_steps, 
+                                         power=decay_rate, # overload decay_rate as polynomial power 
+                                         update_decay_steps=False)
+
     elif scheduler == 'step_decay':
         decay_steps = decay_epochs * steps_per_epoch
         # decay LR by decay_rate every `decay_steps`
