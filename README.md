@@ -2,32 +2,6 @@
 
 MindSpore Computer Vision is an open source computer vision research toolbox based on MindSpore in computer vision direction. It is mainly used for the development of image tasks and includes a large number of classic and cutting-edge deep learning classification models, such as ResNet, ViT, and SwinTransformer.
 
-## Changes 
-
-### 2022/09/06
-
-* loss factory 
-1. Remove args param, use detailed loss-related params
-2. Add BCE loss
-3. add class weighted loss support, weighted BCE loss and weighted CE loss. 
-4. change arg name `smooth_factor` to `label_smoothing`  
-5. change loss type and param organization structure. 
-6. add test code 
-
-* optim factory 
-1. adjust APIs, remove args
-2. add adam, adamW, lamb, adagrad
-
-* scheduler factory
-1. reorganize code, remove args
-2. support Step decay LR, exponential decay LR. 
-
-* TODOs:
-1. test loss computation correctness 
-2. check adamW difference compared to pytorch
-3. label smoothing support for BCE
-4. label data type changed to float for using BCE loss
-
 ## Major Features
 
 - Various backbones based on CNN and Transformer and pretrained models
@@ -70,6 +44,46 @@ python setup.py install
 
 ## Get Started
 See [Get Started With MindCV](quick_tour.ipynb)  to learn about basic usage.
+
+
+## Changes 
+
+### 2022/09/13
+* optim factory 
+1. Add Adan optimizer (experimental), tested in non-dist graph mode. 
+
+* dataset factory 
+1. Adjust interface for custom data. 
+
+* test
+1. unit test for optim and models
+2. test scripts for finetuning and customized dataset 
+
+### 2022/09/06
+
+* loss factory 
+1. Remove args param, use detailed loss-related params
+2. Add BCE loss
+3. add class weighted loss support, weighted BCE loss and weighted CE loss. 
+4. change arg name `smooth_factor` to `label_smoothing`  
+5. change loss type and param organization structure. 
+6. add test code 
+
+* optim factory 
+1. adjust APIs, remove args
+2. add adam, adamW, lamb, adagrad
+
+* scheduler factory
+1. reorganize code, remove args
+2. support Step decay LR, exponential decay LR. 
+
+* TODOs:
+1. test loss computation correctness 
+2. check adamW difference compared to pytorch
+3. label smoothing support for BCE
+4. label data type changed to float for using BCE loss
+
+
 
 ## License
 
