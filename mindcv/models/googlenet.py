@@ -1,3 +1,8 @@
+"""
+MindSpore implementation of GoogLeNet.
+Refer to Going deeper with convolutions.
+"""
+
 from typing import Union, Tuple
 
 import mindspore.nn as nn
@@ -10,7 +15,7 @@ from .registry import register_model
 from .layers.pooling import GlobalAvgPooling
 
 __all__ = [
-    'GoogleNet',
+    'GoogLeNet',
     'googlenet'
 ]
 
@@ -39,46 +44,41 @@ class BasicConv2d(nn.Cell):
                  pad_mode: str = 'same'
                  ) -> None:
         super(BasicConv2d, self).__init__()
-        self.conv = nn.Conv2d(in_channels,
-                              out_channels,
-                              kernel_size=kernel_size,
-                              stride=stride,
-                              padding=padding,
-                              pad_mode=pad_mode)
-        self.bn = nn.BatchNorm2d(out_channels, eps=0.001)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
+                              padding=padding, pad_mode=pad_mode)
         self.relu = nn.ReLU()
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.conv(x)
-        x = self.bn(x)
         x = self.relu(x)
         return x
 
 
 class Inception(nn.Cell):
+    """Inception module of GoogLeNet."""
 
     def __init__(self,
                  in_channels: int,
-                 n1x1: int,
-                 n3x3red: int,
-                 n3x3: int,
-                 n5x5red: int,
-                 n5x5: int,
-                 pool_planes: int) -> None:
+                 ch1x1: int,
+                 ch3x3red: int,
+                 ch3x3: int,
+                 ch5x5red: int,
+                 ch5x5: int,
+                 pool_proj: int
+                 ) -> None:
         super(Inception, self).__init__()
-        self.b1 = BasicConv2d(in_channels, n1x1, kernel_size=1)
+        self.b1 = BasicConv2d(in_channels, ch1x1, kernel_size=1)
         self.b2 = nn.SequentialCell([
-            BasicConv2d(in_channels, n3x3red, kernel_size=1),
-            BasicConv2d(n3x3red, n3x3, kernel_size=3)
+            BasicConv2d(in_channels, ch3x3red, kernel_size=1),
+            BasicConv2d(ch3x3red, ch3x3, kernel_size=3)
         ])
         self.b3 = nn.SequentialCell([
-            BasicConv2d(in_channels, n5x5red, kernel_size=1),
-            BasicConv2d(n5x5red, n5x5, kernel_size=3)
+            BasicConv2d(in_channels, ch5x5red, kernel_size=1),
+            BasicConv2d(ch5x5red, ch5x5, kernel_size=5)
         ])
-
         self.b4 = nn.SequentialCell([
             nn.MaxPool2d(kernel_size=3, stride=1, pad_mode='same'),
-            BasicConv2d(in_channels, pool_planes, kernel_size=1)
+            BasicConv2d(in_channels, pool_proj, kernel_size=1)
         ])
 
     def construct(self, x: Tensor) -> Tensor:
@@ -115,7 +115,17 @@ class InceptionAux(nn.Cell):
         return x
 
 
-class GoogleNet(nn.Cell):
+class GoogLeNet(nn.Cell):
+    r"""GoogLeNet (Inception v1) model architecture from
+    `"Going Deeper with Convolutions" <https://arxiv.org/abs/1409.4842>`_.
+
+    Args:
+        num_classes (int) : number of classification classes. Default: 1000.
+        aux_logits (int) : use auxiliary classifier or not. Default: False.
+        in_channels (int): number the channels of the input. Default: 3.
+        drop_rate (float) : dropout rate of the layer before main classifier.
+        drop_rate_aux (float) : dropout rate of the layer before auxiliary classifier.
+    """
 
     def __init__(self,
                  num_classes: int = 1000,
@@ -124,7 +134,7 @@ class GoogleNet(nn.Cell):
                  drop_rate: float = 0.2,
                  drop_rate_aux: float = 0.7
                  ) -> None:
-        super(GoogleNet, self).__init__()
+        super(GoogLeNet, self).__init__()
         self.aux_logits = aux_logits
         self.conv1 = BasicConv2d(in_channels, 64, kernel_size=7, stride=2)
         self.maxpool1 = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")
@@ -133,30 +143,26 @@ class GoogleNet(nn.Cell):
         self.conv3 = BasicConv2d(64, 192, kernel_size=3)
         self.maxpool2 = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")
 
-        self.block3a = Inception(192, 64, 96, 128, 16, 32, 32)
-        self.block3b = Inception(256, 128, 128, 192, 32, 96, 64)
+        self.inception3a = Inception(192, 64, 96, 128, 16, 32, 32)
+        self.inception3b = Inception(256, 128, 128, 192, 32, 96, 64)
         self.maxpool3 = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")
 
-        self.block4a = Inception(480, 192, 96, 208, 16, 48, 64)
-        self.block4b = Inception(512, 160, 112, 224, 24, 64, 64)
-        self.block4c = Inception(512, 128, 128, 256, 24, 64, 64)
-        self.block4d = Inception(512, 112, 144, 288, 32, 64, 64)
-        self.block4e = Inception(528, 256, 160, 320, 32, 128, 128)
+        self.inception4a = Inception(480, 192, 96, 208, 16, 48, 64)
+        self.inception4b = Inception(512, 160, 112, 224, 24, 64, 64)
+        self.inception4c = Inception(512, 128, 128, 256, 24, 64, 64)
+        self.inception4d = Inception(512, 112, 144, 288, 32, 64, 64)
+        self.inception4e = Inception(528, 256, 160, 320, 32, 128, 128)
         self.maxpool4 = nn.MaxPool2d(kernel_size=2, stride=2, pad_mode="same")
 
-        self.block5a = Inception(832, 256, 160, 320, 32, 128, 128)
-        self.block5b = Inception(832, 384, 192, 384, 48, 128, 128)
+        self.inception5a = Inception(832, 256, 160, 320, 32, 128, 128)
+        self.inception5b = Inception(832, 384, 192, 384, 48, 128, 128)
 
-        if aux_logits:
+        if self.aux_logits:
             self.aux1 = InceptionAux(512, num_classes, drop_rate=drop_rate_aux)
             self.aux2 = InceptionAux(528, num_classes, drop_rate=drop_rate_aux)
-        else:
-            self.aux1 = None
-            self.aux2 = None
 
-        self.dropout = nn.Dropout(keep_prob=1 - drop_rate)
         self.pool = GlobalAvgPooling()
-
+        self.dropout = nn.Dropout(keep_prob=1 - drop_rate)
         self.classifier = nn.Dense(1024, num_classes)
         self._initialize_weights()
 
@@ -164,19 +170,13 @@ class GoogleNet(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 cell.weight.set_data(
-                    init.initializer(init.TruncatedNormal(0.02),
-                                     cell.weight.shape, cell.weight.dtype)
-                )
+                    init.initializer(init.TruncatedNormal(0.02), cell.weight.shape, cell.weight.dtype))
             elif isinstance(cell, nn.Dense):
                 cell.weight.set_data(
-                    init.initializer(init.TruncatedNormal(0.02),
-                                     cell.weight.shape, cell.weight.dtype)
-                )
+                    init.initializer(init.TruncatedNormal(0.02), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(
-                        init.initializer(init.TruncatedNormal(0.02),
-                                         cell.bias.shape, cell.bias.dtype)
-                    )
+                        init.initializer(init.TruncatedNormal(0.02), cell.bias.shape, cell.bias.dtype))
 
     def construct(self, x: Tensor) -> Union[Tensor, Tuple[Tensor, Tensor, Tensor]]:
         x = self.conv1(x)
@@ -186,29 +186,29 @@ class GoogleNet(nn.Cell):
         x = self.conv3(x)
         x = self.maxpool2(x)
 
-        x = self.block3a(x)
-        x = self.block3b(x)
+        x = self.inception3a(x)
+        x = self.inception3b(x)
         x = self.maxpool3(x)
 
-        x = self.block4a(x)
-        if self.aux1 and self.training:
+        x = self.inception4a(x)
+        if self.aux_logits and self.training:
             aux1 = self.aux1(x)
         else:
             aux1 = None
 
-        x = self.block4b(x)
-        x = self.block4c(x)
-        x = self.block4d(x)
-        if self.aux2 and self.training:
+        x = self.inception4b(x)
+        x = self.inception4c(x)
+        x = self.inception4d(x)
+        if self.aux_logits and self.training:
             aux2 = self.aux2(x)
         else:
             aux2 = None
 
-        x = self.block4e(x)
+        x = self.inception4e(x)
         x = self.maxpool4(x)
 
-        x = self.block5a(x)
-        x = self.block5b(x)
+        x = self.inception5a(x)
+        x = self.inception5b(x)
 
         x = self.pool(x)
         x = self.dropout(x)
@@ -220,9 +220,9 @@ class GoogleNet(nn.Cell):
 
 
 @register_model
-def googlenet(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> GoogleNet:
+def googlenet(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> GoogLeNet:
     default_cfg = default_cfgs['googlenet']
-    model = GoogleNet(num_classes=num_classes, in_channels=in_channels, **kwargs)
+    model = GoogLeNet(num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
