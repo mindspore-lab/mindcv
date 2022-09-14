@@ -1,3 +1,8 @@
+"""
+MindSpore implementation of InceptionV4.
+Refer to Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning.
+"""
+
 from typing import Union, Tuple
 
 import mindspore.nn as nn
@@ -39,12 +44,8 @@ class BasicConv2d(nn.Cell):
                  pad_mode: str = 'same'
                  ) -> None:
         super(BasicConv2d, self).__init__()
-        self.conv = nn.Conv2d(in_channels,
-                              out_channels,
-                              kernel_size=kernel_size,
-                              stride=stride,
-                              padding=padding,
-                              pad_mode=pad_mode)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
+                              padding=padding, pad_mode=pad_mode)
         self.bn = nn.BatchNorm2d(out_channels, eps=0.001, momentum=0.9997)
         self.relu = nn.ReLU()
 
@@ -68,13 +69,15 @@ class Stem(nn.Cell):
 
         self.mixed_4a_branch_0 = nn.SequentialCell([
             BasicConv2d(160, 64, kernel_size=1, stride=1),
-            BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode='valid')])
+            BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode='valid')
+        ])
 
         self.mixed_4a_branch_1 = nn.SequentialCell([
             BasicConv2d(160, 64, kernel_size=1, stride=1),
             BasicConv2d(64, 64, kernel_size=(1, 7), stride=1),
             BasicConv2d(64, 64, kernel_size=(7, 1), stride=1),
-            BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode='valid')])
+            BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode='valid')
+        ])
 
         self.mixed_5a_branch_0 = BasicConv2d(192, 192, kernel_size=3, stride=2, pad_mode='valid')
         self.mixed_5a_branch_1 = nn.MaxPool2d(3, stride=2)
@@ -105,16 +108,17 @@ class InceptionA(nn.Cell):
         self.branch_0 = BasicConv2d(384, 96, kernel_size=1, stride=1)
         self.branch_1 = nn.SequentialCell([
             BasicConv2d(384, 64, kernel_size=1, stride=1),
-            BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode='pad', padding=1)])
-
+            BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode='pad', padding=1)
+        ])
         self.branch_2 = nn.SequentialCell([
             BasicConv2d(384, 64, kernel_size=1, stride=1),
             BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode='pad', padding=1),
-            BasicConv2d(96, 96, kernel_size=3, stride=1, pad_mode='pad', padding=1)])
-
+            BasicConv2d(96, 96, kernel_size=3, stride=1, pad_mode='pad', padding=1)
+        ])
         self.branch_3 = nn.SequentialCell([
             nn.AvgPool2d(kernel_size=3, stride=1, pad_mode='same'),
-            BasicConv2d(384, 96, kernel_size=1, stride=1)])
+            BasicConv2d(384, 96, kernel_size=1, stride=1)
+        ])
 
     def construct(self, x: Tensor) -> Tensor:
         x0 = self.branch_0(x)
@@ -238,15 +242,22 @@ class InceptionC(nn.Cell):
 
 
 class InceptionV4(nn.Cell):
+    r"""Inception v4 model architecture from
+    `"Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning" <https://arxiv.org/abs/1602.07261>`_.
+
+    Args:
+        num_classes (int) : number of classification classes. Default: 1000.
+        in_channels (int): number the channels of the input. Default: 3.
+        drop_rate (float) : dropout rate of the layer before main classifier.
+    """
 
     def __init__(self,
-                 in_channels: int = 3,
                  num_classes: int = 1000,
+                 in_channels: int = 3,
                  drop_rate: float = 0.2
                  ) -> None:
         super(InceptionV4, self).__init__()
-        blocks = list()
-        blocks.append(Stem(in_channels))
+        blocks = [Stem(in_channels)]
         for _ in range(4):
             blocks.append(InceptionA())
         blocks.append(ReductionA())
@@ -267,8 +278,7 @@ class InceptionV4(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 cell.weight.set_data(
-                    init.initializer(init.XavierUniform(),
-                                     cell.weight.shape, cell.weight.dtype))
+                    init.initializer(init.XavierUniform(), cell.weight.shape, cell.weight.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)
