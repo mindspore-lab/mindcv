@@ -53,3 +53,14 @@ def make_divisible(v: float,
     if new_v < 0.9 * v:
         new_v += divisor
     return new_v
+
+import collections.abc
+from itertools import repeat
+
+def _ntuple(n):
+    def parse(x):
+        if isinstance(x, collections.abc.Iterable):
+            return x
+        return tuple(repeat(x, n))
+
+    return parse
