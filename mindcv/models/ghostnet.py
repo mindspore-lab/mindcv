@@ -12,6 +12,7 @@ from .layers.pooling import GlobalAvgPooling
 from .utils import load_pretrained, make_divisible
 from .registry import register_model
 
+
 __all__ = [
     'GhostNet',
     'ghostnet_1x',
@@ -26,6 +27,7 @@ def _cfg(url='', **kwargs):
         'first_conv': '', 'classifier': '',
         **kwargs
     }
+
 
 default_cfgs = {
     'ghostnet_1x': _cfg(url=''),
