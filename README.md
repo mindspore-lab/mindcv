@@ -22,6 +22,7 @@ MindSpore Computer Vision, a MindSpore base Python package, provides high-level 
 - numpy >= 1.17.0
 - pyyaml >= 5.3
 - tqdm
+- openmpi 4.0.3 (for distribute mode) 
 
 ## Installation
 
