@@ -1,5 +1,9 @@
+"""
+MindSpore implementation of ResNet.
+Refer to Deep Residual Learning for Image Recognition.
+"""
 
-from typing import Optional, Type, List, Union, Dict
+from typing import Optional, Type, List, Union
 
 import mindspore.nn as nn
 from mindspore import Tensor
@@ -47,13 +51,12 @@ class BasicBlock(nn.Cell):
 
     def __init__(self,
                  in_channels: int,
-                 out_channels: int,
+                 channels: int,
                  stride: int = 1,
                  groups: int = 1,
                  base_width: int = 64,
                  norm: Optional[nn.Cell] = None,
-                 down_sample: Optional[nn.Cell] = None,
-                 block_kwargs: Optional[Dict] = None
+                 down_sample: Optional[nn.Cell] = None
                  ) -> None:
         super(BasicBlock, self).__init__()
         if norm is None:
@@ -61,15 +64,14 @@ class BasicBlock(nn.Cell):
         assert groups == 1, 'BasicBlock only supports groups=1'
         assert base_width == 64, 'BasicBlock only supports base_width=64'
 
-        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=3,
+        self.conv1 = nn.Conv2d(in_channels, channels, kernel_size=3,
                                stride=stride, padding=1, pad_mode='pad')
-        self.bn1 = norm(out_channels)
+        self.bn1 = norm(channels)
         self.relu = nn.ReLU()
-        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3,
+        self.conv2 = nn.Conv2d(channels, channels, kernel_size=3,
                                stride=1, padding=1, pad_mode='pad')
-        self.bn2 = norm(out_channels)
+        self.bn2 = norm(channels)
         self.down_sample = down_sample
-        self.block_kwargs = block_kwargs
 
     def construct(self, x: Tensor) -> Tensor:
         identity = x
@@ -91,38 +93,37 @@ class BasicBlock(nn.Cell):
 
 
 class Bottleneck(nn.Cell):
+    # Bottleneck here places the stride for downsampling at 3x3 convolution(self.conv2) as torchvision does,
+    # while original implementation places the stride at the first 1x1 convolution(self.conv1)
     expansion: int = 4
 
     def __init__(self,
                  in_channels: int,
-                 out_channels: int,
+                 channels: int,
                  stride: int = 1,
                  groups: int = 1,
                  base_width: int = 64,
                  norm: Optional[nn.Cell] = None,
-                 down_sample: Optional[nn.Cell] = None,
-                 block_kwargs: Optional[Dict] = None
+                 down_sample: Optional[nn.Cell] = None
                  ) -> None:
         super(Bottleneck, self).__init__()
         if norm is None:
             norm = nn.BatchNorm2d
 
-        width = int(out_channels * (base_width / 64.0)) * groups
+        width = int(channels * (base_width / 64.0)) * groups
 
         self.conv1 = nn.Conv2d(in_channels, width, kernel_size=1, stride=1)
         self.bn1 = norm(width)
         self.conv2 = nn.Conv2d(width, width, kernel_size=3, stride=stride,
                                padding=1, pad_mode='pad', group=groups)
         self.bn2 = norm(width)
-        self.conv3 = nn.Conv2d(width, out_channels * self.expansion,
+        self.conv3 = nn.Conv2d(width, channels * self.expansion,
                                kernel_size=1, stride=1)
-        self.bn3 = norm(out_channels * self.expansion)
+        self.bn3 = norm(channels * self.expansion)
         self.relu = nn.ReLU()
         self.down_sample = down_sample
-        self.block_kwargs = block_kwargs
 
     def construct(self, x: Tensor) -> Tensor:
-
         identity = x
 
         out = self.conv1(x)
@@ -146,37 +147,46 @@ class Bottleneck(nn.Cell):
 
 
 class ResNet(nn.Cell):
+    r"""ResNet model class, based on
+    `"Deep Residual Learning for Image Recognition" <https://arxiv.org/abs/1512.03385>`_
+
+    Args:
+        block (nn.Cell) : block of resnet.
+        layers (List[int]) : number of layers of each stage.
+        num_classes (int) : number of classification classes. Default: 1000.
+        in_channels (int) : number the channels of the input. Default: 3.
+        groups (int) : number of groups for group conv in blocks.
+        base_width (int) : base width of pre group hidden channel in blocks.
+        norm (Optional[nn.Cell]) : normalization layer in blocks.
+    """
 
     def __init__(self,
                  block: Type[Union[BasicBlock, Bottleneck]],
-                 layer_nums: List[int],
+                 layers: List[int],
                  num_classes: int = 1000,
                  in_channels: int = 3,
                  groups: int = 1,
                  base_width: int = 64,
-                 norm: Optional[nn.Cell] = None,
-                 block_kwargs: Optional[Dict] = None
+                 norm: Optional[nn.Cell] = None
                  ) -> None:
         super(ResNet, self).__init__()
         if norm is None:
             norm = nn.BatchNorm2d
 
-        self.norm = norm
-        self.num_classes = num_classes
+        self.norm: nn.Cell = norm  # add type hints to make pylint happy
         self.input_channels = 64
         self.groups = groups
         self.base_with = base_width
-        self.block_kwargs = block_kwargs
 
         self.conv1 = nn.Conv2d(in_channels, self.input_channels, kernel_size=7,
                                stride=2, pad_mode='pad', padding=3)
         self.bn1 = norm(self.input_channels)
         self.relu = nn.ReLU()
         self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='same')
-        self.layer1 = self._make_layer(block, 64, layer_nums[0])
-        self.layer2 = self._make_layer(block, 128, layer_nums[1], stride=2)
-        self.layer3 = self._make_layer(block, 256, layer_nums[2], stride=2)
-        self.layer4 = self._make_layer(block, 512, layer_nums[3], stride=2)
+        self.layer1 = self._make_layer(block, 64, layers[0])
+        self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
+        self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
+        self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
 
         self.pool = GlobalAvgPooling()
         self.num_features = 512 * block.expansion
@@ -190,7 +200,7 @@ class ResNet(nn.Cell):
                     ) -> nn.SequentialCell:
         down_sample = None
 
-        if stride != 1 or self.input_channels != self.input_channels * block.expansion:
+        if stride != 1 or self.input_channels != channels * block.expansion:
             down_sample = nn.SequentialCell([
                 nn.Conv2d(self.input_channels, channels * block.expansion, kernel_size=1, stride=stride),
                 self.norm(channels * block.expansion)
@@ -205,8 +215,7 @@ class ResNet(nn.Cell):
                 down_sample=down_sample,
                 groups=self.groups,
                 base_width=self.base_with,
-                norm=self.norm,
-                block_kwargs=self.block_kwargs
+                norm=self.norm
             )
         )
         self.input_channels = channels * block.expansion
@@ -218,8 +227,7 @@ class ResNet(nn.Cell):
                     channels,
                     groups=self.groups,
                     base_width=self.base_with,
-                    norm=self.norm,
-                    block_kwargs=self.block_kwargs
+                    norm=self.norm
                 )
             )
 
