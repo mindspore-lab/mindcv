@@ -217,7 +217,6 @@ def convnext_tiny(pretrained: bool = False, num_classes: int = 1000, in_channels
     model = ConvNeXt(in_channel=in_channels, num_classes=num_classes, depths=[3, 3, 9, 3],
                      dims=[96, 192, 384, 768],
                      **kwargs)
-
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
@@ -230,7 +229,6 @@ def convnext_small(pretrained: bool = False, num_classes: int = 1000, in_channel
     model = ConvNeXt(in_channel=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
                      dims=[96, 192, 384, 768],
                      **kwargs)
-
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
@@ -243,7 +241,6 @@ def convnext_base(pretrained: bool = False, num_classes: int = 1000, in_channels
     model = ConvNeXt(in_channel=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
                      dims=[128, 256, 512, 1024],
                      **kwargs)
-
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
@@ -256,7 +253,6 @@ def convnext_large(pretrained: bool = False, num_classes: int = 1000, in_channel
     model = ConvNeXt(in_channel=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
                      dims=[192, 384, 768, 1536],
                      **kwargs)
-
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
