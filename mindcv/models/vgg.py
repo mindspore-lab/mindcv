@@ -1,3 +1,8 @@
+"""
+MindSpore implementation of VGGNet.
+Refer to SqueezeNet: Very Deep Convolutional Networks for Large-Scale Image Recognition.
+"""
+
 from typing import List, Dict, Union
 import math
 
@@ -14,7 +19,6 @@ __all__ = [
     'vgg13',
     'vgg16',
     'vgg19'
-
 ]
 
 
@@ -32,8 +36,8 @@ default_cfgs = {
     'vgg13': _cfg(url=''),
     'vgg16': _cfg(url=''),
     'vgg19': _cfg(url='')
-
 }
+
 
 cfgs: Dict[str, List[Union[str, int]]] = {
     "vgg11": [64, "M", 128, "M", 256, 256, "M", 512, 512, "M", 512, 512, "M"],
@@ -47,27 +51,31 @@ def _make_layers(cfg: List[Union[str, int]],
                  batch_norm: bool = False,
                  in_channels: int = 3) -> nn.SequentialCell:
     layers = []
-
     for v in cfg:
         if v == "M":
             layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
         else:
-            conv2d = nn.Conv2d(in_channels=in_channels,
-                               out_channels=v,
-                               kernel_size=3,
-                               padding=1,
-                               pad_mode="pad")
+            conv2d = nn.Conv2d(in_channels, v, kernel_size=3, pad_mode="pad", padding=1)
             if batch_norm:
                 layers += [conv2d, nn.BatchNorm2d(v), nn.ReLU()]
             else:
                 layers += [conv2d, nn.ReLU()]
-
             in_channels = v
 
     return nn.SequentialCell(layers)
 
 
 class VGG(nn.Cell):
+    r"""VGGNet model class, based on
+    `"Very Deep Convolutional Networks for Large-Scale Image Recognition" <https://arxiv.org/abs/1409.1556>`_
+
+    Args:
+        model_name (str) : name of the architecture. 'vgg11', 'vgg13', 'vgg16' or 'vgg19'.
+        batch_norm (bool) : use batch normalization or not.
+        num_classes (int) : number of classification classes. Default: 1000.
+        in_channels (int) : number the channels of the input. Default: 3.
+        drop_rate (float) : dropout rate of the classifier. Default: 0.5.
+    """
 
     def __init__(self,
                  model_name: str,

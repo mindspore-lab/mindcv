@@ -1,3 +1,8 @@
+"""
+MindSpore implementation of InceptionV3.
+Refer to Rethinking the Inception Architecture for Computer Vision.
+"""
+
 from typing import Union, Tuple
 
 import mindspore.nn as nn
@@ -39,12 +44,8 @@ class BasicConv2d(nn.Cell):
                  pad_mode: str = 'same'
                  ) -> None:
         super(BasicConv2d, self).__init__()
-        self.conv = nn.Conv2d(in_channels,
-                              out_channels,
-                              kernel_size=kernel_size,
-                              stride=stride,
-                              padding=padding,
-                              pad_mode=pad_mode)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
+                              padding=padding, pad_mode=pad_mode)
         self.bn = nn.BatchNorm2d(out_channels, eps=0.001, momentum=0.9997)
         self.relu = nn.ReLU()
 
@@ -58,7 +59,8 @@ class BasicConv2d(nn.Cell):
 class InceptionA(nn.Cell):
     def __init__(self,
                  in_channels: int,
-                 pool_features: int) -> None:
+                 pool_features: int
+                 ) -> None:
         super(InceptionA, self).__init__()
         self.branch0 = BasicConv2d(in_channels, 64, kernel_size=1)
         self.branch1 = nn.SequentialCell([
@@ -108,7 +110,8 @@ class InceptionB(nn.Cell):
 class InceptionC(nn.Cell):
     def __init__(self,
                  in_channels: int,
-                 channels_7x7: int) -> None:
+                 channels_7x7: int
+                 ) -> None:
         super(InceptionC, self).__init__()
         self.branch0 = BasicConv2d(in_channels, 192, kernel_size=1)
         self.branch1 = nn.SequentialCell([
@@ -165,14 +168,14 @@ class InceptionE(nn.Cell):
         super(InceptionE, self).__init__()
         self.branch0 = BasicConv2d(in_channels, 320, kernel_size=1)
         self.branch1 = BasicConv2d(in_channels, 384, kernel_size=1)
-        self.branch1_a = BasicConv2d(384, 384, kernel_size=(1, 3))
-        self.branch1_b = BasicConv2d(384, 384, kernel_size=(3, 1))
+        self.branch1a = BasicConv2d(384, 384, kernel_size=(1, 3))
+        self.branch1b = BasicConv2d(384, 384, kernel_size=(3, 1))
         self.branch2 = nn.SequentialCell([
             BasicConv2d(in_channels, 448, kernel_size=1),
             BasicConv2d(448, 384, kernel_size=3)
         ])
-        self.branch2_a = BasicConv2d(384, 384, kernel_size=(1, 3))
-        self.branch2_b = BasicConv2d(384, 384, kernel_size=(3, 1))
+        self.branch2a = BasicConv2d(384, 384, kernel_size=(1, 3))
+        self.branch2b = BasicConv2d(384, 384, kernel_size=(3, 1))
         self.branch_pool = nn.SequentialCell([
             nn.AvgPool2d(kernel_size=3, pad_mode='same'),
             BasicConv2d(in_channels, 192, kernel_size=1)
@@ -181,9 +184,9 @@ class InceptionE(nn.Cell):
     def construct(self, x: Tensor) -> Tensor:
         x0 = self.branch0(x)
         x1 = self.branch1(x)
-        x1 = ops.concat((self.branch1_a(x1), self.branch1_b(x1)), axis=1)
+        x1 = ops.concat((self.branch1a(x1), self.branch1b(x1)), axis=1)
         x2 = self.branch2(x)
-        x2 = ops.concat((self.branch2_a(x2), self.branch2_b(x2)), axis=1)
+        x2 = ops.concat((self.branch2a(x2), self.branch2b(x2)), axis=1)
         branch_pool = self.branch_pool(x)
         out = ops.concat((x0, x1, x2, branch_pool), axis=1)
         return out
@@ -192,54 +195,69 @@ class InceptionE(nn.Cell):
 class InceptionAux(nn.Cell):
     def __init__(self,
                  in_channels: int,
-                 num_classes: int) -> None:
+                 num_classes: int
+                 ) -> None:
         super(InceptionAux, self).__init__()
         self.avg_pool = nn.AvgPool2d(5, stride=3, pad_mode='valid')
-        self.conv2d_0 = BasicConv2d(in_channels, 128, kernel_size=1)
-        self.conv2d_1 = BasicConv2d(128, 768, kernel_size=5, pad_mode='valid')
+        self.conv0 = BasicConv2d(in_channels, 128, kernel_size=1)
+        self.conv1 = BasicConv2d(128, 768, kernel_size=5, pad_mode='valid')
         self.flatten = nn.Flatten()
         self.fc = nn.Dense(in_channels, num_classes)
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.avg_pool(x)
-        x = self.conv2d_0(x)
-        x = self.conv2d_1(x)
+        x = self.conv0(x)
+        x = self.conv1(x)
         x = self.flatten(x)
         x = self.fc(x)
         return x
 
 
 class InceptionV3(nn.Cell):
+    r"""Inception v3 model architecture from
+    `"Rethinking the Inception Architecture for Computer Vision" <https://arxiv.org/abs/1512.00567>`_.
+
+    .. note::
+        **Important**: In contrast to the other models the inception_v3 expects tensors with a size of
+        N x 3 x 299 x 299, so ensure your images are sized accordingly.
+
+    Args:
+        num_classes (int) : number of classification classes. Default: 1000.
+        aux_logits (int) : use auxiliary classifier or not. Default: False.
+        in_channels (int): number the channels of the input. Default: 3.
+        drop_rate (float) : dropout rate of the layer before main classifier.
+    """
+
     def __init__(self,
                  num_classes: int = 1000,
                  aux_logits: bool = True,
                  in_channels: int = 3,
-                 dropout_rate: float = 0.2) -> None:
+                 drop_rate: float = 0.2) -> None:
         super(InceptionV3, self).__init__()
         self.aux_logits = aux_logits
-        self.Conv2d_1a = BasicConv2d(in_channels, 32, kernel_size=3, stride=2, pad_mode='valid')
-        self.Conv2d_2a = BasicConv2d(32, 32, kernel_size=3, stride=1, pad_mode='valid')
-        self.Conv2d_2b = BasicConv2d(32, 64, kernel_size=3, stride=1)
+        self.conv1a = BasicConv2d(in_channels, 32, kernel_size=3, stride=2, pad_mode='valid')
+        self.conv2a = BasicConv2d(32, 32, kernel_size=3, stride=1, pad_mode='valid')
+        self.conv2b = BasicConv2d(32, 64, kernel_size=3, stride=1)
         self.maxpool1 = nn.MaxPool2d(kernel_size=3, stride=2)
-        self.Conv2d_3b = BasicConv2d(64, 80, kernel_size=1)
-        self.Conv2d_4a = BasicConv2d(80, 192, kernel_size=3, pad_mode='valid')
+        self.conv3b = BasicConv2d(64, 80, kernel_size=1)
+        self.conv4a = BasicConv2d(80, 192, kernel_size=3, pad_mode='valid')
         self.maxpool2 = nn.MaxPool2d(kernel_size=3, stride=2)
-        self.Mixed_5b = InceptionA(192, pool_features=32)
-        self.Mixed_5c = InceptionA(256, pool_features=64)
-        self.Mixed_5d = InceptionA(288, pool_features=64)
-        self.Mixed_6a = InceptionB(288)
-        self.Mixed_6b = InceptionC(768, channels_7x7=128)
-        self.Mixed_6c = InceptionC(768, channels_7x7=160)
-        self.Mixed_6d = InceptionC(768, channels_7x7=160)
-        self.Mixed_6e = InceptionC(768, channels_7x7=192)
-        if aux_logits:
-            self.AuxLogits = InceptionAux(768, num_classes)
-        self.Mixed_7a = InceptionD(768)
-        self.Mixed_7b = InceptionE(1280)
-        self.Mixed_7c = InceptionE(2048)
+        self.inception5b = InceptionA(192, pool_features=32)
+        self.inception5c = InceptionA(256, pool_features=64)
+        self.inception5d = InceptionA(288, pool_features=64)
+        self.inception6a = InceptionB(288)
+        self.inception6b = InceptionC(768, channels_7x7=128)
+        self.inception6c = InceptionC(768, channels_7x7=160)
+        self.inception6d = InceptionC(768, channels_7x7=160)
+        self.inception6e = InceptionC(768, channels_7x7=192)
+        if self.aux_logits:
+            self.aux = InceptionAux(768, num_classes)
+        self.inception7a = InceptionD(768)
+        self.inception7b = InceptionE(1280)
+        self.inception7c = InceptionE(2048)
 
         self.pool = GlobalAvgPooling()
-        self.dropout = nn.Dropout(keep_prob=1 - dropout_rate)
+        self.dropout = nn.Dropout(keep_prob=1 - drop_rate)
         self.num_features = 2048
         self.classifier = nn.Dense(self.num_features, num_classes)
         self._initialize_weights()
@@ -248,31 +266,30 @@ class InceptionV3(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 cell.weight.set_data(
-                    init.initializer(init.XavierUniform(),
-                                     cell.weight.shape, cell.weight.dtype))
+                    init.initializer(init.XavierUniform(), cell.weight.shape, cell.weight.dtype))
 
     def forward_preaux(self, x: Tensor) -> Tensor:
-        x = self.Conv2d_1a(x)
-        x = self.Conv2d_2a(x)
-        x = self.Conv2d_2b(x)
+        x = self.conv1a(x)
+        x = self.conv2a(x)
+        x = self.conv2b(x)
         x = self.maxpool1(x)
-        x = self.Conv2d_3b(x)
-        x = self.Conv2d_4a(x)
+        x = self.conv3b(x)
+        x = self.conv4a(x)
         x = self.maxpool2(x)
-        x = self.Mixed_5b(x)
-        x = self.Mixed_5c(x)
-        x = self.Mixed_5d(x)
-        x = self.Mixed_6a(x)
-        x = self.Mixed_6b(x)
-        x = self.Mixed_6c(x)
-        x = self.Mixed_6d(x)
-        x = self.Mixed_6e(x)
+        x = self.inception5b(x)
+        x = self.inception5c(x)
+        x = self.inception5d(x)
+        x = self.inception6a(x)
+        x = self.inception6b(x)
+        x = self.inception6c(x)
+        x = self.inception6d(x)
+        x = self.inception6e(x)
         return x
 
     def forward_postaux(self, x: Tensor) -> Tensor:
-        x = self.Mixed_7a(x)
-        x = self.Mixed_7b(x)
-        x = self.Mixed_7c(x)
+        x = self.inception7a(x)
+        x = self.inception7b(x)
+        x = self.inception7c(x)
         return x
 
     def forward_features(self, x: Tensor) -> Tensor:
@@ -280,21 +297,20 @@ class InceptionV3(nn.Cell):
         x = self.forward_postaux(x)
         return x
 
-    def construct(self, x: Tensor) -> Tensor:
+    def construct(self, x: Tensor) -> Union[Tensor, Tuple[Tensor, Tensor]]:
         x = self.forward_preaux(x)
-
         if self.training and self.aux_logits:
-            aux_logits = self.AuxLogits(x)
+            aux = self.aux(x)
         else:
-            aux_logits = None
-
+            aux = None
         x = self.forward_postaux(x)
+
         x = self.pool(x)
         x = self.dropout(x)
         x = self.classifier(x)
 
         if self.training and self.aux_logits:
-            return x, aux_logits
+            return x, aux
         return x
 
 

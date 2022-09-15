@@ -53,6 +53,7 @@ def create_optimizer(
                            loss_scale=loss_scale,
                            **opt_args
                            )
+    
     # adaptive 
     elif opt == 'adam':
         optimizer = nn.Adam(params=params,
