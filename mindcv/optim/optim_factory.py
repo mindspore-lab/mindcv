@@ -44,7 +44,7 @@ def create_optimizer(
     #    opt_args.setdefault('lr', lr)
 
     # non-adaptive: SGD, momentum, and nesterov 
-    if opt == 'sgd' or opt == 'nesterov':
+    if opt == 'sgd' or opt == 'nesterov' or opt=='momentum':
         optimizer = nn.SGD(params=params,
                            learning_rate=lr,
                            momentum=momentum,
@@ -53,15 +53,7 @@ def create_optimizer(
                            loss_scale=loss_scale,
                            **opt_args
                            )
-    elif opt == 'momentum':
-        optimizer = nn.Momentum(params=params,
-                                learning_rate=lr,
-                                momentum=momentum,
-                                weight_decay=weight_decay,
-                                use_nesterov=nesterov,
-                                loss_scale=loss_scale,
-                                **opt_args
-                                )
+    
     # adaptive 
     elif opt == 'adam':
         optimizer = nn.Adam(params=params,

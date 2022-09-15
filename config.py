@@ -34,6 +34,8 @@ def create_parser():
                        help='Number of parallel workers (default=8)')
     group.add_argument('--shuffle', action='store_true', default=True,
                        help='Whether or not to perform shuffle on the dataset (default="True")')
+    group.add_argument('--num_samples', type=int, default=None,
+                       help='Number of elements to sample (default=None, which means sample all elements)')
     group.add_argument('--batch_size', type=int, default=64,
                        help='Number of batch size (default=64)')
     group.add_argument('--drop_remainder', action='store_true', default=True,
