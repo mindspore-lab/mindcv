@@ -1,3 +1,8 @@
+"""
+MindSpore implementation of SqueezeNet.
+Refer to SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size.
+"""
+
 import mindspore.nn as nn
 import mindspore.ops as ops
 import mindspore.common.initializer as init
@@ -11,7 +16,6 @@ __all__ = [
     'SqueezeNet',
     'squeezenet1_0',
     'squeezenet1_1'
-
 ]
 
 
@@ -27,7 +31,6 @@ def _cfg(url='', **kwargs):
 default_cfgs = {
     'squeezenet_1.0': _cfg(url=''),
     'squeezenet_1.1': _cfg(url=''),
-
 }
 
 
@@ -37,23 +40,14 @@ class Fire(nn.Cell):
                  in_channels: int,
                  squeeze_channels: int,
                  expand1x1_channels: int,
-                 expand3x3_channels: int) -> None:
+                 expand3x3_channels: int
+                 ) -> None:
         super(Fire, self).__init__()
-        self.squeeze = nn.Conv2d(in_channels,
-                                 squeeze_channels,
-                                 kernel_size=1,
-                                 has_bias=True)
+        self.squeeze = nn.Conv2d(in_channels, squeeze_channels, kernel_size=1, has_bias=True)
         self.squeeze_activation = nn.ReLU()
-        self.expand1x1 = nn.Conv2d(squeeze_channels,
-                                   expand1x1_channels,
-                                   kernel_size=1,
-                                   has_bias=True)
+        self.expand1x1 = nn.Conv2d(squeeze_channels, expand1x1_channels, kernel_size=1, has_bias=True)
         self.expand1x1_activation = nn.ReLU()
-        self.expand3x3 = nn.Conv2d(squeeze_channels,
-                                   expand3x3_channels,
-                                   kernel_size=3,
-                                   pad_mode='same',
-                                   has_bias=True)
+        self.expand3x3 = nn.Conv2d(squeeze_channels, expand3x3_channels, kernel_size=3, pad_mode='same', has_bias=True)
         self.expand3x3_activation = nn.ReLU()
 
     def construct(self, x: Tensor) -> Tensor:
@@ -63,6 +57,19 @@ class Fire(nn.Cell):
 
 
 class SqueezeNet(nn.Cell):
+    r"""SqueezeNet model class, based on
+    `"SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size" <https://arxiv.org/abs/1602.07360>`_
+
+    .. note::
+        **Important**: In contrast to the other models the inception_v3 expects tensors with a size of
+        N x 3 x 227 x 227, so ensure your images are sized accordingly.
+
+    Args:
+        version (str) : version of the architecture. '1_0' or '1_1'.
+        num_classes (int) : number of classification classes. Default: 1000.
+        drop_rate (float) : dropout rate of the classifier. Default: 0.5.
+        in_channels (int) : number the channels of the input. Default: 3.
+    """
 
     def __init__(self,
                  version: str = '1_0',
@@ -73,12 +80,7 @@ class SqueezeNet(nn.Cell):
         super(SqueezeNet, self).__init__()
         if version == '1_0':
             self.features = nn.SequentialCell([
-                nn.Conv2d(in_channels,
-                          96,
-                          kernel_size=7,
-                          stride=2,
-                          pad_mode='valid',
-                          has_bias=True),
+                nn.Conv2d(in_channels, 96, kernel_size=7, stride=2, pad_mode='valid', has_bias=True),
                 nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2),
                 Fire(96, 16, 64, 64),
@@ -94,13 +96,7 @@ class SqueezeNet(nn.Cell):
             ])
         elif version == '1_1':
             self.features = nn.SequentialCell([
-                nn.Conv2d(in_channels,
-                          64,
-                          kernel_size=3,
-                          stride=2,
-                          pad_mode='pad',
-                          padding=1,
-                          has_bias=True),
+                nn.Conv2d(in_channels, 64, kernel_size=3, stride=2, pad_mode='valid', has_bias=True),
                 nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2),
                 Fire(64, 16, 64, 64),
@@ -117,10 +113,7 @@ class SqueezeNet(nn.Cell):
         else:
             raise ValueError(f"Unsupported SqueezeNet version {version}: 1_0 or 1_1 expected")
 
-        self.final_conv = nn.Conv2d(512,
-                                    num_classes,
-                                    kernel_size=1,
-                                    has_bias=True)
+        self.final_conv = nn.Conv2d(512, num_classes, kernel_size=1, has_bias=True)
         self.classifier = nn.SequentialCell([
             nn.Dropout(keep_prob=1 - drop_rate),
             self.final_conv,
@@ -133,14 +126,11 @@ class SqueezeNet(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 if cell is self.final_conv:
-                    cell.weight.set_data(
-                        init.initializer(init.Normal(), cell.weight.shape, cell.weight.dtype))
+                    cell.weight.set_data(init.initializer(init.Normal(), cell.weight.shape, cell.weight.dtype))
                 else:
-                    cell.weight.set_data(
-                        init.initializer(init.HeUniform(), cell.weight.shape, cell.weight.dtype))
+                    cell.weight.set_data(init.initializer(init.HeUniform(), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(
-                        init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)
