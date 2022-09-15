@@ -28,7 +28,9 @@ def clean():
     if os.path.exists(os.path.join(cur_dir, f'{package_name}.egg-info')):
         shutil.rmtree(os.path.join(cur_dir, f'{package_name}.egg-info'), onerror=readonly_handler)
 
+
 clean()
+
 
 def update_permissions(path):
     """
@@ -76,7 +78,7 @@ setup(
     description="An open source computer vision research tool box.",
     license='Eclipse Public License 1.0',
     include_package_data=True,
-    packages = find_packages(exclude=("mindcv")),
+    packages=find_packages(exclude=("mindcv")),
     cmdclass={
         'egg_info': EggInfo,
         'build_py': BuildPy,
