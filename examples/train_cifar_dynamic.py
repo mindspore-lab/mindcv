@@ -87,7 +87,7 @@ def main():
     data_dir = '/data/cifar/cifar-10-batches-bin'
     download = False if os.path.exists(data_dir) else True
         
-    dataset_train = create_dataset(name='cifar10', root=data_dir, split='train', shuffle=True, num_samples=10000, download=download, num_parallel_workers=num_workers)
+    dataset_train = create_dataset(name='cifar10', root=data_dir, split='train', shuffle=True, num_samples=num_samples, download=download, num_parallel_workers=num_workers)
     dataset_test = create_dataset(name='cifar10', root=data_dir, split='test', shuffle=False, download=False)
 
     # create transform and get trans list
@@ -122,7 +122,7 @@ def main():
     opt = create_optimizer(network.trainable_params(), opt='adam', lr=1e-3) 
 
     # --------------------------- Training and monitoring -------------------------#
-    epochs = 3 
+    epochs = 10
     if train_step_mode:
         for t in range(epochs):
             print(f"Epoch {t+1}\n-------------------------------")
