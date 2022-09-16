@@ -32,6 +32,7 @@ def train(args):
         root=args.data_dir,
         split='train',
         shuffle=args.shuffle,
+        num_samples=args.num_samples,
         num_shards=device_num,
         shard_id=rank_id,
         num_parallel_workers=args.num_parallel_workers,
