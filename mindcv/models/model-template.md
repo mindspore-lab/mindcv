@@ -20,7 +20,7 @@ Refer to ${PAPER_NAME}.
 模块导入分为三种类型。分别为
 
 - Python原生或第三方库。如`import math`、`import numpy as np`等等。应当放在第一梯队。
-- MindSpore相关模块。如`import mindspore.nn as nn`、`import mindspore.ops.operations as P`等等。应当放在第二梯队。
+- MindSpore相关模块。如`import mindspore.nn as nn`、`import mindspore.ops as ops`等等。应当放在第二梯队。
 - 套件包内模块。如`from .layers.classifier import ClassifierHead`等等。应当放在第三梯队，并使用相对导入。
 
 示例如下：
@@ -71,13 +71,13 @@ __all__ = [
 class MixerBlock(nn.Cell):
     """Mixer Layer with token-mixing MLP and channel-mixing MLP"""
 
-    def __init__(self, 
-    			 n_patches: int, 
-    			 n_channels: int, 
-    			 token_dim: int, 
-    			 channel_dim: int, 
-    			 dropout: float = 0.
-    			 ) -> None:
+    def __init__(self,
+                 n_patches: int,
+                 n_channels: int,
+                 token_dim: int,
+                 channel_dim: int,
+                 dropout: float = 0.
+                 ) -> None:
         super().__init__()
         self.token_mix = nn.SequentialCell(
             nn.LayerNorm((n_channels,)),
@@ -139,16 +139,16 @@ class MLPMixer(nn.Cell):
         n_classes (int) : number of classification classes. Default: 1000.
     """
 
-    def __init__(self, 
-    			 depth: int, 
-    			 patch_size: Union[int, tuple], 
-    			 n_patches: int, 
-    			 n_channels: int, 
-    			 token_dim: int, 
-    			 channel_dim: int, 
-    			 in_channels: int = 3,
-    			 n_classes: int = 1000,
-    			 ) -> None:
+    def __init__(self,
+                 depth: int,
+                 patch_size: Union[int, tuple],
+                 n_patches: int,
+                 n_channels: int,
+                 token_dim: int,
+                 channel_dim: int,
+                 in_channels: int = 3,
+                 n_classes: int = 1000,
+                 ) -> None:
         super().__init__()
         self.n_patches = n_patches
         self.n_channels = n_channels
@@ -245,7 +245,3 @@ if __name__ == '__main__':
 - shufflenetv2.py
 - mixnet.py
 - mlp_mixer.py
-
-  
-
-如果您有任何疑问，欢迎联系w00580644~
