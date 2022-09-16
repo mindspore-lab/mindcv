@@ -8,8 +8,8 @@ class GlobalAvgPooling(nn.Cell):
                  keep_dims: bool = False
                  ) -> None:
         super(GlobalAvgPooling, self).__init__()
-        self.mean = ops.ReduceMean(keep_dims=keep_dims)
+        self.keep_dims = keep_dims
 
     def construct(self, x):
-        x = self.mean(x, (2, 3))
+        x = ops.mean(x, axis=(2, 3), keep_dims=self.keep_dims)
         return x
