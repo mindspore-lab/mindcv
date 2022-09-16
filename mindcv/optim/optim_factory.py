@@ -1,6 +1,7 @@
 import mindspore.nn as nn
 from typing import Optional
-from .adan import Adan 
+from .adan import Adan
+from .adamw import AdamW
 
 
 def init_group_params(params, weight_decay):
@@ -72,10 +73,11 @@ def create_optimizer(
                             **opt_args)
     elif opt == 'adamw':
         # TODO: the mindspore implementation seems different from the official AdamW 
-        optimizer = nn.AdamWeightDecay(params=params,
-                                       learning_rate=lr,
-                                       weight_decay=weight_decay,
-                                       **opt_args)
+        optimizer = AdamW(params=params,
+                            learning_rate=lr,
+                            weight_decay=weight_decay,
+                            loss_scale=loss_scale,
+                            **opt_args)
     elif opt == 'adan':
         optimizer = Adan(params=params,
                             learning_rate=lr,
