@@ -30,7 +30,7 @@ class SelectiveKernelAttn(nn.Cell):
         self.bn = norm(attn_channels)
         self.act = activation()
         self.fc_select = nn.Conv2d(attn_channels, channels * num_paths, kernel_size=1)
-        self.softmax = ops.Softmax(axis=1)
+        self.softmax = nn.Softmax(axis=1)
 
     def construct(self, x):
         x = self.mean((x.sum(1)))
