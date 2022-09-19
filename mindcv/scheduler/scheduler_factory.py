@@ -1,6 +1,7 @@
 from mindspore.nn import ExponentialDecayLR, PolynomialDecayLR
 
 from .warmup_cosine_decay_lr import WarmupCosineDecayLR
+from .multi_step_decay_lr import MultiStepDecayLR
 
 
 def create_scheduler(
@@ -11,16 +12,18 @@ def create_scheduler(
         warmup_epochs: int = 3,
         decay_epochs: int = 10,
         decay_rate: float = 0.9,
+        milestones: list = []
 ):
     r"""
     Args:
         steps_per_epoch: number of steps per epoch
-        scheduler: 'constant' for constant lr, 'warmup_consine_decay', 'step_decay', 'exponential_decay', 'polynomial_decay' 
+        scheduler: 'constant' for constant lr, 'warmup_consine_decay', 'step_decay', 'exponential_decay', 'polynomial_decay', 'multi_step_decay'
         lr: learning rate value. 
         min_lr: lower lr bound for cyclic/cosine/polynomial schedulers
         warmup_epochs: epochs to warmup LR, if scheduler supports 
         decay_epochs: epochs to decay LR to min_lr for cyclic and polynomial schedulers. decay LR by a factor of decay_rate every `decay_epochs` for exponential scheduler and step LR scheduler
-        decay_rate: LR decay rate (default: 0.9) 
+        decay_rate: LR decay rate (default: 0.9)
+        milestones: list of epoch milestones for multi_step_decay scheduler. Must be increasing.
 
     
     Returns: 
@@ -57,6 +60,15 @@ def create_scheduler(
                                           decay_steps,
                                           is_stair=True
                                           )
+
+    elif scheduler == 'multi_step_decay':
+        decay_step_indices = [epoch * steps_per_epoch for epoch in milestones]
+        # decay LR by decay_rate once the step reaches `decay_step_indices`
+        lr_scheduler = MultiStepDecayLR(lr,
+                                        decay_rate,
+                                        decay_step_indices
+                                        )
+
     elif scheduler == 'constant':
         lr_scheduler = lr
     else:
