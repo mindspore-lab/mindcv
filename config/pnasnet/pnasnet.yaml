@@ -24,7 +24,7 @@ mean: [127.5, 127.5, 127.5]
 std: [127.5, 127.5, 127.5]
 
 # model config
-model: 'nasnet'
+model: 'pnasnet'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''
@@ -39,7 +39,7 @@ loss: 'CE'
 label_smoothing: 0.1
 
 # lr scheduler config
-scheduler: 'warmup_cosine_decay'
+scheduler: 'warmup_cosine_decay' 
 min_lr: 0.0
 lr: 0.01
 warmup_epochs: 0

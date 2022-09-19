@@ -1,13 +1,11 @@
-from typing import Optional, Type, List, Union, Dict, cast, Any
-
 import mindspore.nn as nn
 from mindspore import Tensor
+import mindspore.ops.operations as P
 
 from .utils import load_pretrained
 from .registry import register_model
 
 import numpy as np
-import mindspore.ops.operations as P
 
 __all__ = ['nasnet']
 

@@ -18,3 +18,4 @@ from .utils import *
 from .vgg import *
 from .layers import *
 from .nasnet import *
+from .pnasnet import *

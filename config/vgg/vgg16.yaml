@@ -20,11 +20,9 @@ interpolation: 'bilinear'
 crop_pct: 0.875
 color_jitter: [0.4, 0.4, 0.4]
 re_prob: 0.5
-mean: [127.5, 127.5, 127.5]
-std: [127.5, 127.5, 127.5]
 
 # model config
-model: 'nasnet'
+model: 'vgg16'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''
