@@ -25,7 +25,6 @@ def _check_param_value(beta1, beta2, eps, prim_name):
 
 
 _grad_scale = ops.MultitypeFuncGraph("grad_scale")
-op_mul = ops.Mul()
 map_ = ops.Map()
 
 
@@ -34,13 +33,13 @@ def tensor_grad_scale(scale, grad):
     """Get grad with scale."""
     if scale == 1.0:
         return grad
-    return op_mul(grad, ops.cast(scale, grad.dtype))
+    return ops.mul(grad, ops.cast(scale, grad.dtype))
 
 
 @_grad_scale.register("Tensor", "Tensor")
 def tensor_grad_scale_with_tensor(scale, grad):
     """Get grad with scale."""
-    return op_mul(grad, ops.cast(scale, grad.dtype))
+    return ops.mul(grad, ops.cast(scale, grad.dtype))
 
 
 def scale_grad(gradients, reciprocal_scale):
@@ -58,7 +57,6 @@ def _update_run_op(beta1_power, beta2_power, beta1, beta2, eps, lr, weight_decay
                    m, v, gradient, decay_flag, optim_filter):
     """
     Update parameters.
-
     Args:
         beta1 (Tensor): The exponential decay rate for the 1st moment estimations. Should be in range (0.0, 1.0).
         beta2 (Tensor): The exponential decay rate for the 2nd moment estimations. Should be in range (0.0, 1.0).
@@ -71,36 +69,30 @@ def _update_run_op(beta1_power, beta2_power, beta1, beta2, eps, lr, weight_decay
         gradient (Tensor): Gradient of parameters.
         decay_flag (bool): Applies weight decay or not.
         optim_filter (bool): Applies parameter update or not.
-
     Returns:
         Tensor, the new value of v after updating.
     """
     if optim_filter:
-        # op_mul = ops.Mul(), defined output
-        op_square = ops.Square()
-        op_sqrt = ops.Sqrt()
-        op_reshape = ops.Reshape()
-
         param_fp32 = ops.cast(param, ms.float32)
         m_fp32 = ops.cast(m, ms.float32)
         v_fp32 = ops.cast(v, ms.float32)
         gradient_fp32 = ops.cast(gradient, ms.float32)
 
-        next_m = op_mul(beta1, m_fp32) + op_mul(ops.cast(ops.tuple_to_array((1.0,)), ms.float32)
+        next_m = ops.mul(beta1, m_fp32) + ops.mul(ops.cast(ops.tuple_to_array((1.0,)), ms.float32)
                                                 - beta1, gradient_fp32)
 
-        next_v = op_mul(beta2, v_fp32) + op_mul(ops.cast(ops.tuple_to_array((1.0,)), ms.float32)
-                                                - beta2, op_square(gradient_fp32))
+        next_v = ops.mul(beta2, v_fp32) + ops.mul(ops.cast(ops.tuple_to_array((1.0,)), ms.float32)
+                                                - beta2, ops.square(gradient_fp32))
 
         regulate_m = next_m / (_scaler_one - beta1_power)
         regulate_v = next_v / (_scaler_one - beta2_power)
 
-        update = regulate_m / (eps + op_sqrt(regulate_v))
+        update = regulate_m / (eps + ops.sqrt(regulate_v))
         if decay_flag:
-            update = op_mul(weight_decay, param_fp32) + update
+            update = ops.mul(weight_decay, param_fp32) + update
 
-        update_with_lr = op_mul(lr, update)
-        next_param = param_fp32 - op_reshape(update_with_lr, ops.shape(param_fp32))
+        update_with_lr = ops.mul(lr, update)
+        next_param = param_fp32 - ops.reshape(update_with_lr, ops.shape(param_fp32))
 
         next_param = ops.depend(next_param, ops.assign(param, ops.cast(next_param, param.dtype)))
         next_param = ops.depend(next_param, ops.assign(m, ops.cast(next_m, m.dtype)))
