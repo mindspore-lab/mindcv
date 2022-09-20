@@ -56,8 +56,7 @@ class BasicBlock(nn.Cell):
                  groups: int = 1,
                  base_width: int = 64,
                  norm: Optional[nn.Cell] = None,
-                 down_sample: Optional[nn.Cell] = None,
-                 block_kwargs: Optional[Dict] = None
+                 down_sample: Optional[nn.Cell] = None
                  ) -> None:
         super(BasicBlock, self).__init__()
         if norm is None:
@@ -73,7 +72,6 @@ class BasicBlock(nn.Cell):
                                stride=1, padding=1, pad_mode='pad')
         self.bn2 = norm(channels)
         self.down_sample = down_sample
-        self.block_kwargs = block_kwargs
 
     def construct(self, x: Tensor) -> Tensor:
         identity = x
@@ -106,8 +104,7 @@ class Bottleneck(nn.Cell):
                  groups: int = 1,
                  base_width: int = 64,
                  norm: Optional[nn.Cell] = None,
-                 down_sample: Optional[nn.Cell] = None,
-                 block_kwargs: Optional[Dict] = None
+                 down_sample: Optional[nn.Cell] = None
                  ) -> None:
         super(Bottleneck, self).__init__()
         if norm is None:
@@ -125,7 +122,6 @@ class Bottleneck(nn.Cell):
         self.bn3 = norm(channels * self.expansion)
         self.relu = nn.ReLU()
         self.down_sample = down_sample
-        self.block_kwargs = block_kwargs
 
     def construct(self, x: Tensor) -> Tensor:
         identity = x
@@ -171,8 +167,7 @@ class ResNet(nn.Cell):
                  in_channels: int = 3,
                  groups: int = 1,
                  base_width: int = 64,
-                 norm: Optional[nn.Cell] = None,
-                 block_kwargs: Optional[Dict] = None
+                 norm: Optional[nn.Cell] = None
                  ) -> None:
         super(ResNet, self).__init__()
         if norm is None:
@@ -182,7 +177,6 @@ class ResNet(nn.Cell):
         self.input_channels = 64
         self.groups = groups
         self.base_with = base_width
-        self.block_kwargs = block_kwargs
 
         self.conv1 = nn.Conv2d(in_channels, self.input_channels, kernel_size=7,
                                stride=2, pad_mode='pad', padding=3)
@@ -221,8 +215,7 @@ class ResNet(nn.Cell):
                 down_sample=down_sample,
                 groups=self.groups,
                 base_width=self.base_with,
-                norm=self.norm,
-                block_kwargs=self.block_kwargs
+                norm=self.norm
             )
         )
         self.input_channels = channels * block.expansion
@@ -234,8 +227,7 @@ class ResNet(nn.Cell):
                     channels,
                     groups=self.groups,
                     base_width=self.base_with,
-                    norm=self.norm,
-                    block_kwargs=self.block_kwargs
+                    norm=self.norm
                 )
             )
 
