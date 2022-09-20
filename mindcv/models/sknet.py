@@ -3,6 +3,7 @@ from typing import Optional, Dict
 import mindspore.nn as nn
 from mindspore import Tensor
 
+from .layers.conv_norm_act import Conv2dNormActivation
 from .layers.selective_kernel import SelectiveKernel
 from .utils import load_pretrained
 from .registry import register_model
@@ -57,20 +58,17 @@ class SelectiveKernelBasic(nn.Cell):
 
         self.conv1 = SelectiveKernel(
             in_channels, out_channels, stride=stride, **sk_kwargs)
-        self.conv2 =  nn.Conv2d(
-            out_channels, out_channels * self.expansion, kernel_size=3, pad_mode='pad', padding=1)
-        self.bn = norm(out_channels * self.expansion)
+        self.conv2 = Conv2dNormActivation(
+            out_channels, out_channels * self.expansion, kernel_size=3, padding=1, norm=norm)
 
         self.relu = nn.ReLU()
         self.down_sample = down_sample
 
     def construct(self, x: Tensor) -> Tensor:
-        """ResidualBlockBase construct."""
         identity = x
 
         out = self.conv1(x)
         out = self.conv2(out)
-        out = self.bn(out)
 
         if self.down_sample:
             identity = self.down_sample(x)
@@ -103,24 +101,21 @@ class SelectiveKernelBottleneck(nn.Cell):
             sk_kwargs = block_kwargs['sk_kwargs']
 
         width = int(out_channels * (base_width / 64.0)) * groups
-        self.conv1 = nn.Conv2d(in_channels, width, kernel_size=1)
-        self.bn1 = norm(width)
+        self.conv1 = Conv2dNormActivation(
+            in_channels, width, kernel_size=1, padding=0, norm=norm)
         self.conv2 = SelectiveKernel(
             width, width, stride=stride, groups=groups, **sk_kwargs)
-        self.conv3 = nn.Conv2d(width, out_channels * self.expansion, kernel_size=1)
-        self.bn3 = norm(out_channels * self.expansion)
+        self.conv3 = Conv2dNormActivation(
+            width, out_channels * self.expansion, kernel_size=1, padding=0, norm=norm)
         self.relu = nn.ReLU()
         self.down_sample = down_sample
 
     def construct(self, x: Tensor) -> Tensor:
-        """ResidualBlockBase construct."""
         identity = x
 
         out = self.conv1(x)
-        out = self.bn1(out)
         out = self.conv2(out)
         out = self.conv3(out)
-        out = self.bn3(out)
 
         if self.down_sample:
             identity = self.down_sample(x)
