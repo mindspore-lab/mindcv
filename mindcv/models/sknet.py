@@ -14,7 +14,7 @@
 # ============================================================================
 """"""
 
-from typing import Optional, Type, List, Union, Dict
+from typing import Optional, Type, List, Dict
 
 import mindspore.nn as nn
 from mindspore import Tensor
