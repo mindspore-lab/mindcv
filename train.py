@@ -7,9 +7,7 @@ from mindcv.data import create_dataset, create_transforms, create_loader
 from mindcv.loss import create_loss
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
-from mindcv.utils.callbacks import ValAccSaveMonitor
 from config import parse_args
-import os
 
 ms.set_seed(1)
 
@@ -32,7 +30,7 @@ def train(args):
     dataset_train = create_dataset(
         name=args.dataset,
         root=args.data_dir,
-        split=args.train_split,
+        split='train',
         shuffle=args.shuffle,
         num_samples=args.num_samples,
         num_shards=device_num,
@@ -41,7 +39,7 @@ def train(args):
         download=args.dataset_download)
 
     # create transforms
-    transform_train = create_transforms(
+    transform_list = create_transforms(
         dataset_name=args.dataset,
         is_training=True,
         image_resize=args.image_resize,
@@ -58,9 +56,9 @@ def train(args):
         re_scale=args.re_scale,
         re_ratio=args.re_ratio,
         re_value=args.re_value,
-        re_max_attempts=args.re_max_attempts,
+        re_max_attempts=args.re_max_attempts
     )
-    
+
     # load dataset
     loader_train = create_loader(
         dataset=dataset_train,
@@ -69,43 +67,9 @@ def train(args):
         is_training=True,
         mixup=args.mixup,
         num_classes=args.num_classes,
-        transform=transform_train,
+        transform=transform_list,
         num_parallel_workers=args.num_parallel_workers,
     )
-    
-    # prepare dataset for validate
-    # TODO: validate over multiple devices
-    dataset_val = create_dataset(
-        name=args.dataset,
-        root=args.data_dir,
-        split=args.val_split,
-        shuffle=False,
-        num_shards=1,
-        shard_id=0,
-        num_parallel_workers=args.num_parallel_workers,
-        download=args.dataset_download)
-
-    transform_val = create_transforms(
-        dataset_name=args.dataset,
-        is_training=False,
-        image_resize=args.image_resize,
-        interpolation=args.interpolation,
-        mean=args.mean,
-        std=args.std,
-        crop_pct=args.crop_pct
-    )
-
-    loader_val = create_loader(
-        dataset=dataset_val,
-        batch_size=args.batch_size,
-        drop_remainder=args.drop_remainder, 
-        is_training=False,
-        num_classes=args.num_classes,
-        transform=transform_val,
-        num_parallel_workers=args.num_parallel_workers,
-    )
-
-
     steps_per_epoch = loader_train.get_dataset_size()
 
     # create model
@@ -148,24 +112,26 @@ def train(args):
     # init model
     if args.loss_scale > 1.0:
         loss_scale_manager = FixedLossScaleManager(loss_scale=args.loss_scale, drop_overflow_update=False)
-        model = Model(network, loss_fn=loss, optimizer=optimizer, metrics={'accuracy'}, amp_level=args.amp_level,
+        model = Model(network, loss_fn=loss, optimizer=optimizer, metrics={'acc'}, amp_level=args.amp_level,
                       loss_scale_manager=loss_scale_manager)
     else:
-        model = Model(network, loss_fn=loss, optimizer=optimizer, metrics={'accuracy'}, amp_level=args.amp_level)
+        model = Model(network, loss_fn=loss, optimizer=optimizer, metrics={'acc'}, amp_level=args.amp_level)
 
     # callback
-    # TODO: use AllReduce to get the total loss and acc for all devices 
     loss_cb = LossMonitor(per_print_times=steps_per_epoch)
     time_cb = TimeMonitor(data_size=steps_per_epoch)
-    val_cb = ValAccSaveMonitor(model, loader_val, ckpt_dir=args.ckpt_save_dir, best_ckpt_name=args.model + '_best.ckpt')
-
     callbacks = [loss_cb, time_cb]
-
+    ckpt_config = CheckpointConfig(
+        save_checkpoint_steps=steps_per_epoch,
+        keep_checkpoint_max=args.keep_checkpoint_max)
+    ckpt_cb = ModelCheckpoint(prefix=args.model,
+                              directory=args.ckpt_save_dir,
+                              config=ckpt_config)
     if args.distribute:
         if rank_id == 0:
-            callbacks.append(val_cb)
+            callbacks.append(ckpt_cb)
     else:
-        callbacks.append(val_cb)
+        callbacks.append(ckpt_cb)
 
     # train model
     model.train(args.epoch_size, loader_train, callbacks=callbacks, dataset_sink_mode=args.dataset_sink_mode)
