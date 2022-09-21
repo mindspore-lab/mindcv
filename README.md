@@ -64,7 +64,7 @@ It is easy to train your model on standard datasets or your own dataset with Min
 
 You can run `train.py` to do training with customized hyper-parameters. Here is the example for training a DenseNet on CIFAR10 dataset.
 ``` shell
-python train.py --model=densenet121 --optimizer=adam --lr=0.001 \
+python train.py --model=densenet121 --opt=adam --lr=0.001 \
 		--dataset=cifar10 --num_classes=10 --dataset_download    
 ```
 
