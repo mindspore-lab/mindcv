@@ -113,6 +113,15 @@ class ShuffleV1Block(nn.Cell):
 
 
 class ShuffleNetV1(nn.Cell):
+    r"""ShuffleNetV1 model class, based on
+    `"ShuffleNet: An Extremely Efficient Convolutional Neural Network for Mobile Devices" <https://arxiv.org/abs/1707.01083>`_
+
+    Args:
+        num_classes: number of classification classes. Default: 1000.
+        in_channels: number of input channels. Default: 3.
+        model_size: scale factor which controls the number of channels. Default: '2.0x'.
+        group: number of group for group convolution. Default: 3.
+    """
 
     def __init__(self,
                  num_classes: int = 1000,
