@@ -66,8 +66,8 @@ All supported hyper-parameters (for data transform, model, loss, optimizer, and 
 
 To validate, you can run `validate.py` as shown in the following example.
 ```shell
-python validate.py --model=densenet121 --dataset=cifar10 --val_split=test `
-		   --data_dir=/data/cifar/cifar-10-batches-bin --num_classes=10 --dataset_download
+python validate.py --model=densenet121 --dataset=cifar10 --val_split=test \
+		   --num_classes=10 --dataset_download
 ``` 
 
 - Distributed Training
@@ -89,7 +89,7 @@ python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml
 ```
 
 ## Tutorials
-We provide [jupyter notebook tutorials](tutorials) for helping you.  
+We provide [jupyter notebook tutorials](tutorials) for  
 
 - [Learn about configs](tutorials/learn_about_config.ipynb)  //tbc
 - [Inference with a pretrained model](tutorials/inference.ipynb) //tbc
