@@ -146,7 +146,7 @@ def train(args):
 	# Save checkpoint
         if ((t + 1) % args.ckpt_save_interval == 0):
             if (not args.distribute) or (args.distribute and rank_id==0):
-                save_path = os.path.join(args.ckpt_path, f"{args.model}-{t+1}.ckpt")
+                save_path = os.path.join(args.ckpt_save_dir, f"{args.model}-{t+1}.ckpt")
                 ms.save_checkpoint(network, save_path, async_save=True)
                 print(f"Saving model to {save_path}")
     print("Done!")

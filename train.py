@@ -122,7 +122,7 @@ def train(args):
     time_cb = TimeMonitor(data_size=steps_per_epoch)
     callbacks = [loss_cb, time_cb]
     ckpt_config = CheckpointConfig(
-        save_checkpoint_steps=steps_per_epoch,
+        save_checkpoint_steps=int(steps_per_epoch * args.ckpt_save_interval),
         keep_checkpoint_max=args.keep_checkpoint_max)
     ckpt_cb = ModelCheckpoint(prefix=args.model,
                               directory=args.ckpt_save_dir,
