@@ -106,6 +106,14 @@ class ShuffleV2Block(nn.Cell):
 
 
 class ShuffleNetV2(nn.Cell):
+    r"""ShuffleNetV2 model class, based on
+    `"ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design" <https://arxiv.org/abs/1807.11164>`_
+
+    Args:
+        num_classes: number of classification classes. Default: 1000.
+        in_channels: number of input channels. Default: 3.
+        model_size: scale factor which controls the number of channels. Default: '1.5x'.
+    """
 
     def __init__(self,
                  num_classes: int = 1000,
