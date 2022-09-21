@@ -120,6 +120,20 @@ class _Transition(nn.Cell):
 
 
 class DenseNet(nn.Cell):
+    r"""Densenet-BC model class, based on
+    `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
+
+    Args:
+        growth_rate: how many filters to add each layer (`k` in paper). Default: 32.
+        block_config: how many layers in each pooling block. Default: (6, 12, 24, 16).
+        num_init_features: number of filters in the first Conv2d. Default: 64.
+        bn_size (int): multiplicative factor for number of bottleneck layers
+          (i.e. bn_size * k features in the bottleneck layer). Default: 4.
+        drop_rate: dropout rate after each dense layer. Default: 0.
+        in_channels: number of input channels. Default: 3.
+        num_classes: number of classification classes. Default: 1000.
+    """
+
     def __init__(self,
                  growth_rate: int = 32,
                  block_config: Tuple[int, int, int, int] = (6, 12, 24, 16),
