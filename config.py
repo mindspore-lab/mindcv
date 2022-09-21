@@ -27,7 +27,7 @@ def create_parser():
     group = parser.add_argument_group('Dataset parameters')
     group.add_argument('--dataset', type=str, default='imagenet',
                        help='Type of dataset (default="imagenet")')
-    group.add_argument('--data_dir', type=str, help='Path to dataset')
+    group.add_argument('--data_dir', type=str, default='./', help='Path to dataset')
     group.add_argument('--train_split', type=str, default='train', help='dataset train split name')
     group.add_argument('--val_split', type=str, default='val', help='dataset validation split name')
     group.add_argument('--dataset_download', action='store_true', default=False,
