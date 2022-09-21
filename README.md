@@ -52,7 +52,7 @@ python setup.py install
 ## Get Started 
 
 ### Hands-on Demo
-Please see the [Quick Start Demo] (quick_tour.ipynb) to help you get started with MindCV and learn about the basic usage. 
+Please see the [Quick Start Demo](quick_tour.ipynb) to help you get started with MindCV and learn about the basic usage. 
 
 
 ### Quick Running Scripts
