@@ -106,7 +106,7 @@ We provide [jupyter notebook tutorials](tutorials) for
 
 ### License
 
-This project is released under the [Eclipse Public License 1.0](LICENSE.md).
+This project is released under the [Apache License 2.0](LICENSE.md).
 
 ### Feedbacks and Contact
 
