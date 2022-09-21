@@ -25,21 +25,20 @@ def create_loss(
         aux_factor: The factor for auxiluary loss, which is only applicable for cross entropy loss type for models with two logit outputs. 
 
 
-    Inputs:(BCE)
-        - **logits** (Tensor) - The input tensor with shape :math:`(N, *)` where :math:`*` means, any number of additional dimensions. The data type must be float16 or float32.
-        - **labels** (Tensor) - The label tensor with shape :math:`(N, *)`, the same shape and data type as `logits`.
-
-
-    Inputs:(CE)
+    Inputs:
+        if name is 'CE':
         - **logits** (Tensor) - Tensor of shape :math:`(C,)` :math:`(N, C)` or :math:`(N, C, d_1, d_2, ..., d_K)` ,
           where `C = number of classes`. Data type must be float16 or float32.
         - **labels** (Tensor) - For class indices, tensor of shape :math:`()`, :math:`(N)` or :math:`(N, d_1, d_2, ..., d_K)` , data type must be int32.
           For probabilities, tensor of shape :math:`(C,)` :math:`(N, C)` or :math:`(N, C, d_1, d_2, ..., d_K)` , data type must be float16 or float32.
 
+        if name is 'BCE':
+        - **logits** (Tensor) - The input tensor with shape :math:`(N, *)` where :math:`*` means, any number of additional dimensions. The data type must be float16 or float32.
+        - **labels** (Tensor) - The label tensor with shape :math:`(N, *)`, the same shape and data type as `logits`.
 
 
     Returns:
-      created loss object, which will the computed loss value when invoked.  
+       Loss object that will be invoked to computed loss value.  
     """
 
     if name.lower() == 'bce':
