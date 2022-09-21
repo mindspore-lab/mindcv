@@ -70,6 +70,7 @@ python validate.py --model=densenet121 --dataset=cifar10 --val_split=test --data
 ```
 
 - Distributed Training
+
 For large datasets like ImageNet, it is necessary to do training in distributed mode on multiple devices, which is well supported in MindCV. The following script is an example for training DenseNet121 on ImageNet with 4 GPUs.   
 
 ```shell
@@ -78,6 +79,7 @@ mpirun --allow-run-as-root -n 4 python train.py --distribute --model=densenet121
 ```
 
 - Train with Yaml Config
+
 We also provide that yaml config files that yield competitive results on ImageNet for different models in [yaml config files](configs). To trigger training using yaml config, 
 
 ```
