@@ -14,7 +14,7 @@ def create_loss(
     create loss
 
     Args:
-        name (str):  loss name, : 'BCE' (binary cross entropy), 'CE' for cross_entropy. Default: 'cross_entropy'
+        name (str):  loss name, : 'BCE' (binary cross entropy), 'CE' for cross_entropy. Default: 'CE'
         weight (Tensor): The rescaling weight to each class. If the value is not None, the shape is (C,). 
             The data type only supports float32 or float16. Default: None.
             For bce loss, it is a manual rescaling weight given to the loss of each batch element. If given, has to be a Tensor of size nbatch.

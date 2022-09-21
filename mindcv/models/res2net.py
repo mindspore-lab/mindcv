@@ -1,3 +1,8 @@
+"""
+MindSpore implementation of `Res2Net`.
+Refer to Res2Net: A New Multi-scale Backbone Architecture.
+"""
+
 from typing import Optional, Type, List
 
 import math
@@ -133,6 +138,20 @@ class Bottle2neck(nn.Cell):
 
 
 class Res2Net(nn.Cell):
+    r"""Res2Net model class, based on
+    `"Res2Net: A New Multi-scale Backbone Architecture" <https://arxiv.org/abs/1904.01169>`_
+
+    Args:
+        block: block of resnet.
+        layer_nums: number of layers of each stage.
+        version: variety of Res2Net, 'res2net' or 'res2net_v1b'. Default: 'res2net'.
+        num_classes: number of classification classes. Default: 1000.
+        in_channels: number the channels of the input. Default: 3.
+        groups: number of groups for group conv in blocks. Default: 1.
+        base_width: base width of pre group hidden channel in blocks. Default: 26.
+        scale: scale factor of Bottle2neck. Default: 4.
+        norm: normalization layer in blocks. Default: None.
+    """
 
     def __init__(self,
                  block: Type[nn.Cell],
@@ -283,6 +302,9 @@ class Res2Net(nn.Cell):
 
 @register_model
 def res2net50(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
+    """Get 50 layers Res2Net model.
+     Refer to the base class `models.Res2Net` for more details.
+     """
     default_cfg = default_cfgs['res2net50']
     model = Res2Net(Bottle2neck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -294,6 +316,9 @@ def res2net50(pretrained: bool = False, num_classes: int = 1001, in_channels=3, 
 
 @register_model
 def res2net101(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
+    """Get 101 layers Res2Net model.
+     Refer to the base class `models.Res2Net` for more details.
+     """
     default_cfg = default_cfgs['res2net101']
     model = Res2Net(Bottle2neck, [3, 4, 23, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -304,6 +329,9 @@ def res2net101(pretrained: bool = False, num_classes: int = 1001, in_channels=3,
 
 @register_model
 def res2net152(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
+    """Get 152 layers Res2Net model.
+     Refer to the base class `models.Res2Net` for more details.
+     """
     default_cfg = default_cfgs['res2net152']
     model = Res2Net(Bottle2neck, [3, 8, 36, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 

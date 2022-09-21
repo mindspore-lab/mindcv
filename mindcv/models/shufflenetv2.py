@@ -106,6 +106,14 @@ class ShuffleV2Block(nn.Cell):
 
 
 class ShuffleNetV2(nn.Cell):
+    r"""ShuffleNetV2 model class, based on
+    `"ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design" <https://arxiv.org/abs/1807.11164>`_
+
+    Args:
+        num_classes: number of classification classes. Default: 1000.
+        in_channels: number of input channels. Default: 3.
+        model_size: scale factor which controls the number of channels. Default: '1.5x'.
+    """
 
     def __init__(self,
                  num_classes: int = 1000,
@@ -193,6 +201,9 @@ class ShuffleNetV2(nn.Cell):
 
 @register_model
 def shufflenet_v2_x0_5(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV2:
+    """Get ShuffleNetV2 model with width scaled by 0.5.
+     Refer to the base class `models.ShuffleNetV2` for more details.
+     """
     default_cfg = default_cfgs['shufflenet_v2_0.5']
     model = ShuffleNetV2(model_size='0.5x', num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -204,6 +215,9 @@ def shufflenet_v2_x0_5(pretrained: bool = False, num_classes: int = 1000, in_cha
 
 @register_model
 def shufflenet_v2_x1_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV2:
+    """Get ShuffleNetV2 model with width scaled by 1.0.
+     Refer to the base class `models.ShuffleNetV2` for more details.
+     """
     default_cfg = default_cfgs['shufflenet_v2_1.0']
     model = ShuffleNetV2(model_size='1.0x', num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -215,6 +229,9 @@ def shufflenet_v2_x1_0(pretrained: bool = False, num_classes: int = 1000, in_cha
 
 @register_model
 def shufflenet_v2_x1_5(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV2:
+    """Get ShuffleNetV2 model with width scaled by 1.5.
+     Refer to the base class `models.ShuffleNetV2` for more details.
+     """
     default_cfg = default_cfgs['shufflenet_v2_1.5']
     model = ShuffleNetV2(model_size='1.5x', num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -226,6 +243,9 @@ def shufflenet_v2_x1_5(pretrained: bool = False, num_classes: int = 1000, in_cha
 
 @register_model
 def shufflenet_v2_x2_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV2:
+    """Get ShuffleNetV2 model with width scaled by 2.0.
+     Refer to the base class `models.ShuffleNetV2` for more details.
+     """
     default_cfg = default_cfgs['shufflenet_v2_2.0']
     model = ShuffleNetV2(model_size='2.0x', num_classes=num_classes, in_channels=in_channels, **kwargs)
 

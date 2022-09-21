@@ -1,5 +1,5 @@
 """
-MindSpore implementation of InceptionV3.
+MindSpore implementation of `InceptionV3`.
 Refer to Rethinking the Inception Architecture for Computer Vision.
 """
 
@@ -222,10 +222,10 @@ class InceptionV3(nn.Cell):
         N x 3 x 299 x 299, so ensure your images are sized accordingly.
 
     Args:
-        num_classes (int) : number of classification classes. Default: 1000.
-        aux_logits (int) : use auxiliary classifier or not. Default: False.
-        in_channels (int): number the channels of the input. Default: 3.
-        drop_rate (float) : dropout rate of the layer before main classifier.
+        num_classes: number of classification classes. Default: 1000.
+        aux_logits: use auxiliary classifier or not. Default: False.
+        in_channels: number the channels of the input. Default: 3.
+        drop_rate: dropout rate of the layer before main classifier. Default: 0.2.
     """
 
     def __init__(self,
@@ -316,6 +316,8 @@ class InceptionV3(nn.Cell):
 
 @register_model
 def inception_v3(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> InceptionV3:
+    """Get InceptionV3 model.
+     Refer to the base class `models.InceptionV3` for more details."""
     default_cfg = default_cfgs['inception_v3']
     model = InceptionV3(num_classes=num_classes, aux_logits=True, in_channels=in_channels, **kwargs)
 

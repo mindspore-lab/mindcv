@@ -1,5 +1,5 @@
 """
-MindSpore implementation of InceptionV4.
+MindSpore implementation of `InceptionV4`.
 Refer to Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning.
 """
 
@@ -246,9 +246,9 @@ class InceptionV4(nn.Cell):
     `"Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning" <https://arxiv.org/abs/1602.07261>`_.
 
     Args:
-        num_classes (int) : number of classification classes. Default: 1000.
-        in_channels (int): number the channels of the input. Default: 3.
-        drop_rate (float) : dropout rate of the layer before main classifier.
+        num_classes: number of classification classes. Default: 1000.
+        in_channels: number the channels of the input. Default: 3.
+        drop_rate: dropout rate of the layer before main classifier. Default: 0.2.
     """
 
     def __init__(self,
@@ -298,6 +298,8 @@ class InceptionV4(nn.Cell):
 
 @register_model
 def inception_v4(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> InceptionV4:
+    """Get InceptionV4 model.
+     Refer to the base class `models.InceptionV4` for more details."""
     default_cfg = default_cfgs['inception_v4']
     model = InceptionV4(num_classes=num_classes, in_channels=in_channels, **kwargs)
 

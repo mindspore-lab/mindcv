@@ -113,6 +113,15 @@ class ShuffleV1Block(nn.Cell):
 
 
 class ShuffleNetV1(nn.Cell):
+    r"""ShuffleNetV1 model class, based on
+    `"ShuffleNet: An Extremely Efficient Convolutional Neural Network for Mobile Devices" <https://arxiv.org/abs/1707.01083>`_
+
+    Args:
+        num_classes: number of classification classes. Default: 1000.
+        in_channels: number of input channels. Default: 3.
+        model_size: scale factor which controls the number of channels. Default: '2.0x'.
+        group: number of group for group convolution. Default: 3.
+    """
 
     def __init__(self,
                  num_classes: int = 1000,
@@ -211,6 +220,9 @@ class ShuffleNetV1(nn.Cell):
 
 @register_model
 def shufflenet_v1_g3_x0_5(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV1:
+    """Get ShuffleNetV1 model with width scaled by 0.5 and 3 groups of GPConv.
+     Refer to the base class `models.ShuffleNetV1` for more details.
+     """
     default_cfg = default_cfgs['shufflenet_v1_g3_0.5']
     model = ShuffleNetV1(group=3, model_size='0.5x', num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -222,6 +234,9 @@ def shufflenet_v1_g3_x0_5(pretrained: bool = False, num_classes: int = 1000, in_
 
 @register_model
 def shufflenet_v1_g3_x1_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV1:
+    """Get ShuffleNetV1 model with width scaled by 1.0 and 3 groups of GPConv.
+     Refer to the base class `models.ShuffleNetV1` for more details.
+     """
     default_cfg = default_cfgs['shufflenet_v1_g3_1.0']
     model = ShuffleNetV1(group=3, model_size='1.0x', num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -233,6 +248,9 @@ def shufflenet_v1_g3_x1_0(pretrained: bool = False, num_classes: int = 1000, in_
 
 @register_model
 def shufflenet_v1_g3_x1_5(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV1:
+    """Get ShuffleNetV1 model with width scaled by 1.5 and 3 groups of GPConv.
+     Refer to the base class `models.ShuffleNetV1` for more details.
+     """
     default_cfg = default_cfgs['shufflenet_v1_g3_1.5']
     model = ShuffleNetV1(group=3, model_size='1.5x', num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -244,6 +262,9 @@ def shufflenet_v1_g3_x1_5(pretrained: bool = False, num_classes: int = 1000, in_
 
 @register_model
 def shufflenet_v1_g3_x2_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV1:
+    """Get ShuffleNetV1 model with width scaled by 2.0 and 3 groups of GPConv.
+     Refer to the base class `models.ShuffleNetV1` for more details.
+     """
     default_cfg = default_cfgs['shufflenet_v1_g3_2.0']
     model = ShuffleNetV1(group=3, model_size='2.0x', num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -255,6 +276,9 @@ def shufflenet_v1_g3_x2_0(pretrained: bool = False, num_classes: int = 1000, in_
 
 @register_model
 def shufflenet_v1_g8_x0_5(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV1:
+    """Get ShuffleNetV1 model with width scaled by 0.5 and 8 groups of GPConv.
+     Refer to the base class `models.ShuffleNetV1` for more details.
+     """
     default_cfg = default_cfgs['shufflenet_v1_g8_0.5']
     model = ShuffleNetV1(group=8, model_size='0.5x', num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -266,6 +290,9 @@ def shufflenet_v1_g8_x0_5(pretrained: bool = False, num_classes: int = 1000, in_
 
 @register_model
 def shufflenet_v1_g8_x1_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV1:
+    """Get ShuffleNetV1 model with width scaled by 1.0 and 8 groups of GPConv.
+     Refer to the base class `models.ShuffleNetV1` for more details.
+     """
     default_cfg = default_cfgs['shufflenet_v1_g8_1.0']
     model = ShuffleNetV1(group=8, model_size='1.0x', num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -277,6 +304,9 @@ def shufflenet_v1_g8_x1_0(pretrained: bool = False, num_classes: int = 1000, in_
 
 @register_model
 def shufflenet_v1_g8_x1_5(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV1:
+    """Get ShuffleNetV1 model with width scaled by 1.5 and 8 groups of GPConv.
+     Refer to the base class `models.ShuffleNetV1` for more details.
+     """
     default_cfg = default_cfgs['shufflenet_v1_g8_1.5']
     model = ShuffleNetV1(group=8, model_size='1.5x', num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -288,6 +318,9 @@ def shufflenet_v1_g8_x1_5(pretrained: bool = False, num_classes: int = 1000, in_
 
 @register_model
 def shufflenet_v1_g8_x2_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV1:
+    """Get ShuffleNetV1 model with width scaled by 2.0 and 8 groups of GPConv.
+     Refer to the base class `models.ShuffleNetV1` for more details.
+     """
     default_cfg = default_cfgs['shufflenet_v1_g8_2.0']
     model = ShuffleNetV1(group=8, model_size='2.0x', num_classes=num_classes, in_channels=in_channels, **kwargs)
 

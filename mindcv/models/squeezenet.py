@@ -1,5 +1,5 @@
 """
-MindSpore implementation of SqueezeNet.
+MindSpore implementation of `SqueezeNet`.
 Refer to SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size.
 """
 
@@ -65,10 +65,10 @@ class SqueezeNet(nn.Cell):
         N x 3 x 227 x 227, so ensure your images are sized accordingly.
 
     Args:
-        version (str) : version of the architecture. '1_0' or '1_1'.
-        num_classes (int) : number of classification classes. Default: 1000.
-        drop_rate (float) : dropout rate of the classifier. Default: 0.5.
-        in_channels (int) : number the channels of the input. Default: 3.
+        version: version of the architecture, '1_0' or '1_1'. Default: '1_0'.
+        num_classes: number of classification classes. Default: 1000.
+        drop_rate: dropout rate of the classifier. Default: 0.5.
+        in_channels: number the channels of the input. Default: 3.
     """
 
     def __init__(self,
@@ -148,6 +148,9 @@ class SqueezeNet(nn.Cell):
 
 @register_model
 def squeezenet1_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> SqueezeNet:
+    """Get SqueezeNet model of version 1.0.
+     Refer to the base class `models.SqueezeNet` for more details.
+     """
     default_cfg = default_cfgs['squeezenet_1.0']
     model = SqueezeNet(version='1_0', num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -159,6 +162,9 @@ def squeezenet1_0(pretrained: bool = False, num_classes: int = 1000, in_channels
 
 @register_model
 def squeezenet1_1(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> SqueezeNet:
+    """Get SqueezeNet model of version 1.1.
+     Refer to the base class `models.SqueezeNet` for more details.
+     """
     default_cfg = default_cfgs['squeezenet_1.1']
     model = SqueezeNet(version='1_1', num_classes=num_classes, in_channels=in_channels, **kwargs)
 

@@ -1,5 +1,5 @@
 """
-MindSpore implementation of MobileNetV1.
+MindSpore implementation of `MobileNetV1`.
 Refer to MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications.
 """
 
@@ -58,9 +58,9 @@ class MobileNetV1(nn.Cell):
     `"MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications" <https://arxiv.org/abs/1704.04861>`_
 
     Args:
-        alpha (float) : scale factor of model width. Default: 1.
-        in_channels(int): number the channels of the input. Default: 3.
-        num_classes (int) : number of classification classes. Default: 1000.
+        alpha: scale factor of model width. Default: 1.
+        in_channels: number the channels of the input. Default: 3.
+        num_classes: number of classification classes. Default: 1000.
     """
 
     def __init__(self,
@@ -139,6 +139,9 @@ class MobileNetV1(nn.Cell):
 
 @register_model
 def mobilenet_v1_025_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
+    """Get MobileNetV1 model with width scaled by 0.25.
+     Refer to the base class `models.MobileNetV1` for more details.
+     """
     default_cfg = default_cfgs['mobilenet_v1_0.25_224']
     model = MobileNetV1(alpha=0.25, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
@@ -150,6 +153,9 @@ def mobilenet_v1_025_224(pretrained: bool = False, num_classes: int = 1000, in_c
 
 @register_model
 def mobilenet_v1_050_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
+    """Get MobileNetV1 model with width scaled by 0.5.
+     Refer to the base class `models.MobileNetV1` for more details.
+     """
     default_cfg = default_cfgs['mobilenet_v1_0.5_224']
     model = MobileNetV1(alpha=0.5, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
@@ -161,6 +167,9 @@ def mobilenet_v1_050_224(pretrained: bool = False, num_classes: int = 1000, in_c
 
 @register_model
 def mobilenet_v1_075_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
+    """Get MobileNetV1 model with width scaled by 0.75.
+     Refer to the base class `models.MobileNetV1` for more details.
+     """
     default_cfg = default_cfgs['mobilenet_v1_0.75_224']
     model = MobileNetV1(alpha=0.75, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
@@ -172,6 +181,9 @@ def mobilenet_v1_075_224(pretrained: bool = False, num_classes: int = 1000, in_c
 
 @register_model
 def mobilenet_v1_100_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
+    """Get MobileNetV1 model without width scaling.
+     Refer to the base class `models.MobileNetV1` for more details.
+     """
     default_cfg = default_cfgs['mobilenet_v1_1.0_224']
     model = MobileNetV1(alpha=1.0, in_channels=in_channels, num_classes=num_classes, **kwargs)
 

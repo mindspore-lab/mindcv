@@ -1,5 +1,5 @@
 """
-MindSpore implementation of MobileNetV3.
+MindSpore implementation of `MobileNetV3`.
 Refer to Searching for MobileNetV3.
 """
 
@@ -96,11 +96,11 @@ class MobileNetV3(nn.Cell):
     `"Searching for MobileNetV3" <https://arxiv.org/abs/1905.02244>`_
 
     Args:
-        arch (str) : size of the architecture. 'small' or 'large'.
-        alpha (float) : scale factor of model width. Default: 1.
-        round_nearest (int) : divisor of make divisible function. Default: 8.
-        in_channels(int): number the channels of the input. Default: 3.
-        num_classes (int) : number of classification classes. Default: 1000.
+        arch: size of the architecture. 'small' or 'large'.
+        alpha: scale factor of model width. Default: 1.
+        round_nearest: divisor of make divisible function. Default: 8.
+        in_channels: number the channels of the input. Default: 3.
+        num_classes: number of classification classes. Default: 1000.
     """
 
     def __init__(self,
@@ -222,6 +222,9 @@ class MobileNetV3(nn.Cell):
 
 @register_model
 def mobilenet_v3_small_100(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV3:
+    """Get small MobileNetV3 model without width scaling.
+     Refer to the base class `models.MobileNetV3` for more details.
+     """
     default_cfg = default_cfgs['mobilenet_v3_small_1.0']
     model = MobileNetV3(arch='small', alpha=1.0, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
@@ -233,6 +236,9 @@ def mobilenet_v3_small_100(pretrained: bool = False, num_classes: int = 1000, in
 
 @register_model
 def mobilenet_v3_large_100(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV3:
+    """Get large MobileNetV3 model without width scaling.
+     Refer to the base class `models.MobileNetV3` for more details.
+     """
     default_cfg = default_cfgs['mobilenet_v3_large_1.0']
     model = MobileNetV3(arch='large', alpha=1.0, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
@@ -244,6 +250,9 @@ def mobilenet_v3_large_100(pretrained: bool = False, num_classes: int = 1000, in
 
 @register_model
 def mobilenet_v3_small_075(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV3:
+    """Get small MobileNetV3 model with width scaled by 0.75.
+     Refer to the base class `models.MobileNetV3` for more details.
+     """
     default_cfg = default_cfgs['mobilenet_v3_small_0.75']
     model = MobileNetV3(arch='small', alpha=0.75, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
@@ -255,6 +264,9 @@ def mobilenet_v3_small_075(pretrained: bool = False, num_classes: int = 1000, in
 
 @register_model
 def mobilenet_v3_large_075(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV3:
+    """Get large MobileNetV3 model with width scaled by 0.75.
+     Refer to the base class `models.MobileNetV3` for more details.
+     """
     default_cfg = default_cfgs['mobilenet_v3_large_0.75']
     model = MobileNetV3(arch='large', alpha=0.75, in_channels=in_channels, num_classes=num_classes, **kwargs)
 

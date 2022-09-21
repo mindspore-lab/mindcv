@@ -1,5 +1,5 @@
 """
-MindSpore implementation of GoogLeNet.
+MindSpore implementation of `GoogLeNet`.
 Refer to Going deeper with convolutions.
 """
 
@@ -120,11 +120,11 @@ class GoogLeNet(nn.Cell):
     `"Going Deeper with Convolutions" <https://arxiv.org/abs/1409.4842>`_.
 
     Args:
-        num_classes (int) : number of classification classes. Default: 1000.
-        aux_logits (int) : use auxiliary classifier or not. Default: False.
-        in_channels (int): number the channels of the input. Default: 3.
-        drop_rate (float) : dropout rate of the layer before main classifier.
-        drop_rate_aux (float) : dropout rate of the layer before auxiliary classifier.
+        num_classes: number of classification classes. Default: 1000.
+        aux_logits: use auxiliary classifier or not. Default: False.
+        in_channels: number the channels of the input. Default: 3.
+        drop_rate: dropout rate of the layer before main classifier. Default: 0.2.
+        drop_rate_aux: dropout rate of the layer before auxiliary classifier. Default: 0.7.
     """
 
     def __init__(self,
@@ -221,6 +221,8 @@ class GoogLeNet(nn.Cell):
 
 @register_model
 def googlenet(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> GoogLeNet:
+    """Get GoogLeNet model.
+     Refer to the base class `models.GoogLeNet` for more details."""
     default_cfg = default_cfgs['googlenet']
     model = GoogLeNet(num_classes=num_classes, in_channels=in_channels, **kwargs)
 
