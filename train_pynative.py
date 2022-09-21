@@ -8,12 +8,40 @@ from mindcv.loss import create_loss
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
 from config import parse_args
+from time import time
+from mindspore import ops
+import os
 
 ms.set_seed(1)
 
+def train_epoch(network, dataset, loss_fn, optimizer, log_interval=100):
+    # Define forward function
+    def forward_fn(data, label):
+        logits = network(data)
+        loss = loss_fn(logits, label)
+        return loss, logits
+
+    # Get gradient function
+    grad_fn = ops.value_and_grad(forward_fn, None, optimizer.parameters, has_aux=True)
+
+    # Define function of one-step training,
+    @ms.ms_function
+    def train_step(data, label):
+        (loss, _), grads = grad_fn(data, label)
+        loss = ops.depend(loss, optimizer(grads))
+        return loss
+
+    network.set_train()
+    size = dataset.get_dataset_size()
+    for batch, (data, label) in enumerate(dataset.create_tuple_iterator()):
+        loss = train_step(data, label)
+        if (batch+1) % log_interval  == 0:
+            loss, current = loss.asnumpy(), batch
+            print(f"Step {current+1:>3d}/{size:>3d}, loss: {loss:>7f}")
+
 
 def train(args):
-    ms.set_context(mode=args.mode)
+    ms.set_context(mode=ms.PYNATIVE_MODE)
 
     if args.distribute:
         init()
@@ -63,7 +91,7 @@ def train(args):
     loader_train = create_loader(
         dataset=dataset_train,
         batch_size=args.batch_size,
-        drop_remainder=args.drop_remainder,
+        drop_remainder=False,
         is_training=True,
         mixup=args.mixup,
         num_classes=args.num_classes,
@@ -97,8 +125,6 @@ def train(args):
                                     decay_rate=args.decay_rate)
 
     # create optimizer
-    #TODO: consistent naming opt, name, dataset_name 
-    #TODO: network as input param can be simpler.   
     optimizer = create_optimizer(network.trainable_params(),
                                  opt=args.opt,
                                  lr=lr_scheduler,
@@ -107,35 +133,23 @@ def train(args):
                                  nesterov=args.use_nesterov,
                                  filter_bias_and_bn=args.filter_bias_and_bn,
                                  loss_scale=args.loss_scale)
-    
-    # TODO: this following code for training the network is too complex!! Needs to be simplified! warp into a trainer? 
-    # init model
-    if args.loss_scale > 1.0:
-        loss_scale_manager = FixedLossScaleManager(loss_scale=args.loss_scale, drop_overflow_update=False)
-        model = Model(network, loss_fn=loss, optimizer=optimizer, metrics={'acc'}, amp_level=args.amp_level,
-                      loss_scale_manager=loss_scale_manager)
-    else:
-        model = Model(network, loss_fn=loss, optimizer=optimizer, metrics={'acc'}, amp_level=args.amp_level)
 
-    # callback
-    loss_cb = LossMonitor(per_print_times=steps_per_epoch)
-    time_cb = TimeMonitor(data_size=steps_per_epoch)
-    callbacks = [loss_cb, time_cb]
-    ckpt_config = CheckpointConfig(
-        save_checkpoint_steps=int(steps_per_epoch * args.ckpt_save_interval),
-        keep_checkpoint_max=args.keep_checkpoint_max)
-    ckpt_cb = ModelCheckpoint(prefix=args.model,
-                              directory=args.ckpt_save_dir,
-                              config=ckpt_config)
-    if args.distribute:
-        if rank_id == 0:
-            callbacks.append(ckpt_cb)
-    else:
-        callbacks.append(ckpt_cb)
+    # training
+    # TODO: args.loss_scale is not making effect. 
+    print('Training...')
+    for t in range(args.epoch_size):
+        #print(f"Epoch {t+1}\n-------------------------------")
+        b = time()
+        train_epoch(network, loader_train, loss, optimizer, log_interval=steps_per_epoch)
+        print(f'Epoch {t+1} training time: {time()-b: .3f}s')
 
-    # train model
-    model.train(args.epoch_size, loader_train, callbacks=callbacks, dataset_sink_mode=args.dataset_sink_mode)
-
+	# Save checkpoint
+        if ((t + 1) % args.ckpt_save_interval == 0):
+            if (not args.distribute) or (args.distribute and rank_id==0):
+                save_path = os.path.join(args.ckpt_save_dir, f"{args.model}-{t+1}.ckpt")
+                ms.save_checkpoint(network, save_path, async_save=True)
+                print(f"Saving model to {save_path}")
+    print("Done!")
 
 if __name__ == '__main__':
     args = parse_args()

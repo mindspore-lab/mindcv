@@ -29,7 +29,7 @@ def create_parser():
                        help='Type of dataset (default="imagenet")')
     group.add_argument('--data_dir', type=str, help='Path to dataset')
     group.add_argument('--train_split', type=str, default='train', help='dataset train split name')
-    group.add_argument('--val_split', type=str, default='validation', help='dataset validation split name')
+    group.add_argument('--val_split', type=str, default='val', help='dataset validation split name')
     group.add_argument('--dataset_download', action='store_true', default=False,
                        help='Download dataset (default=False)')
     group.add_argument('--num_parallel_workers', type=int, default=8,
@@ -103,6 +103,8 @@ def create_parser():
                        help='Max number of checkpoint files (default=10)')
     group.add_argument('--ckpt_save_dir', type=str, default="./ckpt",
                        help='Path of checkpoint (default="./ckpt")')
+    group.add_argument('--ckpt_save_interval', type=int, default=1,
+                       help='checkpoint saving interval, unit: epoch, (default=1)')
     group.add_argument('--epoch_size', type=int, default=90,
                        help='Train epoch size (default=90)')
     group.add_argument('--dataset_sink_mode', action='store_true', default=True,
@@ -132,8 +134,8 @@ def create_parser():
     group.add_argument('--scheduler', type=str, default='constant',
                        choices=['constant', 'warmup_cosine_decay', 'exponential_decay', 'step_decay'],
                        help='Type of scheduler (default="constant")')
-    group.add_argument('--lr', type=float, default=0.01,
-                       help='learning rate (default=0.01)')
+    group.add_argument('--lr', type=float, default=0.001,
+                       help='learning rate (default=0.001)')
     group.add_argument('--min_lr', type=float, default=None,
                        help='The minimum value of learning rate if scheduler supports (default=None)')
     group.add_argument('--warmup_epochs', type=int, default=None,
