@@ -23,8 +23,16 @@ Under construction...
 - tqdm
 - openmpi 4.0.3 (for distributed mode) 
 
+To install the dependent packages, please run
+```shell
+pip install -r requirements.txt
+```
 
-The following instructions assume that you have desired dependency installed and working. 
+MindSpore can be easily installed by following the [official instruction](https://www.mindspore.cn/install) where you can select your hardware platform for the best fit.  
+
+To run training in distributed mode, [openmpi](https://www.open-mpi.org/software/ompi/v4.0/) is needed.   
+
+The following instructions assume the desired dependency is fulfilled. 
 
 ### Install with pip
 
@@ -50,7 +58,7 @@ You can see the notebook demo ([Get Started With MindCV](quick_tour.ipynb)) to l
 
 
 ### Quick Running Scripts
-It is easy to train your model on standard datasets or your own dataset with MindCV. 
+It is easy to train your model on standard datasets or your own dataset with MindCV. Below are some useful scripts that you can run directly to train or validate a model.  
 
 - Standalone Training
 
@@ -61,14 +69,6 @@ python train.py --model=densenet121 --optimizer=adam --lr=0.001 \
 ```
 
 Detailed adjustable hyper-parameters for data transform, model, loss, and optimizer configuration can be viewed in [config.py](config.py)
-
-- Validation
-
-To validate, you can run `validate.py` as shown in the following example.
-```shell
-python validate.py --model=densenet121 --dataset=cifar10 --val_split=test \
-		   --num_classes=10 --dataset_download
-``` 
 
 - Distributed Training
 
@@ -87,6 +87,14 @@ We also provide that yaml config files that yield competitive results on ImageNe
 ```shell
 mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
+
+- Validation
+
+To validate the model, you can use `validate.py`. Here is an example.
+```shell
+python validate.py --model=densenet121 --dataset=imagenet --val_split=val \
+		           --ckpt_path='./ckpt/densenet121-best.ckpt' 
+``` 
 
 
 ## Tutorials
