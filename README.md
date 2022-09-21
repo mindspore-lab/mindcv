@@ -52,12 +52,12 @@ You can see [Get Started With MindCV](quick_tour.ipynb) to learn about the key c
 ### Running Scripts
 It is easy to train your model on standard datasets or your own dataset with MindCV. 
 
-
 - Standalone Training
 
 You can run `train.py` to do training with customized hyper-parameters. Here is the example for training a DenseNet on CIFAR10 dataset.
 ``` shell
-python train.py --model=densenet121 --optimizer=adam --lr=0.001 --dataset=cifar10 --num_classes=10 --dataset_download    
+python train.py --model=densenet121 --optimizer=adam --lr=0.001 \
+		--dataset=cifar10 --num_classes=10 --dataset_download    
 ```
 
 All supported hyper-parameters (for data transform, model, loss, optimizer, and others) can be viewed in [config.py](config.py)
@@ -65,25 +65,28 @@ All supported hyper-parameters (for data transform, model, loss, optimizer, and 
 - Validation
 
 To validate, you can run `validate.py` as shown in the following example.
-`python validate.py --model=densenet121 --dataset=cifar10 --val_split=test --data_dir=/data/cifar/cifar-10-batches-bin --num_classes=10 --dataset_download` 
-
+```shell
+python validate.py --model=densenet121 --dataset=cifar10 --val_split=test `
+		   --data_dir=/data/cifar/cifar-10-batches-bin --num_classes=10 --dataset_download
+``` 
 
 - Distributed Training
 
 For large datasets like ImageNet, it is necessary to do training in distributed mode on multiple devices, which is well supported in MindCV. The following script is an example for training DenseNet121 on ImageNet with 4 GPUs.   
 
-`
+```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3  # suppose there are 4 GPUs
-mpirun --allow-run-as-root -n 4 python train.py --distribute --model=densenet121 --dataset=imagenet --data_dir=./datasets/imagenet   
-`
+mpirun --allow-run-as-root -n 4 python train.py --distribute \
+	--model=densenet121 --dataset=imagenet --data_dir=./datasets/imagenet   
+```
 
 - Train with Yaml Config
 
 We also provide that yaml config files that yield competitive results on ImageNet for different models in [yaml config files](configs). To trigger training using yaml config, 
 
-`
+```shell
 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
-`
+```
 
 ## Tutorials
 We provide [jupyter notebook tutorials](tutorials) for helping you.  
