@@ -1,5 +1,5 @@
 """
-MindSpore implementation of MobileNetV3.
+MindSpore implementation of `MobileNetV3`.
 Refer to Searching for MobileNetV3.
 """
 
@@ -96,11 +96,11 @@ class MobileNetV3(nn.Cell):
     `"Searching for MobileNetV3" <https://arxiv.org/abs/1905.02244>`_
 
     Args:
-        arch (str) : size of the architecture. 'small' or 'large'.
-        alpha (float) : scale factor of model width. Default: 1.
-        round_nearest (int) : divisor of make divisible function. Default: 8.
-        in_channels(int): number the channels of the input. Default: 3.
-        num_classes (int) : number of classification classes. Default: 1000.
+        arch: size of the architecture. 'small' or 'large'.
+        alpha: scale factor of model width. Default: 1.
+        round_nearest: divisor of make divisible function. Default: 8.
+        in_channels: number the channels of the input. Default: 3.
+        num_classes: number of classification classes. Default: 1000.
     """
 
     def __init__(self,

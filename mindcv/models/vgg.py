@@ -1,5 +1,5 @@
 """
-MindSpore implementation of VGGNet.
+MindSpore implementation of `VGGNet`.
 Refer to SqueezeNet: Very Deep Convolutional Networks for Large-Scale Image Recognition.
 """
 
@@ -70,11 +70,11 @@ class VGG(nn.Cell):
     `"Very Deep Convolutional Networks for Large-Scale Image Recognition" <https://arxiv.org/abs/1409.1556>`_
 
     Args:
-        model_name (str) : name of the architecture. 'vgg11', 'vgg13', 'vgg16' or 'vgg19'.
-        batch_norm (bool) : use batch normalization or not.
-        num_classes (int) : number of classification classes. Default: 1000.
-        in_channels (int) : number the channels of the input. Default: 3.
-        drop_rate (float) : dropout rate of the classifier. Default: 0.5.
+        model_name: name of the architecture. 'vgg11', 'vgg13', 'vgg16' or 'vgg19'.
+        batch_norm: use batch normalization or not. Default: False.
+        num_classes: number of classification classes. Default: 1000.
+        in_channels: number the channels of the input. Default: 3.
+        drop_rate: dropout rate of the classifier. Default: 0.5.
     """
 
     def __init__(self,

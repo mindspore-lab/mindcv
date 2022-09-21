@@ -1,3 +1,8 @@
+"""
+MindSpore implementation of `Res2Net`.
+Refer to Res2Net: A New Multi-scale Backbone Architecture.
+"""
+
 from typing import Optional, Type, List
 
 import math
@@ -133,6 +138,20 @@ class Bottle2neck(nn.Cell):
 
 
 class Res2Net(nn.Cell):
+    r"""Res2Net model class, based on
+    `"Res2Net: A New Multi-scale Backbone Architecture" <https://arxiv.org/abs/1904.01169>`_
+
+    Args:
+        block: block of resnet.
+        layer_nums: number of layers of each stage.
+        version: variety of Res2Net, 'res2net' or 'res2net_v1b'. Default: 'res2net'.
+        num_classes: number of classification classes. Default: 1000.
+        in_channels: number the channels of the input. Default: 3.
+        groups: number of groups for group conv in blocks. Default: 1.
+        base_width: base width of pre group hidden channel in blocks. Default: 26.
+        scale: scale factor of Bottle2neck. Default: 4.
+        norm: normalization layer in blocks. Default: None.
+    """
 
     def __init__(self,
                  block: Type[nn.Cell],

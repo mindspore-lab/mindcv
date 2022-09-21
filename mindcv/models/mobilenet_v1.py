@@ -1,5 +1,5 @@
 """
-MindSpore implementation of MobileNetV1.
+MindSpore implementation of `MobileNetV1`.
 Refer to MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications.
 """
 
@@ -58,9 +58,9 @@ class MobileNetV1(nn.Cell):
     `"MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications" <https://arxiv.org/abs/1704.04861>`_
 
     Args:
-        alpha (float) : scale factor of model width. Default: 1.
-        in_channels(int): number the channels of the input. Default: 3.
-        num_classes (int) : number of classification classes. Default: 1000.
+        alpha: scale factor of model width. Default: 1.
+        in_channels: number the channels of the input. Default: 3.
+        num_classes: number of classification classes. Default: 1000.
     """
 
     def __init__(self,

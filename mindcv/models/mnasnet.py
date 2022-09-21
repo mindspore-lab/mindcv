@@ -1,3 +1,8 @@
+"""
+MindSpore implementation of `MnasNet`.
+Refer to MnasNet: Platform-Aware Neural Architecture Search for Mobile.
+"""
+
 from typing import List
 
 import mindspore.nn as nn
@@ -72,6 +77,15 @@ class InvertedResidual(nn.Cell):
 
 
 class Mnasnet(nn.Cell):
+    r"""MnasNet model architecture from
+    `"MnasNet: Platform-Aware Neural Architecture Search for Mobile" <https://arxiv.org/abs/1807.11626>`_.
+
+    Args:
+        alpha: scale factor of model width.
+        in_channels: number the channels of the input. Default: 3.
+        num_classes: number of classification classes. Default: 1000.
+        drop_rate: dropout rate of the layer before main classifier. Default: 0.2.
+    """
 
     def __init__(self,
                  alpha: float,

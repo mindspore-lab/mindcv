@@ -1,5 +1,5 @@
 """
-MindSpore implementation of MobileNetV2.
+MindSpore implementation of `MobileNetV2`.
 Refer to MobileNetV2: Inverted Residuals and Linear Bottlenecks.
 """
 
@@ -120,10 +120,10 @@ class MobileNetV2(nn.Cell):
     `"MobileNetV2: Inverted Residuals and Linear Bottlenecks" <https://arxiv.org/abs/1801.04381>`_
 
     Args:
-        alpha (float) : scale factor of model width. Default: 1.
-        round_nearest (int) : divisor of make divisible function. Default: 8.
-        in_channels(int): number the channels of the input. Default: 3.
-        num_classes (int) : number of classification classes. Default: 1000.
+        alpha: scale factor of model width. Default: 1.
+        round_nearest: divisor of make divisible function. Default: 8.
+        in_channels: number the channels of the input. Default: 3.
+        num_classes: number of classification classes. Default: 1000.
     """
 
     def __init__(self,

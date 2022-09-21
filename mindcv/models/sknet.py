@@ -1,5 +1,5 @@
 """
-MindSpore implementation of SKNet.
+MindSpore implementation of `SKNet`.
 Refer to Selective Kernel Networks.
 """
 
@@ -139,14 +139,14 @@ class SKNet(ResNet):
     `"Selective Kernel Networks" <https://arxiv.org/abs/1903.06586>`_
 
     Args:
-        block (nn.Cell) : block of sknet.
-        layers (List[int]) : number of layers of each stage.
-        num_classes (int) : number of classification classes. Default: 1000.
-        in_channels (int) : number the channels of the input. Default: 3.
-        groups (int) : number of groups for group conv in blocks.
-        base_width (int) : base width of pre group hidden channel in blocks.
-        norm (Optional[nn.Cell]) : normalization layer in blocks.
-        sk_kwargs (Optional[Dict]) : kwargs of selective kernel
+        block: block of sknet.
+        layers: number of layers of each stage.
+        num_classes: number of classification classes. Default: 1000.
+        in_channels: number the channels of the input. Default: 3.
+        groups: number of groups for group conv in blocks. Default: 1.
+        base_width: base width of pre group hidden channel in blocks. Default: 64.
+        norm: normalization layer in blocks. Default: None.
+        sk_kwargs: kwargs of selective kernel. Default: None.
     """
     def __init__(self,
                  block: Type[nn.Cell],

@@ -1,5 +1,5 @@
 """
-MindSpore implementation of ResNet.
+MindSpore implementation of `ResNet`.
 Refer to Deep Residual Learning for Image Recognition.
 """
 
@@ -151,13 +151,13 @@ class ResNet(nn.Cell):
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/abs/1512.03385>`_
 
     Args:
-        block (nn.Cell) : block of resnet.
-        layers (List[int]) : number of layers of each stage.
-        num_classes (int) : number of classification classes. Default: 1000.
-        in_channels (int) : number the channels of the input. Default: 3.
-        groups (int) : number of groups for group conv in blocks.
-        base_width (int) : base width of pre group hidden channel in blocks.
-        norm (Optional[nn.Cell]) : normalization layer in blocks.
+        block: block of resnet.
+        layers: number of layers of each stage.
+        num_classes: number of classification classes. Default: 1000.
+        in_channels: number the channels of the input. Default: 3.
+        groups: number of groups for group conv in blocks. Default: 1.
+        base_width: base width of pre group hidden channel in blocks. Default: 64.
+        norm: normalization layer in blocks. Default: None.
     """
 
     def __init__(self,
