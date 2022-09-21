@@ -15,7 +15,7 @@ def validate(args):
     dataset_eval = create_dataset(
         name=args.dataset,
         root=args.data_dir,
-        split='val',
+        split=args.val_split,
         num_parallel_workers=args.num_parallel_workers,
         download=args.dataset_download)
 

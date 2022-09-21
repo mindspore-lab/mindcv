@@ -25,33 +25,34 @@ def create_dataset(
         download: bool = False,
         **kwargs
 ):
-    '''
-    name: dataset name, if empty '' or non-standard dataset name, then process as customized dataset.    
-    root: dataset root dir. 
-    split: subfolder of root dir, e.g., train, val, test
-    shuffle: whether to shuffle the dataset, default: True
-    num_samples (int, optional): Number of elements to sample (default=None, which means sample all elements).
-    
-    For custom datasets and imagenet, the dataset dir should follow the structure like: 
-    .dataset_name/
-    ├── train/  
-    │  ├── class1/
-    │  │   ├── 000001.jpg
-    │  │   ├── 000002.jpg
-    │  │   └── ....
-    │  └── class2/
-    │      ├── 000001.jpg
-    │      ├── 000002.jpg
-    │      └── ....
-    └── val/   
-       ├── class1/
-       │   ├── 000001.jpg
-       │   ├── 000002.jpg
-       │   └── ....
-       └── class2/
-           ├── 000001.jpg
-           ├── 000002.jpg
-           └── ....
+    r'''
+    Args:
+        name: dataset name: MNIST, CIFAR10, ImageNeT, ''. '' means a customized dataset. Default: ''    
+        root: dataset root dir. 
+        split: data split: '' or split name string (train/val/test), if it is '', no split is used. Otherwise, it is a subfolder of root dir, e.g., train, val, test. Default: 'train'
+        shuffle: whether to shuffle the dataset, default: True
+        num_samples (int, optional): Number of elements to sample (default=None, which means sample all elements).
+        
+        For custom datasets and imagenet, the dataset dir should follow the structure like: 
+        .dataset_name/
+        ├── split1/  
+        │  ├── class1/
+        │  │   ├── 000001.jpg
+        │  │   ├── 000002.jpg
+        │  │   └── ....
+        │  └── class2/
+        │      ├── 000001.jpg
+        │      ├── 000002.jpg
+        │      └── ....
+        └── split2/   
+           ├── class1/
+           │   ├── 000001.jpg
+           │   ├── 000002.jpg
+           │   └── ....
+           └── class2/
+               ├── 000001.jpg
+               ├── 000002.jpg
+               └── ....
 
     '''
     

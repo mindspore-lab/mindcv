@@ -30,7 +30,7 @@ def train(args):
     dataset_train = create_dataset(
         name=args.dataset,
         root=args.data_dir,
-        split='train',
+        split=args.train_split,
         shuffle=args.shuffle,
         num_samples=args.num_samples,
         num_shards=device_num,
