@@ -80,10 +80,10 @@ mpirun --allow-run-as-root -n 4 python train.py --distribute \
 
 - Train with Yaml Config
 
-We also provide that yaml config files that yield competitive results on ImageNet for different models in [config](configs) folder. To trigger training using yaml config, 
+The [yaml config files](config) that yield competitive results on ImageNet for different models are listed in the `config` folder. To trigger training using preset yaml config, 
 
 ```shell
-mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
+mpirun --allow-run-as-root -n 4 python train.py -c config/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
 
 - Validation
