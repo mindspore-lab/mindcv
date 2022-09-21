@@ -28,11 +28,20 @@ def create_dataset(
     r'''
     Args:
         name: dataset name: MNIST, CIFAR10, ImageNeT, ''. '' means a customized dataset. Default: ''    
-        root: dataset root dir. 
+        root: dataset root dir.  Default: './'
         split: data split: '' or split name string (train/val/test), if it is '', no split is used. Otherwise, it is a subfolder of root dir, e.g., train, val, test. Default: 'train'
-        shuffle: whether to shuffle the dataset, default: True
+        shuffle: whether to shuffle the dataset. Default: True
         num_samples (int, optional): Number of elements to sample (default=None, which means sample all elements).
-        
+        num_shards (int, optional): Number of shards that the dataset will be divided
+            into (default=None). When this argument is specified, `num_samples` reflects
+            the maximum sample number of per shard.
+        shard_id (int, optional): The shard ID within `num_shards` (default=None). This
+            argument can only be specified when `num_shards` is also specified.
+        num_parallel_workers (int, optional): Number of workers to read the data
+            (default=None, set in the config).
+        download: whether to download the dataset. Default: False
+
+    Note:
         For custom datasets and imagenet, the dataset dir should follow the structure like: 
         .dataset_name/
         ├── split1/  
@@ -53,6 +62,9 @@ def create_dataset(
                ├── 000001.jpg
                ├── 000002.jpg
                └── ....
+
+    Returns:
+        Dataset object
 
     '''
     

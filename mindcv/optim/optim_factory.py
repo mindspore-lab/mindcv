@@ -31,7 +31,19 @@ def create_optimizer(
         loss_scale: float = 1.0,
         **kwargs):
     '''
-    opt: optimizer name, default 'adam' for covolution-based networks. 'AdamW' is recommended for ViT-based networks.
+    Args:
+        params: network parameters
+        opt: optimizer name: 'sgd', 'nesterov', 'momentum', 'adam', 'adamw', 'rmsprop', 'adagrad', 'lamb'. Adam is the default choise for covolution-based networks. 'AdamW' is recommended for ViT-based networks. Default: 'adam'
+        lr: learning rate: float or lr scheduler. Fixed and dynamic learning rate are supported. Default: 1e-3.
+        weight_decay: weight decay factor, Default: 0
+        momentum: momentum if the optimizer supports. Default: 0.9 
+        nesterov: Whether to use Nesterov Accelerated Gradient (NAG) algorithm to update the gradients.
+            If true, update the gradients using NAG.
+        filter_bias_and_bn: whether to filter batch norm paramters and bias from weight decay. if True, weight decay will not apply on BN parameters and bias in Conv or Dense layers.  
+        loss_scale (float): A floating point value for the loss scale, which must be larger than 0.0. Default: 1.0
+
+    Returns:
+        Optimizer object 
     '''
 
     opt = opt.lower()

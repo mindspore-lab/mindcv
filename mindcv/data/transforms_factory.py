@@ -141,11 +141,15 @@ def create_transforms(
         is_training=False,
         **kwargs
 ):
-    ''' 
+    r''' 
     Args:
         dataset_name: if '', customized dataset. Currently apply the same transform pipeline as ImageNet. if standard dataset name is given including imagenet, cifar10, mnist, preset transforms will be returned.   
         image_resize: the image size after resize for adapting to network.
         is_training: if True, augmentation will be applied if support 
+        **kwargs: additional args parsed to `transforms_imagenet_train` and `transforms_imagenet_eval`
+
+    Returns:
+        A list of transformation operations
     '''
 
     dataset_name = dataset_name.lower()

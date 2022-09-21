@@ -24,7 +24,6 @@ def create_scheduler(
         decay_epochs: epochs to decay LR to min_lr for cyclic and polynomial schedulers. decay LR by a factor of decay_rate every `decay_epochs` for exponential scheduler and step LR scheduler
         decay_rate: LR decay rate (default: 0.9)
         milestones: list of epoch milestones for multi_step_decay scheduler. Must be increasing.
-
     
     Returns: 
         Cell object for computing LR with input of current global steps 
