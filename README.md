@@ -1,22 +1,21 @@
 # MindSpore Computer Vision
 
+## Introduction
 MindSpore Computer Vision is an open source computer vision research toolbox based on MindSpore in computer vision direction. It is mainly used for the development of image tasks and includes a large number of classic and cutting-edge deep learning classification models, such as ResNet, ViT, and SwinTransformer.
 
-## Major Features
 
-- Various backbones based on CNN and Transformer and pretrained models
-- High efficiency, extensibility and compatibility(GPU/CPU/Ascend)
-- Easy-to-use API
+### Major Features
+- Friendly modular design for the overal DL workflow, including constructing dataloader, models, optimizer, loss for training and testing. It is easy to customize your data transform and learning algorithms. 
+- State-of-art models, MindCV provides various SoTA CNN-based and Transformer-based models with pretrained weights including SwinTransformer and EfficientNet (See model list) 
+- High efficiency, extensibility and compatibility for different hardware platform  (GPU/CPU/Ascend)
 
-## Base Structure
+### Results
 
-MindSpore Computer Vision, a MindSpore base Python package, provides high-level features:
+Under construction... 
 
-- Base backbone of models like resnet and mobilenet series.
-- Deep neural networks' workflows which contain loss, optimizers, lr_scheduler.
-- Domain oriented rich dataset interface.
+## Installation
 
-## Dependency
+### Dependency
 
 - mindspore >= 1.8.1
 - numpy >= 1.17.0
@@ -24,15 +23,16 @@ MindSpore Computer Vision, a MindSpore base Python package, provides high-level 
 - tqdm
 - openmpi 4.0.3 (for distributed mode) 
 
-## Installation
 
 The following instructions assume that you have desired dependency installed and working. 
+
+### Install with pip
 
 ```shell
 pip install https://github.com/mindlab-ai/mindcv/releases/download/v0.0.1-alpha/mindcv-0.0.1a0-py3-none-any.whl
 ```
 
-- From source:
+### Install from source
 
 ```shell
 # Clone the mindcv repository.
@@ -43,66 +43,83 @@ cd mindcv
 python setup.py install
 ```
 
-## Get Started
-See [Get Started With MindCV](quick_tour.ipynb)  to learn about basic usage.
+## Get Started 
+
+### Quick tour
+You can see [Get Started With MindCV](quick_tour.ipynb) to learn about the key component in MindCV . 
 
 
-## Changes 
+### Running Scripts
+It is easy to train your model on standard datasets or your own dataset with MindCV. 
 
-### 2022/09/13
+
+- Standalone Training
+
+You can run `train.py` to do training with customized hyper-parameters. Here is the example for training a DenseNet on CIFAR10 dataset.
+``` shell
+python train.py --model=densenet121 --optimizer=adam --lr=0.001 --dataset=cifar10 --num_classes=10 --dataset_download    
+```
+
+All supported hyper-parameters (for data transform, model, loss, optimizer, and others) can be viewed in [config.py](config.py)
+
+- Validation
+
+To validate, you can run `validate.py` as shown in the following example.
+```shell
+python validate.py --model=densenet121 --dataset=cifar10 --val_split=test --data_dir=/data/cifar/cifar-10-batches-bin --num_classes=10 --dataset_download  
+```
+
+- Distributed Training
+
+For large datasets like ImageNet, it is necessary to do training in distributed mode on multiple devices, which is well supported in MindCV. The following script is an example for training DenseNet121 on ImageNet with 4 GPUs.   
+
+```shell
+export CUDA_VISIBLE_DEVICES=0,1,2,3  # suppose there are 4 GPUs
+mpirun --allow-run-as-root -n 4 python train.py --distribute --model=densenet121 --dataset=imagenet --data_dir=./datasets/imagenet   
+```
+
+- Train with Yaml Config
+
+We also provide that yaml config files that yield competitive results on ImageNet for different models in [yaml config files](configs). To trigger training using yaml config, 
+
+```
+python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
+```
+
+## Tutorials
+We provide [jupyter notebook tutorials](tutorials) for helping you.  
+
+- [Learn about configs](tutorials/learn_about_config.ipynb)  //tbc
+- [Inference with a pretrained model](tutorials/inference.ipynb) //tbc
+- [Finetune a pretrained model on custom datasets](tutorials/finetune.ipynb) 
+- [Customize models](tutorials/customize_model.ipynb)
+- [Optimizing performance for vision transformer](tutorials/transformer.ipynb)
+
+
+## Notes
+### What is New 
+
+- 2022/09/13
 * optim factory 
 1. Add Adan optimizer (experimental), tested in non-dist graph mode. 
 
-* dataset factory 
-1. Adjust interface for custom data. 
-
-* test
-1. unit test for optim and models
-2. test scripts for finetuning and customized dataset 
-
-### 2022/09/06
-
-* loss factory 
-1. Remove args param, use detailed loss-related params
-2. Add BCE loss
-3. add class weighted loss support, weighted BCE loss and weighted CE loss. 
-4. change arg name `smooth_factor` to `label_smoothing`  
-5. change loss type and param organization structure. 
-6. add test code 
-
-* optim factory 
-1. adjust APIs, remove args
-2. add adam, adamW, lamb, adagrad
-
-* scheduler factory
-1. reorganize code, remove args
-2. support Step decay LR, exponential decay LR. 
-
-* TODOs:
-1. test loss computation correctness 
-2. check adamW difference compared to pytorch
-3. label smoothing support for BCE
-4. label data type changed to float for using BCE loss
-
-
-
-## License
+### License
 
 This project is released under the [Eclipse Public License 1.0](LICENSE).
 
-## Feedbacks and Contact
+### Feedbacks and Contact
 
 The dynamic version is still under development, if you find any issue or have an idea on new features, please don't hesitate to contact us via [issue](https://github.com/mindlab-ai/mindcv/issues).
 
-## Acknowledgement
+### Acknowledgement
 
 MindSpore is an open source project that welcome any contribution and feedback. We wish that the toolbox and benchmark could serve the growing research community by providing a flexible as well as standardized toolkit to reimplement existing methods and develop their own new computer vision methods.
 
-## Contributing
+### Contributing
 
 We appreciate all contributions to improve MindSpore Vision. Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline.
 
-## Citation
+### Citation
 
 If you find this project useful in your research, please consider citing:
 
