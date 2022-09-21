@@ -51,8 +51,8 @@ python setup.py install
 
 ## Get Started 
 
-### Hands-on Tutiral
-We provide an hands-on tutorial - [Get Started With MindCV](quick_tour.ipynb) to help learn about the basic usage of MindCV quickly. 
+### Hands-on Demo
+Please see the [Quick Start Demo] (quick_tour.ipynb) to help you get started with MindCV and learn about the basic usage. 
 
 
 ### Quick Running Scripts
