@@ -258,6 +258,9 @@ class ResNet(nn.Cell):
 
 @register_model
 def resnet18(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    """Get 18 layers ResNet model.
+     Refer to the base class `models.ResNet` for more details.
+     """
     default_cfg = default_cfgs['resnet18']
     model = ResNet(BasicBlock, [2, 2, 2, 2], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -269,6 +272,9 @@ def resnet18(pretrained: bool = False, num_classes: int = 1000, in_channels=3, *
 
 @register_model
 def resnet34(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    """Get 34 layers ResNet model.
+     Refer to the base class `models.ResNet` for more details.
+     """
     default_cfg = default_cfgs['resnet34']
     model = ResNet(BasicBlock, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -280,6 +286,9 @@ def resnet34(pretrained: bool = False, num_classes: int = 1000, in_channels=3, *
 
 @register_model
 def resnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    """Get 50 layers ResNet model.
+     Refer to the base class `models.ResNet` for more details.
+     """
     default_cfg = default_cfgs['resnet50']
     model = ResNet(Bottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -291,6 +300,9 @@ def resnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, *
 
 @register_model
 def resnet101(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    """Get 101 layers ResNet model.
+     Refer to the base class `models.ResNet` for more details.
+     """
     default_cfg = default_cfgs['resnet101']
     model = ResNet(Bottleneck, [3, 4, 23, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -302,6 +314,9 @@ def resnet101(pretrained: bool = False, num_classes: int = 1000, in_channels=3, 
 
 @register_model
 def resnet152(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    """Get 152 layers ResNet model.
+     Refer to the base class `models.ResNet` for more details.
+     """
     default_cfg = default_cfgs['resnet152']
     model = ResNet(Bottleneck, [3, 8, 36, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -313,6 +328,9 @@ def resnet152(pretrained: bool = False, num_classes: int = 1000, in_channels=3, 
 
 @register_model
 def resnext50_32x4d(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    """Get 50 layers ResNeXt model with 32 groups of GPConv.
+     Refer to the base class `models.ResNet` for more details.
+     """
     default_cfg = default_cfgs['resnext50_32x4d']
     model = ResNet(Bottleneck, [3, 4, 6, 3], groups=32, base_width=4, num_classes=num_classes,
                    in_channels=in_channels, **kwargs)
@@ -325,6 +343,9 @@ def resnext50_32x4d(pretrained: bool = False, num_classes: int = 1000, in_channe
 
 @register_model
 def resnext101_32x4d(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    """Get 101 layers ResNeXt model with 32 groups of GPConv.
+     Refer to the base class `models.ResNet` for more details.
+     """
     default_cfg = default_cfgs['resnext101_32x4d']
     model = ResNet(Bottleneck, [3, 4, 23, 3], groups=32, base_width=4, num_classes=num_classes,
                    in_channels=in_channels, **kwargs)
@@ -337,6 +358,9 @@ def resnext101_32x4d(pretrained: bool = False, num_classes: int = 1000, in_chann
 
 @register_model
 def resnext101_64x4d(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    """Get 101 layers ResNeXt model with 64 groups of GPConv.
+     Refer to the base class `models.ResNet` for more details.
+     """
     default_cfg = default_cfgs['resnext101_64x4d']
     model = ResNet(Bottleneck, [3, 4, 23, 3], groups=64, base_width=4, num_classes=num_classes,
                    in_channels=in_channels, **kwargs)

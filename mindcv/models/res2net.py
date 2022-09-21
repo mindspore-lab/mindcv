@@ -302,6 +302,9 @@ class Res2Net(nn.Cell):
 
 @register_model
 def res2net50(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
+    """Get 50 layers Res2Net model.
+     Refer to the base class `models.Res2Net` for more details.
+     """
     default_cfg = default_cfgs['res2net50']
     model = Res2Net(Bottle2neck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -313,6 +316,9 @@ def res2net50(pretrained: bool = False, num_classes: int = 1001, in_channels=3, 
 
 @register_model
 def res2net101(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
+    """Get 101 layers Res2Net model.
+     Refer to the base class `models.Res2Net` for more details.
+     """
     default_cfg = default_cfgs['res2net101']
     model = Res2Net(Bottle2neck, [3, 4, 23, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -323,6 +329,9 @@ def res2net101(pretrained: bool = False, num_classes: int = 1001, in_channels=3,
 
 @register_model
 def res2net152(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
+    """Get 152 layers Res2Net model.
+     Refer to the base class `models.Res2Net` for more details.
+     """
     default_cfg = default_cfgs['res2net152']
     model = Res2Net(Bottle2neck, [3, 8, 36, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 

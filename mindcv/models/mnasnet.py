@@ -176,6 +176,8 @@ class Mnasnet(nn.Cell):
 
 @register_model
 def mnasnet0_5(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
+    """Get MnasNet model with width scaled by 0.5.
+     Refer to the base class `models.Mnasnet` for more details."""
     default_cfg = default_cfgs['mnasnet0.5']
     model = Mnasnet(alpha=0.5, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
@@ -187,6 +189,8 @@ def mnasnet0_5(pretrained: bool = False, num_classes: int = 1000, in_channels=3,
 
 @register_model
 def mnasnet0_75(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
+    """Get MnasNet model with width scaled by 0.75.
+     Refer to the base class `models.Mnasnet` for more details."""
     default_cfg = default_cfgs['mnasnet0.75']
     model = Mnasnet(alpha=0.75, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
@@ -198,6 +202,8 @@ def mnasnet0_75(pretrained: bool = False, num_classes: int = 1000, in_channels=3
 
 @register_model
 def mnasnet1_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
+    """Get MnasNet model with width scaled by 1.0.
+     Refer to the base class `models.Mnasnet` for more details."""
     default_cfg = default_cfgs['mnasnet1.0']
     model = Mnasnet(alpha=1.0, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
@@ -209,6 +215,8 @@ def mnasnet1_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3,
 
 @register_model
 def mnasnet1_3(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
+    """Get MnasNet model with width scaled by 1.3.
+     Refer to the base class `models.Mnasnet` for more details."""
     default_cfg = default_cfgs['mnasnet1.3']
     model = Mnasnet(alpha=1.3, in_channels=in_channels, num_classes=num_classes, **kwargs)
 

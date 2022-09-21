@@ -207,6 +207,9 @@ class SKNet(ResNet):
 
 @register_model
 def sk_resnet18(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ResNet:
+    """Get 18 layers SKNet model.
+     Refer to the base class `models.SKNet` for more details.
+     """
     default_cfg = default_cfgs['sk_resnet18']
     sk_kwargs = dict(rd_ratio=1 / 8, rd_divisor=16, split_input=True)
     model = SKNet(SelectiveKernelBasic, [2, 2, 2, 2], num_classes=num_classes, in_channels=in_channels,
@@ -220,6 +223,9 @@ def sk_resnet18(pretrained: bool = False, num_classes: int = 1000, in_channels=3
 
 @register_model
 def sk_resnet34(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ResNet:
+    """Get 34 layers SKNet model.
+     Refer to the base class `models.SKNet` for more details.
+     """
     default_cfg = default_cfgs['sk_resnet34']
     sk_kwargs = dict(rd_ratio=1 / 8, rd_divisor=16, split_input=True)
     model = SKNet(SelectiveKernelBasic, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels,
@@ -233,6 +239,9 @@ def sk_resnet34(pretrained: bool = False, num_classes: int = 1000, in_channels=3
 
 @register_model
 def sk_resnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ResNet:
+    """Get 50 layers SKNet model.
+     Refer to the base class `models.SKNet` for more details.
+     """
     default_cfg = default_cfgs['sk_resnet50']
     sk_kwargs = dict(split_input=True)
     model = SKNet(SelectiveKernelBottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels,
@@ -246,6 +255,9 @@ def sk_resnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3
 
 @register_model
 def sk_resnext50_32x4d(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ResNet:
+    """Get 50 layers SKNeXt model with 32 groups of GPConv.
+     Refer to the base class `models.SKNet` for more details.
+     """
     default_cfg = default_cfgs['sk_resnext50_32X4d']
     sk_kwargs = dict(rd_ratio=1 / 16, rd_divisor=32, split_input=False)
     model = SKNet(SelectiveKernelBottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels,

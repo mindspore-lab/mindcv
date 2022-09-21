@@ -148,6 +148,9 @@ class SqueezeNet(nn.Cell):
 
 @register_model
 def squeezenet1_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> SqueezeNet:
+    """Get SqueezeNet model of version 1.0.
+     Refer to the base class `models.SqueezeNet` for more details.
+     """
     default_cfg = default_cfgs['squeezenet_1.0']
     model = SqueezeNet(version='1_0', num_classes=num_classes, in_channels=in_channels, **kwargs)
 
@@ -159,6 +162,9 @@ def squeezenet1_0(pretrained: bool = False, num_classes: int = 1000, in_channels
 
 @register_model
 def squeezenet1_1(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> SqueezeNet:
+    """Get SqueezeNet model of version 1.1.
+     Refer to the base class `models.SqueezeNet` for more details.
+     """
     default_cfg = default_cfgs['squeezenet_1.1']
     model = SqueezeNet(version='1_1', num_classes=num_classes, in_channels=in_channels, **kwargs)
 

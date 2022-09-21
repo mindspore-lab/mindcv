@@ -316,6 +316,8 @@ class InceptionV3(nn.Cell):
 
 @register_model
 def inception_v3(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> InceptionV3:
+    """Get InceptionV3 model.
+     Refer to the base class `models.InceptionV3` for more details."""
     default_cfg = default_cfgs['inception_v3']
     model = InceptionV3(num_classes=num_classes, aux_logits=True, in_channels=in_channels, **kwargs)
 

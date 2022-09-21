@@ -221,6 +221,8 @@ class GoogLeNet(nn.Cell):
 
 @register_model
 def googlenet(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> GoogLeNet:
+    """Get GoogLeNet model.
+     Refer to the base class `models.GoogLeNet` for more details."""
     default_cfg = default_cfgs['googlenet']
     model = GoogLeNet(num_classes=num_classes, in_channels=in_channels, **kwargs)
 

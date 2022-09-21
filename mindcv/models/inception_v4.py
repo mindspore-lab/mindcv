@@ -298,6 +298,8 @@ class InceptionV4(nn.Cell):
 
 @register_model
 def inception_v4(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> InceptionV4:
+    """Get InceptionV4 model.
+     Refer to the base class `models.InceptionV4` for more details."""
     default_cfg = default_cfgs['inception_v4']
     model = InceptionV4(num_classes=num_classes, in_channels=in_channels, **kwargs)
 

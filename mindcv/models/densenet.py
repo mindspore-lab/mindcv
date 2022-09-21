@@ -214,6 +214,8 @@ class DenseNet(nn.Cell):
 
 @register_model
 def densenet121(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> DenseNet:
+    """Get 121 layers DenseNet model.
+     Refer to the base class `models.DenseNet` for more details."""
     default_cfg = default_cfgs['densenet121']
     model = DenseNet(growth_rate=32, block_config=(6, 12, 24, 16), num_init_features=64, in_channels=in_channels,
                      num_classes=num_classes, **kwargs)
@@ -226,6 +228,8 @@ def densenet121(pretrained: bool = False, num_classes: int = 1000, in_channels=3
 
 @register_model
 def densenet161(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> DenseNet:
+    """Get 161 layers DenseNet model.
+     Refer to the base class `models.DenseNet` for more details."""
     default_cfg = default_cfgs['densenet161']
     model = DenseNet(growth_rate=48, block_config=(6, 12, 36, 24), num_init_features=96, in_channels=in_channels,
                      num_classes=num_classes, **kwargs)
@@ -238,6 +242,8 @@ def densenet161(pretrained: bool = False, num_classes: int = 1000, in_channels=3
 
 @register_model
 def densenet169(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> DenseNet:
+    """Get 169 layers DenseNet model.
+     Refer to the base class `models.DenseNet` for more details."""
     default_cfg = default_cfgs['densenet169']
     model = DenseNet(growth_rate=32, block_config=(6, 12, 32, 32), num_init_features=64, in_channels=in_channels,
                      num_classes=num_classes, **kwargs)
@@ -250,6 +256,8 @@ def densenet169(pretrained: bool = False, num_classes: int = 1000, in_channels=3
 
 @register_model
 def densenet201(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> DenseNet:
+    """Get 201 layers DenseNet model.
+     Refer to the base class `models.DenseNet` for more details."""
     default_cfg = default_cfgs['densenet201']
     model = DenseNet(growth_rate=32, block_config=(6, 12, 48, 32), num_init_features=64, in_channels=in_channels,
                      num_classes=num_classes, **kwargs)
