@@ -96,7 +96,7 @@ class SqueezeNet(nn.Cell):
             ])
         elif version == '1_1':
             self.features = nn.SequentialCell([
-                nn.Conv2d(in_channels, 64, kernel_size=3, stride=2, pad_mode='valid', has_bias=True),
+                nn.Conv2d(in_channels, 64, kernel_size=3, stride=2, padding=1, pad_mode='pad', has_bias=True),
                 nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2),
                 Fire(64, 16, 64, 64),
