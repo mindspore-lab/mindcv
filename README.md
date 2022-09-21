@@ -102,7 +102,6 @@ We provide [jupyter notebook tutorials](tutorials) for
 ### What is New 
 
 - 2022/09/13
-* optim factory 
 1. Add Adan optimizer (experimental), tested in non-dist graph mode. 
 
 ### License
