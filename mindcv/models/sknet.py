@@ -1,20 +1,9 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ============================================================================
-""""""
+"""
+MindSpore implementation of SKNet.
+Refer to Selective Kernel Networks.
+"""
 
-from typing import Optional, Type, List, Dict
+from typing import Optional, Type, List, Dict, Union
 
 import mindspore.nn as nn
 from mindspore import Tensor
@@ -25,6 +14,11 @@ from .registry import register_model
 from .resnet import ResNet
 
 __all__ = [
+    "SKNet",
+    "sk_resnet18",
+    "sk_resnet34",
+    "sk_resnet50",
+    "sk_resnext50_32x4d"
 ]
 
 
@@ -42,7 +36,6 @@ default_cfgs = {
     'sk_resnet34': _cfg(url=''),
     'sk_resnet50': _cfg(url=''),
     'sk_resnext50_32X4d': _cfg(url='')
-
 }
 
 
@@ -57,16 +50,14 @@ class SelectiveKernelBasic(nn.Cell):
                  down_sample: Optional[nn.Cell] = None,
                  base_width: int = 64,
                  norm: Optional[nn.Cell] = None,
-                 block_kwargs: Optional[Dict] = None
+                 sk_kwargs: Optional[Dict] = None
                  ):
         super(SelectiveKernelBasic, self).__init__()
         if norm is None:
             norm = nn.BatchNorm2d
 
-        if block_kwargs is None:
+        if sk_kwargs is None:
             sk_kwargs = {}
-        else:
-            sk_kwargs = block_kwargs['sk_kwargs']
 
         assert groups == 1, 'BasicBlock only supports cardinality of 1'
         assert base_width == 64, 'BasicBlock doest not support changing base width'
@@ -76,13 +67,12 @@ class SelectiveKernelBasic(nn.Cell):
         self.conv2 = nn.SequentialCell([
             nn.Conv2d(out_channels, out_channels * self.expansion, kernel_size=3, padding=1, pad_mode='pad'),
             norm(out_channels * self.expansion)
-            ])
+        ])
 
         self.relu = nn.ReLU()
         self.down_sample = down_sample
 
     def construct(self, x: Tensor) -> Tensor:
-        """ResidualBlockBase construct."""
         identity = x
 
         out = self.conv1(x)
@@ -106,29 +96,26 @@ class SelectiveKernelBottleneck(nn.Cell):
                  groups: int = 1,
                  base_width: int = 64,
                  norm: Optional[nn.Cell] = None,
-                 block_kwargs: Optional[Dict] = None,
-
+                 sk_kwargs: Optional[Dict] = None,
                  ):
         super(SelectiveKernelBottleneck, self).__init__()
         if norm is None:
             norm = nn.BatchNorm2d
 
-        if block_kwargs is None:
+        if sk_kwargs is None:
             sk_kwargs = {}
-        else:
-            sk_kwargs = block_kwargs['sk_kwargs']
 
         width = int(out_channels * (base_width / 64.0)) * groups
         self.conv1 = nn.SequentialCell([
             nn.Conv2d(in_channels, width, kernel_size=1),
             norm(width)
-            ])
+        ])
         self.conv2 = SelectiveKernel(
             width, width, stride=stride, groups=groups, **sk_kwargs)
         self.conv3 = nn.SequentialCell([
             nn.Conv2d(width, out_channels * self.expansion, kernel_size=1),
             norm(out_channels * self.expansion)
-            ])
+        ])
 
         self.relu = nn.ReLU()
         self.down_sample = down_sample
@@ -146,6 +133,7 @@ class SelectiveKernelBottleneck(nn.Cell):
         out = self.relu(out)
         return out
 
+
 class SKNet(ResNet):
     r"""SKNet model class, based on
     `"Selective Kernel Networks" <https://arxiv.org/abs/1903.06586>`_
@@ -158,35 +146,30 @@ class SKNet(ResNet):
         groups (int) : number of groups for group conv in blocks.
         base_width (int) : base width of pre group hidden channel in blocks.
         norm (Optional[nn.Cell]) : normalization layer in blocks.
-        block_kwargs (Optional[Dict]) : kwargs of selective kernel
+        sk_kwargs (Optional[Dict]) : kwargs of selective kernel
     """
     def __init__(self,
                  block: Type[nn.Cell],
-                 layer_nums: List[int],
+                 layers: List[int],
                  num_classes: int = 1000,
                  in_channels: int = 3,
                  groups: int = 1,
                  base_width: int = 64,
                  norm: Optional[nn.Cell] = None,
-                 block_kwargs: Optional[Dict] = None
+                 sk_kwargs: Optional[Dict] = None
                  ) -> None:
-        super(SKNet, self).__init__(block, layer_nums)
-        self.num_classes = num_classes
-        self.in_channels = in_channels
-        self.groups = groups
-        self.base_width = base_width
-        self.norm = norm
-        self.block_kwargs = block_kwargs
+        self.sk_kwargs: Optional[Dict] = sk_kwargs  # make pylint happy
+        super(SKNet, self).__init__(block, layers, num_classes, in_channels, groups, base_width, norm)
 
     def _make_layer(self,
-                    block: Type[nn.Cell],
+                    block: Type[Union[SelectiveKernelBasic, SelectiveKernelBottleneck]],
                     channels: int,
                     block_nums: int,
                     stride: int = 1
                     ) -> nn.SequentialCell:
         down_sample = None
 
-        if stride != 1 or self.input_channels != self.input_channels * block.expansion:
+        if stride != 1 or self.input_channels != channels * block.expansion:
             down_sample = nn.SequentialCell([
                 nn.Conv2d(self.input_channels, channels * block.expansion, kernel_size=1, stride=stride),
                 self.norm(channels * block.expansion)
@@ -202,7 +185,7 @@ class SKNet(ResNet):
                 groups=self.groups,
                 base_width=self.base_with,
                 norm=self.norm,
-                block_kwargs=self.block_kwargs
+                sk_kwargs=self.sk_kwargs
             )
         )
         self.input_channels = channels * block.expansion
@@ -215,18 +198,19 @@ class SKNet(ResNet):
                     groups=self.groups,
                     base_width=self.base_with,
                     norm=self.norm,
-                    block_kwargs=self.block_kwargs
+                    sk_kwargs=self.sk_kwargs
                 )
             )
 
         return nn.SequentialCell(layers)
+
 
 @register_model
 def sk_resnet18(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ResNet:
     default_cfg = default_cfgs['sk_resnet18']
     sk_kwargs = dict(rd_ratio=1 / 8, rd_divisor=16, split_input=True)
     model = SKNet(SelectiveKernelBasic, [2, 2, 2, 2], num_classes=num_classes, in_channels=in_channels,
-                   block_kwargs=dict(sk_kwargs=sk_kwargs), **kwargs)
+                  sk_kwargs=sk_kwargs, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -239,7 +223,7 @@ def sk_resnet34(pretrained: bool = False, num_classes: int = 1000, in_channels=3
     default_cfg = default_cfgs['sk_resnet34']
     sk_kwargs = dict(rd_ratio=1 / 8, rd_divisor=16, split_input=True)
     model = SKNet(SelectiveKernelBasic, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels,
-                   block_kwargs=dict(sk_kwargs=sk_kwargs), **kwargs)
+                  sk_kwargs=sk_kwargs, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -252,7 +236,7 @@ def sk_resnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3
     default_cfg = default_cfgs['sk_resnet50']
     sk_kwargs = dict(split_input=True)
     model = SKNet(SelectiveKernelBottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels,
-                   block_kwargs=dict(sk_kwargs=sk_kwargs), **kwargs)
+                  sk_kwargs=sk_kwargs, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -265,7 +249,7 @@ def sk_resnext50_32x4d(pretrained: bool = False, num_classes: int = 1000, in_cha
     default_cfg = default_cfgs['sk_resnext50_32X4d']
     sk_kwargs = dict(rd_ratio=1 / 16, rd_divisor=32, split_input=False)
     model = SKNet(SelectiveKernelBottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels,
-                   block_kwargs=dict(sk_kwargs=sk_kwargs), **kwargs)
+                  sk_kwargs=sk_kwargs, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
