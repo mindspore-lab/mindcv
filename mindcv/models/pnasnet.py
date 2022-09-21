@@ -1,15 +1,25 @@
-from collections import OrderedDict
-import numpy as np
+'''
+MindSpore implementation of pnasnet.
+Refer to Progressive Neural Architecture Search.
+'''
 
+from collections import OrderedDict
+import math
+
+import mindspore.common.initializer as init
 import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore import Tensor
 
-from .utils import load_pretrained
+from .layers import GlobalAvgPooling
 from .registry import register_model
+from .utils import load_pretrained
 
+__all__ = [
+    'PNASNet5_Mobile',
+    'pnasnet'
+]
 
-__all__ = ['pnasnet']
 
 def _cfg(url='', **kwargs):
     return {
@@ -24,18 +34,23 @@ default_cfgs = {
     'pnasnet': _cfg(url='')
 }
 
+
 class MaxPool(nn.Cell):
     """
     MaxPool: MaxPool2d with zero padding.
     """
-    def __init__(self, kernel_size, stride=1, zero_pad=False):
+
+    def __init__(self,
+                 kernel_size: int,
+                 stride: int = 1,
+                 zero_pad: bool = False) -> None:
         super(MaxPool, self).__init__()
         self.pad = zero_pad
         if self.pad:
             self.zero_pad = nn.Pad(paddings=((0, 0), (0, 0), (1, 0), (1, 0)))
         self.pool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride, pad_mode='same')
 
-    def construct(self, x):
+    def construct(self, x: Tensor) -> Tensor:
         if self.pad:
             x = self.zero_pad(x)
         x = self.pool(x)
@@ -43,13 +58,19 @@ class MaxPool(nn.Cell):
             x = x[:, :, 1:, 1:]
         return x
 
+
 class SeparableConv2d(nn.Cell):
     """
     SeparableConv2d: Separable convolutions consist of first performing
     a depthwise spatial convolution followed by a pointwise convolution.
     """
-    def __init__(self, in_channels, out_channels, dw_kernel_size, dw_stride,
-                 dw_padding):
+
+    def __init__(self,
+                 in_channels: int,
+                 out_channels: int,
+                 dw_kernel_size: int,
+                 dw_stride: int,
+                 dw_padding: int) -> None:
         super(SeparableConv2d, self).__init__()
         self.depthwise_conv2d = nn.Conv2d(in_channels=in_channels, out_channels=in_channels,
                                           kernel_size=dw_kernel_size, stride=dw_stride,
@@ -58,19 +79,25 @@ class SeparableConv2d(nn.Cell):
         self.pointwise_conv2d = nn.Conv2d(in_channels=in_channels, out_channels=out_channels,
                                           kernel_size=1, pad_mode='pad', has_bias=False)
 
-    def construct(self, x):
-        """ construct network """
+    def construct(self, x: Tensor) -> Tensor:
         x = self.depthwise_conv2d(x)
         x = self.pointwise_conv2d(x)
         return x
+
 
 class BranchSeparables(nn.Cell):
     """
     BranchSeparables: ReLU + Zero_Pad (when zero_pad is True) +  SeparableConv2d + BatchNorm2d +
                       ReLU + SeparableConv2d + BatchNorm2d
     """
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1,
-                 stem_cell=False, zero_pad=False):
+
+    def __init__(self,
+                 in_channels: int,
+                 out_channels: int,
+                 kernel_size: int,
+                 stride: int = 1,
+                 stem_cell: bool = False,
+                 zero_pad: bool = False) -> None:
         super(BranchSeparables, self).__init__()
         padding = kernel_size // 2
         middle_channels = out_channels if stem_cell else in_channels
@@ -91,8 +118,7 @@ class BranchSeparables(nn.Cell):
                                            dw_padding=padding)
         self.bn_sep_2 = nn.BatchNorm2d(num_features=out_channels, eps=0.001, momentum=0.9)
 
-    def construct(self, x):
-        """ construct network """
+    def construct(self, x: Tensor) -> Tensor:
         x = self.relu_1(x)
         if self.pad:
             x = self.zero_pad(x)
@@ -105,11 +131,17 @@ class BranchSeparables(nn.Cell):
         x = self.bn_sep_2(x)
         return x
 
+
 class ReluConvBn(nn.Cell):
     """
     ReluConvBn: ReLU + Conv2d + BatchNorm2d
     """
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1):
+
+    def __init__(self,
+                 in_channels: int,
+                 out_channels: int,
+                 kernel_size: int,
+                 stride: int = 1) -> None:
         super(ReluConvBn, self).__init__()
         self.relu = nn.ReLU()
 
@@ -117,19 +149,22 @@ class ReluConvBn(nn.Cell):
                               stride=stride, pad_mode='pad', has_bias=False)
         self.bn = nn.BatchNorm2d(num_features=out_channels, eps=0.001, momentum=0.9)
 
-    def construct(self, x):
-        """ construct network """
+    def construct(self, x: Tensor) -> Tensor:
         x = self.relu(x)
         x = self.conv(x)
         x = self.bn(x)
         return x
+
 
 class FactorizedReduction(nn.Cell):
     """
     FactorizedReduction is used to reduce the spatial size
     of the left input of a cell approximately by a factor of 2.
     """
-    def __init__(self, in_channels, out_channels):
+
+    def __init__(self,
+                 in_channels: int,
+                 out_channels: int) -> None:
         super(FactorizedReduction, self).__init__()
         self.relu = nn.ReLU()
 
@@ -152,8 +187,7 @@ class FactorizedReduction(nn.Cell):
 
         self.final_path_bn = nn.BatchNorm2d(num_features=out_channels, eps=0.001, momentum=0.9)
 
-    def construct(self, x):
-        """ construct network """
+    def construct(self, x: Tensor) -> Tensor:
         x = self.relu(x)
         x_path1 = self.path_1(x)
 
@@ -162,14 +196,16 @@ class FactorizedReduction(nn.Cell):
         x_path2 = self.path_2[1](x_path2)
         x_path2 = self.path_2[2](x_path2)
 
-        out = self.final_path_bn(ops.Concat(1)((x_path1, x_path2)))
+        out = self.final_path_bn(ops.concat((x_path1, x_path2), axis=1))
         return out
+
 
 class CellBase(nn.Cell):
     """
     CellBase: PNASNet base unit.
     """
-    def cell_forward(self, x_left, x_right):
+
+    def cell_forward(self, x_left: Tensor, x_right: Tensor) -> Tensor:
         """
         cell_forward: to calculate the output according the x_left and x_right.
         """
@@ -196,16 +232,21 @@ class CellBase(nn.Cell):
             x_comb_iter_4_right = x_right
         x_comb_iter_4 = x_comb_iter_4_left + x_comb_iter_4_right
 
-        x_out = ops.Concat(1)((x_comb_iter_0, x_comb_iter_1, x_comb_iter_2, x_comb_iter_3, x_comb_iter_4))
+        x_out = ops.concat((x_comb_iter_0, x_comb_iter_1, x_comb_iter_2, x_comb_iter_3, x_comb_iter_4), axis=1)
 
         return x_out
+
 
 class CellStem0(CellBase):
     """
     CellStemp0:PNASNet Stem0 unit
     """
-    def __init__(self, in_channels_left, out_channels_left, in_channels_right,
-                 out_channels_right):
+
+    def __init__(self,
+                 in_channels_left: int,
+                 out_channels_left: int,
+                 in_channels_right: int,
+                 out_channels_right: int) -> None:
         super(CellStem0, self).__init__()
         self.conv_1x1 = ReluConvBn(in_channels_right, out_channels_right,
                                    kernel_size=1)
@@ -243,19 +284,25 @@ class CellStem0(CellBase):
                                             out_channels_right,
                                             kernel_size=1, stride=2)
 
-    def construct(self, x_left):
-        """ construct network """
+    def construct(self, x_left: Tensor) -> Tensor:
         x_right = self.conv_1x1(x_left)
         x_out = self.cell_forward(x_left, x_right)
         return x_out
+
 
 class Cell(CellBase):
     """
     Cell class that is used as a 'layer' in image architectures
     """
-    def __init__(self, in_channels_left, out_channels_left, in_channels_right,
-                 out_channels_right, is_reduction=False, zero_pad=False,
-                 match_prev_layer_dimensions=False):
+
+    def __init__(self,
+                 in_channels_left: int,
+                 out_channels_left: int,
+                 in_channels_right: int,
+                 out_channels_right: int,
+                 is_reduction: bool = False,
+                 zero_pad: bool = False,
+                 match_prev_layer_dimensions: bool = False) -> None:
         super(Cell, self).__init__()
 
         stride = 2 if is_reduction else 1
@@ -300,69 +347,29 @@ class Cell(CellBase):
         else:
             self.comb_iter_4_right = None
 
-    def construct(self, x_left, x_right):
-        """ construct network """
+    def construct(self, x_left: Tensor, x_right: Tensor) -> Tensor:
         x_left = self.conv_prev_1x1(x_left)
         x_right = self.conv_1x1(x_right)
         x_out = self.cell_forward(x_left, x_right)
         return x_out
 
-class AuxLogits(nn.Cell):
-    """
-    AuxLogits: an auxiliary classifier to improve the convergence of very deep networks.
-    """
-    def __init__(self, in_channels, out_channels, name=None):
-        super(AuxLogits, self).__init__()
-        self.relu = nn.ReLU()
-        self.pool = nn.AvgPool2d(5, stride=3, pad_mode='valid')
-        self.conv = nn.Conv2d(in_channels, 128, kernel_size=1)
-        self.bn = nn.BatchNorm2d(128)
-
-        self.conv_1 = nn.Conv2d(128, 768, (4, 4), pad_mode='valid')
-        self.bn_1 = nn.BatchNorm2d(768)
-        self.flatten = nn.Flatten()
-        if name == 'large':
-            self.fc = nn.Dense(6912, out_channels)  # large: 6912, mobile:768
-        else:
-            self.fc = nn.Dense(768, out_channels)
-
-    def construct(self, x):
-        """ construct network """
-        x = self.relu(x)
-        x = self.pool(x)
-        x = self.conv(x)
-        x = self.bn(x)
-        x = self.relu(x)
-        x = self.conv_1(x)
-        x = self.bn_1(x)
-        x = self.relu(x)
-        x = self.flatten(x)
-        x = self.fc(x)
-        return x
 
 class PNASNet5_Mobile(nn.Cell):
-    """
-    Progressive Neural Architecture Search (PNAS).
-    Reference:
-        Chenxi Liu et al. Progressive Neural Architecture SearchLearning Transferable Architectures.
-                          ECCV 2018.
+    r"""PNasNet model class, based on
+    `"Progressive Neural Architecture Search" <https://arxiv.org/pdf/1712.00559.pdf>`_
     Args:
-        num_classes(int): The number of classes.
-        enable_aux_logits(bool): whether to enable aux_logits. True for training, False(default) for evaluation.
-        enable_dropout(bool): whether to enable dropout. True for training. False(default) for evaluation.
-    Returns:
-        Tensor, Tensor: the logits, aux_logits when enable_aux_logits is True.
-        Tensor: the logits when enable_aux_logits is False.
+        number of input channels. Default: 3.
+        num_classes: number of classification classes. Default: 1000.
     """
 
-    def __init__(self, num_classes=1000, enable_aux_logits=False, enable_dropout=False):
+    def __init__(self,
+                 in_channels: int = 3,
+                 num_classes: int = 1000) -> None:
         super(PNASNet5_Mobile, self).__init__()
         self.num_classes = num_classes
-        self.enable_aux_logits = enable_aux_logits
-        self.enable_dropout = enable_dropout
 
         self.conv_0 = nn.SequentialCell(OrderedDict([
-            ('conv', nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, stride=2,
+            ('conv', nn.Conv2d(in_channels=in_channels, out_channels=32, kernel_size=3, stride=2,
                                pad_mode='pad', has_bias=False)),
             ('bn', nn.BatchNorm2d(num_features=32, eps=0.001, momentum=0.9))
         ]))
@@ -391,11 +398,6 @@ class PNASNet5_Mobile(nn.Cell):
         self.cell_5 = Cell(in_channels_left=540, out_channels_left=108,
                            in_channels_right=540, out_channels_right=108)
 
-        if enable_aux_logits:
-            self.aux_logits = AuxLogits(540, num_classes)
-        else:
-            self.aux_logits = None
-
         self.cell_6 = Cell(in_channels_left=540, out_channels_left=216,
                            in_channels_right=540, out_channels_right=216,
                            is_reduction=True)
@@ -404,15 +406,10 @@ class PNASNet5_Mobile(nn.Cell):
                            match_prev_layer_dimensions=True)
         self.cell_8 = Cell(in_channels_left=1080, out_channels_left=216,
                            in_channels_right=1080, out_channels_right=216)
+
         self.relu = nn.ReLU()
-
-        self.avg_pool = nn.AvgPool2d(kernel_size=7, stride=1, pad_mode='valid')
-
-        if enable_dropout:
-            self.dropout = nn.Dropout(keep_prob=0.5)
-        else:
-            self.dropout = None
-
+        self.pool = GlobalAvgPooling()
+        self.dropout = nn.Dropout(keep_prob=0.5)
         self.last_linear = nn.Dense(in_channels=1080, out_channels=num_classes)
 
         self._initialize_weights()
@@ -422,30 +419,27 @@ class PNASNet5_Mobile(nn.Cell):
         _initialize_weights: to initialize the weights.
         """
         self.init_parameters_data()
-        for _, m in self.cells_and_names():
-            if isinstance(m, nn.Conv2d):
-                n = m.kernel_size[0]*m.kernel_size[1]*m.out_channels
-                m.weight.set_data(Tensor(np.random.normal(0, np.sqrt(2./n),
-                                                          m.weight.data.shape).astype("float32")))
-                if m.bias is not None:
-                    m.bias.set_data(
-                        Tensor(np.zeros(m.bias.data.shape, dtype="float32")))
-            elif isinstance(m, nn.BatchNorm2d):
-                m.gamma.set_data(
-                    Tensor(np.ones(m.gamma.data.shape, dtype="float32")))
-                m.beta.set_data(
-                    Tensor(np.zeros(m.beta.data.shape, dtype="float32")))
-            elif isinstance(m, nn.Dense):
-                m.weight.set_data(Tensor(np.random.normal(
-                    0, 0.01, m.weight.data.shape).astype("float32")))
-                if m.bias is not None:
-                    m.bias.set_data(
-                        Tensor(np.zeros(m.bias.data.shape, dtype="float32")))
+        for _, cell in self.cells_and_names():
+            if isinstance(cell, nn.Conv2d):
+                n = cell.kernel_size[0] * cell.kernel_size[1] * cell.out_channels
+                cell.weight.set_data(init.initializer(init.Normal(math.sqrt(2. / n), 0),
+                                                      cell.weight.shape, cell.weight.dtype))
+                if cell.bias is not None:
+                    cell.bias.set_data(init.initializer(init.Zero(),
+                                                        cell.bias.shape, cell.bias.dtype))
+            elif isinstance(cell, nn.BatchNorm2d):
+                cell.gamma.set_data(init.initializer(init.One(),
+                                                     cell.gamma.shape, cell.gamma.dtype))
+                cell.beta.set_data(init.initializer(init.Zero(),
+                                                    cell.beta.shape, cell.beta.dtype))
+            elif isinstance(cell, nn.Dense):
+                cell.weight.set_data(init.initializer(init.Normal(0.01, 0),
+                                                      cell.weight.shape, cell.weight.dtype))
+                if cell.bias is not None:
+                    cell.bias.set_data(init.initializer(init.Zero(),
+                                                        cell.bias.shape, cell.bias.dtype))
 
-    def forward_features(self, x):
-        """
-        features: to calculate the features
-        """
+    def forward_features(self, x: Tensor) -> Tensor:
         x_conv_0 = self.conv_0(x)
         x_stem_0 = self.cell_stem_0(x_conv_0)
         x_stem_1 = self.cell_stem_1(x_conv_0, x_stem_0)
@@ -458,49 +452,31 @@ class PNASNet5_Mobile(nn.Cell):
         x_cell_4 = self.cell_4(x_cell_2, x_cell_3)
         x_cell_5 = self.cell_5(x_cell_3, x_cell_4)
 
-        if self.enable_aux_logits:
-            y_aux_logits = self.aux_logits(x_cell_5)
-        else:
-            y_aux_logits = None
-
         x_cell_6 = self.cell_6(x_cell_4, x_cell_5)
         x_cell_7 = self.cell_7(x_cell_5, x_cell_6)
         x_cell_8 = self.cell_8(x_cell_6, x_cell_7)
 
-        return x_cell_8, y_aux_logits
+        return x_cell_8
 
-    def forward_head(self, features):
-        """
-        logits: to classify according to the features
-        """
-        y = self.relu(features)
+    def forward_head(self, x: Tensor) -> Tensor:
+        x = self.relu(x)
+        x = self.pool(x)
+        x = self.dropout(x)
+        x = self.last_linear(x)
+        return x
 
-        y = self.avg_pool(y)
+    def construct(self, x: Tensor) -> Tensor:
+        x = self.forward_features(x)
+        x = self.forward_head(x)
+        return x
 
-        y = ops.Reshape()(y, (ops.Shape()(y)[0], -1,))
-
-        if self.enable_dropout:
-            y = self.dropout(y)
-
-        y = self.last_linear(y)
-        return y
-
-    def construct(self, x):
-        """ construct network """
-        y, y_aux_logits = self.forward_features(x)
-
-        y = self.forward_head(y)
-
-        if self.enable_aux_logits:
-            return y, y_aux_logits
-        return y
 
 @register_model
-def pnasnet(pretrained: bool = False, num_classes: int = 1000, in_channels=3) -> PNASNet5_Mobile:
-    """NASNet-A large model architecture.
-    """
+def pnasnet(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PNASNet5_Mobile:
+    """Get PNASNet5_Mobile model.
+     Refer to the base class `models.PNASNet5_Mobile` for more details."""
     default_cfg = default_cfgs['pnasnet']
-    model = PNASNet5_Mobile(num_classes=1000)
+    model = PNASNet5_Mobile(in_channels=in_channels, num_classes=num_classes, **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
