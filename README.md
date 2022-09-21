@@ -45,8 +45,8 @@ python setup.py install
 
 ## Get Started 
 
-### Quick tour
-You can see [Get Started With MindCV](quick_tour.ipynb) to learn about the key component in MindCV . 
+### Demo
+You can see the jupyter notebook demo [Get Started With MindCV](quick_tour.ipynb) to learn about the basic usage of MindCV . 
 
 
 ### Running Scripts
@@ -82,11 +82,12 @@ mpirun --allow-run-as-root -n 4 python train.py --distribute \
 
 - Train with Yaml Config
 
-We also provide that yaml config files that yield competitive results on ImageNet for different models in [yaml config files](configs). To trigger training using yaml config, 
+We also provide that yaml config files that yield competitive results on ImageNet for different models in [config](configs) folder. To trigger training using yaml config, 
 
 ```shell
-python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
+mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
+
 
 ## Tutorials
 We provide [jupyter notebook tutorials](tutorials) for  
