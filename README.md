@@ -46,10 +46,10 @@ python setup.py install
 ## Get Started 
 
 ### Demo
-You can see the jupyter notebook demo [Get Started With MindCV](quick_tour.ipynb) to learn about the basic usage of MindCV . 
+You can see the notebook demo ([Get Started With MindCV](quick_tour.ipynb)) to learn about the basic usage of MindCV . 
 
 
-### Running Scripts
+### Quick Running Scripts
 It is easy to train your model on standard datasets or your own dataset with MindCV. 
 
 - Standalone Training
@@ -60,7 +60,7 @@ python train.py --model=densenet121 --optimizer=adam --lr=0.001 \
 		--dataset=cifar10 --num_classes=10 --dataset_download    
 ```
 
-All supported hyper-parameters (for data transform, model, loss, optimizer, and others) can be viewed in [config.py](config.py)
+Detailed adjustable hyper-parameters for data transform, model, loss, and optimizer configuration can be viewed in [config.py](config.py)
 
 - Validation
 
