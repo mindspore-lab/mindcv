@@ -57,7 +57,7 @@ It is easy to train your model on standard datasets or your own dataset with Min
 
 You can run `train.py` to do training with customized hyper-parameters. Here is the example for training a DenseNet on CIFAR10 dataset.
 ``` shell
-python train.py --model=densenet121 --optimizer=adam --lr=0.001 --dataset=cifar10 --num_classes=10 --dataset_download 
+python train.py --model=densenet121 --optimizer=adam --lr=0.001 --dataset=cifar10 --num_classes=10 --dataset_download    
 ```
 
 All supported hyper-parameters (for data transform, model, loss, optimizer, and others) can be viewed in [config.py](config.py)
@@ -66,7 +66,7 @@ All supported hyper-parameters (for data transform, model, loss, optimizer, and 
 
 To validate, you can run `validate.py` as shown in the following example.
 ```shell
-python validate.py --model=densenet121 --dataset=cifar10 --val_split=test --data_dir=/data/cifar/cifar-10-batches-bin --num_classes=10 --dataset_download
+python validate.py --model=densenet121 --dataset=cifar10 --val_split=test --data_dir=/data/cifar/cifar-10-batches-bin --num_classes=10 --dataset_download  
 ```
 
 - Distributed Training
@@ -74,14 +74,14 @@ For large datasets like ImageNet, it is necessary to do training in distributed 
 
 ```shell
 export CUDA_VISIBLE_DEVICES=0,1,2,3  # suppose there are 4 GPUs
-mpirun --allow-run-as-root -n 4 python train.py --distribute --model=densenet121 --dataset=imagenet --data_dir=./datasets/imagenet
+mpirun --allow-run-as-root -n 4 python train.py --distribute --model=densenet121 --dataset=imagenet --data_dir=./datasets/imagenet   
 ```
 
 - Train with Yaml Config
 We also provide that yaml config files that yield competitive results on ImageNet for different models in [yaml config files](configs). To trigger training using yaml config, 
 
 ```
-python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml 
+python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
 
 ## Tutorials
