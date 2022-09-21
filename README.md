@@ -23,25 +23,23 @@ Under construction...
 - tqdm
 - openmpi 4.0.3 (for distributed mode) 
 
-To install the dependent packages, please run
+To install the dependency, please run
 ```shell
 pip install -r requirements.txt
 ```
 
-MindSpore can be easily installed by following the [official instruction](https://www.mindspore.cn/install) where you can select your hardware platform for the best fit.  
-
-To run training in distributed mode, [openmpi](https://www.open-mpi.org/software/ompi/v4.0/) is needed.   
+MindSpore can be easily installed by following the official [instruction](https://www.mindspore.cn/install) where you can select your hardware platform for the best fit. To run in distributed mode, [openmpi](https://www.open-mpi.org/software/ompi/v4.0/) is required to install.   
 
 The following instructions assume the desired dependency is fulfilled. 
 
 ### Install with pip
-
+MindCV can be installed with pip. 
 ```shell
 pip install https://github.com/mindlab-ai/mindcv/releases/download/v0.0.1-alpha/mindcv-0.0.1a0-py3-none-any.whl
 ```
 
 ### Install from source
-
+To install MindCV from source, please run,
 ```shell
 # Clone the mindcv repository.
 git clone https://github.com/mindlab-ai/mindcv.git
@@ -53,8 +51,8 @@ python setup.py install
 
 ## Get Started 
 
-### Demo
-You can see the notebook demo ([Get Started With MindCV](quick_tour.ipynb)) to learn about the basic usage of MindCV . 
+### Hands-on Tutiral
+We provide an hands-on tutorial - [Get Started With MindCV](quick_tour.ipynb) to help learn about the basic usage of MindCV quickly. 
 
 
 ### Quick Running Scripts
