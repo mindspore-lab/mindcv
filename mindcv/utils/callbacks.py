@@ -1,9 +1,6 @@
-import time
 import os
 import stat
-import numpy as np
 
-import mindspore as ms
 from mindspore import save_checkpoint
 from mindspore.train.callback import Callback
 
@@ -43,7 +40,7 @@ class ValAccSaveMonitor(Callback):
 
     def apply_eval(self):
         """Model evaluation, return validation accuracy."""
-        return self.model.eval(self.dataset_val, dataset_sink_mode=self.dataset_sink_mode)[self.metric_name]
+        return self.model.eval(self.dataset_val, dataset_sink_mode=self.dataset_sink_mode)
 
     def on_train_epoch_end(self, run_context):
         """
@@ -56,31 +53,24 @@ class ValAccSaveMonitor(Callback):
         if cur_epoch >= self.eval_start_epoch and (cur_epoch - self.eval_start_epoch) % self.interval == 0:
             # Validation result
             res = self.apply_eval()
-
-            #print("-" * 20)
-            print(f"Epoch: {cur_epoch}, val {self.metric_name}: {res: 5.3f}")
-            '''
-            print(f"Epoch: [{cur_epoch: 3d} / {self.num_epochs: 3d}], "
-                  f"Train Loss: [{callback_params.net_outputs.asnumpy() :5.3f}], "
-                  f"{self.metric_name}: {res: 5.3f}")
-            '''
+            print(f"Eval result: epoch: {cur_epoch}, metrics: {res}")
 
             def remove_ckpt_file(file_name):
                 os.chmod(file_name, stat.S_IWRITE)
                 os.remove(file_name)
 
             # Save the best ckpt file
-            if res >= self.best_res:
-                self.best_res = res
+            if res[self.metric_name] >= self.best_res:
+                self.best_res = res[self.metric_name]
                 if self.save_best_ckpt:
                     if os.path.exists(self.best_ckpt_path):
                         remove_ckpt_file(self.best_ckpt_path)
                     save_checkpoint(callback_params.train_network, self.best_ckpt_path, async_save=True)
+                    print(f"Save the best {self.metric_name} ckpt, the {self.metric_name} is {self.best_res}")
+            print("-" * 80)
 
     # pylint: disable=unused-argument
-    def end(self, run_context):
-        print("=" * 80)
-        print(f"End of validation the best {self.metric_name} is: {self.best_res: 5.3f}, "
+    def on_train_end(self, run_context):
+        print(f"End of validation the best {self.metric_name} is: {self.best_res}, "
               f"save the best ckpt file in {self.best_ckpt_path}", flush=True)
-
-
+        print("=" * 80)

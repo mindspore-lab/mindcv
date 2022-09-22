@@ -29,7 +29,7 @@ def create_parser():
                        help='Type of dataset (default="imagenet")')
     group.add_argument('--data_dir', type=str, default='./', help='Path to dataset')
     group.add_argument('--train_split', type=str, default='train', help='dataset train split name')
-    group.add_argument('--val_split', type=str, default='val', help='dataset validation split name')
+    group.add_argument('--val_split', type=str, default='test', help='dataset validation split name')
     group.add_argument('--dataset_download', action='store_true', default=False,
                        help='Download dataset (default=False)')
     group.add_argument('--num_parallel_workers', type=int, default=8,
@@ -115,7 +115,7 @@ def create_parser():
     # Optimize parameters
     group = parser.add_argument_group('Optimizer parameters')
     group.add_argument('--opt', type=str, default='adam',
-                       choices=['sgd', 'momentum', 'adam', 'adamw', 'rmsprop', 'adagrad', 'lamb'],
+                       choices=['sgd', 'momentum', 'adam', 'adamw', 'rmsprop', 'adagrad', 'lamb', "nadam"],
                        help='Type of optimizer (default="adam")')
     group.add_argument('--momentum', type=float, default=0.9,
                        help='Hyperparameter of type float, means momentum for the moving average. '
