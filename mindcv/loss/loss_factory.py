@@ -10,20 +10,18 @@ def create_loss(
         reduction: str = 'mean',
         label_smoothing: float = 0.,
         aux_factor: float = 0.):
-    r"""
-    create loss
+    r"""Creates loss by name.
 
     Args:
-        name (str):  loss name, : 'BCE' (binary cross entropy), 'CE' for cross_entropy. Default: 'CE'
-        weight (Tensor): The rescaling weight to each class. If the value is not None, the shape is (C,). 
+        name:  loss name, : 'BCE' (binary cross entropy), 'CE' for cross_entropy. Default: 'CE'
+        weight: The rescaling weight to each class. If the value is not None, the shape is (C,).
             The data type only supports float32 or float16. Default: None.
             For bce loss, it is a manual rescaling weight given to the loss of each batch element. If given, has to be a Tensor of size nbatch.
-        reduction (str):  Apply specific reduction method to the output: 'none', 'mean', or 'sum'.
+        reduction: Apply specific reduction method to the output: 'none', 'mean', or 'sum'.
             Default: 'mean'.
-        label_smoothing (float): Label smoothing values, a regularization tool used to prevent the model
-            from overfitting when calculating Loss. The value range is [0.0, 1.0]. Default value: 0.0.
-        aux_factor: The factor for auxiluary loss, which is only applicable for cross entropy loss type for models with two logit outputs. 
-
+        label_smoothing: Label smoothing values, a regularization tool used to prevent the model
+            from overfitting when calculating Loss. The value range is [0.0, 1.0]. Default: 0.0.
+        aux_factor: The factor for auxiliary loss, which is only applicable for cross entropy loss type for models with two logit outputs.  Default: 0.0.
 
     Inputs:
         if name is 'CE':
@@ -35,7 +33,6 @@ def create_loss(
         if name is 'BCE':
         - **logits** (Tensor) - The input tensor with shape :math:`(N, *)` where :math:`*` means, any number of additional dimensions. The data type must be float16 or float32.
         - **labels** (Tensor) - The label tensor with shape :math:`(N, *)`, the same shape and data type as `logits`.
-
 
     Returns:
        Loss object that will be invoked to computed loss value.  

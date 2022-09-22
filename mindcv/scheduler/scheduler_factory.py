@@ -14,21 +14,25 @@ def create_scheduler(
         decay_rate: float = 0.9,
         milestones: list = []
 ):
-    r"""
+    r"""Creates learning rate scheduler by name.
+
     Args:
-        steps_per_epoch: number of steps per epoch
-        scheduler: 'constant' for constant lr, 'warmup_consine_decay', 'step_decay', 'exponential_decay', 'polynomial_decay', 'multi_step_decay'
-        lr: learning rate value. 
-        min_lr: lower lr bound for cyclic/cosine/polynomial schedulers
-        warmup_epochs: epochs to warmup LR, if scheduler supports 
-        decay_epochs: epochs to decay LR to min_lr for cyclic and polynomial schedulers. decay LR by a factor of decay_rate every `decay_epochs` for exponential scheduler and step LR scheduler
+        steps_per_epoch: number of steps per epoch.
+        scheduler: scheduler name like 'constant', 'warmup_cosine_decay', 'step_decay',
+            'exponential_decay', 'polynomial_decay', 'multi_step_decay'. Default: 'constant'.
+        lr: learning rate value. Default: 0.01.
+        min_lr: lower lr bound for cyclic/cosine/polynomial schedulers. Default: 1e-6.
+        warmup_epochs: epochs to warmup LR, if scheduler supports. Default: 3.
+        decay_epochs: epochs to decay LR to min_lr for cyclic and polynomial schedulers.
+            decay LR by a factor of decay_rate every `decay_epochs` for exponential scheduler and step LR scheduler.
+            Default: 10.
         decay_rate: LR decay rate (default: 0.9)
         milestones: list of epoch milestones for multi_step_decay scheduler. Must be increasing.
     
     Returns: 
-        Cell object for computing LR with input of current global steps 
-
+        Cell object for computing LR with input of current global steps
     """
+
     if scheduler == 'warmup_cosine_decay':
         lr_scheduler = WarmupCosineDecayLR(min_lr=min_lr,
                                            max_lr=lr,
