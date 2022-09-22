@@ -52,8 +52,16 @@ python setup.py install
 ## Get Started 
 
 ### Hands-on Demo
-Please see the [Quick Start Demo](quick_tour.ipynb) to help you get started with MindCV and learn about the basic usage. 
+Please see the [Quick Start Demo](quick_tour.ipynb) to help you get started with MindCV and learn about the basic usage quickly. Below is how to create a deep vision model quickly.  
 
+```python
+>>> import mindcv 
+# Search a wanted pretrained model 
+>>> mindcv.list_models("densenet*", pretrain=True)
+['densenet201', 'densenet161', 'densenet169', 'densenet121']
+# Create the model object
+>>> network = mindcv.create_model('densenet121', pretrained=True)
+```
 
 ### Quick Running Scripts
 It is easy to train your model on standard datasets or your own dataset with MindCV. Model training, transfer learning, or evaluaiton can be done using one or a few line of code with flexible configuration. Below are the running examples for reference.  
