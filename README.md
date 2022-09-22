@@ -56,17 +56,17 @@ Please see the [Quick Start Demo](quick_tour.ipynb) to help you get started with
 
 
 ### Quick Running Scripts
-It is easy to train your model on standard datasets or your own dataset with MindCV. Below are some useful scripts that you can run directly to train or validate a model.  
+It is easy to train your model on standard datasets or your own dataset with MindCV. Model training, transfer learning, or evaluaiton can be done using one or a few line of code with flexible configuration. Below are the running examples for reference.  
 
 - Standalone Training
 
-You can run `train.py` to do training with customized hyper-parameters. Here is the example for training a DenseNet on CIFAR10 dataset.
+`train.py` is the main script for model training, where you can set the dataset, data transformation, model, loss, LR scheduler, and optimizier easily. Here is the example for finetuning a pretrained DenseNet on CIFAR10 dataset using Adam optimizer.
 ``` shell
-python train.py --model=densenet121 --opt=adam --lr=0.001 \
+python train.py --model=densenet121 --pretrained --opt=adam --lr=0.001 \
 		--dataset=cifar10 --num_classes=10 --dataset_download    
 ```
 
-Detailed adjustable hyper-parameters for data transform, model, loss, and optimizer configuration can be viewed in [config.py](config.py)
+Detailed adjustable parameters and their default value can be seen in [config.py](config.py)
 
 - Distributed Training
 
