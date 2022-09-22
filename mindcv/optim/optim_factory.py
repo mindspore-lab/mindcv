@@ -2,6 +2,7 @@ import mindspore.nn as nn
 from typing import Optional
 from .adan import Adan
 from .adamw import AdamW
+from .nadam import NAdam
 
 
 def init_group_params(params, weight_decay):
@@ -29,6 +30,7 @@ def create_optimizer(
         nesterov: bool = False,
         filter_bias_and_bn: bool = True,
         loss_scale: float = 1.0,
+        schedule_decay: float = 4e-3,
         **kwargs):
     '''
     Args:
@@ -76,11 +78,17 @@ def create_optimizer(
                             use_nesterov=nesterov,
                             **opt_args)
     elif opt == 'adamw':
-        # TODO: the mindspore implementation seems different from the official AdamW 
         optimizer = AdamW(params=params,
                             learning_rate=lr,
                             weight_decay=weight_decay,
                             loss_scale=loss_scale,
+                            **opt_args)
+    elif opt == 'nadam':
+        optimizer = NAdam(params=params,
+                            learning_rate=lr,
+                            weight_decay=weight_decay,
+                            loss_scale=loss_scale,
+                            schedule_decay=schedule_decay,
                             **opt_args)
     elif opt == 'adan':
         optimizer = Adan(params=params,
