@@ -19,31 +19,40 @@ def create_loader(
         num_parallel_workers=None,
         python_multiprocessing=False,
 ):
-    r'''
+    r"""Creates dataloader.
+
+    Applies operations such as transform and batch to the `ms.dataset.Dataset` object
+    created by the `create_dataset` function to get the dataloader.
+
     Args:
-        dataset: dataset object created by `create_dataset`
+        dataset (ms.dataset.Dataset): dataset object created by `create_dataset`.
         batch_size (int or function): The number of rows each batch is created with. An
             int or callable object which takes exactly 1 parameter, BatchInfo.
-        drop_remainder (bool, optional): Determines whether or not to drop the last block
+        drop_remainder (bool, optional): Determines whether to drop the last block
             whose data row number is less than batch size (default=False). If True, and if there are less
             than batch_size rows available to make the last batch, then those rows will
             be dropped and not propagated to the child node.
-        is_training (bool): whether it is in train mode
-        mixup (float): mixup hyperparameter of beta distribution. The value must be positive (default = 0.0).
-        num_classes (int): the number of classes
-        transform (list or None): the list of transformations that wil be applied on the image, which is obtained by `create_transform`. If None, the default imagenet transformation for evaluation will be applied. Default: None.
-        target_transform (list or None): the list of transformations that will be applied on the label. If None, the label will be converted to the type of ms.int32. 
+        is_training (bool): whether it is in train mode. Default: False.
+        mixup (float): mixup hyperparameter of beta distribution. The value must be positive (default=0.0).
+        num_classes (int): the number of classes. Default: 1000.
+        transform (list or None): the list of transformations that wil be applied on the image,
+            which is obtained by `create_transform`. If None, the default imagenet transformation
+            for evaluation will be applied. Default: None.
+        target_transform (list or None): the list of transformations that will be applied on the label.
+            If None, the label will be converted to the type of ms.int32. Default: None.
         num_parallel_workers (int, optional): Number of workers(threads) to process the dataset in parallel
             (default=None).
         python_multiprocessing (bool, optional): Parallelize Python operations with multiple worker processes. This
             option could be beneficial if the Python operation is computational heavy (default=False).
-    
+
+    Note:
+        Args: `is_training`, `mixup`, `num_classes` is used for MixUp, which is a kind of transform operation.
+        However, we are not able to merge it into `transform`, due to the limitations of the `mindspore.dataset` API.
+
     Returns:
         BatchDataset, dataset batched.
+    """
 
-    '''
-    # TODO: Args: `is_training`, `mixup`, `num_classes` is used for MixUp, which is a kind of transform operation.
-    #  However, we are not able to merge it into `transform`, due to the limitations of the `mindspore.dataset` API.
     if transform is None:
         warnings.warn("Using None as the default value of transform will set it back to "
                       "traditional image transform, which is not recommended. "

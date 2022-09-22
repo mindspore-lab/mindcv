@@ -25,26 +25,26 @@ def create_dataset(
         download: bool = False,
         **kwargs
 ):
-    r'''
+    r"""Creates dataset by name.
+
     Args:
-        name: dataset name: MNIST, CIFAR10, ImageNeT, ''. '' means a customized dataset. Default: ''    
-        root: dataset root dir.  Default: './'
-        split: data split: '' or split name string (train/val/test), if it is '', no split is used. Otherwise, it is a subfolder of root dir, e.g., train, val, test. Default: 'train'
-        shuffle: whether to shuffle the dataset. Default: True
-        num_samples (int, optional): Number of elements to sample (default=None, which means sample all elements).
-        num_shards (int, optional): Number of shards that the dataset will be divided
-            into (default=None). When this argument is specified, `num_samples` reflects
-            the maximum sample number of per shard.
-        shard_id (int, optional): The shard ID within `num_shards` (default=None). This
-            argument can only be specified when `num_shards` is also specified.
-        num_parallel_workers (int, optional): Number of workers to read the data
-            (default=None, set in the config).
+        name: dataset name like MNIST, CIFAR10, ImageNeT, ''. '' means a customized dataset. Default: ''.
+        root: dataset root dir. Default: './'.
+        split: data split: '' or split name string (train/val/test), if it is '', no split is used.
+            Otherwise, it is a subfolder of root dir, e.g., train, val, test. Default: 'train'.
+        shuffle: whether to shuffle the dataset. Default: True.
+        num_samples: Number of elements to sample (default=None, which means sample all elements).
+        num_shards: Number of shards that the dataset will be divided into (default=None).
+            When this argument is specified, `num_samples` reflects the maximum sample number of per shard.
+        shard_id: The shard ID within `num_shards` (default=None).
+            This argument can only be specified when `num_shards` is also specified.
+        num_parallel_workers: Number of workers to read the data (default=None, set in the config).
         download: whether to download the dataset. Default: False
 
     Note:
-        For custom datasets and imagenet, the dataset dir should follow the structure like: 
+        For custom datasets and imagenet, the dataset dir should follow the structure like:
         .dataset_name/
-        ├── split1/  
+        ├── split1/
         │  ├── class1/
         │  │   ├── 000001.jpg
         │  │   ├── 000002.jpg
@@ -53,7 +53,7 @@ def create_dataset(
         │      ├── 000001.jpg
         │      ├── 000002.jpg
         │      └── ....
-        └── split2/   
+        └── split2/
            ├── class1/
            │   ├── 000001.jpg
            │   ├── 000002.jpg
@@ -65,17 +65,16 @@ def create_dataset(
 
     Returns:
         Dataset object
+    """
 
-    '''
-    
-    if num_samples == None:
+    if num_samples is None:
         sampler = None
     elif num_samples > 0:
         if shuffle:
             sampler = ds.RandomSampler(replacement=False, num_samples=num_samples)
         else:
             sampler = ds.SequentialSampler(num_samples=num_samples)
-        shuffle = None # shuffle and sampler cannot be set at the same in mindspore datatset API
+        shuffle = None  # shuffle and sampler cannot be set at the same in mindspore datatset API
     else:
         sampler = None
 
@@ -105,4 +104,3 @@ def create_dataset(
         dataset = ImageFolderDataset(dataset_dir=root, **mindspore_kwargs)
 
     return dataset
-

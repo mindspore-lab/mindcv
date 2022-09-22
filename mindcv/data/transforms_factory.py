@@ -25,6 +25,7 @@ def transforms_imagenet_train(
         re_value=0,
         re_max_attempts=10
 ):
+    """Transform operation list when training on ImageNet."""
     # Define map operations for training dataset
     if hasattr(Inter, interpolation.upper()):
         interpolation = getattr(Inter, interpolation.upper())
@@ -76,6 +77,7 @@ def transforms_imagenet_eval(
         interpolation='bilinear',
 
 ):
+    """Transform operation list when evaluating on ImageNet."""
     if isinstance(image_resize, (tuple, list)):
         assert len(image_resize) == 2
         if image_resize[-1] == image_resize[-2]:
@@ -103,6 +105,7 @@ def transforms_imagenet_eval(
 
 
 def transforms_cifar(resize=224, is_training=True):
+    """Transform operation list when training or evaluating on cifar."""
     trans = []
     if is_training:
         trans += [
@@ -121,6 +124,7 @@ def transforms_cifar(resize=224, is_training=True):
 
 
 def transforms_mnist(resize=224):
+    """Transform operation list when training or evaluating on mnist."""
     rescale = 1.0 / 255.0
     shift = 0.0
     rescale_nml = 1 / 0.3081
@@ -141,16 +145,19 @@ def create_transforms(
         is_training=False,
         **kwargs
 ):
-    r''' 
+    r"""Creates a list of transform operation on image data.
+
     Args:
-        dataset_name: if '', customized dataset. Currently apply the same transform pipeline as ImageNet. if standard dataset name is given including imagenet, cifar10, mnist, preset transforms will be returned.   
-        image_resize: the image size after resize for adapting to network.
-        is_training: if True, augmentation will be applied if support 
+        dataset_name (str): if '', customized dataset. Currently, apply the same transform pipeline as ImageNet.
+            if standard dataset name is given including imagenet, cifar10, mnist, preset transforms will be returned.
+            Default: ''.
+        image_resize (int): the image size after resize for adapting to network. Default: 224.
+        is_training (bool): if True, augmentation will be applied if support. Default: False.
         **kwargs: additional args parsed to `transforms_imagenet_train` and `transforms_imagenet_eval`
 
     Returns:
         A list of transformation operations
-    '''
+    """
 
     dataset_name = dataset_name.lower()
 

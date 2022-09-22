@@ -3,6 +3,12 @@ from mindcv.utils.download import DownLoad
 
 
 class MnistDownload(DownLoad):
+    """Utility class for downloading Mnist dataset.
+
+    Args:
+        root: The root path where the downloaded dataset is placed.
+    """
+
     url_path = 'http://yann.lecun.com/exdb/mnist/'
 
     resources = [("train-images-idx3-ubyte.gz", "f68b3c2dcbeaaa9fbdd348bbdeb94873"),
@@ -16,7 +22,7 @@ class MnistDownload(DownLoad):
         self.path = root
 
     def download(self):
-        """Download the MNIST dataset if it doesn't exists."""
+        """Download the MNIST dataset if it doesn't exist."""
         bool_list = []
         # Check whether the file exists and check value of md5.
         for url, md5 in self.resources:
@@ -37,6 +43,12 @@ class MnistDownload(DownLoad):
 
 
 class Cifar10Download(DownLoad):
+    """Utility class for downloading Cifar10 dataset.
+
+    Args:
+        root: The root path where the downloaded dataset is placed.
+    """
+
     url = ('http://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz', 'c32a1d4ab5d03f1284b67883e8d87530')
     base_dir = 'cifar-10-batches-bin'
 
@@ -54,7 +66,7 @@ class Cifar10Download(DownLoad):
         self.path = os.path.join(self.root, self.base_dir)
 
     def download(self):
-        """Download the Cifar10 dataset if it doesn't exists."""
+        """Download the Cifar10 dataset if it doesn't exist."""
         bool_list = []
         # Check whether the file exists and check value of md5.
         for filename in self.resources:
@@ -71,6 +83,12 @@ class Cifar10Download(DownLoad):
 
 
 class Cifar100Download(DownLoad):
+    """Utility class for downloading Cifar100 dataset.
+
+    Args:
+        root: The root path where the downloaded dataset is placed.
+    """
+
     url = ('http://www.cs.toronto.edu/~kriz/cifar-100-binary.tar.gz', '03b5dce01913d631647c71ecec9e9cb8')
     base_dir = 'cifar-100-binary'
 
@@ -85,7 +103,7 @@ class Cifar100Download(DownLoad):
         self.path = os.path.join(self.root, self.base_dir)
 
     def download(self):
-        """Download the Cifar100 dataset if it doesn't exists."""
+        """Download the Cifar100 dataset if it doesn't exist."""
         bool_list = []
         # Check whether the file exists and check value of md5.
         for filename in self.resources:
