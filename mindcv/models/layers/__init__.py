@@ -3,3 +3,4 @@ from .pooling import *
 from .squeeze_excite import *
 from .selective_kernel import *
 from .drop_path import *
+from .identity import *
