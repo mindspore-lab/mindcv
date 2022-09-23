@@ -5,6 +5,7 @@ from .inception_v4 import *
 from .mobilenet_v1 import *
 from .mobilenet_v2 import *
 from .mobilenet_v3 import *
+from .xception import *
 from .model_factory import *
 from .registry import *
 from .resnet import *
