@@ -21,7 +21,8 @@ __all__ = [
     'resnet152',
     'resnext50_32x4d',
     'resnext101_32x4d',
-    'resnext101_64x4d'
+    'resnext101_64x4d',
+    'resnext152_64x4d'
 ]
 
 
@@ -363,6 +364,17 @@ def resnext101_64x4d(pretrained: bool = False, num_classes: int = 1000, in_chann
      """
     default_cfg = default_cfgs['resnext101_64x4d']
     model = ResNet(Bottleneck, [3, 4, 23, 3], groups=64, base_width=4, num_classes=num_classes,
+                   in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
+    return model
+
+@register_model
+def resnext152_64x4d(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['resnext101_64x4d']
+    model = ResNet(Bottleneck, [3, 8, 36, 3], groups=64, base_width=4, num_classes=num_classes,
                    in_channels=in_channels, **kwargs)
 
     if pretrained:
