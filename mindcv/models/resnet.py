@@ -43,7 +43,8 @@ default_cfgs = {
     'resnet152': _cfg(url=''),
     'resnext50_32x4d': _cfg(url=''),
     'resnext101_32x4d': _cfg(url=''),
-    'resnext101_64x4d': _cfg(url='')
+    'resnext101_64x4d': _cfg(url=''),
+    'resnext152_64x4d': _cfg(url='')
 }
 
 
@@ -370,6 +371,7 @@ def resnext101_64x4d(pretrained: bool = False, num_classes: int = 1000, in_chann
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
     return model
+
 
 @register_model
 def resnext152_64x4d(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
