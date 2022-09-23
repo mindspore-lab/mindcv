@@ -11,6 +11,7 @@ import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore.common import initializer as weight_init
 from mindspore.common.initializer import Initializer as MeInitializer
+from mindspore.common.initializer import Uniform, Normal
 
 from .layers.squeeze_excite import SqueezeExcite
 from .layers.activation import Swish
@@ -58,42 +59,6 @@ default_cfgs = {
     'efficientnet_v2_l': _cfg(url=''),
     'efficientnet_v2_xl': _cfg(url=''),
 }
-
-
-def assignment(arr, num):
-    """Assign the value of `num` to `arr`."""
-    if arr.shape == ():
-        arr = arr.reshape((1))
-        arr[:] = num
-        arr = arr.reshape(())
-    else:
-        if isinstance(num, np.ndarray):
-            arr[:] = num[:]
-        else:
-            arr[:] = num
-    return arr
-
-
-class RandomUniform(MeInitializer):
-    def __init__(self, init_range=0.001):
-        super(RandomUniform, self).__init__()
-        self.init_range = init_range
-
-    def _initialize(self, arr):
-        init_range = self.init_range
-        tmp = np.random.uniform(-init_range, init_range, arr.shape)
-        assignment(arr, tmp)
-
-
-class RandomNormal(MeInitializer):
-    def __init__(self, std=0.001):
-        super(RandomNormal, self).__init__()
-        self.std = std
-
-    def _initialize(self, arr):
-        std = self.std
-        tmp = np.random.normal(0, std, arr.shape)
-        assignment(arr, tmp)
 
 
 class MBConvConfig:
@@ -227,7 +192,6 @@ class MBConv(nn.Cell):
         self.out_channels = cnf.out_channels
 
     def construct(self, x) -> Tensor:
-        """MBConv construct."""
         result = self.block(x)
         if self.shortcut:
             result = self.dropout(result)
@@ -304,6 +268,7 @@ class FusedMBConv(nn.Cell):
 class EfficientNet(nn.Cell):
     """
     EfficientNet architecture.
+    `EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks <https://arxiv.org/abs/1905.11946>`_.
 
     Args:
         arch (str): The name of the model.
@@ -467,7 +432,6 @@ class EfficientNet(nn.Cell):
 
 
     def construct(self, x: Tensor) -> Tensor:
-        """Efficientnet construct."""
         x = self.forward_features(x)
         return self.forward_head(x)
 
@@ -475,7 +439,7 @@ class EfficientNet(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Dense):
                 init_range = 1.0 / np.sqrt(cell.weight.shape[0])
-                cell.weight.set_data(weight_init.initializer(RandomUniform(init_range),
+                cell.weight.set_data(weight_init.initializer(Uniform(init_range),
                                                              cell.weight.shape,
                                                              cell.weight.dtype))
                 if cell.bias is not None:
@@ -485,7 +449,7 @@ class EfficientNet(nn.Cell):
             if isinstance(cell, nn.Conv2d):
                 out_channel, _, kernel_size_h, kernel_size_w = cell.weight.shape
                 stddev = np.sqrt(2 / int(out_channel * kernel_size_h * kernel_size_w))
-                cell.weight.set_data(weight_init.initializer(RandomNormal(std=stddev),
+                cell.weight.set_data(weight_init.initializer(Normal(sigma=stddev),
                                                              cell.weight.shape,
                                                              cell.weight.dtype))
                 if cell.bias is not None:
