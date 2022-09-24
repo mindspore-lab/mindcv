@@ -1,3 +1,8 @@
+"""
+MindSpore implementation of `DPN`.
+Refer to: Dual Path Networks
+"""
+
 import math
 from collections import OrderedDict
 from typing import Tuple
@@ -128,7 +133,17 @@ class DualPathBlock(nn.Cell):
 
 
 class DPN(nn.Cell):
+    r"""DPN model class, based on
+    `"Dual Path Networks" <https://arxiv.org/pdf/1707.01629.pdf>`_
 
+    Args:
+        num_init_channel: the output channel of first blocks. Default: 64.
+        k_r: the first channel of each stage. Default: 96.
+        g: number of group in the conv2d. Default: 32.
+        k_sec Tuple[int]: multiplicative factor for number of bottleneck layers. Default: 4.
+        inc_sec Tuple[int]: the first output channel in each stage. Default: (16, 32, 24, 128).
+        num_classes: number of classification classes. Default: 1000.
+    """
     def __init__(self,
                  num_init_channel: int = 64,
                  k_r: int = 96,
@@ -233,8 +248,11 @@ class DPN(nn.Cell):
         x = self.forward_head(x)
         return x
 
+
 @register_model
 def dpn92(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> DPN:
+    """Get 92 layers DPN model.
+     Refer to the base class `models.DPN` for more details."""
     default_cfg = default_cfgs['dpn92']
     model = DPN(num_init_channel=64, k_r=96, g=32, k_sec=(3, 4, 20, 3), inc_sec=(16, 32, 24, 128),
                num_classes=num_classes, **kwargs)
@@ -244,8 +262,11 @@ def dpn92(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kw
 
     return model
 
+
 @register_model
 def dpn98(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> DPN:
+    """Get 98 layers DPN model.
+     Refer to the base class `models.DPN` for more details."""
     default_cfg = default_cfgs['dpn98']
     model = DPN(num_init_channel=96, k_r=160, g=40, k_sec=(3, 6, 20, 3), inc_sec=(16, 32, 32, 128),
                num_classes=num_classes, **kwargs)
@@ -255,8 +276,11 @@ def dpn98(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kw
 
     return model
 
+
 @register_model
 def dpn131(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> DPN:
+    """Get 131 layers DPN model.
+     Refer to the base class `models.DPN` for more details."""
     default_cfg = default_cfgs['dpn131']
     model = DPN(num_init_channel=128, k_r=160, g=40, k_sec=(4, 8, 28, 3), inc_sec=(16, 32, 32, 128),
                num_classes=num_classes, **kwargs)
@@ -266,8 +290,11 @@ def dpn131(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **k
 
     return model
 
+
 @register_model
 def dpn107(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> DPN:
+    """Get 107 layers DPN model.
+     Refer to the base class `models.DPN` for more details."""
     default_cfg = default_cfgs['dpn107']
     model = DPN(num_init_channel=128, k_r=200, g=50, k_sec=(4, 8, 20, 3), inc_sec=(20, 64, 64, 128),
                num_classes=num_classes, **kwargs)
