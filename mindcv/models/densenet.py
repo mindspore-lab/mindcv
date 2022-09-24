@@ -177,25 +177,30 @@ class DenseNet(nn.Cell):
         self.classifier = nn.Dense(self.num_features, num_classes)
         self._initialize_weights()
 
-    def _initialize_weights(self) -> None:
+    def _initialize_weights(self):
+        """
+        _initialize_weights: to initialize the weights.
+        """
+        self.init_parameters_data()
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
-                cell.weight.set_data(
-                    init.initializer(init.HeNormal(math.sqrt(5), mode='fan_out', nonlinearity='relu'),
-                                     cell.weight.shape, cell.weight.dtype))
+                n = cell.kernel_size[0] * cell.kernel_size[1] * cell.out_channels
+                cell.weight.set_data(init.initializer(init.Normal(math.sqrt(2. / n), 0),
+                                                      cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(
-                        init.initializer(init.HeUniform(math.sqrt(5), mode='fan_in', nonlinearity='leaky_relu'),
-                                         cell.bias.shape, cell.bias.dtype))
+                    cell.bias.set_data(init.initializer(init.Zero,
+                                                      cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(init.initializer('ones', cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(init.initializer('zeros', cell.beta.shape, cell.beta.dtype))
+                cell.gamma.set_data(init.initializer(init.One,
+                                                     cell.gamma.shape, cell.gamma.dtype))
+                cell.beta.set_data(init.initializer(init.Zero,
+                                                    cell.beta.shape, cell.beta.dtype))
             elif isinstance(cell, nn.Dense):
-                cell.weight.set_data(
-                    init.initializer(init.HeUniform(math.sqrt(5), mode='fan_in', nonlinearity='leaky_relu'),
-                                     cell.weight.shape, cell.weight.dtype))
+                cell.weight.set_data(init.initializer(init.Normal(0.01, 0),
+                                                      cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+                    cell.bias.set_data(init.initializer(init.Zero,
+                                                        cell.bias.shape, cell.bias.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)
