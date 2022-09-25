@@ -25,3 +25,4 @@ from .dpn import *
 from .efficientnet import *
 from .ghostnet import *
 from .repvgg import *
+from .swin_transformer import *
