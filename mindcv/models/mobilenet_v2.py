@@ -44,7 +44,7 @@ def _cfg(url='', **kwargs):
     return {
         'url': url,
         'num_classes': 1000,
-        'first_conv': 'features.0.features.0', 'classifier': 'classifier',
+        'first_conv': 'features.0', 'classifier': 'classifier.1',
         **kwargs
     }
 
