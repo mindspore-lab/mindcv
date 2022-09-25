@@ -20,7 +20,7 @@ jobs:
         pip install pylint
     - name: display env
       run: |
-        env;tree;ls;pwd;cd mindcv && git branch -r; 
+        env;echo "[info] grep env"; env | grep 7;echo "[info] fininsh grep env";ls;pwd; git branch -a; 
     - name: get pylint config
       run: |
         wget --no-check-certificate https://tools.mindspore.cn/tools/check/pylint/rules/pylintrc
