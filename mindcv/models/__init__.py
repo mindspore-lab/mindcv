@@ -21,3 +21,4 @@ from .layers import *
 from .nasnet import *
 from .pnasnet import *
 from .convnext import *
+from .dpn import *
