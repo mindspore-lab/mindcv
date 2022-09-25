@@ -29,7 +29,7 @@ def _cfg(url='', **kwargs):
     return {
         'url': url,
         'num_classes': 1000,
-        'first_conv': '', 'classifier': '',
+        'first_conv': 'first_conv.0', 'classifier': 'classifier',
         **kwargs
     }
 
