@@ -23,12 +23,13 @@ def _cfg(url='', **kwargs):
     return {
         'url': url,
         'num_classes': 1000,
-        'first_conv': '', 'classifier': '',
+        'first_conv': 'conv0.0', 'classifier': 'classifier',
         **kwargs
     }
 
 
 default_cfgs = {
+    'nasnet': _cfg(url=''),
 }
 
 
@@ -661,8 +662,8 @@ class NASNetAMobile(nn.Cell):
     """
 
     def __init__(self,
-                 in_channels: int,
-                 num_classes: int,
+                 in_channels: int = 3,
+                 num_classes: int = 1000,
                  stem_filters: int = 32,
                  penultimate_filters: int = 1056,
                  filters_multiplier: int = 2) -> None:
@@ -852,7 +853,7 @@ def nasnet(pretrained: bool = False, num_classes: int = 1000, in_channels: int =
     """Get NasNet model.
      Refer to the base class `models.NASNetAMobile` for more details."""
     default_cfg = default_cfgs['nasnet']
-    model = NASNetAMobile(in_channels=3, num_classes=1000, **kwargs)
+    model = NASNetAMobile(in_channels=in_channels, num_classes=num_classes, **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
