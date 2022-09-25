@@ -27,7 +27,7 @@ def _cfg(url='', **kwargs):
     return {
         'url': url,
         'num_classes': 1000,
-        'first_conv': '', 'classifier': '',
+        'first_conv': 'first_conv.0', 'classifier': 'classifier',
         **kwargs
     }
 
@@ -166,7 +166,7 @@ class ShuffleNetV2(nn.Cell):
             nn.ReLU()
         ])
         self.pool = GlobalAvgPooling()
-        self.classifier = nn.Dense(self.stage_out_channels[-1], num_classes, has_bias=False)
+        self.classifier = nn.Dense(self.stage_out_channels[-1], num_classes)
         self._initialize_weights()
 
     def construct(self, x):
