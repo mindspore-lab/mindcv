@@ -178,6 +178,7 @@ class GhostNet(nn.Cell):
     def __init__(self,
                  cfgs,
                  num_classes: int = 1000,
+                 in_channels: int = 3,
                  width: float = 1.0,
                  dropout: float = 0.2
                  ) -> None:
@@ -188,7 +189,7 @@ class GhostNet(nn.Cell):
 
         # building first layer
         output_channel = make_divisible(16 * width, 4)
-        self.conv_stem = nn.Conv2d(3, output_channel, kernel_size=3,
+        self.conv_stem = nn.Conv2d(in_channels, output_channel, kernel_size=3,
                                    padding=1, stride=2, has_bias=False, pad_mode='pad')
         self.bn1 = nn.BatchNorm2d(output_channel)
         self.act1 = nn.ReLU()
@@ -329,7 +330,6 @@ model_cfgs = {
 def ghostnet_1x(pretrained: bool = False,
                 num_classes: int = 1000,
                 in_channels: int = 3,
-                dropout: int = 0.2,
                 **kwargs) -> GhostNet:
     """Get GhostNet model.
     Refer to the base class 'models.GhostNet' for more details.
@@ -337,7 +337,7 @@ def ghostnet_1x(pretrained: bool = False,
     model_args = model_cfgs['1x']['cfg']
     model = GhostNet(cfgs=model_args,
                      num_classes=num_classes,
-                     dropout=dropout,
+                     in_channels=in_channels,
                      **kwargs)
 
     if pretrained:
@@ -350,7 +350,6 @@ def ghostnet_1x(pretrained: bool = False,
 def ghostnet_nose_1x(pretrained: bool = False,
                      num_classes: int = 1000,
                      in_channels: int = 3,
-                     dropout: int = 0.2,
                      **kwargs) -> GhostNet:
     """Get GhostNet model without SEModule.
     Refer to the base class 'models.GhostNet' for more details.
@@ -358,7 +357,7 @@ def ghostnet_nose_1x(pretrained: bool = False,
     model_args = model_cfgs['nose_1x']['cfg']
     model = GhostNet(cfgs=model_args,
                      num_classes=num_classes,
-                     dropout=dropout,
+                     in_channels=in_channels,
                      **kwargs)
 
     if pretrained:
