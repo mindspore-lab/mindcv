@@ -20,13 +20,13 @@ def _cfg(url='', **kwargs):
     return {
         'url': url,
         'num_classes': 1000,
-        'first_conv': '', 'classifier': '',
+        'first_conv': 'stage0.rbr_dense.0', 'classifier': 'linear',
         **kwargs
     }
 
 
 default_cfgs = {
-    'RepVGG-A0': _cfg(url=''),
+    'RepVG_A0': _cfg(url=''),
 }
 
 
