@@ -102,7 +102,7 @@ class ConvNeXt(nn.Cell):
     '"A ConvNet for the 2020s" <https://arxiv.org/abs/2201.03545>'
 
     Args:
-        in_channel (int) : dim of the input channel.
+        in_channels (int) : dim of the input channel.
         num_classes (int) : dim of the classes predicted.
         depths (List[int]) : the depths of each layer.
         dims (List[int]) : the middle dim of each layer.
@@ -112,7 +112,7 @@ class ConvNeXt(nn.Cell):
     """
 
     def __init__(self,
-                 in_channel: int,
+                 in_channels: int,
                  num_classes: int,
                  depths: List[int],
                  dims: List[int],
@@ -123,7 +123,7 @@ class ConvNeXt(nn.Cell):
 
         self.downsample_layers = nn.CellList()  # stem and 3 intermediate down_sampling conv layers
         stem = nn.SequentialCell(
-            nn.Conv2d(in_channel, dims[0], kernel_size=4, stride=4, has_bias=True),
+            nn.Conv2d(in_channels, dims[0], kernel_size=4, stride=4, has_bias=True),
             ConvNextLayerNorm((dims[0],), epsilon=1e-6, norm_axis=1)
         )
         self.downsample_layers.append(stem)
@@ -194,7 +194,7 @@ def convnext_tiny(pretrained: bool = False, num_classes: int = 1000, in_channels
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs['convnext_tiny']
-    model = ConvNeXt(in_channel=in_channels, num_classes=num_classes, depths=[3, 3, 9, 3],
+    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 9, 3],
                      dims=[96, 192, 384, 768],
                      **kwargs)
 
@@ -210,7 +210,7 @@ def convnext_small(pretrained: bool = False, num_classes: int = 1000, in_channel
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs['convnext_small']
-    model = ConvNeXt(in_channel=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
+    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
                      dims=[96, 192, 384, 768],
                      **kwargs)
 
@@ -226,7 +226,7 @@ def convnext_base(pretrained: bool = False, num_classes: int = 1000, in_channels
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs['convnext_base']
-    model = ConvNeXt(in_channel=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
+    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
                      dims=[128, 256, 512, 1024],
                      **kwargs)
 
@@ -242,7 +242,7 @@ def convnext_large(pretrained: bool = False, num_classes: int = 1000, in_channel
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs['convnext_large']
-    model = ConvNeXt(in_channel=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
+    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
                      dims=[192, 384, 768, 1536],
                      **kwargs)
 
@@ -258,7 +258,7 @@ def convnext_xlarge(pretrained: bool = False, num_classes: int = 1000, in_channe
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs['convnext_xlarge']
-    model = ConvNeXt(in_channel=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
+    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
                      dims=[256, 512, 1024, 2048],
                      **kwargs)
 
