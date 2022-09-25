@@ -24,3 +24,4 @@ from .convnext import *
 from .dpn import *
 from .efficientnet import *
 from .ghostnet import *
+from .repvgg import *
