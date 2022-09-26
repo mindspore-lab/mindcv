@@ -29,7 +29,7 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'ghostnet_1x': _cfg(url=''),
+    'ghostnet_1x': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/ghostnet/ghostnet_1x_224.ckpt'),
     'ghostnet_nose_1x': _cfg(url=''),
 }
 
