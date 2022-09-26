@@ -25,7 +25,7 @@ __all__ = [
 def _cfg(url='', **kwargs):
     return {
         'url': url,
-        'num_classes': 1000,
+        'num_classes': 1001,
         'first_conv': 'features.0', 'classifier': 'classifier',
         **kwargs
     }
