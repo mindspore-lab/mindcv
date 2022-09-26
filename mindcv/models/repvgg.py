@@ -16,6 +16,11 @@ from .utils import load_pretrained
 from .registry import register_model
 
 
+__all__ = [
+    'RepVGG',
+    'RepVGG_A0'
+]
+
 def _cfg(url='', **kwargs):
     return {
         'url': url,
@@ -26,7 +31,7 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'RepVG_A0': _cfg(url=''),
+    'RepVGG-A0': _cfg(url=''),
 }
 
 
