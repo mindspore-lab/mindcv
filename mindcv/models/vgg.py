@@ -34,8 +34,8 @@ def _cfg(url='', **kwargs):
 default_cfgs = {
     'vgg11': _cfg(url=''),
     'vgg13': _cfg(url=''),
-    'vgg16': _cfg(url=''),
-    'vgg19': _cfg(url='')
+    'vgg16': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/vgg/vgg16_224.ckpt'),
+    'vgg19': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/vgg/vgg19_224.ckpt')
 }
 
 
