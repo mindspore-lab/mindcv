@@ -36,11 +36,11 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'resnet18': _cfg(url=''),
-    'resnet34': _cfg(url=''),
-    'resnet50': _cfg(url=''),
-    'resnet101': _cfg(url=''),
-    'resnet152': _cfg(url=''),
+    'resnet18': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/resnet/resnet18_224.ckpt'),
+    'resnet34': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/resnet/resnet34_224.ckpt'),
+    'resnet50': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/resnet/resnet50_224.ckpt'),
+    'resnet101': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/resnet/resnet101_224.ckpt'),
+    'resnet152': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/resnet/resnet152_224.ckpt'),
     'resnext50_32x4d': _cfg(url=''),
     'resnext101_32x4d': _cfg(url=''),
     'resnext101_64x4d': _cfg(url=''),
