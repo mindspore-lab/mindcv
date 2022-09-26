@@ -166,7 +166,7 @@ class ShuffleNetV2(nn.Cell):
             nn.ReLU()
         ])
         self.pool = GlobalAvgPooling()
-        self.classifier = nn.Dense(self.stage_out_channels[-1], num_classes)
+        self.classifier = nn.Dense(self.stage_out_channels[-1], num_classes, has_bias=False)
         self._initialize_weights()
 
     def construct(self, x):
