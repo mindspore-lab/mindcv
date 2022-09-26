@@ -30,7 +30,7 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'inception_v3': _cfg(url='')
+    'inception_v3': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/inception/inception_v3_299.ckpt')
 }
 
 
