@@ -34,7 +34,7 @@ def _cfg(url='', **kwargs):
 
 default_cfgs = {
     'shufflenet_v2_0.5': _cfg(url=''),
-    'shufflenet_v2_1.0': _cfg(url=''),
+    'shufflenet_v2_1.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenet_v2_1.0_224.ckpt'),
     'shufflenet_v2_1.5': _cfg(url=''),
     'shufflenet_v2_2.0': _cfg(url=''),
 
