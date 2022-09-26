@@ -142,6 +142,7 @@ class DPN(nn.Cell):
         g: number of group in the conv2d. Default: 32.
         k_sec Tuple[int]: multiplicative factor for number of bottleneck layers. Default: 4.
         inc_sec Tuple[int]: the first output channel in each stage. Default: (16, 32, 24, 128).
+        in_channels: number of input channels. Default: 3.
         num_classes: number of classification classes. Default: 1000.
     """
     def __init__(self,
