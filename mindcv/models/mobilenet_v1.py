@@ -107,20 +107,13 @@ class MobileNetV1(nn.Cell):
     def _initialize_weights(self) -> None:
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
-                n = cell.kernel_size[0] * cell.kernel_size[1] * cell.out_channels
-                cell.weight.set_data(
-                    init.initializer(init.Normal(sigma=math.sqrt(2. / n), mean=0.0),
-                                     cell.weight.shape, cell.weight.dtype))
-                if cell.bias is not None:
-                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
-            elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(init.initializer('ones', cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(init.initializer('zeros', cell.beta.shape, cell.beta.dtype))
-            elif isinstance(cell, nn.Dense):
-                cell.weight.set_data(
-                    init.initializer(init.Normal(sigma=0.01, mean=0.0), cell.weight.shape, cell.weight.dtype))
-                if cell.bias is not None:
-                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+                cell.weight.set_data(init.initializer(init.XavierUniform(),
+                                                             cell.weight.shape,
+                                                             cell.weight.dtype))
+            if isinstance(cell, nn.Dense):
+                cell.weight.set_data(init.initializer(init.TruncatedNormal(),
+                                                             cell.weight.shape,
+                                                             cell.weight.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)
