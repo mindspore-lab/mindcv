@@ -150,7 +150,7 @@ class DPN(nn.Cell):
                  g: int = 32,
                  k_sec: Tuple[int, int, int, int] = (3, 4, 20, 3),
                  inc_sec: Tuple[int, int, int, int] = (16, 32, 24, 128),
-                 in_channels: int = 3
+                 in_channels: int = 3,
                  num_classes: int = 1000):
 
         super(DPN, self).__init__()
