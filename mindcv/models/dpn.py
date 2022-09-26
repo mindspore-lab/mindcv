@@ -36,7 +36,7 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'dpn92': _cfg(url=''),
+    'dpn92': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/dpn/dpn92_224.ckpt'),
     'dpn98': _cfg(url=''),
     'dpn107': _cfg(url=''),
     'dpn131': _cfg(url='')
