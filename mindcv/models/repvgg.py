@@ -31,7 +31,7 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'RepVGG-A0': _cfg(url=''),
+    'RepVGG-A0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/repvgg/RepVGG_A0_224.ckpt'),
 }
 
 
