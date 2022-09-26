@@ -76,7 +76,7 @@ setup(
         'Issue Tracker': 'https://github.com/mindlab-ai/mindcv/issues',
     },
     description="An open source computer vision research tool box.",
-    license='Eclipse Public License 1.0',
+    license='Apache 2.0',
     include_package_data=True,
     packages=find_packages(exclude=("mindcv")),
     cmdclass={
