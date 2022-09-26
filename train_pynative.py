@@ -39,8 +39,8 @@ def train_epoch(network, dataset, loss_fn, optimizer, log_interval=100):
         if (batch+1) % log_interval  == 0:
             step_time = (time() - t) / log_interval
             t = time()
-            loss?!?jedi=0, , current = loss.asnumpy(), batch?!? (*_**values: object*_*, sep: Optional[str]=..., end: Optional[str]=..., file: Optional[SupportsWrite[str]]=..., flush: bool=...) ?!?jedi?!?
-            print(f"Step {current+1:>3d}/{size:>3d}, loss: {loss:>7f}, time per step: {step_time:.5f}s")
+            loss, current = loss.asnumpy(), batch
+            print(f"Step {current+1:>3d}/{size:>3d}, loss: {loss:>7f}, time per step: {step_time:.5f}")
 
 
 def train(args):
