@@ -55,6 +55,6 @@ Detailed adjustable parameters and their default value can be seen in [config.py
 - To validate the model, you can use `validate.py`. Here is an example for squeezenet_1.0 to verify the accuracy of your training.
 
   ```python
-  python validate.py --model=squeezenet1_0 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/squeezenet_1.0-best.ckpt'
+  python validate.py --model=squeezenet1_0 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/squeezenet1_0-best.ckpt'
   ```
 
