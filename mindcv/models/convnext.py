@@ -36,7 +36,7 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'convnext_tiny': _cfg(url=''),
+    'convnext_tiny': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_tiny_224.ckpt'),
     'convnext_small': _cfg(url=''),
     'convnext_base': _cfg(url=''),
     'convnext_large': _cfg(url=''),
