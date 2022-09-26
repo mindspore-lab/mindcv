@@ -1,5 +1,7 @@
 import os
 import logging
+import collections.abc
+from itertools import repeat
 from typing import Optional
 
 from mindspore import load_checkpoint, load_param_into_net
@@ -53,3 +55,12 @@ def make_divisible(v: float,
     if new_v < 0.9 * v:
         new_v += divisor
     return new_v
+
+
+def _ntuple(n):
+    def parse(x):
+        if isinstance(x, collections.abc.Iterable):
+            return x
+        return tuple(repeat(x, n))
+
+    return parse
