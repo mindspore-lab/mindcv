@@ -178,7 +178,7 @@ class ShuffleNetV1(nn.Cell):
 
         self.features = nn.SequentialCell(features)
         self.global_pool = GlobalAvgPooling()
-        self.classifier = nn.Dense(self.stage_out_channels[-1], num_classes)
+        self.classifier = nn.Dense(self.stage_out_channels[-1], num_classes, has_bias=False)
         self._initialize_weights()
 
     def _initialize_weights(self):
