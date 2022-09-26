@@ -33,11 +33,14 @@ def train_epoch(network, dataset, loss_fn, optimizer, log_interval=100):
 
     network.set_train()
     size = dataset.get_dataset_size()
+    t = time()
     for batch, (data, label) in enumerate(dataset.create_tuple_iterator()):
         loss = train_step(data, label)
         if (batch+1) % log_interval  == 0:
-            loss, current = loss.asnumpy(), batch
-            print(f"Step {current+1:>3d}/{size:>3d}, loss: {loss:>7f}")
+            step_time = (time() - t) / log_interval
+            t = time()
+            loss?!?jedi=0, , current = loss.asnumpy(), batch?!? (*_**values: object*_*, sep: Optional[str]=..., end: Optional[str]=..., file: Optional[SupportsWrite[str]]=..., flush: bool=...) ?!?jedi?!?
+            print(f"Step {current+1:>3d}/{size:>3d}, loss: {loss:>7f}, time per step: {step_time:.5f}s")
 
 
 def train(args):
