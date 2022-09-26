@@ -29,7 +29,7 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'nasnet': _cfg(url=''),
+    'nasnet': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/nasnet/nasnet_224.ckpt'),
 }
 
 
