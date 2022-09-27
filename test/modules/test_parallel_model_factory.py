@@ -34,6 +34,7 @@ def test_model_factory_parallel(mode, num_classes,
                                  parallel_mode='data_parallel',
                                  gradients_mean=True)
 
+    batch_size = 1
     model_names = list_models()
     for model_name in model_names:
         if checkpoint_path != '':
@@ -64,7 +65,7 @@ def test_model_factory_parallel(mode, num_classes,
         # load dataset
         loader_eval = create_loader(
             dataset=dataset_eval,
-            batch_size=1,
+            batch_size=batch_size,
             drop_remainder=False,
             is_training=False,
             transform=transform_list,
@@ -86,5 +87,9 @@ def test_model_factory_parallel(mode, num_classes,
 
         # init model
         model = Model(network, loss_fn=loss, metrics=eval_metrics)
-        result = model.eval(loader_eval)
-        print(result)
+        iterator = loader_eval.create_dict_iterator()
+        data = iterator.__next__()
+        result = model.predict(data['image'])
+        print(result.shape)
+        assert result.shape[0] == batch_size
+        assert result.shape[1] == num_classes
