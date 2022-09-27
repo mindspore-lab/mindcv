@@ -12,8 +12,6 @@ from mindspore.nn import TrainOneStepCell, WithLossCell
 from mindcv.loss import create_loss
 from mindcv.optim import create_optimizer
 
-ms.set_context(mode=ms.PYNATIVE_MODE)
-
 class SimpleCNN(nn.Cell):
     def __init__(self, num_classes=10, in_channels=1, include_top=True, aux_head=False):
         super(SimpleCNN, self).__init__()
