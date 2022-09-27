@@ -106,8 +106,8 @@ python validate.py --model=densenet121 --dataset=imagenet --val_split=val \
 ## Tutorials
 We provide [jupyter notebook tutorials](tutorials) for  
 
-- [Learn about configs](tutorials/learn_about_config.ipynb)  //tbc
-- [Inference with a pretrained model](tutorials/inference.ipynb) //tbc
+- [Learn about configs](tutorials/learn_about_config.ipynb)  
+- [Inference with a pretrained model](tutorials/inference.ipynb) 
 - [Finetune a pretrained model on custom datasets](tutorials/finetune.ipynb) 
 - [Customize models](tutorials/customize_model.ipynb) //tbc
 - [Optimizing performance for vision transformer](tutorials/transformer.ipynb) //tbc
@@ -129,11 +129,11 @@ The dynamic version is still under development, if you find any issue or have an
 
 ### Acknowledgement
 
-MindSpore is an open source project that welcome any contribution and feedback. We wish that the toolbox and benchmark could serve the growing research community by providing a flexible as well as standardized toolkit to reimplement existing methods and develop their own new computer vision methods.
+MindCV is an open source project that welcome any contribution and feedback. We wish that the toolbox and benchmark could serve the growing research community by providing a flexible as well as standardized toolkit to reimplement existing methods and develop their own new computer vision methods.
 
 ### Contributing
 
-We appreciate all contributions to improve MindSpore Vision. Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline.
+We appreciate all contributions to improve MindCV. Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline.
 
 ### Citation
 
