@@ -142,5 +142,14 @@ def test_create_loss_BCE():
 
     test_loss(name, weight, reduction, label_smoothing, aux_factor)
 
+@pytest.mark.parametrize('mode', [0, 1])
+def test_create_loss_mode(mode):
+    ms.set_context(mode=mode)
+    print("mode", mode)
+    if random.randint(0, 1):
+        test_create_loss_CE()
+    else:
+        test_create_loss_BCE()
+
 if __name__:
     test_create_loss_CE()
