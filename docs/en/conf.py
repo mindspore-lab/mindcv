@@ -69,8 +69,6 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-source_encoding = 'UTF-8'
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -89,18 +87,6 @@ html_theme_options = {
     # Specify the language of shared menu
     'menu_lang': 'en',
 }
-
-layout_target = os.path.join(os.path.dirname(pytorch_sphinx_theme.__file__), 'layout.html')
-layout_src = '../resource/_static/layout.html'
-if os.path.exists(layout_target):
-    os.remove(layout_target)
-shutil.copy(layout_src, layout_target)
-
-jinja_target = os.path.join(os.path.dirname(pytorch_sphinx_theme.__file__), 'theme_variables.jinja')
-jinja_src = '../resource/_static/theme_variables.jinja'
-if os.path.exists(jinja_target):
-    os.remove(jinja_target)
-shutil.copy(jinja_src, jinja_target)
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
