@@ -144,8 +144,8 @@ def train(args):
     # training
     # TODO: args.loss_scale is not making effect. 
     print('Training...')
+    epoch_time = time()
     for t in range(args.epoch_size):
-        epoch_time = time()
         train_epoch(network, loader_train, loss, optimizer, epoch=t, n_epochs=args.epoch_size)
         print(f'Epoch {t + 1} training time: {time() - epoch_time:.3f}s')
 
@@ -156,6 +156,7 @@ def train(args):
                 save_path = os.path.join(args.ckpt_save_dir, f"{args.model}-{t + 1}.ckpt")
                 ms.save_checkpoint(network, save_path, async_save=True)
                 print(f"Saving model to {save_path}")
+        epoch_time = time()
     print("Done!")
 
 
