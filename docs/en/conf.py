@@ -13,9 +13,10 @@
 import os
 import sys
 import shutil
-import pytorch_sphinx_theme
+import sphinx_rtd_theme
+import mindcv
 
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('../../'))
 
 # -- Project information -----------------------------------------------------
 
@@ -57,9 +58,20 @@ myst_heading_anchors = 4
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'numpy': ('https://numpy.org/doc/stable', None),
-    'torch': ('https://pytorch.org/docs/stable/', None),
-    'mmcv': ('https://mmcv.readthedocs.io/en/dev-2.x/', None),
 }
+
+# copy markdown files from outer directory
+shutil.copy('../../tutorials/deployment.md', './tutorials/deployment.md')
+shutil.copy('../../tutorials/finetune.md', './tutorials/finetune.md')
+shutil.copy('../../tutorials/Inference.md', './tutorials/Inference.md')
+shutil.copy('../../tutorials/learn_about_config.md', './tutorials/learn_about_config.md')
+shutil.copy('../../tutorials/output_8_0.png', './tutorials/output_8_0.png')
+shutil.copy('../../tutorials/output_11_0.png', './tutorials/output_11_0.png')
+shutil.copy('../../tutorials/output_23_0.png', './tutorials/output_23_0.png')
+shutil.copy('../../tutorials/output_30_0.png', './tutorials/output_30_0.png')
+shutil.copy('../../quick_start.md', './quick_start/quick_start.md')
+
+os.system('cp -R %s %s'% ('../../config', './'))
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -74,19 +86,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'pytorch_sphinx_theme'
-html_theme_path = [pytorch_sphinx_theme.get_html_theme_path()]
-
-html_theme_options = {
-    'menu': [
-        {
-            'name': 'GitHub',
-            'url': 'https://github.com/mindlab-ai/mindcv'
-        },
-    ],
-    # Specify the language of shared menu
-    'menu_lang': 'en',
-}
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
