@@ -109,8 +109,8 @@ We provide [jupyter notebook tutorials](tutorials) for
 - [Learn about configs](tutorials/learn_about_config.ipynb)  
 - [Inference with a pretrained model](tutorials/inference.ipynb) 
 - [Finetune a pretrained model on custom datasets](tutorials/finetune.ipynb) 
-- [Customize models](tutorials/customize_model.ipynb) //tbc
-- [Optimizing performance for vision transformer](tutorials/transformer.ipynb) //tbc
+- [Customize models] //coming soon
+- [Optimizing performance for vision transformer] //coming soon
 - [Deployment demo](tutorials/deployment.ipynb) 
 
 
