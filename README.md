@@ -111,6 +111,7 @@ We provide [jupyter notebook tutorials](tutorials) for
 - [Finetune a pretrained model on custom datasets](tutorials/finetune.ipynb) 
 - [Customize models](tutorials/customize_model.ipynb) //tbc
 - [Optimizing performance for vision transformer](tutorials/transformer.ipynb) //tbc
+- [Deployment demo](tutorials/deployment.ipynb) 
 
 
 ## Notes
