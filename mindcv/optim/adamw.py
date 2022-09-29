@@ -3,7 +3,6 @@
 import numpy as np
 
 import mindspore as ms
-import mindspore.ops as ops
 from mindspore._checkparam import Validator as validator
 
 from mindspore.common.initializer import initializer
@@ -109,7 +108,7 @@ class AdamW(Optimizer):
     @opt_init_args_register
     def __init__(self, params, learning_rate=1e-3, beta1=0.9, beta2=0.999, eps=1e-8, \
                  weight_decay=0.0, loss_scale=1.0, clip=False):
-        super(AdamW, self).__init__(learning_rate, params, weight_decay)
+        super().__init__(learning_rate, params, weight_decay)
         _check_param_value(beta1, beta2, eps, self.cls_name)
         self.beta1 = Tensor(np.array([beta1]).astype(np.float32))
         self.beta2 = Tensor(np.array([beta2]).astype(np.float32))

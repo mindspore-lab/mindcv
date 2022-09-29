@@ -1,5 +1,6 @@
-import mindspore.nn as nn
+''' optim factory '''
 from typing import Optional
+from mindspore import nn
 from .adan import Adan
 from .adamw import AdamW
 from .nadam import NAdam
@@ -53,7 +54,6 @@ def create_optimizer(
 
     opt = opt.lower()
 
-    weight_decay = weight_decay
     if weight_decay and filter_bias_and_bn:
         params = init_group_params(params, weight_decay)
 
@@ -61,8 +61,8 @@ def create_optimizer(
     # if lr is not None:
     #    opt_args.setdefault('lr', lr)
 
-    # non-adaptive: SGD, momentum, and nesterov 
-    if opt == 'sgd' or opt == 'nesterov' or opt=='momentum':
+    # non-adaptive: SGD, momentum, and nesterov
+    if opt in ['sgd','nesterov', 'momentum']:
         optimizer = nn.SGD(params=params,
                            learning_rate=lr,
                            momentum=momentum,
@@ -71,8 +71,8 @@ def create_optimizer(
                            loss_scale=loss_scale,
                            **opt_args
                            )
-    
-    # adaptive 
+
+    # adaptive
     elif opt == 'adam':
         optimizer = nn.Adam(params=params,
                             learning_rate=lr,
