@@ -3,6 +3,8 @@ from mindspore.nn import BCELoss, CrossEntropyLoss  # BCEWithLogitsLoss, Softmax
 from .cross_entropy_smooth import CrossEntropySmooth
 from typing import Optional
 
+__all__ = ["create_loss"]
+
 
 def create_loss(
         name: str = 'CE',

@@ -6,6 +6,8 @@ from .dataset_download import MnistDownload, Cifar10Download, Cifar100Download
 from mindspore.dataset import MnistDataset, Cifar10Dataset, Cifar100Dataset, ImageFolderDataset
 import mindspore.dataset as ds
 
+__all__ = ["create_dataset"]
+
 _MINDSPORE_BASIC_DATASET = dict(
     mnist=(MnistDataset, MnistDownload),
     cifar10=(Cifar10Dataset, Cifar10Download),
