@@ -3,6 +3,8 @@ from mindspore.nn import ExponentialDecayLR, PolynomialDecayLR
 from .warmup_cosine_decay_lr import WarmupCosineDecayLR
 from .multi_step_decay_lr import MultiStepDecayLR
 
+__all__ = ["create_scheduler"]
+
 
 def create_scheduler(
         steps_per_epoch: int,
@@ -49,10 +51,10 @@ def create_scheduler(
                                           )
     elif scheduler == 'polynomial_decay':
         decay_steps = decay_epochs * steps_per_epoch
-        lr_scheduler = PolynomialDecayLR(lr, 
-                                         min_lr, # end_learning_rate 
-                                         decay_steps, 
-                                         power=decay_rate, # overload decay_rate as polynomial power 
+        lr_scheduler = PolynomialDecayLR(lr,
+                                         min_lr,  # end_learning_rate
+                                         decay_steps,
+                                         power=decay_rate,  # overload decay_rate as polynomial power
                                          update_decay_steps=False)
 
     elif scheduler == 'step_decay':

@@ -1,6 +1,12 @@
 import os
 from mindcv.utils.download import DownLoad
 
+__all__ = [
+    "MnistDownload",
+    "Cifar10Download",
+    "Cifar100Download"
+]
+
 
 class MnistDownload(DownLoad):
     """Utility class for downloading Mnist dataset.
