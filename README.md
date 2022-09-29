@@ -52,7 +52,7 @@ python setup.py install
 ## Get Started 
 
 ### Hands-on Demo
-Please see the [Quick Start Demo](quick_tour.ipynb) to help you get started with MindCV and learn about the basic usage quickly. Below is how to create a deep vision model quickly.  
+Please see the [Quick Start Demo](quick_start.ipynb) to help you get started with MindCV and learn about the basic usage quickly. Below is how to create a deep vision model quickly.  
 
 ```python
 >>> import mindcv 
