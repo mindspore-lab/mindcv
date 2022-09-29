@@ -30,13 +30,13 @@ def _cfg(url='', **kwargs):
     return {
         'url': url,
         'num_classes': 1000,
-        'first_conv': '', 'classifier': '',
+        'first_conv': 'features.conv1.conv', 'classifier': 'classifier',
         **kwargs
     }
 
 
 default_cfgs = {
-    'dpn92': _cfg(url=''),
+    'dpn92': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/dpn/dpn92_224.ckpt'),
     'dpn98': _cfg(url=''),
     'dpn107': _cfg(url=''),
     'dpn131': _cfg(url='')
@@ -142,6 +142,7 @@ class DPN(nn.Cell):
         g: number of group in the conv2d. Default: 32.
         k_sec Tuple[int]: multiplicative factor for number of bottleneck layers. Default: 4.
         inc_sec Tuple[int]: the first output channel in each stage. Default: (16, 32, 24, 128).
+        in_channels: number of input channels. Default: 3.
         num_classes: number of classification classes. Default: 1000.
     """
     def __init__(self,
@@ -150,6 +151,7 @@ class DPN(nn.Cell):
                  g: int = 32,
                  k_sec: Tuple[int, int, int, int] = (3, 4, 20, 3),
                  inc_sec: Tuple[int, int, int, int] = (16, 32, 24, 128),
+                 in_channels: int = 3,
                  num_classes: int = 1000):
 
         super(DPN, self).__init__()
@@ -157,7 +159,7 @@ class DPN(nn.Cell):
 
         # conv1
         blocks['conv1'] = nn.SequentialCell(OrderedDict([
-            ('conv', nn.Conv2d(3, num_init_channel, kernel_size=7, stride=2, pad_mode='pad', padding=3)),
+            ('conv', nn.Conv2d(in_channels, num_init_channel, kernel_size=7, stride=2, pad_mode='pad', padding=3)),
             ('norm', nn.BatchNorm2d(num_init_channel, eps=1e-3, momentum=0.9)),
             ('relu', nn.ReLU()),
             ('maxpool', nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='same')),
@@ -255,7 +257,7 @@ def dpn92(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kw
      Refer to the base class `models.DPN` for more details."""
     default_cfg = default_cfgs['dpn92']
     model = DPN(num_init_channel=64, k_r=96, g=32, k_sec=(3, 4, 20, 3), inc_sec=(16, 32, 24, 128),
-               num_classes=num_classes, **kwargs)
+               num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -269,7 +271,7 @@ def dpn98(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kw
      Refer to the base class `models.DPN` for more details."""
     default_cfg = default_cfgs['dpn98']
     model = DPN(num_init_channel=96, k_r=160, g=40, k_sec=(3, 6, 20, 3), inc_sec=(16, 32, 32, 128),
-               num_classes=num_classes, **kwargs)
+               num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -283,7 +285,7 @@ def dpn131(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **k
      Refer to the base class `models.DPN` for more details."""
     default_cfg = default_cfgs['dpn131']
     model = DPN(num_init_channel=128, k_r=160, g=40, k_sec=(4, 8, 28, 3), inc_sec=(16, 32, 32, 128),
-               num_classes=num_classes, **kwargs)
+               num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -297,7 +299,7 @@ def dpn107(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **k
      Refer to the base class `models.DPN` for more details."""
     default_cfg = default_cfgs['dpn107']
     model = DPN(num_init_channel=128, k_r=200, g=50, k_sec=(4, 8, 20, 3), inc_sec=(20, 64, 64, 128),
-               num_classes=num_classes, **kwargs)
+               num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)

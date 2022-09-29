@@ -16,17 +16,22 @@ from .utils import load_pretrained
 from .registry import register_model
 
 
+__all__ = [
+    'RepVGG',
+    'RepVGG_A0'
+]
+
 def _cfg(url='', **kwargs):
     return {
         'url': url,
         'num_classes': 1000,
-        'first_conv': '', 'classifier': '',
+        'first_conv': 'stage0.rbr_dense.0', 'classifier': 'linear',
         **kwargs
     }
 
 
 default_cfgs = {
-    'RepVGG-A0': _cfg(url=''),
+    'RepVGG-A0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/repvgg/RepVGG_A0_224.ckpt'),
 }
 
 
