@@ -1,0 +1,105 @@
+{%- set shared_menu_en = [
+        {
+            'name':
+            'Docs',
+            'children': [
+                {
+                    'name': 'mindcv',
+                    'url': 'https://mindcv.readthedocs.io/en/latest/',
+                },
+                {
+                    'name': 'mindnlp',
+                    'url': 'https://mindnlp.readthedocs.io/en/latest/',
+                },
+                {
+                    'name': 'mindface',
+                    'url': 'https://mindface.readthedocs.io/en/latest/',
+                },
+                {
+                    'name': 'mindaudio',
+                    'url': 'https://mindaudio.readthedocs.io/en/latest/',
+                },
+            ]
+        },
+        {
+            'name':
+            'mindlab-ai',
+            'children': [
+                {
+                    'name': 'Homepage',
+                    'url': '#'
+                },
+                {
+                    'name': 'Open Platform',
+                    'url': '#'
+                },
+                {
+                    'name': 'GitHub',
+                    'url': 'https://github.com/mindlab-ai/'
+                },
+                {
+                    'name': 'Twitter',
+                    'url': '#'
+                },
+                {
+                    'name': 'Zhihu',
+                    'url': '#'
+                },
+            ]
+        },
+    ]
+-%}
+
+{%- set shared_menu_cn = [
+        {
+            'name':
+            '文档',
+            'children': [
+                {
+                    'name': 'mindcv',
+                    'url': 'https://mindcv.readthedocs.io/zh_CN/latest/',
+                },
+                {
+                    'name': 'mindnlp',
+                    'url': 'https://mindnlp.readthedocs.io/zh_CN/latest/',
+                },
+                {
+                    'name': 'mindface',
+                    'url': 'https://mindface.readthedocs.io/zh_CN/latest/',
+                },
+                {
+                    'name': 'mindaudio',
+                    'url': 'https://mindaudio.readthedocs.io/zh_CN/latest/',
+                },
+            ]
+        },
+        {
+            'name':
+            'mindlab-ai',
+            'children': [
+                {
+                    'name': '官网',
+                    'url': '#'
+                },
+                {
+                    'name': '开放平台',
+                    'url': '#'
+                },
+                {
+                    'name': 'GitHub',
+                    'url': 'https://github.com/mindlab-ai/'
+                },
+                {
+                    'name': '推特',
+                    'url': '#'
+                },
+                {
+                    'name': '知乎',
+                    'url': '#'
+                },
+            ]
+        },
+    ]
+-%}
+
+{%- set lang_menu_mapping = {'default': shared_menu_en, 'cn': shared_menu_cn, 'en': shared_menu_en} -%}

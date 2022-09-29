@@ -23,14 +23,14 @@ def _cfg(url='', **kwargs):
     return {
         'url': url,
         'num_classes': 1000,
-        'first_conv': '', 'classifier': '',
+        'first_conv': 'features.0', 'classifier': 'classifier.1',
         **kwargs
     }
 
 
 default_cfgs = {
-    'squeezenet_1.0': _cfg(url=''),
-    'squeezenet_1.1': _cfg(url=''),
+    'squeezenet_1.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.0_224.ckpt'),
+    'squeezenet_1.1': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.1_224.ckpt'),
 }
 
 

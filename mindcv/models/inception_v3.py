@@ -24,13 +24,13 @@ def _cfg(url='', **kwargs):
     return {
         'url': url,
         'num_classes': 1000,
-        'first_conv': '', 'classifier': '',
+        'first_conv': 'conv1a', 'classifier': 'classifier',
         **kwargs
     }
 
 
 default_cfgs = {
-    'inception_v3': _cfg(url='')
+    'inception_v3': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/inception/inception_v3_299.ckpt')
 }
 
 

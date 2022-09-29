@@ -275,6 +275,7 @@ class EfficientNet(nn.Cell):
         dropout_rate (float): The dropout rate of efficientnet.
         width_mult (float): The ratio of the channel. Default: 1.0.
         depth_mult (float): The ratio of num_layers. Default: 1.0.
+        in_channels (int): The input channels. Default: 3.
         num_classes (int): The number of class. Default: 1000.
         inverted_residual_setting (Sequence[Union[MBConvConfig, FusedMBConvConfig]], optional): The settings of block.
             Default: None.
@@ -291,8 +292,9 @@ class EfficientNet(nn.Cell):
     def __init__(self,
                  arch: str,
                  dropout_rate: float,
-                 width_mult: float = 1,
-                 depth_mult: float = 1,
+                 width_mult: float = 1.0,
+                 depth_mult: float = 1.0,
+                 in_channels: int = 3,
                  num_classes: int = 1000,
                  inverted_residual_setting: Optional[Sequence[Union[MBConvConfig, FusedMBConvConfig]]] = None,
                  keep_prob: float = 0.2,
@@ -367,7 +369,7 @@ class EfficientNet(nn.Cell):
         # building first layer
         firstconv_output_channels = inverted_residual_setting[0].input_channels
         layers.extend([
-            nn.Conv2d(3, firstconv_output_channels, kernel_size=3, stride=2),
+            nn.Conv2d(in_channels, firstconv_output_channels, kernel_size=3, stride=2),
             norm_layer(firstconv_output_channels),
             Swish()
         ])
@@ -430,7 +432,6 @@ class EfficientNet(nn.Cell):
     def forward_head(self, x: Tensor) -> Tensor:
         return self.mlp_head(x)
 
-
     def construct(self, x: Tensor) -> Tensor:
         x = self.forward_features(x)
         return self.forward_head(x)
@@ -462,33 +463,33 @@ def _efficientnet(arch: str,
                   width_mult: float,
                   depth_mult: float,
                   dropout: float,
+                  in_channels: int,
                   num_classes: int,
                   pretrained: bool,
                   **kwargs: Any,
                   ) -> EfficientNet:
     """EfficientNet architecture."""
 
-    model = EfficientNet(arch, dropout, width_mult, depth_mult, num_classes, **kwargs)
+    model = EfficientNet(arch, dropout, width_mult, depth_mult, in_channels, num_classes, **kwargs)
     default_cfg = default_cfgs[arch]
 
     if pretrained:
-        # Download the pre-trained checkpoint file from url, and load
+        # Download the pretrained checkpoint file from url, and load
         # checkpoint file.
-        load_pretrained(model, default_cfg)
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
 
 
 @register_model
-def efficientnet_b0(num_classes: int = 1000,
-                    pretrained: bool = False,
-                    ) -> EfficientNet:
+def efficientnet_b0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> EfficientNet:
     """
     Constructs a EfficientNet B0 architecture from
     `EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks <https://arxiv.org/abs/1905.11946>`_.
 
     Args:
+        pretrained (bool): If True, returns a model pretrained on IMAGENET. Default: False.
         num_classes (int): The numbers of classes. Default: 1000.
-        pretrained (bool): If True, returns a model pre-trained on IMAGENET. Default: False.
+        in_channels (int): The input channels. Default: 1000.
 
     Inputs:
         - **x** (Tensor) - Tensor of shape :math:`(N, C_{in}, H_{in}, W_{in})`.
@@ -496,20 +497,19 @@ def efficientnet_b0(num_classes: int = 1000,
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_b0", 1.0, 1.0, 0.2, num_classes, pretrained)
+    return _efficientnet("efficientnet_b0", 1.0, 1.0, 0.2, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def efficientnet_b1(num_classes: int = 1000,
-                    pretrained: bool = False,
-                    ) -> EfficientNet:
+def efficientnet_b1(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> EfficientNet:
     """
     Constructs a EfficientNet B1 architecture from
     `EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks <https://arxiv.org/abs/1905.11946>`_.
 
     Args:
+        pretrained (bool): If True, returns a model pretrained on IMAGENET. Default: False.
         num_classes (int): The numbers of classes. Default: 1000.
-        pretrained (bool): If True, returns a model pre-trained on IMAGENET. Default: False.
+        in_channels (int): The input channels. Default: 1000.
 
     Inputs:
         - **x** (Tensor) - Tensor of shape :math:`(N, C_{in}, H_{in}, W_{in})`.
@@ -517,20 +517,19 @@ def efficientnet_b1(num_classes: int = 1000,
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_b1", 1.0, 1.1, 0.2, num_classes, pretrained)
+    return _efficientnet("efficientnet_b1", 1.0, 1.1, 0.2, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def efficientnet_b2(num_classes: int = 1000,
-                    pretrained: bool = False,
-                    ) -> EfficientNet:
+def efficientnet_b2(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> EfficientNet:
     """
     Constructs a EfficientNet B2 architecture from
     `EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks <https://arxiv.org/abs/1905.11946>`_.
 
     Args:
+        pretrained (bool): If True, returns a model pretrained on IMAGENET. Default: False.
         num_classes (int): The numbers of classes. Default: 1000.
-        pretrained (bool): If True, returns a model pre-trained on IMAGENET. Default: False.
+        in_channels (int): The input channels. Default: 1000.
 
     Inputs:
         - **x** (Tensor) - Tensor of shape :math:`(N, C_{in}, H_{in}, W_{in})`.
@@ -538,20 +537,19 @@ def efficientnet_b2(num_classes: int = 1000,
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_b2", 1.1, 1.2, 0.3, num_classes, pretrained)
+    return _efficientnet("efficientnet_b2", 1.1, 1.2, 0.3, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def efficientnet_b3(num_classes: int = 1000,
-                    pretrained: bool = False,
-                    ) -> EfficientNet:
+def efficientnet_b3(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> EfficientNet:
     """
     Constructs a EfficientNet B3 architecture from
     `EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks <https://arxiv.org/abs/1905.11946>`_.
 
     Args:
+        pretrained (bool): If True, returns a model pretrained on IMAGENET. Default: False.
         num_classes (int): The numbers of classes. Default: 1000.
-        pretrained (bool): If True, returns a model pre-trained on IMAGENET. Default: False.
+        in_channels (int): The input channels. Default: 1000.
 
     Inputs:
         - **x** (Tensor) - Tensor of shape :math:`(N, C_{in}, H_{in}, W_{in})`.
@@ -559,20 +557,19 @@ def efficientnet_b3(num_classes: int = 1000,
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_b3", 1.2, 1.4, 0.3, num_classes, pretrained)
+    return _efficientnet("efficientnet_b3", 1.2, 1.4, 0.3, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def efficientnet_b4(num_classes: int = 1000,
-                    pretrained: bool = False,
-                    ) -> EfficientNet:
+def efficientnet_b4(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> EfficientNet:
     """
     Constructs a EfficientNet B4 architecture from
     `EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks <https://arxiv.org/abs/1905.11946>`_.
 
     Args:
+        pretrained (bool): If True, returns a model pretrained on IMAGENET. Default: False.
         num_classes (int): The numbers of classes. Default: 1000.
-        pretrained (bool): If True, returns a model pre-trained on IMAGENET. Default: False.
+        in_channels (int): The input channels. Default: 1000.
 
     Inputs:
         - **x** (Tensor) - Tensor of shape :math:`(N, C_{in}, H_{in}, W_{in})`.
@@ -580,20 +577,19 @@ def efficientnet_b4(num_classes: int = 1000,
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_b4", 1.4, 1.8, 0.4, num_classes, pretrained)
+    return _efficientnet("efficientnet_b4", 1.4, 1.8, 0.4, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def efficientnet_b5(num_classes: int = 1000,
-                    pretrained: bool = False,
-                    ) -> EfficientNet:
+def efficientnet_b5(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> EfficientNet:
     """
     Constructs a EfficientNet B5 architecture from
     `EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks <https://arxiv.org/abs/1905.11946>`_.
 
     Args:
+        pretrained (bool): If True, returns a model pretrained on IMAGENET. Default: False.
         num_classes (int): The numbers of classes. Default: 1000.
-        pretrained (bool): If True, returns a model pre-trained on IMAGENET. Default: False.
+        in_channels (int): The input channels. Default: 1000.
 
     Inputs:
         - **x** (Tensor) - Tensor of shape :math:`(N, C_{in}, H_{in}, W_{in})`.
@@ -601,20 +597,19 @@ def efficientnet_b5(num_classes: int = 1000,
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_b5", 1.6, 2.2, 0.4, num_classes, pretrained)
+    return _efficientnet("efficientnet_b5", 1.6, 2.2, 0.4, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def efficientnet_b6(num_classes: int = 1000,
-                    pretrained: bool = False,
-                    ) -> EfficientNet:
+def efficientnet_b6(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> EfficientNet:
     """
     Constructs a EfficientNet B6 architecture from
     `EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks <https://arxiv.org/abs/1905.11946>`_.
 
     Args:
+        pretrained (bool): If True, returns a model pretrained on IMAGENET. Default: False.
         num_classes (int): The numbers of classes. Default: 1000.
-        pretrained (bool): If True, returns a model pre-trained on IMAGENET. Default: False.
+        in_channels (int): The input channels. Default: 1000.
 
     Inputs:
         - **x** (Tensor) - Tensor of shape :math:`(N, C_{in}, H_{in}, W_{in})`.
@@ -622,20 +617,19 @@ def efficientnet_b6(num_classes: int = 1000,
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_b6", 1.8, 2.6, 0.5, num_classes, pretrained)
+    return _efficientnet("efficientnet_b6", 1.8, 2.6, 0.5, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def efficientnet_b7(num_classes: int = 1000,
-                    pretrained: bool = False,
-                    ) -> EfficientNet:
+def efficientnet_b7(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> EfficientNet:
     """
     Constructs a EfficientNet B7 architecture from
     `EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks <https://arxiv.org/abs/1905.11946>`_.
 
     Args:
+        pretrained (bool): If True, returns a model pretrained on IMAGENET. Default: False.
         num_classes (int): The numbers of classes. Default: 1000.
-        pretrained (bool): If True, returns a model pre-trained on IMAGENET. Default: False.
+        in_channels (int): The input channels. Default: 1000.
 
     Inputs:
         - **x** (Tensor) - Tensor of shape :math:`(N, C_{in}, H_{in}, W_{in})`.
@@ -643,20 +637,19 @@ def efficientnet_b7(num_classes: int = 1000,
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_b7", 2.0, 3.1, 0.5, num_classes, pretrained)
+    return _efficientnet("efficientnet_b7", 2.0, 3.1, 0.5, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def efficientnet_v2_s(num_classes: int = 1000,
-                      pretrained: bool = False,
-                      ) -> EfficientNet:
+def efficientnet_v2_s(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> EfficientNet:
     """
     Constructs a EfficientNet B4 architecture from
     `EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks <https://arxiv.org/abs/1905.11946>`_.
 
     Args:
+        pretrained (bool): If True, returns a model pretrained on IMAGENET. Default: False.
         num_classes (int): The numbers of classes. Default: 1000.
-        pretrained (bool): If True, returns a model pre-trained on IMAGENET. Default: False.
+        in_channels (int): The input channels. Default: 1000.
 
     Inputs:
         - **x** (Tensor) - Tensor of shape :math:`(N, C_{in}, H_{in}, W_{in})`.
@@ -664,20 +657,19 @@ def efficientnet_v2_s(num_classes: int = 1000,
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_v2_s", 1., 1., 0.2, num_classes, pretrained)
+    return _efficientnet("efficientnet_v2_s", 1., 1., 0.2, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def efficientnet_v2_m(num_classes: int = 1000,
-                      pretrained: bool = False,
-                      ) -> EfficientNet:
+def efficientnet_v2_m(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> EfficientNet:
     """
     Constructs a EfficientNet B4 architecture from
     `EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks <https://arxiv.org/abs/1905.11946>`_.
 
     Args:
+        pretrained (bool): If True, returns a model pretrained on IMAGENET. Default: False.
         num_classes (int): The numbers of classes. Default: 1000.
-        pretrained (bool): If True, returns a model pre-trained on IMAGENET. Default: False.
+        in_channels (int): The input channels. Default: 1000.
 
     Inputs:
         - **x** (Tensor) - Tensor of shape :math:`(N, C_{in}, H_{in}, W_{in})`.
@@ -685,20 +677,19 @@ def efficientnet_v2_m(num_classes: int = 1000,
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_v2_m", 1., 1., 0.2, num_classes, pretrained)
+    return _efficientnet("efficientnet_v2_m", 1., 1., 0.2, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def efficientnet_v2_l(num_classes: int = 1000,
-                      pretrained: bool = False,
-                      ) -> EfficientNet:
+def efficientnet_v2_l(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> EfficientNet:
     """
     Constructs a EfficientNet B4 architecture from
     `EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks <https://arxiv.org/abs/1905.11946>`_.
 
     Args:
+        pretrained (bool): If True, returns a model pretrained on IMAGENET. Default: False.
         num_classes (int): The numbers of classes. Default: 1000.
-        pretrained (bool): If True, returns a model pre-trained on IMAGENET. Default: False.
+        in_channels (int): The input channels. Default: 1000.
 
     Inputs:
         - **x** (Tensor) - Tensor of shape :math:`(N, C_{in}, H_{in}, W_{in})`.
@@ -706,20 +697,19 @@ def efficientnet_v2_l(num_classes: int = 1000,
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_v2_l", 1., 1., 0.2, num_classes, pretrained)
+    return _efficientnet("efficientnet_v2_l", 1., 1., 0.2, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def efficientnet_v2_xl(num_classes: int = 1000,
-                       pretrained: bool = False,
-                       ) -> EfficientNet:
+def efficientnet_v2_xl(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> EfficientNet:
     """
     Constructs a EfficientNet B4 architecture from
     `EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks <https://arxiv.org/abs/1905.11946>`_.
 
     Args:
+        pretrained (bool): If True, returns a model pretrained on IMAGENET. Default: False.
         num_classes (int): The numbers of classes. Default: 1000.
-        pretrained (bool): If True, returns a model pre-trained on IMAGENET. Default: False.
+        in_channels (int): The input channels. Default: 1000.
 
     Inputs:
         - **x** (Tensor) - Tensor of shape :math:`(N, C_{in}, H_{in}, W_{in})`.
@@ -727,4 +717,4 @@ def efficientnet_v2_xl(num_classes: int = 1000,
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_v2_xl", 1., 1., 0.2, num_classes, pretrained)
+    return _efficientnet("efficientnet_v2_xl", 1., 1., 0.2, in_channels, num_classes, pretrained, **kwargs)

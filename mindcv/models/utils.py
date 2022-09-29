@@ -1,5 +1,7 @@
 import os
 import logging
+import collections.abc
+from itertools import repeat
 from typing import Optional
 
 from mindspore import load_checkpoint, load_param_into_net
@@ -29,9 +31,9 @@ def load_pretrained(model, default_cfg, path='./', num_classes=1000, in_channels
     classifier_name = default_cfg['classifier']
     if num_classes == 1000 and default_cfg['num_classes'] == 1001:
         classifier_weight = param_dict['classifier_name' + '.weight']
-        classifier_weight.set_data(classifier_weight[1:], slice_shape=True)
+        classifier_weight.set_data(classifier_weight[:1000], slice_shape=True)
         classifier_bias = param_dict[classifier_name + '.bias']
-        classifier_bias.set_data(classifier_bias[1:], slice_shape=True)
+        classifier_bias.set_data(classifier_bias[:1000], slice_shape=True)
     elif num_classes != default_cfg['num_classes']:
         del param_dict[classifier_name + '.weight']
         del param_dict[classifier_name + '.bias']
@@ -53,3 +55,12 @@ def make_divisible(v: float,
     if new_v < 0.9 * v:
         new_v += divisor
     return new_v
+
+
+def _ntuple(n):
+    def parse(x):
+        if isinstance(x, collections.abc.Iterable):
+            return x
+        return tuple(repeat(x, n))
+
+    return parse
