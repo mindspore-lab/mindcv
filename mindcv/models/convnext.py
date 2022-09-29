@@ -165,12 +165,12 @@ class ConvNeXt(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, (nn.Dense, nn.Conv2d)):
                 cell.weight.set_data(init.initializer(init.TruncatedNormal(sigma=0.02),
-                                                             cell.weight.shape,
-                                                             cell.weight.dtype))
+                                                      cell.weight.shape,
+                                                      cell.weight.dtype))
                 if isinstance(cell, nn.Dense) and cell.bias is not None:
                     cell.bias.set_data(init.initializer(init.Zero(),
-                                                               cell.bias.shape,
-                                                               cell.bias.dtype))
+                                                        cell.bias.shape,
+                                                        cell.bias.dtype))
         self.classifier.weight.set_data(self.classifier.weight * self.head_init_scale)
         self.classifier.bias.set_data(self.classifier.bias * self.head_init_scale)
 

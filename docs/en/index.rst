@@ -26,16 +26,15 @@ You can switch between Chinese and English documents in the lower-left corner of
    tutorials/deployment.md
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
    :caption: APIs
 
-   Main Class:
-   mindcv.data <api/mindcv.data>
-   mindcv.loss <api/mindcv.loss>
-   mindcv.optim <api/mindcv.optim>
-   mindcv.models <api/mindcv.models>
-   mindcv.scheduler <api/mindcv.scheduler>
-   mindcv.utils <api/mindcv.utils>
+   api/mindcv.data
+   api/mindcv.loss
+   api/mindcv.optim
+   api/mindcv.models
+   api/mindcv.models.layers
+   api/mindcv.scheduler
 
 .. toctree::
    :maxdepth: 1

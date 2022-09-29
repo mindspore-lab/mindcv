@@ -54,13 +54,14 @@ extensions = [
 autodoc_typehints = 'description'
 myst_heading_anchors = 4
 
-# Configuration for intersphinx
-intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
-    'numpy': ('https://numpy.org/doc/stable', None),
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
 }
 
 # copy markdown files from outer directory
+if not os.path.exists('./tutorials'):
+    os.makedirs('./tutorials')
 shutil.copy('../../tutorials/deployment.md', './tutorials/deployment.md')
 shutil.copy('../../tutorials/finetune.md', './tutorials/finetune.md')
 shutil.copy('../../tutorials/Inference.md', './tutorials/Inference.md')
@@ -69,6 +70,8 @@ shutil.copy('../../tutorials/output_8_0.png', './tutorials/output_8_0.png')
 shutil.copy('../../tutorials/output_11_0.png', './tutorials/output_11_0.png')
 shutil.copy('../../tutorials/output_23_0.png', './tutorials/output_23_0.png')
 shutil.copy('../../tutorials/output_30_0.png', './tutorials/output_30_0.png')
+if not os.path.exists('./quick_start'):
+    os.makedirs('./quick_start')
 shutil.copy('../../quick_start.md', './quick_start/quick_start.md')
 
 os.system('cp -R %s %s'% ('../../config', './'))

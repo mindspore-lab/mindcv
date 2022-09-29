@@ -5,9 +5,9 @@ name: Run CI check
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -37,4 +37,4 @@ jobs:
         pytest tests/modules
     - name: Test with tasks pytest
       run: |
-        pytest tests/tasks
+        pytest test/tasks

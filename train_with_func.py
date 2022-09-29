@@ -1,5 +1,8 @@
+import os
+from time import time
+
 import mindspore as ms
-from mindspore import FixedLossScaleManager, Model, LossMonitor, TimeMonitor, CheckpointConfig, ModelCheckpoint
+import mindspore.ops as ops
 from mindspore.communication import init, get_rank, get_group_size
 
 from mindcv.models import create_model
@@ -8,13 +11,9 @@ from mindcv.loss import create_loss
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
 from config import parse_args
-from time import time
-from mindspore import ops
-import os
 
-ms.set_seed(1)
 
-def train_epoch(network, dataset, loss_fn, optimizer, log_interval=100):
+def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, log_interval=100):
     # Define forward function
     def forward_fn(data, label):
         logits = network(data)
@@ -24,7 +23,7 @@ def train_epoch(network, dataset, loss_fn, optimizer, log_interval=100):
     # Get gradient function
     grad_fn = ops.value_and_grad(forward_fn, None, optimizer.parameters, has_aux=True)
 
-    # Define function of one-step training,
+    # Define function of one-step training
     @ms.ms_function
     def train_step(data, label):
         (loss, _), grads = grad_fn(data, label)
@@ -32,18 +31,23 @@ def train_epoch(network, dataset, loss_fn, optimizer, log_interval=100):
         return loss
 
     network.set_train()
-    size = dataset.get_dataset_size()
-    t = time()
+    n_batches = dataset.get_dataset_size()
+    n_steps = n_batches * n_epochs
+    epoch_width, batch_width, step_width = len(str(n_epochs)), len(str(n_batches)), len(str(n_steps))
+    step_time = time()
     for batch, (data, label) in enumerate(dataset.create_tuple_iterator()):
         loss = train_step(data, label)
-        if (batch+1) % log_interval  == 0:
-            step_time = (time() - t) / log_interval
-            t = time()
-            loss, current = loss.asnumpy(), batch
-            print(f"Step {current+1:>3d}/{size:>3d}, loss: {loss:>7f}, time per step: {step_time:.5f}")
+        if (batch + 1) % log_interval == 0:
+            step = epoch * n_batches + batch
+            print(f"Epoch:[{epoch:{epoch_width}d}/{n_epochs:{epoch_width}d}], "
+                  f"batch:[{batch:{batch_width}d}/{n_batches:{batch_width}d}], "
+                  f"step:[{step:{step_width}d}/{n_steps:{step_width}d}], "
+                  f"loss:{loss.asnumpy():8.6f}, time:{time() - step_time:.6f}s")
+            step_time = time()
 
 
 def train(args):
+    ms.set_seed(1)
     ms.set_context(mode=ms.PYNATIVE_MODE)
 
     if args.distribute:
@@ -54,8 +58,8 @@ def train(args):
                                      parallel_mode='data_parallel',
                                      gradients_mean=True)
     else:
-        device_num = None
-        rank_id = None
+        device_num = 1
+        rank_id = 0
 
     # create dataset
     dataset_train = create_dataset(
@@ -140,19 +144,21 @@ def train(args):
     # training
     # TODO: args.loss_scale is not making effect. 
     print('Training...')
+    epoch_time = time()
     for t in range(args.epoch_size):
-        #print(f"Epoch {t+1}\n-------------------------------")
-        b = time()
-        train_epoch(network, loader_train, loss, optimizer, log_interval=steps_per_epoch)
-        print(f'Epoch {t+1} training time: {time()-b: .3f}s')
+        train_epoch(network, loader_train, loss, optimizer, epoch=t, n_epochs=args.epoch_size)
+        print(f'Epoch {t + 1} training time: {time() - epoch_time:.3f}s')
 
-	# Save checkpoint
-        if ((t + 1) % args.ckpt_save_interval == 0):
-            if (not args.distribute) or (args.distribute and rank_id==0):
-                save_path = os.path.join(args.ckpt_save_dir, f"{args.model}-{t+1}.ckpt")
+        # Save checkpoint
+        if (t + 1) % args.ckpt_save_interval == 0:
+            if (not args.distribute) or (args.distribute and rank_id == 0):
+                os.makedirs(args.ckpt_save_dir, exist_ok=True)
+                save_path = os.path.join(args.ckpt_save_dir, f"{args.model}-{t + 1}.ckpt")
                 ms.save_checkpoint(network, save_path, async_save=True)
                 print(f"Saving model to {save_path}")
+        epoch_time = time()
     print("Done!")
+
 
 if __name__ == '__main__':
     args = parse_args()

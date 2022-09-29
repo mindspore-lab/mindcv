@@ -6,6 +6,8 @@ import mindspore.dataset.transforms as transforms
 
 from .transforms_factory import create_transforms
 
+__all__ = ["create_loader"]
+
 
 def create_loader(
         dataset,
@@ -13,6 +15,8 @@ def create_loader(
         drop_remainder=False,
         is_training=False,
         mixup=0.0,
+        cutmix=0.0,
+        cutmix_prob=0.0,
         num_classes=1000,
         transform=None,
         target_transform=None,
@@ -33,7 +37,9 @@ def create_loader(
             than batch_size rows available to make the last batch, then those rows will
             be dropped and not propagated to the child node.
         is_training (bool): whether it is in train mode. Default: False.
-        mixup (float): mixup hyperparameter of beta distribution. The value must be positive (default=0.0).
+        mixup (float): mixup alpha, mixup will be enbled if > 0. (default=0.0).
+        cutmix (float): cutmix alpha, cutmix will be enabled if > 0. (default=0.0). This operation is experimental. 
+        cutmix_prob (float): prob of doing cutmix for an image (default=0.0) 
         num_classes (int): the number of classes. Default: 1000.
         transform (list or None): the list of transformations that wil be applied on the image,
             which is obtained by `create_transform`. If None, the default imagenet transformation
@@ -46,8 +52,10 @@ def create_loader(
             option could be beneficial if the Python operation is computational heavy (default=False).
 
     Note:
-        Args: `is_training`, `mixup`, `num_classes` is used for MixUp, which is a kind of transform operation.
-        However, we are not able to merge it into `transform`, due to the limitations of the `mindspore.dataset` API.
+        1. cutmix is now experimental (which means performance gain is not guarantee) and can not be used together with mixup due to the label int type conflict.   
+        2. `is_training`, `mixup`, `num_classes` is used for MixUp, which is a kind of transform operation.
+          However, we are not able to merge it into `transform`, due to the limitations of the `mindspore.dataset` API.
+        
 
     Returns:
         BatchDataset, dataset batched.
@@ -70,15 +78,22 @@ def create_loader(
                           num_parallel_workers=num_parallel_workers,
                           python_multiprocessing=python_multiprocessing)
 
-    if is_training and mixup > 0:
+    if is_training and (mixup > 0 or cutmix > 0):
         one_hot_encode = transforms.OneHot(num_classes)
         dataset = dataset.map(operations=one_hot_encode, input_columns=[target_input_columns])
 
     dataset = dataset.batch(batch_size=batch_size, drop_remainder=drop_remainder)
 
-    if is_training and mixup > 0:
-        trans_mixup = vision.MixUpBatch(alpha=mixup)
-        dataset = dataset.map(input_columns=["image", target_input_columns], num_parallel_workers=num_parallel_workers,
-                              operations=trans_mixup)
+    assert (mixup * cutmix == 0), 'Currently, mixup and cutmix cannot be applied together'
+
+    if is_training:
+        trans_batch = []
+        if mixup > 0:
+            trans_batch = vision.MixUpBatch(alpha=mixup)
+        elif cutmix > 0:
+            trans_batch = vision.CutMixBatch(vision.ImageBatchFormat.NCHW, cutmix, cutmix_prob)
+        if trans_batch != []:
+            dataset = dataset.map(input_columns=["image", target_input_columns],
+                                  num_parallel_workers=num_parallel_workers, operations=trans_batch)
 
     return dataset
