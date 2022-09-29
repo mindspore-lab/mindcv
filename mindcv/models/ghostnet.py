@@ -1,6 +1,7 @@
+"""MindSpore implementation of `GhostNet`."""
+
 import math
 import numpy as np
-from typing import Optional
 
 import mindspore.nn as nn
 import mindspore.ops as ops
@@ -35,9 +36,10 @@ default_cfgs = {
 
 
 class GhostGate(nn.Cell):
+    """Implementation for (relu6 + 3) / 6"""
 
     def __init__(self):
-        super(GhostGate, self).__init__()
+        super().__init__()
         self.relu6 = nn.ReLU6()
 
     def construct(self, x):
@@ -45,9 +47,11 @@ class GhostGate(nn.Cell):
 
 
 class ConvBnAct(nn.Cell):
+    """A block for conv bn and relu"""
+
     def __init__(self, in_chs, out_chs, kernel_size,
                  stride=1, act_layer=nn.ReLU):
-        super(ConvBnAct, self).__init__()
+        super().__init__()
         self.conv = nn.Conv2d(in_chs, out_chs, kernel_size=kernel_size, stride=stride,
                               padding=kernel_size//2, pad_mode='pad', has_bias=False)
         self.bn1 = nn.BatchNorm2d(out_chs)
@@ -72,7 +76,7 @@ class GhostModule(nn.Cell):
                  stride: int = 1,
                  relu: bool = True
                  ) -> None:
-        super(GhostModule, self).__init__()
+        super().__init__()
         self.oup = oup
         init_channels = math.ceil(oup / ratio)
         new_channels = init_channels*(ratio-1)
@@ -107,7 +111,7 @@ class GhostBottleneck(nn.Cell):
                  stride: int = 1,
                  se_ratio: float = 0.
                  ) -> None:
-        super(GhostBottleneck, self).__init__()
+        super().__init__()
         has_se = se_ratio is not None and se_ratio > 0.
         self.stride = stride
 
@@ -183,7 +187,7 @@ class GhostNet(nn.Cell):
                  width: float = 1.0,
                  dropout: float = 0.2
                  ) -> None:
-        super(GhostNet, self).__init__()
+        super().__init__()
         # setting of inverted residual blocks
         self.cfgs = cfgs
         self.dropout_rate = dropout
@@ -199,6 +203,7 @@ class GhostNet(nn.Cell):
         # building inverted residual blocks
         stages = []
         block = GhostBottleneck
+        exp_size = 128
         for cfg in self.cfgs:
             layers = []
             for k, exp_size, c, se_ratio, s in cfg:
