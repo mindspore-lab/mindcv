@@ -23,7 +23,7 @@ class Swish(nn.Cell):
     """
 
     def __init__(self):
-        super(Swish, self).__init__()
+        super().__init__()
         self.result = None
         self.sigmoid = nn.Sigmoid()
 

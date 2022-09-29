@@ -1,3 +1,8 @@
+""" Squeeze-and-Excitation Channel Attention
+An SE implementation originally based on PyTorch SE-Net impl.
+Has since evolved with additional functionality / configuration.
+Paper: `Squeeze-and-Excitation Networks` - https://arxiv.org/abs/1709.01507
+"""
 from typing import Optional
 
 import mindspore.nn as nn
@@ -8,7 +13,13 @@ from .pooling import GlobalAvgPooling
 
 
 class SqueezeExcite(nn.Cell):
-
+    """ SqueezeExcite Module as defined in original SE-Nets with a few additions
+    Additions include:
+        * divisor can be specified to keep channels % div == 0 (default: 8)
+        * reduction channels can be specified directly by arg (if rd_channels is set)
+        * reduction channels can be specified by float rd_ratio (default: 1/16)
+        * customizable activation, normalization, and gate layer
+    """
     def __init__(self,
                  in_channels: int,
                  rd_ratio: float = 1. / 16,
@@ -18,7 +29,7 @@ class SqueezeExcite(nn.Cell):
                  act_layer: nn.Cell = nn.ReLU,
                  gate_layer: nn.Cell = nn.Sigmoid
                  ) -> None:
-        super(SqueezeExcite, self).__init__()
+        super().__init__()
         self.norm = norm
         self.act = act_layer()
         self.gate = gate_layer()

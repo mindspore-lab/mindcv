@@ -51,7 +51,7 @@ class _DenseLayer(nn.Cell):
                  bn_size: int,
                  drop_rate: float
                  ) -> None:
-        super(_DenseLayer, self).__init__()
+        super().__init__()
         self.norm1 = nn.BatchNorm2d(num_input_features)
         self.relu1 = nn.ReLU()
         self.conv1 = nn.Conv2d(num_input_features, bn_size * growth_rate, kernel_size=1, stride=1)
@@ -80,7 +80,7 @@ class _DenseBlock(nn.Cell):
                  bn_size: int,
                  growth_rate: int,
                  drop_rate: float) -> None:
-        super(_DenseBlock, self).__init__()
+        super().__init__()
         self.cell_list = nn.CellList()
         for i in range(num_layers):
             layer = _DenseLayer(
@@ -106,7 +106,7 @@ class _Transition(nn.Cell):
                  num_input_features: int,
                  num_output_features: int,
                  ) -> None:
-        super(_Transition, self).__init__()
+        super().__init__()
         self.features = nn.SequentialCell(OrderedDict([
             ('norm', nn.BatchNorm2d(num_input_features)),
             ('relu', nn.ReLU()),
@@ -142,7 +142,7 @@ class DenseNet(nn.Cell):
                  drop_rate: float = 0.,
                  in_channels: int = 3,
                  num_classes: int = 1000) -> None:
-        super(DenseNet, self).__init__()
+        super().__init__()
         layers = OrderedDict()
         # first Conv2d
         num_features = num_init_features
@@ -160,11 +160,11 @@ class DenseNet(nn.Cell):
                 growth_rate=growth_rate,
                 drop_rate=drop_rate
             )
-            layers['denseblock%d' % (i + 1)] = block
+            layers[f'denseblock{i + 1}'] = block
             num_features += num_layers * growth_rate
             if i != len(block_config) - 1:
                 transition = _Transition(num_features, num_features // 2)
-                layers['transition%d' % (i + 1)] = transition
+                layers[f'transition{i + 1}'] = transition
                 num_features = num_features // 2
 
         # final bn+ReLU

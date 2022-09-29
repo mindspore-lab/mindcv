@@ -1,4 +1,7 @@
-from typing import Optional, Union, List
+""" Selective Kernel Convolution/Attention
+Paper: Selective Kernel Networks (https://arxiv.org/abs/1903.06586)
+"""
+from typing import Optional, Union, List, Tensor
 
 import mindspore.nn as nn
 import mindspore.ops as ops
@@ -9,13 +12,16 @@ from ..utils import make_divisible
 
 
 def _kernel_valid(k):
+    assert k >= 3 and k % 2
     if isinstance(k, (list, tuple)):
         for ki in k:
             return _kernel_valid(ki)
-    assert k >= 3 and k % 2
-
+    return None
 
 class SelectiveKernelAttn(nn.Cell):
+    """ Selective Kernel Attention Module
+    Selective Kernel attention mechanism factored out into its own module.
+    """
     def __init__(self,
                  channels: int,
                  num_paths: int = 2,
@@ -23,7 +29,7 @@ class SelectiveKernelAttn(nn.Cell):
                  activation: Optional[nn.Cell] = nn.ReLU,
                  norm: Optional[nn.Cell] = nn.BatchNorm2d
                  ):
-        super(SelectiveKernelAttn, self).__init__()
+        super().__init__()
         self.num_paths = num_paths
         self.mean = GlobalAvgPooling(keep_dims=True)
         self.fc_reduce = nn.Conv2d(channels, attn_channels, kernel_size=1, has_bias=False)
@@ -32,20 +38,41 @@ class SelectiveKernelAttn(nn.Cell):
         self.fc_select = nn.Conv2d(attn_channels, channels * num_paths, kernel_size=1)
         self.softmax = nn.Softmax(axis=1)
 
-    def construct(self, x):
+    def construct(self, x: Tensor) -> Tensor:
         x = self.mean((x.sum(1)))
         x = self.fc_reduce(x)
         x = self.bn(x)
         x = self.act(x)
         x = self.fc_select(x)
-        B, C, H, W = x.shape
-        x = x.reshape((B, self.num_paths, C // self.num_paths, H, W))
+        b, c, h, w = x.shape
+        x = x.reshape((b, self.num_paths, c // self.num_paths, h, w))
         x = self.softmax(x)
         return x
 
 
 class SelectiveKernel(nn.Cell):
-
+    """ Selective Kernel Convolution Module
+    As described in Selective Kernel Networks (https://arxiv.org/abs/1903.06586) with some modifications.
+    Largest change is the input split, which divides the input channels across each convolution path, this can
+    be viewed as a grouping of sorts, but the output channel counts expand to the module level value. This keeps
+    the parameter count from ballooning when the convolutions themselves don't have groups, but still provides
+    a noteworthy increase in performance over similar param count models without this attention layer. -Ross W
+    Args:
+        in_channels (int):  module input (feature) channel count
+        out_channels (int):  module output (feature) channel count
+        kernel_size (int, list): kernel size for each convolution branch
+        stride (int): stride for convolutions
+        dilation (int): dilation for module as a whole, impacts dilation of each branch
+        groups (int): number of groups for each branch
+        rd_ratio (int, float): reduction factor for attention features
+        rd_channels(int): reduction channels can be specified directly by arg (if rd_channels is set)
+        rd_divisor(int): divisor can be specified to keep channels
+        keep_3x3 (bool): keep all branch convolution kernels as 3x3, changing larger kernels for dilations
+        split_input (bool): split input channels evenly across each convolution branch, keeps param count lower,
+            can be viewed as grouping by path, output expands to module out_channels count
+        activation (nn.Module): activation layer to use
+        norm (nn.Module): batchnorm/norm layer to use
+    """
     def __init__(self,
                  in_channels: int,
                  out_channels: Optional[int] = None,
@@ -62,7 +89,7 @@ class SelectiveKernel(nn.Cell):
                  norm: Optional[nn.Cell] = nn.BatchNorm2d
                  ):
 
-        super(SelectiveKernel, self).__init__()
+        super().__init__()
         out_channels = out_channels or in_channels
         kernel_size = kernel_size or [3, 5]  # default to one 3x3 and one 5x5 branch. 5x5 -> 3x3 + dilation
         _kernel_valid(kernel_size)
@@ -91,8 +118,7 @@ class SelectiveKernel(nn.Cell):
         attn_channels = rd_channels or make_divisible(out_channels * rd_ratio, divisor=rd_divisor)
         self.attn = SelectiveKernelAttn(out_channels, self.num_paths, attn_channels)
 
-    def construct(self, x):
-
+    def construct(self, x: Tensor) -> Tensor:
         x_paths = []
         if self.split_input:
             x_split = ops.split(x, axis=1, output_num=self.num_paths)

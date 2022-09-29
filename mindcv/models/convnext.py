@@ -2,8 +2,8 @@
 MindSpore implementation of `ConvNeXt`.
 Refer to: A ConvNet for the 2020s
 """
+from typing import List, Tuple
 import numpy as np
-from typing import List, Tuple, Optional
 
 import mindspore.nn as nn
 import mindspore.ops as ops
@@ -45,13 +45,14 @@ default_cfgs = {
 
 
 class ConvNextLayerNorm(nn.LayerNorm):
-
+    r""" LayerNorm for channels_first tensors with 2d spatial dimensions (ie N, C, H, W).
+    """
     def __init__(self,
                  normalized_shape: Tuple[int],
                  epsilon: float,
                  norm_axis: int = -1
                  ) -> None:
-        super(ConvNextLayerNorm, self).__init__(normalized_shape=normalized_shape, epsilon=epsilon)
+        super().__init__(normalized_shape=normalized_shape, epsilon=epsilon)
         assert norm_axis in (-1, 1), "ConvNextLayerNorm's norm_axis must be 1 or -1."
         self.norm_axis = norm_axis
 
@@ -66,7 +67,18 @@ class ConvNextLayerNorm(nn.LayerNorm):
 
 
 class Block(nn.Cell):
-
+    """ ConvNeXt Block
+    There are two equivalent implementations:
+      (1) DwConv -> LayerNorm (channels_first) -> 1x1 Conv -> GELU -> 1x1 Conv; all in (N, C, H, W)
+      (2) DwConv -> Permute to (N, H, W, C); LayerNorm (channels_last) -> Linear -> GELU -> Linear; Permute back
+    Unlike the official impl, this one allows choice of 1 or 2, 1x1 conv can be faster with appropriate
+    choice of LayerNorm impl, however as model size increases the tradeoffs appear to change and nn.Linear
+    is a better choice. This was observed with PyTorch 1.10 on 3090 GPU, it could change over time & w/ different HW.
+    Args:
+        dim (int): Number of input channels.
+        drop_path (float): Stochastic depth rate. Default: 0.0
+        layer_scale_init_value (float): Init value for Layer Scale. Default: 1e-6.
+    """
     def __init__(self,
                  dim: int,
                  drop_path: float = 0.,
@@ -135,7 +147,7 @@ class ConvNeXt(nn.Cell):
             self.downsample_layers.append(downsample_layer)
 
         self.stages = nn.CellList()  # 4 feature resolution stages, each consisting of multiple residual blocks
-        dp_rates = [x for x in np.linspace(0, drop_path_rate, sum(depths))]
+        dp_rates = list(np.linspace(0, drop_path_rate, sum(depths)))
         cur = 0
         for i in range(4):
             blocks = []

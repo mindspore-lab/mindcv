@@ -1,3 +1,4 @@
+"""Identity Module"""
 import mindspore.nn as nn
 
 
