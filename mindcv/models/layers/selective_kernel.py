@@ -1,10 +1,9 @@
 """ Selective Kernel Convolution/Attention
 Paper: Selective Kernel Networks (https://arxiv.org/abs/1903.06586)
 """
-from typing import Optional, Union, List, Tensor
+from typing import Optional, Union, List
 
-from mindspore import nn
-from mindspore import ops
+from mindspore import nn, ops, Tensor
 
 from .conv_norm_act import Conv2dNormActivation
 from .pooling import GlobalAvgPooling
