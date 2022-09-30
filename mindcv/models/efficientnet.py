@@ -163,7 +163,7 @@ class MBConv(nn.Cell):
         if expanded_channels != cnf.input_channels:
             layers.extend([
                 nn.Conv2d(cnf.input_channels, expanded_channels, kernel_size=1),
-                nn.BatchNorm2d(expanded_channels),
+                norm(expanded_channels),
                 Swish()
             ])
 
@@ -171,18 +171,18 @@ class MBConv(nn.Cell):
         layers.extend([
             nn.Conv2d(expanded_channels, expanded_channels, kernel_size=cnf.kernel_size,
                       stride=cnf.stride, group=expanded_channels),
-            nn.BatchNorm2d(expanded_channels),
+            norm(expanded_channels),
             Swish()
         ])
 
         # squeeze and excitation
         squeeze_channels = max(1, cnf.input_channels // 4)
-        layers.append(se_layer(expanded_channels, squeeze_channels, Swish, "sigmoid"))
+        layers.append(se_layer(in_channels=expanded_channels, rd_channels=squeeze_channels, act_layer=Swish))
 
         # project
         layers.extend([
             nn.Conv2d(expanded_channels, cnf.out_channels, kernel_size=1),
-            nn.BatchNorm2d(expanded_channels)
+            norm(cnf.out_channels)
         ])
 
         self.block = nn.SequentialCell(layers)
@@ -232,20 +232,20 @@ class FusedMBConv(nn.Cell):
             layers.extend([
                 nn.Conv2d(cnf.input_channels, expanded_channels, kernel_size=cnf.kernel_size,
                           stride=cnf.stride),
-                nn.BatchNorm2d(expanded_channels),
+                norm(expanded_channels),
                 Swish()
             ])
 
             # project
             layers.extend([
                 nn.Conv2d(expanded_channels, cnf.out_channels, kernel_size=1),
-                nn.BatchNorm2d(cnf.out_channels)
+                norm(cnf.out_channels)
             ])
         else:
             layers.extend([
                 nn.Conv2d(cnf.input_channels, cnf.out_channels, kernel_size=cnf.kernel_size,
                           stride=cnf.stride),
-                nn.BatchNorm2d(cnf.out_channels),
+                norm(cnf.out_channels),
                 Swish()
             ])
 
@@ -418,7 +418,7 @@ class EfficientNet(nn.Cell):
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)
 
-        x = self.adaptive_avg_pool2d(x, 1)
+        x = ops.adaptive_avg_pool2d(x, 1)
         x = ops.flatten(x)
 
         if self.training:
