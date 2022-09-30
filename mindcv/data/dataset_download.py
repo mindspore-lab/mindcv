@@ -1,5 +1,15 @@
+"""
+Dataset download
+"""
+
 import os
 from mindcv.utils.download import DownLoad
+
+__all__ = [
+    "MnistDownload",
+    "Cifar10Download",
+    "Cifar100Download"
+]
 
 
 class MnistDownload(DownLoad):
@@ -17,7 +27,7 @@ class MnistDownload(DownLoad):
                  ("t10k-labels-idx1-ubyte.gz", "ec29112dd5afa0611ce80d1b7f02629c")]
 
     def __init__(self, root: str):
-        super(MnistDownload, self).__init__()
+        super().__init__()
         self.root = root
         self.path = root
 
@@ -61,7 +71,7 @@ class Cifar10Download(DownLoad):
                  'batches.meta.txt']
 
     def __init__(self, root: str):
-        super(Cifar10Download, self).__init__()
+        super().__init__()
         self.root = root
         self.path = os.path.join(self.root, self.base_dir)
 
@@ -98,7 +108,7 @@ class Cifar100Download(DownLoad):
                  'coarse_label_names.txt']
 
     def __init__(self, root: str):
-        super(Cifar100Download, self).__init__()
+        super().__init__()
         self.root = root
         self.path = os.path.join(self.root, self.base_dir)
 

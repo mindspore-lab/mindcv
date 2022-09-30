@@ -1,11 +1,16 @@
+"""
+Transform operation list
+"""
+
 import math
 
-import mindspore.dataset.vision as vision
+from mindspore.dataset import vision
 from mindspore.dataset.vision import Inter
-import mindspore.dataset.vision.transforms as transforms
 
 from .constants import DEFAULT_CROP_PCT, IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from .auto_augment import imagenet_policy
+
+__all__ = ["create_transforms"]
 
 
 def transforms_imagenet_train(
@@ -83,7 +88,7 @@ def transforms_imagenet_eval(
         if image_resize[-1] == image_resize[-2]:
             scale_size = int(math.floor(image_resize[0] / crop_pct))
         else:
-            scale_size = tuple([int(x / crop_pct) for x in image_resize])
+            scale_size = tuple(int(x / crop_pct) for x in image_resize)
     else:
         scale_size = int(math.floor(image_resize / crop_pct))
 
@@ -109,15 +114,15 @@ def transforms_cifar(resize=224, is_training=True):
     trans = []
     if is_training:
         trans += [
-            transforms.RandomCrop((32, 32), (4, 4, 4, 4)),
-            transforms.RandomHorizontalFlip(prob=0.5)
+            vision.RandomCrop((32, 32), (4, 4, 4, 4)),
+            vision.RandomHorizontalFlip(prob=0.5)
         ]
 
     trans += [
-        transforms.Resize(resize),
-        transforms.Rescale(1.0 / 255.0, 0.0),
-        transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
-        transforms.HWC2CHW()
+        vision.Resize(resize),
+        vision.Rescale(1.0 / 255.0, 0.0),
+        vision.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
+        vision.HWC2CHW()
     ]
 
     return trans
@@ -131,10 +136,10 @@ def transforms_mnist(resize=224):
     shift_nml = -1 * 0.1307 / 0.3081
 
     trans = [
-        transforms.Resize(size=resize, interpolation=Inter.LINEAR),
-        transforms.Rescale(rescale, shift),
-        transforms.Rescale(rescale_nml, shift_nml),
-        transforms.HWC2CHW(),
+        vision.Resize(size=resize, interpolation=Inter.LINEAR),
+        vision.Rescale(rescale, shift),
+        vision.Rescale(rescale_nml, shift_nml),
+        vision.HWC2CHW(),
     ]
     return trans
 
@@ -161,13 +166,13 @@ def create_transforms(
 
     dataset_name = dataset_name.lower()
 
-    if dataset_name == "imagenet" or dataset_name == '':
+    if dataset_name in ("imagenet", ''):
         trans_args = dict(image_resize=image_resize, **kwargs)
         if is_training:
             return transforms_imagenet_train(**trans_args)
-        else:
-            return transforms_imagenet_eval(**trans_args)
-    elif dataset_name == 'cifar10' or dataset_name == 'cifar100':
+
+        return transforms_imagenet_eval(**trans_args)
+    elif dataset_name in ('cifar10', 'cifar100'):
         trans_list = transforms_cifar(resize=image_resize,
                                       is_training=is_training)
         return trans_list

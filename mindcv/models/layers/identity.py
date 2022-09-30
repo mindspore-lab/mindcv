@@ -1,4 +1,5 @@
-import mindspore.nn as nn
+"""Identity Module"""
+from mindspore import nn
 
 
 class Identity(nn.Cell):

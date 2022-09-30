@@ -1,6 +1,8 @@
 from .registry import is_model, model_entrypoint
 from mindspore import load_checkpoint, load_param_into_net
 
+__all__ = ["create_model"]
+
 
 def create_model(
         model_name: str,
@@ -9,6 +11,15 @@ def create_model(
         in_channels: int = 3,
         checkpoint_path: str = '',
         **kwargs):
+    r"""Creates model by name.
+
+    Args:
+        model_name (str):  The name of model.
+        num_classes (int): The number of classes. Default: 1000.
+        pretrained (bool): Whether to load the pretrained model. Default: False.
+        in_channels (int): The input channels. Default: 3.
+        checkpoint_path (str): The path of checkpoint files. Default: "".
+    """
 
     if checkpoint_path != '' and pretrained:
         raise ValueError('checkpoint_path is mutually exclusive with pretrained')
