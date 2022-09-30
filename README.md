@@ -41,12 +41,7 @@ pip install https://github.com/mindlab-ai/mindcv/releases/download/v0.0.1-alpha/
 ### Install from source
 To install MindCV from source, please run,
 ```shell
-# Clone the mindcv repository.
-git clone https://github.com/mindlab-ai/mindcv.git
-cd mindcv
-
-# Install
-python setup.py install
+pip install git+https://github.com/mindlab-ai/mindcv.git
 ```
 
 ## Get Started 
