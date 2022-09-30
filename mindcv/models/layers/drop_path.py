@@ -13,6 +13,7 @@ def drop_path(x: Tensor,
               drop_prob: float = 0.,
               training: bool = False,
               scale_by_keep: bool = True) -> Tensor:
+    """ DropPath (Stochastic Depth) regularization layers """
     if drop_prob == 0. or not training:
         return x
     keep_prob = 1 - drop_prob
