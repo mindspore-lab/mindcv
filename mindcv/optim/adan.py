@@ -15,22 +15,17 @@
 """adan"""
 from __future__ import absolute_import
 
-import numpy as np
-
-from mindspore import context
 from mindspore.common import dtype as mstype
-from mindspore.common.initializer import initializer
 from mindspore.common.api import ms_function
 from mindspore.ops import operations as P
 from mindspore.ops import composite as C
 from mindspore.ops import functional as F
-from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
 from mindspore._checkparam import Validator as validator
 from mindspore._checkparam import Rel
 from mindspore.nn.optim.optimizer import Optimizer
 from mindspore.nn.optim.optimizer import opt_init_args_register
-from mindspore.nn.optim._dist_optimizer_registry import _register_dist_optimizer
+
 
 _adan_opt = C.MultitypeFuncGraph("adan_opt")
 #_fused_adan_weight_decay = C.MultitypeFuncGraph("fused_adan_weight_decay")
@@ -106,7 +101,8 @@ def _run_opt_with_sparse(opt, sparse_opt, push, pull,
 
 
 
-@_adan_opt.register("Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor")
+@_adan_opt.register("Tensor", "Tensor", "Tensor", "Tensor", "Tensor", \
+        "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor")
 def _update_run_op(beta1, beta2, beta3, eps, lr, weight_decay, param, m, v, n, gradient, prev_gradient):
     """
     Update parameters.
@@ -135,14 +131,14 @@ def _update_run_op(beta1, beta2, beta3, eps, lr, weight_decay, param, m, v, n, g
 
     success = True
 
-    #if global_step == 0.0: # init 
-    # TODO: use global_step==0 as the condition to init prev_gradient as gradient 
+    #if global_step == 0.0: # init
+    # TODO: use global_step==0 as the condition to init prev_gradient as gradient
     #if (F.reduce_min(prev_gradient) == 0.0) and (F.reduce_max(prev_gradient) == 0.0):
-    if (F.reduce_sum(prev_gradient) == 0.0):
+    if F.reduce_sum(prev_gradient) == 0.0:
         success = F.depend(success, F.assign(prev_gradient, gradient))
 
 
-    # TODO: is casting needed? 
+    # TODO: is casting needed?
     param_fp32 = op_cast(param, mstype.float32)
     m_fp32 = op_cast(m, mstype.float32)
     v_fp32 = op_cast(v, mstype.float32)
@@ -154,7 +150,7 @@ def _update_run_op(beta1, beta2, beta3, eps, lr, weight_decay, param, m, v, n, g
 
     next_v = op_mul(F.tuple_to_array((1.0,)) - beta2, v_fp32) + op_mul(beta2, gradient_fp32 - prev_gradient_fp32)
 
-    next_n = op_mul(F.tuple_to_array((1.0,)) - beta3, n_fp32) + op_mul(beta3, 
+    next_n = op_mul(F.tuple_to_array((1.0,)) - beta3, n_fp32) + op_mul(beta3,
                     op_square(
                         gradient + op_mul(F.tuple_to_array((1.0,)) - beta2, gradient_fp32 - prev_gradient_fp32)
                         )
@@ -163,14 +159,14 @@ def _update_run_op(beta1, beta2, beta3, eps, lr, weight_decay, param, m, v, n, g
     lr_t = lr /  (eps + op_sqrt(next_n))
 
 
-    update = next_m + op_mul(F.tuple_to_array((1.0,)) - beta2, next_v)  
+    update = next_m + op_mul(F.tuple_to_array((1.0,)) - beta2, next_v)
 
     #if decay_flag:
     #    update = op_mul(weight_decay, param_fp32) + update
 
-    next_param = param_fp32 - op_reshape(op_mul(lr, update), op_shape(param_fp32))
+    next_param = param_fp32 - op_reshape(op_mul(lr_t, update), op_shape(param_fp32))
 
-    next_param = next_param / (Tensor(1.0, mstype.float32)  + op_mul(weight_decay, lr))
+    next_param = next_param / (Tensor(1.0, mstype.float32)  + op_mul(weight_decay, lr_t))
 
     success= F.depend(success, F.assign(param, op_cast(next_param, F.dtype(param))))
     success= F.depend(success, F.assign(m, op_cast(next_m, F.dtype(m))))
@@ -193,14 +189,14 @@ def _check_param_value(beta1, beta2, eps, prim_name):
 
 class Adan(Optimizer):
     '''
-    The Adan (ADAptive Nesterov momentum algorithm) Optimizer from https://arxiv.org/abs/2208.06677  
+    The Adan (ADAptive Nesterov momentum algorithm) Optimizer from https://arxiv.org/abs/2208.06677
 
-    Note: it is an experimental version. 
+    Note: it is an experimental version.
     '''
     @opt_init_args_register
     def __init__(self, params, learning_rate=1e-3, beta1=0.98, beta2=0.92, beta3=0.99, eps=1e-8, use_locking=False,
                  weight_decay=1e-6, loss_scale=1.0):
-        super(Adan, self).__init__(learning_rate, params, weight_decay=weight_decay, loss_scale=loss_scale) # Optimized inherit weight decay is bloaked. weight decay is computed in this py. 
+        super().__init__(learning_rate, params, weight_decay=weight_decay, loss_scale=loss_scale) # Optimized inherit weight decay is bloaked. weight decay is computed in this py.
 
         _check_param_value(beta1, beta2, eps, self.cls_name)
         validator.check_value_type("use_locking", use_locking, [bool], self.cls_name)
@@ -213,29 +209,14 @@ class Adan(Optimizer):
         #self.beta3_power = Parameter(initializer(1, [1], mstype.float32), name="beta3_power")
         self.eps = Tensor(eps, mstype.float32)
         self.use_locking = use_locking
-        self.moment1 = self._parameters.clone(prefix="moment1", init='zeros') # m 
+        self.moment1 = self._parameters.clone(prefix="moment1", init='zeros') # m
         self.moment2 = self._parameters.clone(prefix="moment2", init='zeros') # v
         self.moment3 = self._parameters.clone(prefix="moment3", init='zeros') # n
-        self.prev_gradient= self._parameters.clone(prefix="prev_gradient", init='zeros') 
+        self.prev_gradient= self._parameters.clone(prefix="prev_gradient", init='zeros')
         # print('prev g: ', type(self.prev_gradient))
-       
+
         self.weight_decay = Tensor(weight_decay, mstype.float32)
 
-        #self.vhat = self._parameters.clone(prefix="vhat", init='zeros')
-
-        #self._is_device = True
-        
-        # TODO: 
-        #self.opt = P.Adam(use_locking, use_nesterov)
-
-        #self.sparse_opt = P.FusedSparseAdam(use_locking, use_nesterov)
-        #self.sparse_opt.add_prim_attr("primitive_target", "CPU")
-        #self._ps_pull = P.Pull()
-
-        #self._ps_push = P.Push("Adan", [0, 1, 2])
-        #self._ps_push.add_prim_attr("use_nesterov", use_nesterov)
-
-        #self._init_distributed_opts(use_locking, use_nesterov)
 
     @ms_function
     def construct(self, gradients):
@@ -245,7 +226,7 @@ class Adan(Optimizer):
         moment3 = self.moment3
         #vhat = self.vhat
         gradients = self.flatten_gradients(gradients)
-        #gradients = self.decay_weight(gradients) # we decay weight in adan_opt func 
+        #gradients = self.decay_weight(gradients) # we decay weight in adan_opt func
         gradients = self.gradients_centralization(gradients)
         gradients = self.scale_grad(gradients)
         gradients = self._grad_sparse_indices_deduplicate(gradients)
@@ -255,7 +236,7 @@ class Adan(Optimizer):
         #if self.global_step == 0:
         #    success = F.depend(True, F.assign(self.prev_gradient, gradients))
 
-        #TODO: currently not support dist 
+        #TODO: currently not support dist
         success = self.map_(F.partial(_adan_opt, self.beta1, self.beta2, self.beta3, self.eps, lr, self.weight_decay),
                 params, moment1, moment2, moment3, gradients, self.prev_gradient)
                 #params, moment1, moment2, moment3, gradients, self.prev_gradient, self.global_step)
@@ -270,40 +251,3 @@ class Adan(Optimizer):
         optimizer operation.
         """
         self._set_base_target(value)
-    '''
-    def _init_distributed_opts(self, use_locking, use_nesterov):
-        self.use_dist_optimizer = self._use_distibuted_optimizer()
-        self.dense_adan_opts, self.use_dense_opt_flags = \
-            self._get_distributed_optimizer_list("adan", use_locking, use_nesterov)
-        self.sparse_adan_opts, self.use_sparse_opt_flags = \
-            self._get_distributed_optimizer_list("fused_sparse_adan", use_locking, use_nesterov)
-    '''
-
-'''
-def create_distributed_adan(*args, **kwargs):
-    """
-    Create the distributed Adan op.
-    """
-    adan = P.Adan(*args, **kwargs)
-    adan.add_prim_attr("gradient_type", "dense_gradient")
-    adan.add_prim_attr("parameter_input_index", 0)
-    adan.add_prim_attr("gradient_input_index", 9)
-    return adan
-
-
-def create_distributed_fused_sparse_adan(*args, **kwargs):
-    """
-    Create the distributed FusedSparseAdan op.
-    """
-    sparse_adan = P.FusedSparseAdan(*args, **kwargs)
-    sparse_adan.add_prim_attr("gradient_type", "sparse_gradient")
-    sparse_adan.add_prim_attr("parameter_input_index", 0)
-    sparse_adan.add_prim_attr("gradient_input_index", 9)
-    sparse_adan.add_prim_attr("indices_input_index", 10)
-    return sparse_adan
-
-
-_register_dist_optimizer("adan", create_distributed_adan)
-_register_dist_optimizer("fused_sparse_adan", create_distributed_fused_sparse_adan)
-
-'''
