@@ -60,7 +60,7 @@ class Bottle2neck(nn.Cell):
                  norm: Optional[nn.Cell] = None,
                  down_sample: Optional[nn.Cell] = None
                  ) -> None:
-        super(Bottle2neck, self).__init__()
+        super().__init__()
         if norm is None:
             norm = nn.BatchNorm2d
 
@@ -164,7 +164,7 @@ class Res2Net(nn.Cell):
                  scale = 4,
                  norm: Optional[nn.Cell] = None
                  ) -> None:
-        super(Res2Net, self).__init__()
+        super().__init__()
         assert version in ['res2net', 'res2net_v1b']
         self.version = version
 
@@ -248,7 +248,7 @@ class Res2Net(nn.Cell):
                     self.norm(channels * block.expansion)
                 ])
 
-        layers = list()
+        layers = []
         layers.append(
             block(
                 self.input_channels,
@@ -343,7 +343,8 @@ def res2net152(pretrained: bool = False, num_classes: int = 1001, in_channels=3,
 @register_model
 def res2net50_v1b(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
     default_cfg = default_cfgs['res2net50_v1b']
-    model = Res2Net(Bottle2neck, [3, 4, 6, 3], version='res2net_v1b', num_classes=num_classes, in_channels=in_channels, **kwargs)
+    model = Res2Net(Bottle2neck, [3, 4, 6, 3], version='res2net_v1b', num_classes=num_classes,
+                    in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -354,7 +355,8 @@ def res2net50_v1b(pretrained: bool = False, num_classes: int = 1001, in_channels
 @register_model
 def res2net101_v1b(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
     default_cfg = default_cfgs['res2net101_v1b']
-    model = Res2Net(Bottle2neck, [3, 4, 23, 3], version='res2net_v1b', num_classes=num_classes, in_channels=in_channels, **kwargs)
+    model = Res2Net(Bottle2neck, [3, 4, 23, 3], version='res2net_v1b', num_classes=num_classes,
+                    in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -364,7 +366,8 @@ def res2net101_v1b(pretrained: bool = False, num_classes: int = 1001, in_channel
 @register_model
 def res2net152_v1b(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
     default_cfg = default_cfgs['res2net152_v1b']
-    model = Res2Net(Bottle2neck, [3, 8, 36, 3], version='res2net_v1b', num_classes=num_classes, in_channels=in_channels, **kwargs)
+    model = Res2Net(Bottle2neck, [3, 8, 36, 3], version='res2net_v1b', num_classes=num_classes,
+                    in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)

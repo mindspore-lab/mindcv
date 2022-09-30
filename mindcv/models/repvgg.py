@@ -18,8 +18,9 @@ from .registry import register_model
 
 __all__ = [
     'RepVGG',
-    'RepVGG_A0'
+    'repvgg'
 ]
+
 
 def _cfg(url='', **kwargs):
     return {
@@ -47,11 +48,12 @@ def conv_bn(in_channels: int, out_channels: int, kernel_size: int,
 
 
 class RepVGGBlock(nn.Cell):
+    """Basic Block of RepVGG"""
     def __init__(self, in_channels: int, out_channels: int, kernel_size: int,
                  stride: int = 1, padding: int = 0, dilation: int = 1,
                  group: int = 1, padding_mode: str = 'zeros',
                  deploy: bool = False, use_se: bool = False) -> None:
-        super(RepVGGBlock, self).__init__()
+        super().__init__()
         self.deploy = deploy
         self.group = group
         self.in_channels = in_channels
@@ -71,8 +73,8 @@ class RepVGGBlock(nn.Cell):
 
         if deploy:
             self.rbr_reparam = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size,
-                                         stride=stride, padding=padding, dilation=dilation, group=group, bias=True,
-                                         padding_mode=padding_mode)
+                                         stride=stride, padding=padding, dilation=dilation, group=group, has_bias=True,
+                                         pad_mode=padding_mode)
         else:
             self.rbr_reparam = None
             self.rbr_identity = nn.BatchNorm2d(
@@ -94,9 +96,9 @@ class RepVGGBlock(nn.Cell):
 
         return self.nonlinearity(self.se(self.rbr_dense(inputs) + self.rbr_1x1(inputs) + id_out))
 
-    def get_custom_L2(self):
-        K3 = self.rbr_dense.conv.weight
-        K1 = self.rbr_1x1.conv.weight
+    def get_custom_l2(self):
+        k3 = self.rbr_dense.conv.weight
+        k1 = self.rbr_1x1.conv.weight
 
         t3 = self.rbr_dense.bn.weight / (
             ops.sqrt((self.rbr_dense.bn.moving_variance + self.rbr_dense.bn.eps)))
@@ -107,8 +109,8 @@ class RepVGGBlock(nn.Cell):
         t1 = ops.reshape(t1, (-1, 1, 1, 1))
 
         l2_loss_circle = ops.reduce_sum(
-            K3 ** 2) - ops.reduce_sum(K3[:, :, 1:2, 1:2] ** 2)
-        eq_kernel = K3[:, :, 1:2, 1:2] * t3 + K1 * t1
+            k3 ** 2) - ops.reduce_sum(k3[:, :, 1:2, 1:2] ** 2)
+        eq_kernel = k3[:, :, 1:2, 1:2] * t3 + k1 * t1
         l2_loss_eq_kernel = ops.reduce_sum(
             eq_kernel ** 2 / (t3 ** 2 + t1 ** 2))
         return l2_loss_eq_kernel + l2_loss_circle
@@ -196,12 +198,12 @@ class RepVGG(nn.Cell):
 
     def __init__(self, num_blocks, num_classes=1000, in_channels=3, width_multiplier=None, override_group_map=None,
                  deploy=False, use_se=False):
-        super(RepVGG, self).__init__()
+        super().__init__()
 
         assert len(width_multiplier) == 4
 
         self.deploy = deploy
-        self.override_group_map = override_group_map or dict()
+        self.override_group_map = override_group_map or {}
         self.use_se = use_se
 
         assert 0 not in self.override_group_map
@@ -259,7 +261,7 @@ class RepVGG(nn.Cell):
 
 
 @register_model
-def RepVGG_A0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> RepVGG:
+def repvgg(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> RepVGG:
     """Get RepVGG model with num_blocks=[2, 4, 14, 1], width_multiplier=[0.75, 0.75, 0.75, 2.5].
      Refer to the base class `models.RepVGG` for more details.
      """

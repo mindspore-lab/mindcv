@@ -34,7 +34,7 @@ default_cfgs = {
 
 
 class SeparableConv2d(nn.Cell):
-
+    """depth-wise convolutions + point-wise convolutions"""
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
@@ -42,7 +42,7 @@ class SeparableConv2d(nn.Cell):
                  dw_stride: int,
                  dw_padding: int,
                  bias: bool = False) -> None:
-        super(SeparableConv2d, self).__init__()
+        super().__init__()
         self.depthwise_conv2d = nn.Conv2d(in_channels=in_channels, out_channels=in_channels, kernel_size=dw_kernel,
                                           stride=dw_stride, pad_mode='pad', padding=dw_padding, group=in_channels,
                                           has_bias=bias)
@@ -64,7 +64,7 @@ class BranchSeparables(nn.Cell):
                  stride: int,
                  padding: int,
                  bias: bool = False) -> None:
-        super(BranchSeparables, self).__init__()
+        super().__init__()
         self.relu = nn.ReLU()
         self.separable_1 = SeparableConv2d(
             in_channels, in_channels, kernel_size, stride, padding, bias=bias
@@ -95,7 +95,7 @@ class BranchSeparablesStem(nn.Cell):
                  stride: int,
                  padding: int,
                  bias: bool = False) -> None:
-        super(BranchSeparablesStem, self).__init__()
+        super().__init__()
         self.relu = nn.ReLU()
         self.separable_1 = SeparableConv2d(
             in_channels, out_channels, kernel_size, stride, padding, bias=bias
@@ -149,7 +149,7 @@ class CellStem0(nn.Cell):
     def __init__(self,
                  stem_filters: int,
                  num_filters: int = 42) -> None:
-        super(CellStem0, self).__init__()
+        super().__init__()
         self.num_filters = num_filters
         self.stem_filters = stem_filters
         self.conv_1x1 = nn.SequentialCell([
@@ -214,7 +214,7 @@ class CellStem1(nn.Cell):
     def __init__(self,
                  stem_filters: int,
                  num_filters: int) -> None:
-        super(CellStem1, self).__init__()
+        super().__init__()
         self.num_filters = num_filters
         self.stem_filters = stem_filters
         self.conv_1x1 = nn.SequentialCell([
@@ -333,7 +333,7 @@ class FirstCell(nn.Cell):
                  out_channels_left: int,
                  in_channels_right: int,
                  out_channels_right: int) -> None:
-        super(FirstCell, self).__init__()
+        super().__init__()
         self.conv_1x1 = nn.SequentialCell([
             nn.ReLU(),
             nn.Conv2d(in_channels=in_channels_right, out_channels=out_channels_right, kernel_size=1, stride=1,
@@ -422,7 +422,7 @@ class NormalCell(nn.Cell):
                  out_channels_left: int,
                  in_channels_right: int,
                  out_channels_right: int) -> None:
-        super(NormalCell, self).__init__()
+        super().__init__()
         self.conv_prev_1x1 = nn.SequentialCell([
             nn.ReLU(),
             nn.Conv2d(in_channels=in_channels_left, out_channels=out_channels_left, kernel_size=1, stride=1,
@@ -491,7 +491,7 @@ class ReductionCell0(nn.Cell):
                  out_channels_left: int,
                  in_channels_right: int,
                  out_channels_right: int) -> None:
-        super(ReductionCell0, self).__init__()
+        super().__init__()
         self.conv_prev_1x1 = nn.SequentialCell([
             nn.ReLU(),
             nn.Conv2d(in_channels=in_channels_left, out_channels=out_channels_left, kernel_size=1, stride=1,
@@ -562,7 +562,7 @@ class ReductionCell1(nn.Cell):
                  out_channels_left: int,
                  in_channels_right: int,
                  out_channels_right: int) -> None:
-        super(ReductionCell1, self).__init__()
+        super().__init__()
         self.conv_prev_1x1 = nn.SequentialCell([
             nn.ReLU(),
             nn.Conv2d(in_channels=in_channels_left, out_channels=out_channels_left, kernel_size=1, stride=1,
@@ -667,7 +667,7 @@ class NASNetAMobile(nn.Cell):
                  stem_filters: int = 32,
                  penultimate_filters: int = 1056,
                  filters_multiplier: int = 2) -> None:
-        super(NASNetAMobile, self).__init__()
+        super().__init__()
         self.stem_filters = stem_filters
         self.penultimate_filters = penultimate_filters
         self.filters_multiplier = filters_multiplier
