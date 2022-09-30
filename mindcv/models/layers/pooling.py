@@ -1,13 +1,16 @@
-import mindspore.nn as nn
-import mindspore.ops as ops
+""" GlobalAvgPooling Module"""
+from mindspore import nn
+from mindspore import ops
 
 
 class GlobalAvgPooling(nn.Cell):
-
+    """
+    GlobalAvgPooling, same as torch.nn.AdaptiveAvgPool2d when output shape is 1
+    """
     def __init__(self,
                  keep_dims: bool = False
                  ) -> None:
-        super(GlobalAvgPooling, self).__init__()
+        super().__init__()
         self.keep_dims = keep_dims
 
     def construct(self, x):
