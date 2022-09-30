@@ -1,9 +1,10 @@
 docutils==0.16.0
 myst-parser
 opencv-python
--e git+https://github.com/open-mmlab/pytorch_sphinx_theme.git#egg=pytorch_sphinx_theme
+sphinx-rtd-theme
 sphinx==4.0.2
 sphinx-copybutton
 sphinx_markdown_tables
 torch
 torchvision
+-e git+https://github.com/mindlab-ai/mindcv.git#egg=mindcv
