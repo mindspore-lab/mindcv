@@ -35,6 +35,7 @@ default_cfgs = {
 
 
 class BasicConv2d(nn.Cell):
+    """A block for combine conv and relu"""
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
@@ -43,7 +44,7 @@ class BasicConv2d(nn.Cell):
                  padding: int = 0,
                  pad_mode: str = 'same'
                  ) -> None:
-        super(BasicConv2d, self).__init__()
+        super().__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
                               padding=padding, pad_mode=pad_mode)
         self.relu = nn.ReLU()
@@ -66,7 +67,7 @@ class Inception(nn.Cell):
                  ch5x5: int,
                  pool_proj: int
                  ) -> None:
-        super(Inception, self).__init__()
+        super().__init__()
         self.b1 = BasicConv2d(in_channels, ch1x1, kernel_size=1)
         self.b2 = nn.SequentialCell([
             BasicConv2d(in_channels, ch3x3red, kernel_size=1),
@@ -90,12 +91,14 @@ class Inception(nn.Cell):
 
 
 class InceptionAux(nn.Cell):
+    """Inception module for the aux classifier head"""
+
     def __init__(self,
                  in_channels: int,
                  num_classes: int,
                  drop_rate: float = 0.7
                  ) -> None:
-        super(InceptionAux, self).__init__()
+        super().__init__()
         self.avg_pool = nn.AvgPool2d(kernel_size=5, stride=3)
         self.conv = BasicConv2d(in_channels, 128, kernel_size=1)
         self.fc1 = nn.Dense(2048, 1024)
@@ -134,7 +137,7 @@ class GoogLeNet(nn.Cell):
                  drop_rate: float = 0.2,
                  drop_rate_aux: float = 0.7
                  ) -> None:
-        super(GoogLeNet, self).__init__()
+        super().__init__()
         self.aux_logits = aux_logits
         self.conv1 = BasicConv2d(in_channels, 64, kernel_size=7, stride=2)
         self.maxpool1 = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")

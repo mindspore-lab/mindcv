@@ -41,18 +41,13 @@ pip install https://github.com/mindlab-ai/mindcv/releases/download/v0.0.1-alpha/
 ### Install from source
 To install MindCV from source, please run,
 ```shell
-# Clone the mindcv repository.
-git clone https://github.com/mindlab-ai/mindcv.git
-cd mindcv
-
-# Install
-python setup.py install
+pip install git+https://github.com/mindlab-ai/mindcv.git
 ```
 
 ## Get Started 
 
 ### Hands-on Demo
-Please see the [Quick Start Demo](quick_tour.ipynb) to help you get started with MindCV and learn about the basic usage quickly. Below is how to create a deep vision model quickly.  
+Please see the [Quick Start Demo](quick_start.ipynb) to help you get started with MindCV and learn about the basic usage quickly. Below is how to create a deep vision model quickly.  
 
 ```python
 >>> import mindcv 
@@ -109,8 +104,9 @@ We provide [jupyter notebook tutorials](tutorials) for
 - [Learn about configs](tutorials/learn_about_config.ipynb)  
 - [Inference with a pretrained model](tutorials/inference.ipynb) 
 - [Finetune a pretrained model on custom datasets](tutorials/finetune.ipynb) 
-- [Customize models](tutorials/customize_model.ipynb) //tbc
-- [Optimizing performance for vision transformer](tutorials/transformer.ipynb) //tbc
+- [Customize models] //coming soon
+- [Optimizing performance for vision transformer] //coming soon
+- [Deployment demo](tutorials/deployment.ipynb) 
 
 
 ## Notes

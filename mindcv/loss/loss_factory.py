@@ -1,7 +1,10 @@
-from mindspore import Tensor
-from mindspore.nn import BCELoss, CrossEntropyLoss  # BCEWithLogitsLoss, SoftmaxCrossEntropyWithLogits
-from .cross_entropy_smooth import CrossEntropySmooth
+''' loss factory '''
 from typing import Optional
+from mindspore import Tensor
+from mindspore.nn import BCELoss, CrossEntropyLoss
+from .cross_entropy_smooth import CrossEntropySmooth
+
+__all__ = ["create_loss"]
 
 
 def create_loss(
@@ -15,13 +18,15 @@ def create_loss(
     Args:
         name:  loss name, : 'BCE' (binary cross entropy), 'CE' for cross_entropy. Default: 'CE'
         weight: The rescaling weight to each class. If the value is not None, the shape is (C,).
-            The data type only supports float32 or float16. Default: None.
-            For bce loss, it is a manual rescaling weight given to the loss of each batch element. If given, has to be a Tensor of size nbatch.
+                The data type only supports float32 or float16. Default: None.
+                For bce loss, it is a manual rescaling weight given to the loss of each batch element. If given, has to be a Tensor of size nbatch.
         reduction: Apply specific reduction method to the output: 'none', 'mean', or 'sum'.
             Default: 'mean'.
         label_smoothing: Label smoothing values, a regularization tool used to prevent the model
             from overfitting when calculating Loss. The value range is [0.0, 1.0]. Default: 0.0.
-        aux_factor: The factor for auxiliary loss, which is only applicable for cross entropy loss type for models with two logit outputs.  Default: 0.0.
+        aux_factor: The factor for auxiliary loss. It should be set larger than 0 networks with two logit outputs (i.e., deep supervision), such as inception_v3.  Default: 0.0.
+
+    Note:
 
     Inputs:
         if name is 'CE':
@@ -35,7 +40,7 @@ def create_loss(
         - **labels** (Tensor) - The label tensor with shape :math:`(N, *)`, the same shape and data type as `logits`.
 
     Returns:
-       Loss object that will be invoked to computed loss value.  
+       Loss object that will be invoked to computed loss value.
     """
 
     if name.lower() == 'bce':
@@ -47,7 +52,7 @@ def create_loss(
 
     else:
         if aux_factor > 0:
-            # fixme: 1) support reduction arg. 2) fixme: support class weight 
+            # fixme: 1) support reduction arg. 2) fixme: support class weight
             loss = CrossEntropySmooth(smooth_factor=label_smoothing, factor=aux_factor)
         else:
             loss = CrossEntropyLoss(weight=weight, reduction=reduction, label_smoothing=label_smoothing)

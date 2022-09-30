@@ -1,4 +1,5 @@
-import mindspore.nn as nn
+"""MultiStep Decay Learning Rate Scheduler"""
+from mindspore import nn
 from mindspore.nn.learning_rate_schedule import LearningRateSchedule
 
 
@@ -6,8 +7,9 @@ class MultiStepDecayLR(LearningRateSchedule):
     """ Multiple step learning rate
     The learning rate will decay once the number of step reaches one of the milestones.
     """
+
     def __init__(self, learning_rate, decay_rate, decay_step_indices):
-        super(MultiStepDecayLR, self).__init__()
+        super().__init__()
         self.learning_rate = learning_rate
         self.decay_rate = decay_rate
         self.decay_step_indices = decay_step_indices
