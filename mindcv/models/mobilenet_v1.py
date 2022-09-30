@@ -3,8 +3,6 @@ MindSpore implementation of `MobileNetV1`.
 Refer to MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications.
 """
 
-import math
-
 import mindspore.nn as nn
 import mindspore.common.initializer as init
 from mindspore import Tensor
@@ -67,7 +65,7 @@ class MobileNetV1(nn.Cell):
                  alpha: float = 1.,
                  in_channels: int = 3,
                  num_classes: int = 1000) -> None:
-        super(MobileNetV1, self).__init__()
+        super().__init__()
         input_channels = int(32 * alpha)
         # Setting of depth-wise separable conv
         # c: number of output channel

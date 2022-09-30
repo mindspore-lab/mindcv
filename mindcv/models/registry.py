@@ -43,7 +43,7 @@ def register_model(fn):
     return fn
 
 
-def list_models(filter='', module='', pretrained=False, exclude_filters=''):
+def list_models(filter: '', module: '', pretrained: False, exclude_filters: ''):
     if module:
         all_models = list(_module_to_models[module])
     else:
@@ -54,7 +54,7 @@ def list_models(filter='', module='', pretrained=False, exclude_filters=''):
         include_filters = filter if isinstance(filter, (tuple, list)) else [filter]
         for f in include_filters:
             include_models = fnmatch.filter(all_models, f)  # include these models
-            if len(include_models):
+            if include_models:
                 models = set(models).union(include_models)
     else:
         models = all_models
@@ -64,7 +64,7 @@ def list_models(filter='', module='', pretrained=False, exclude_filters=''):
             exclude_filters = [exclude_filters]
         for xf in exclude_filters:
             exclude_models = fnmatch.filter(models, xf)  # exclude these models
-            if len(exclude_models):
+            if exclude_models:
                 models = set(models).difference(exclude_models)
 
     if pretrained:

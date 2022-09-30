@@ -35,14 +35,14 @@ default_cfgs = {
 
 
 class Fire(nn.Cell):
-
+    """define the basic block of squeezenet"""
     def __init__(self,
                  in_channels: int,
                  squeeze_channels: int,
                  expand1x1_channels: int,
                  expand3x3_channels: int
                  ) -> None:
-        super(Fire, self).__init__()
+        super().__init__()
         self.squeeze = nn.Conv2d(in_channels, squeeze_channels, kernel_size=1, has_bias=True)
         self.squeeze_activation = nn.ReLU()
         self.expand1x1 = nn.Conv2d(squeeze_channels, expand1x1_channels, kernel_size=1, has_bias=True)
@@ -77,7 +77,7 @@ class SqueezeNet(nn.Cell):
                  drop_rate: float = 0.5,
                  in_channels: int = 3
                  ) -> None:
-        super(SqueezeNet, self).__init__()
+        super().__init__()
         if version == '1_0':
             self.features = nn.SequentialCell([
                 nn.Conv2d(in_channels, 96, kernel_size=7, stride=2, pad_mode='valid', has_bias=True),

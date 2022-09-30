@@ -41,7 +41,7 @@ class SeparableConv2d(nn.Cell):
                  kernel_size: int = 1,
                  stride: int = 1,
                  padding: int = 0):
-        super(SeparableConv2d, self).__init__()
+        super().__init__()
         self.conv1 = nn.Conv2d(in_channels, in_channels, kernel_size, stride, group=in_channels, pad_mode='pad',
                                padding=padding)
         self.pointwise = nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=1, pad_mode='valid')
@@ -61,7 +61,7 @@ class Block(nn.Cell):
                  strides: int = 1,
                  start_with_relu: bool = True,
                  grow_first: bool = True):
-        super(Block, self).__init__()
+        super().__init__()
 
         if out_filters != in_filters or strides != 1:
             self.skip = nn.Conv2d(in_filters, out_filters, 1, stride=strides, pad_mode='valid', has_bias=False)
@@ -120,9 +120,8 @@ class Xception(nn.Cell):
 
     def __init__(self,
                  num_classes: int = 1000,
-                 in_channels: int = 3,
-                 **kwargs):
-        super(Xception, self).__init__()
+                 in_channels: int = 3):
+        super().__init__()
         self.num_classes = num_classes
         blocks = []
         self.conv1 = nn.Conv2d(in_channels, 32, 3, 2, pad_mode='valid')
@@ -157,6 +156,7 @@ class Xception(nn.Cell):
         self._initialize_weights()
 
     def forward_features(self, x: Tensor) -> Tensor:
+        """forward the backbone of Xception"""
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)

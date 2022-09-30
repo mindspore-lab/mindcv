@@ -1,5 +1,5 @@
-from .registry import is_model, model_entrypoint
 from mindspore import load_checkpoint, load_param_into_net
+from .registry import is_model, model_entrypoint
 
 __all__ = ["create_model"]
 
@@ -28,7 +28,7 @@ def create_model(
     kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
     if not is_model(model_name):
-        raise RuntimeError('Unknown model (%s)' % model_name)
+        raise RuntimeError(f'Unknown model {model_name}')
 
     create_fn = model_entrypoint(model_name)
     model = create_fn(**model_args, **kwargs)

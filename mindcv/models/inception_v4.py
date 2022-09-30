@@ -35,6 +35,8 @@ default_cfgs = {
 
 
 class BasicConv2d(nn.Cell):
+    """A block for conv bn and relu"""
+
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
@@ -43,7 +45,7 @@ class BasicConv2d(nn.Cell):
                  padding: int = 0,
                  pad_mode: str = 'same'
                  ) -> None:
-        super(BasicConv2d, self).__init__()
+        super().__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
                               padding=padding, pad_mode=pad_mode)
         self.bn = nn.BatchNorm2d(out_channels, eps=0.001, momentum=0.9997)
@@ -59,7 +61,7 @@ class BasicConv2d(nn.Cell):
 class Stem(nn.Cell):
 
     def __init__(self, in_channels: int) -> None:
-        super(Stem, self).__init__()
+        super().__init__()
         self.conv2d_1a_3x3 = BasicConv2d(in_channels, 32, kernel_size=3, stride=2, pad_mode='valid')
         self.conv2d_2a_3x3 = BasicConv2d(32, 32, kernel_size=3, stride=1, pad_mode='valid')
         self.conv2d_2b_3x3 = BasicConv2d(32, 64, kernel_size=3, stride=1, pad_mode='pad', padding=1)
@@ -104,7 +106,7 @@ class Stem(nn.Cell):
 class InceptionA(nn.Cell):
 
     def __init__(self) -> None:
-        super(InceptionA, self).__init__()
+        super().__init__()
         self.branch_0 = BasicConv2d(384, 96, kernel_size=1, stride=1)
         self.branch_1 = nn.SequentialCell([
             BasicConv2d(384, 64, kernel_size=1, stride=1),
@@ -132,7 +134,7 @@ class InceptionA(nn.Cell):
 class InceptionB(nn.Cell):
 
     def __init__(self) -> None:
-        super(InceptionB, self).__init__()
+        super().__init__()
         self.branch_0 = BasicConv2d(1024, 384, kernel_size=1, stride=1)
         self.branch_1 = nn.SequentialCell([
             BasicConv2d(1024, 192, kernel_size=1, stride=1),
@@ -163,7 +165,7 @@ class InceptionB(nn.Cell):
 class ReductionA(nn.Cell):
 
     def __init__(self) -> None:
-        super(ReductionA, self).__init__()
+        super().__init__()
         self.branch_0 = BasicConv2d(384, 384, kernel_size=3, stride=2, pad_mode='valid')
         self.branch_1 = nn.SequentialCell([
             BasicConv2d(384, 192, kernel_size=1, stride=1),
@@ -183,7 +185,7 @@ class ReductionA(nn.Cell):
 class ReductionB(nn.Cell):
 
     def __init__(self) -> None:
-        super(ReductionB, self).__init__()
+        super().__init__()
         self.branch_0 = nn.SequentialCell([
             BasicConv2d(1024, 192, kernel_size=1, stride=1),
             BasicConv2d(192, 192, kernel_size=3, stride=2, pad_mode='valid'),
@@ -207,7 +209,7 @@ class ReductionB(nn.Cell):
 class InceptionC(nn.Cell):
 
     def __init__(self) -> None:
-        super(InceptionC, self).__init__()
+        super().__init__()
         self.branch_0 = BasicConv2d(1536, 256, kernel_size=1, stride=1)
 
         self.branch_1 = BasicConv2d(1536, 384, kernel_size=1, stride=1)
@@ -256,7 +258,7 @@ class InceptionV4(nn.Cell):
                  in_channels: int = 3,
                  drop_rate: float = 0.2
                  ) -> None:
-        super(InceptionV4, self).__init__()
+        super().__init__()
         blocks = [Stem(in_channels)]
         for _ in range(4):
             blocks.append(InceptionA())

@@ -8,3 +8,6 @@ sphinx_markdown_tables
 torch
 torchvision
 -e git+https://github.com/mindlab-ai/mindcv.git#egg=mindcv
+numpy >= 1.17.0
+pyyaml >= 5.3
+tqdm

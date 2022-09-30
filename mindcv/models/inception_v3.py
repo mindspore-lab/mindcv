@@ -35,6 +35,8 @@ default_cfgs = {
 
 
 class BasicConv2d(nn.Cell):
+    """A block for conv bn and relu"""
+
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
@@ -43,7 +45,7 @@ class BasicConv2d(nn.Cell):
                  padding: int = 0,
                  pad_mode: str = 'same'
                  ) -> None:
-        super(BasicConv2d, self).__init__()
+        super().__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
                               padding=padding, pad_mode=pad_mode)
         self.bn = nn.BatchNorm2d(out_channels, eps=0.001, momentum=0.9997)
@@ -61,7 +63,7 @@ class InceptionA(nn.Cell):
                  in_channels: int,
                  pool_features: int
                  ) -> None:
-        super(InceptionA, self).__init__()
+        super().__init__()
         self.branch0 = BasicConv2d(in_channels, 64, kernel_size=1)
         self.branch1 = nn.SequentialCell([
             BasicConv2d(in_channels, 48, kernel_size=1),
@@ -89,7 +91,7 @@ class InceptionA(nn.Cell):
 
 class InceptionB(nn.Cell):
     def __init__(self, in_channels: int) -> None:
-        super(InceptionB, self).__init__()
+        super().__init__()
         self.branch0 = BasicConv2d(in_channels, 384, kernel_size=3, stride=2, pad_mode='valid')
         self.branch1 = nn.SequentialCell([
             BasicConv2d(in_channels, 64, kernel_size=1),
@@ -112,7 +114,7 @@ class InceptionC(nn.Cell):
                  in_channels: int,
                  channels_7x7: int
                  ) -> None:
-        super(InceptionC, self).__init__()
+        super().__init__()
         self.branch0 = BasicConv2d(in_channels, 192, kernel_size=1)
         self.branch1 = nn.SequentialCell([
             BasicConv2d(in_channels, channels_7x7, kernel_size=1),
@@ -142,7 +144,7 @@ class InceptionC(nn.Cell):
 
 class InceptionD(nn.Cell):
     def __init__(self, in_channels: int) -> None:
-        super(InceptionD, self).__init__()
+        super().__init__()
         self.branch0 = nn.SequentialCell([
             BasicConv2d(in_channels, 192, kernel_size=1),
             BasicConv2d(192, 320, kernel_size=3, stride=2, pad_mode='valid')
@@ -165,7 +167,7 @@ class InceptionD(nn.Cell):
 
 class InceptionE(nn.Cell):
     def __init__(self, in_channels: int) -> None:
-        super(InceptionE, self).__init__()
+        super().__init__()
         self.branch0 = BasicConv2d(in_channels, 320, kernel_size=1)
         self.branch1 = BasicConv2d(in_channels, 384, kernel_size=1)
         self.branch1a = BasicConv2d(384, 384, kernel_size=(1, 3))
@@ -193,11 +195,13 @@ class InceptionE(nn.Cell):
 
 
 class InceptionAux(nn.Cell):
+    """Inception module for the aux classifier head"""
+
     def __init__(self,
                  in_channels: int,
                  num_classes: int
                  ) -> None:
-        super(InceptionAux, self).__init__()
+        super().__init__()
         self.avg_pool = nn.AvgPool2d(5, stride=3, pad_mode='valid')
         self.conv0 = BasicConv2d(in_channels, 128, kernel_size=1)
         self.conv1 = BasicConv2d(128, 768, kernel_size=5, pad_mode='valid')
@@ -233,7 +237,7 @@ class InceptionV3(nn.Cell):
                  aux_logits: bool = True,
                  in_channels: int = 3,
                  drop_rate: float = 0.2) -> None:
-        super(InceptionV3, self).__init__()
+        super().__init__()
         self.aux_logits = aux_logits
         self.conv1a = BasicConv2d(in_channels, 32, kernel_size=3, stride=2, pad_mode='valid')
         self.conv2a = BasicConv2d(32, 32, kernel_size=3, stride=1, pad_mode='valid')

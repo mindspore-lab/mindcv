@@ -49,7 +49,7 @@ class InvertedResidual(nn.Cell):
                  kernel_size: int,
                  expand_ratio: int,
                  ) -> None:
-        super(InvertedResidual, self).__init__()
+        super().__init__()
         assert stride in [1, 2]
 
         hidden_dim = round(in_channels * expand_ratio)
@@ -93,7 +93,7 @@ class Mnasnet(nn.Cell):
                  num_classes: int = 1000,
                  drop_rate: float = 0.2
                  ):
-        super(Mnasnet, self).__init__()
+        super().__init__()
 
         inverted_residual_setting = [
             # t, c, n, s, k

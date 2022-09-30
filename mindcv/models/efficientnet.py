@@ -10,7 +10,6 @@ from mindspore import Tensor
 import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore.common import initializer as weight_init
-from mindspore.common.initializer import Initializer as MeInitializer
 from mindspore.common.initializer import Uniform, Normal
 
 from .layers.squeeze_excite import SqueezeExcite
@@ -151,7 +150,6 @@ class MBConv(nn.Cell):
             self,
             cnf: MBConvConfig,
             keep_prob: float = 0.8,
-            norm: Optional[nn.Cell] = None,
             se_layer: Callable[..., nn.Cell] = SqueezeExcite,
     ) -> None:
         super().__init__()
@@ -200,7 +198,7 @@ class MBConv(nn.Cell):
 
 
 class FusedMBConvConfig(MBConvConfig):
-    # Stores information listed at Table 4 of the EfficientNetV2 paper
+    """Stores information listed at Table 4 of the EfficientNetV2 paper"""
     def __init__(
             self,
             expand_ratio: float,
@@ -218,17 +216,15 @@ class FusedMBConv(nn.Cell):
             self,
             cnf: FusedMBConvConfig,
             keep_prob: float,
-            norm: Optional[nn.Cell] = None,
     ) -> None:
         super().__init__()
 
-        if not (1 <= cnf.stride <= 2):
+        if not 1 <= cnf.stride <= 2:
             raise ValueError("illegal stride value")
 
         self.shortcut = cnf.stride == 1 and cnf.input_channels == cnf.out_channels
 
         layers: List[nn.Cell] = []
-        activation = Swish
 
         expanded_channels = cnf.adjust_channels(cnf.input_channels, cnf.expand_ratio)
         if expanded_channels != cnf.input_channels:
@@ -300,7 +296,7 @@ class EfficientNet(nn.Cell):
                  keep_prob: float = 0.2,
                  norm_layer: Optional[nn.Cell] = None,
                  ) -> None:
-        super(EfficientNet, self).__init__()
+        super().__init__()
         self.last_channel = None
 
         if norm_layer is None:
@@ -400,7 +396,7 @@ class EfficientNet(nn.Cell):
                 # adjust dropout rate of blocks based on the depth of the stage block
                 sd_prob = keep_prob * float(stage_block_id + 0.00001) / total_stage_blocks
 
-                stage.append(block(block_cnf, sd_prob, norm_layer))
+                stage.append(block(block_cnf, sd_prob))
                 stage_block_id += 1
 
             layers.append(nn.SequentialCell(stage))

@@ -44,6 +44,7 @@ default_cfgs = {
 
 
 class BottleBlock(nn.Cell):
+    """ A block for the Dual Path Architecture"""
     def __init__(self,
                  in_channel: int,
                  num_1x1_a: int,
@@ -52,7 +53,7 @@ class BottleBlock(nn.Cell):
                  inc: int,
                  g: int,
                  key_stride: int):
-        super(BottleBlock, self).__init__()
+        super().__init__()
         self.bn1 = nn.BatchNorm2d(in_channel, eps=1e-3, momentum=0.9)
         self.conv1 = nn.Conv2d(in_channel, num_1x1_a, 1, stride=1)
         self.bn2 = nn.BatchNorm2d(num_1x1_a, eps=1e-3, momentum=0.9)
@@ -76,6 +77,7 @@ class BottleBlock(nn.Cell):
 
 
 class DualPathBlock(nn.Cell):
+    """ A block for Dual Path Networks to combine proj, residual and densely network"""
     def __init__(self,
                  in_channel: int,
                  num_1x1_a: int,
@@ -85,7 +87,7 @@ class DualPathBlock(nn.Cell):
                  g: int,
                  _type: str = 'normal',
                  cat_input: bool = True):
-        super(DualPathBlock, self).__init__()
+        super().__init__()
         self.num_1x1_c = num_1x1_c
 
         if _type == 'proj':
@@ -154,7 +156,7 @@ class DPN(nn.Cell):
                  in_channels: int = 3,
                  num_classes: int = 1000):
 
-        super(DPN, self).__init__()
+        super().__init__()
         blocks = OrderedDict()
 
         # conv1
@@ -168,41 +170,41 @@ class DPN(nn.Cell):
         # conv2
         bw = 256
         inc = inc_sec[0]
-        R = int((k_r * bw) / 256)
-        blocks['conv2_1'] = DualPathBlock(num_init_channel, R, R, bw, inc, g, 'proj', False)
+        r = int((k_r * bw) / 256)
+        blocks['conv2_1'] = DualPathBlock(num_init_channel, r, r, bw, inc, g, 'proj', False)
         in_channel = bw + 3 * inc
         for i in range(2, k_sec[0] + 1):
-            blocks['conv2_{}'.format(i)] = DualPathBlock(in_channel, R, R, bw, inc, g, 'normal')
+            blocks[f'conv2_{i}'] = DualPathBlock(in_channel, r, r, bw, inc, g, 'normal')
             in_channel += inc
 
         # conv3
         bw = 512
         inc = inc_sec[1]
-        R = int((k_r * bw) / 256)
-        blocks['conv3_1'] = DualPathBlock(in_channel, R, R, bw, inc, g, 'down')
+        r = int((k_r * bw) / 256)
+        blocks['conv3_1'] = DualPathBlock(in_channel, r, r, bw, inc, g, 'down')
         in_channel = bw + 3 * inc
         for i in range(2, k_sec[1] + 1):
-            blocks['conv3_{}'.format(i)] = DualPathBlock(in_channel, R, R, bw, inc, g, 'normal')
+            blocks[f'conv3_{i}'] = DualPathBlock(in_channel, r, r, bw, inc, g, 'normal')
             in_channel += inc
 
         # conv4
         bw = 1024
         inc = inc_sec[2]
-        R = int((k_r * bw) / 256)
-        blocks['conv4_1'] = DualPathBlock(in_channel, R, R, bw, inc, g, 'down')
+        r = int((k_r * bw) / 256)
+        blocks['conv4_1'] = DualPathBlock(in_channel, r, r, bw, inc, g, 'down')
         in_channel = bw + 3 * inc
         for i in range(2, k_sec[2] + 1):
-            blocks['conv4_{}'.format(i)] = DualPathBlock(in_channel, R, R, bw, inc, g, 'normal')
+            blocks[f'conv4_{i}'] = DualPathBlock(in_channel, r, r, bw, inc, g, 'normal')
             in_channel += inc
 
         # conv5
         bw = 2048
         inc = inc_sec[3]
-        R = int((k_r * bw) / 256)
-        blocks['conv5_1'] = DualPathBlock(in_channel, R, R, bw, inc, g, 'down')
+        r = int((k_r * bw) / 256)
+        blocks['conv5_1'] = DualPathBlock(in_channel, r, r, bw, inc, g, 'down')
         in_channel = bw + 3 * inc
         for i in range(2, k_sec[3] + 1):
-            blocks['conv5_{}'.format(i)] = DualPathBlock(in_channel, R, R, bw, inc, g, 'normal')
+            blocks[f'conv5_{i}'] = DualPathBlock(in_channel, r, r, bw, inc, g, 'normal')
             in_channel += inc
 
         self.features = nn.SequentialCell(blocks)
