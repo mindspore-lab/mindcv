@@ -57,7 +57,7 @@ class ShuffleV1Block(nn.Cell):
                  group: int,
                  first_group: bool,
                  ) -> None:
-        super(ShuffleV1Block, self).__init__()
+        super().__init__()
         assert stride in [1, 2]
         self.stride = stride
         self.group = group
@@ -128,7 +128,7 @@ class ShuffleNetV1(nn.Cell):
                  in_channels: int = 3,
                  model_size: str = '2.0x',
                  group: int = 3):
-        super(ShuffleNetV1, self).__init__()
+        super().__init__()
         self.stage_repeats = [4, 8, 4]
         self.model_size = model_size
         if group == 3:
@@ -164,8 +164,8 @@ class ShuffleNetV1(nn.Cell):
         self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='same')
 
         features = []
-        for idxstage in range(len(self.stage_repeats)):
-            numrepeat = self.stage_repeats[idxstage]
+        for idxstage in self.stage_repeats:
+            numrepeat = idxstage
             output_channel = self.stage_out_channels[idxstage + 2]
 
             for i in range(numrepeat):

@@ -42,6 +42,7 @@ default_cfgs = {
 
 
 class ShuffleV2Block(nn.Cell):
+    """define the basic block of ShuffleV2"""
 
     def __init__(self,
                  in_channels: int,
@@ -49,7 +50,7 @@ class ShuffleV2Block(nn.Cell):
                  mid_channels: int,
                  kernel_size: int,
                  stride: int) -> None:
-        super(ShuffleV2Block, self).__init__()
+        super().__init__()
         assert stride in [1, 2]
         self.stride = stride
         pad = kernel_size // 2
@@ -119,7 +120,7 @@ class ShuffleNetV2(nn.Cell):
                  num_classes: int = 1000,
                  in_channels: int = 3,
                  model_size: str = '1.5x'):
-        super(ShuffleNetV2, self).__init__()
+        super().__init__()
 
         self.stage_repeats = [4, 8, 4]
         self.model_size = model_size
@@ -145,8 +146,8 @@ class ShuffleNetV2(nn.Cell):
         self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='same')
 
         self.features = []
-        for idxstage in range(len(self.stage_repeats)):
-            numrepeat = self.stage_repeats[idxstage]
+        for idxstage in self.stage_repeats:
+            numrepeat = idxstage
             output_channel = self.stage_out_channels[idxstage + 2]
 
             for i in range(numrepeat):

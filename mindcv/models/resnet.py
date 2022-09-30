@@ -49,6 +49,7 @@ default_cfgs = {
 
 
 class BasicBlock(nn.Cell):
+    """define the basic block of resnet"""
     expansion: int = 1
 
     def __init__(self,
@@ -60,7 +61,7 @@ class BasicBlock(nn.Cell):
                  norm: Optional[nn.Cell] = None,
                  down_sample: Optional[nn.Cell] = None
                  ) -> None:
-        super(BasicBlock, self).__init__()
+        super().__init__()
         if norm is None:
             norm = nn.BatchNorm2d
         assert groups == 1, 'BasicBlock only supports groups=1'
@@ -95,8 +96,10 @@ class BasicBlock(nn.Cell):
 
 
 class Bottleneck(nn.Cell):
-    # Bottleneck here places the stride for downsampling at 3x3 convolution(self.conv2) as torchvision does,
-    # while original implementation places the stride at the first 1x1 convolution(self.conv1)
+    """
+    Bottleneck here places the stride for downsampling at 3x3 convolution(self.conv2) as torchvision does,
+    while original implementation places the stride at the first 1x1 convolution(self.conv1)
+    """
     expansion: int = 4
 
     def __init__(self,
@@ -108,7 +111,7 @@ class Bottleneck(nn.Cell):
                  norm: Optional[nn.Cell] = None,
                  down_sample: Optional[nn.Cell] = None
                  ) -> None:
-        super(Bottleneck, self).__init__()
+        super().__init__()
         if norm is None:
             norm = nn.BatchNorm2d
 
@@ -171,7 +174,7 @@ class ResNet(nn.Cell):
                  base_width: int = 64,
                  norm: Optional[nn.Cell] = None
                  ) -> None:
-        super(ResNet, self).__init__()
+        super().__init__()
         if norm is None:
             norm = nn.BatchNorm2d
 
@@ -200,6 +203,7 @@ class ResNet(nn.Cell):
                     block_nums: int,
                     stride: int = 1
                     ) -> nn.SequentialCell:
+        """build model depending on cfgs"""
         down_sample = None
 
         if stride != 1 or self.input_channels != channels * block.expansion:
@@ -208,7 +212,7 @@ class ResNet(nn.Cell):
                 self.norm(channels * block.expansion)
             ])
 
-        layers = list()
+        layers = []
         layers.append(
             block(
                 self.input_channels,
