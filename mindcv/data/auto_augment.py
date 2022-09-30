@@ -1,7 +1,10 @@
-import mindspore.dataset.vision as vision
+"""
+Define auto augmentation operators
+"""
+
+from mindspore.dataset import vision
 import mindspore.dataset.transforms as c_transforms
 
-# define Auto Augmentation operators
 PARAMETER_MAX = 10
 
 
@@ -80,7 +83,7 @@ def contrast_impl(level):
     return vision.RandomColorAdjust(contrast=(v, v))
 
 
-def autocontrast_impl(level):
+def autocontrast_impl():
     return vision.AutoContrast()
 
 
@@ -97,7 +100,7 @@ def brightness_impl(level):
 # define the Auto Augmentation policy
 imagenet_policy = [
     [(posterize_impl(8), 0.4), (rotate_impl(9), 0.6)],
-    [(solarize_impl(5), 0.6), (autocontrast_impl(5), 0.6)],
+    [(solarize_impl(5), 0.6), (autocontrast_impl(), 0.6)],
     [(vision.Equalize(), 0.8), (vision.Equalize(), 0.6)],
     [(posterize_impl(7), 0.6), (posterize_impl(6), 0.6)],
 
@@ -121,9 +124,8 @@ imagenet_policy = [
     [(color_impl(0), 0.4), (vision.Equalize(), 0.6)],
 
     [(vision.Equalize(), 0.4), (solarize_impl(4), 0.2)],
-    [(solarize_impl(5), 0.6), (autocontrast_impl(5), 0.6)],
+    [(solarize_impl(5), 0.6), (autocontrast_impl(), 0.6)],
     [(vision.Invert(), 0.6), (vision.Equalize(), 1.0)],
     [(color_impl(4), 0.6), (contrast_impl(8), 1.0)],
     [(vision.Equalize(), 0.8), (vision.Equalize(), 0.6)],
 ]
-

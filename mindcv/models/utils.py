@@ -1,3 +1,6 @@
+"""
+Some utils while building models
+"""
 import os
 import logging
 import collections.abc
@@ -10,6 +13,7 @@ from mindcv.utils.download import DownLoad
 
 
 def load_pretrained(model, default_cfg, path='./', num_classes=1000, in_channels=3, filter_fn=None):
+    '''load pretrained model depending on cfgs of model'''
     if 'url' not in default_cfg or not default_cfg['url']:
         logging.warning('Pretrained model URL is invalid')
         return

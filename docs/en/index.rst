@@ -14,40 +14,27 @@ You can switch between Chinese and English documents in the lower-left corner of
    :maxdepth: 1
    :caption: Quick Start
 
-   quick_start/installation.md
-   quick_start/quick_run.md
+   quick_start/quick_start.md
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
    :caption: Tutorials
 
-   tutorials/config.md
-   tutorials/inference.md
-   tutorials/finetune_a_model.md
-   tutorials/train.md
-   tutorials/optimize.md
-   tutorials/zero_shot.md
-   tutorials/deployment_demo.md
+   tutorials/learn_about_config.md
+   tutorials/Inference.md
+   tutorials/finetune.md
+   tutorials/deployment.md
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
    :caption: APIs
 
-   Main Class:
-   mindcv.data <api/mindcv.data>
-   mindcv.loss <api/mindcv.loss>
-   mindcv.optim <api/mindcv.optim>
-   mindcv.models <api/mindcv.models>
-   mindcv.models.layers <api/mindcv.models.layers>
-   mindcv.scheduler <api/mindcv.scheduler>
-   mindcv.utils <api/mindcv.utils>
-
-   Models:
-   resnet <api/resnet>
-
-   External Helpers:
-   Utility for visualization
-   Utility for explanation
+   api/mindcv.data
+   api/mindcv.loss
+   api/mindcv.optim
+   api/mindcv.models
+   api/mindcv.models.layers
+   api/mindcv.scheduler
 
 .. toctree::
    :maxdepth: 1
@@ -61,12 +48,14 @@ You can switch between Chinese and English documents in the lower-left corner of
    :maxdepth: 1
    :caption: Examples
 
+   config/densenet/README.md
    config/googlenet/README.md
    config/inception_v3/README.md
    config/inception_v4/README.md
    config/mobilenetv1/README.md
    config/mobilenetv3/README.md
    config/repvgg/README.md
+   config/res2net/README.md
    config/sknet/README.md
    config/squeezenet/README.md
    config/xception/README.md

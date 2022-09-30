@@ -142,7 +142,7 @@ def train(args):
                                  loss_scale=args.loss_scale)
 
     # training
-    # TODO: args.loss_scale is not making effect. 
+    # TODO: args.loss_scale is not making effect.
     print('Training...')
     epoch_time = time()
     for t in range(args.epoch_size):

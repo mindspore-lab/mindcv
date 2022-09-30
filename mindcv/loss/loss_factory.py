@@ -4,6 +4,8 @@ from mindspore import Tensor
 from mindspore.nn import BCELoss, CrossEntropyLoss
 from .cross_entropy_smooth import CrossEntropySmooth
 
+__all__ = ["create_loss"]
+
 
 def create_loss(
         name: str = 'CE',

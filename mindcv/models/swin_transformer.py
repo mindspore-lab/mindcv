@@ -1,8 +1,6 @@
 """Define SwinTransformer model"""
-import collections.abc
-import numpy as np
-from itertools import repeat
 from typing import Optional, List, Tuple
+import numpy as np
 
 import mindspore.nn as nn
 import mindspore.ops as ops
@@ -12,7 +10,7 @@ from mindspore import dtype as mstype
 
 from .utils import load_pretrained, _ntuple
 from .registry import register_model
-from .layers import DropPath, Identity, GlobalAvgPooling
+from .layers import DropPath, Identity
 
 __all__ = [
     'SwinTransformer',
@@ -71,14 +69,14 @@ def window_partition(x, window_size: int):
     Returns:
         windows: numpy(num_windows*B, window_size, window_size, C)
     """
-    B, H, W, C = x.shape
-    x = np.reshape(x, (B, H // window_size, window_size, W // window_size, window_size, C))
-    windows = x.transpose(0, 1, 3, 2, 4, 5).reshape(-1, window_size, window_size, C)
+    b, h, w, c = x.shape
+    x = np.reshape(x, (b, h // window_size, window_size, w // window_size, window_size, c))
+    windows = x.transpose(0, 1, 3, 2, 4, 5).reshape(-1, window_size, window_size, c)
     return windows
 
 
 class WindowPartition(nn.Cell):
-
+    
     def __init__(self,
                  window_size: int
                  ) -> None:
@@ -89,16 +87,16 @@ class WindowPartition(nn.Cell):
     def construct(self, x: Tensor) -> Tensor:
         """
         Args:
-            x: (B, H, W, C)
+            x: (b, h, w, c)
             window_size (int): window size
 
         Returns:
-            windows: Tensor(num_windows*B, window_size, window_size, C)
+            windows: Tensor(num_windows*b, window_size, window_size, c)
         """
-        B, H, W, C = x.shape
-        x = ops.reshape(x, (B, H // self.window_size, self.window_size, W // self.window_size, self.window_size, C))
+        b, h, w, c = x.shape
+        x = ops.reshape(x, (b, h // self.window_size, self.window_size, w // self.window_size, self.window_size, c))
         x = ops.transpose(x, (0, 1, 3, 2, 4, 5))
-        x = ops.reshape(x, (B * H * W // (self.window_size ** 2), self.window_size, self.window_size, C))
+        x = ops.reshape(x, (b * h * w // (self.window_size ** 2), self.window_size, self.window_size, c))
 
         return x
 
@@ -134,7 +132,7 @@ class RelativeBias(nn.Cell):
                  window_size: int,
                  num_heads: int
                  ) -> None:
-        super(RelativeBias, self).__init__()
+        super().__init__()
         self.window_size = window_size
         # define a parameter table of relative position bias
         coords_h = np.arange(self.window_size[0]).reshape(self.window_size[0], 1).repeat(self.window_size[0],
@@ -215,26 +213,26 @@ class WindowAttention(nn.Cell):
             x: input features with shape of (num_windows*B, N, C)
             mask: (0/-inf) mask with shape of (num_windows, Wh*Ww, Wh*Ww) or None
         """
-        B_, N, C = x.shape
-        q = ops.reshape(self.q(x), (B_, N, self.num_heads, C // self.num_heads)) * self.scale
+        b_, n, c = x.shape
+        q = ops.reshape(self.q(x), (b_, n, self.num_heads, c // self.num_heads)) * self.scale
         q = ops.transpose(q, (0, 2, 1, 3))
-        k = ops.reshape(self.k(x), (B_, N, self.num_heads, C // self.num_heads))
+        k = ops.reshape(self.k(x), (b_, n, self.num_heads, c // self.num_heads))
         k = ops.transpose(k, (0, 2, 3, 1))
-        v = ops.reshape(self.v(x), (B_, N, self.num_heads, C // self.num_heads))
+        v = ops.reshape(self.v(x), (b_, n, self.num_heads, c // self.num_heads))
         v = ops.transpose(v, (0, 2, 1, 3))
 
         attn = self.batch_matmul(q, k)
         attn = attn + self.relative_bias()
 
         if mask is not None:
-            nW = mask.shape[1]
-            attn = ops.reshape(attn, (B_ // nW, nW, self.num_heads, N, N,)) + mask
-            attn = ops.reshape(attn, (-1, self.num_heads, N, N,))
+            nw = mask.shape[1]
+            attn = ops.reshape(attn, (b_ // nw, nw, self.num_heads, n, n,)) + mask
+            attn = ops.reshape(attn, (-1, self.num_heads, n, n,))
             attn = self.softmax(attn)
         else:
             attn = self.softmax(attn)
         attn = self.attn_drop(attn)
-        x = ops.reshape(ops.transpose(self.batch_matmul(attn, v), (0, 2, 1, 3)), (B_, N, C))
+        x = ops.reshape(ops.transpose(self.batch_matmul(attn, v), (0, 2, 1, 3)), (b_, n, c))
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
@@ -304,8 +302,8 @@ class SwinTransformerBlock(nn.Cell):
                        act_layer=act_layer, drop=drop)
         if self.shift_size > 0:
             # calculate attention mask for SW-MSA
-            H, W = self.input_resolution
-            img_mask = np.zeros((1, H, W, 1))  # 1 H W 1
+            h_, w_ = self.input_resolution
+            img_mask = np.zeros((1, h_, w_, 1))  # 1 H W 1
             h_slices = (slice(0, -self.window_size),
                         slice(-self.window_size, -self.shift_size),
                         slice(-self.shift_size, None))
@@ -336,12 +334,12 @@ class SwinTransformerBlock(nn.Cell):
 
     def construct(self, x: Tensor) -> Tensor:
 
-        H, W = self.input_resolution
-        B, _, C = x.shape
+        h, w = self.input_resolution
+        b, _, c = x.shape
 
         shortcut = x
         x = self.norm1(x)
-        x = ops.reshape(x, (B, H, W, C,))
+        x = ops.reshape(x, (b, h, w, c,))
 
         # cyclic shift
         if self.shift_size > 0:
@@ -353,14 +351,14 @@ class SwinTransformerBlock(nn.Cell):
         # partition windows
         x_windows = self.window_partition(shifted_x)  # nW*B, window_size, window_size, C
         x_windows = ops.reshape(x_windows,
-                                (-1, self.window_size * self.window_size, C,))  # nW*B, window_size*window_size, C
+                                (-1, self.window_size * self.window_size, c,))  # nW*B, window_size*window_size, C
 
         # W-MSA/SW-MSA
         attn_windows = self.attn(x_windows, mask=self.attn_mask)  # nW*B, window_size*window_size, C
 
         # merge windows
-        attn_windows = ops.reshape(attn_windows, (-1, self.window_size, self.window_size, C,))
-        shifted_x = self.window_reverse(attn_windows, self.window_size, H, W)  # B H' W' C
+        attn_windows = ops.reshape(attn_windows, (-1, self.window_size, self.window_size, c,))
+        shifted_x = self.window_reverse(attn_windows, self.window_size, h, w)  # B H' W' C
 
         # reverse cyclic shift
         if self.shift_size > 0:
@@ -368,7 +366,7 @@ class SwinTransformerBlock(nn.Cell):
         else:
             x = shifted_x
 
-        x = ops.reshape(x, (B, H * W, C,))
+        x = ops.reshape(x, (b, h * w, c,))
 
         # FFN
         x = shortcut + self.drop_path(x)
@@ -388,7 +386,7 @@ class Roll(nn.Cell):
                  shift_size: int,
                  shift_axis: Tuple[int] = (1, 2)
                  ) -> None:
-        super(Roll, self).__init__()
+        super().__init__()
         self.shift_size = to_2tuple(shift_size)
         self.shift_axis = shift_axis
 
@@ -427,10 +425,10 @@ class PatchMerging(nn.Cell):
         """
         x: B, H*W, C
         """
-        B = x.shape[0]
-        x = ops.reshape(x, (B, self.H_2, 2, self.W_2, 2, self.dim))
+        b = x.shape[0]
+        x = ops.reshape(x, (b, self.H_2, 2, self.W_2, 2, self.dim))
         x = ops.transpose(x, (0, 1, 3, 4, 2, 5))
-        x = ops.reshape(x, (B, self.H2W2, self.dim_mul_4))
+        x = ops.reshape(x, (b, self.H2W2, self.dim_mul_4))
         x = self.norm(x)
         x = self.reduction(x)
 
@@ -552,9 +550,9 @@ class PatchEmbed(nn.Cell):
 
     def construct(self, x: Tensor) -> Tensor:
 
-        B = x.shape[0]
+        b = x.shape[0]
         # FIXME look at relaxing size constraints
-        x = ops.reshape(self.proj(x), (B, self.embed_dim, -1))  # B Ph*Pw C
+        x = ops.reshape(self.proj(x), (b, self.embed_dim, -1))  # b Ph*Pw c
         x = ops.transpose(x, (0, 2, 1))
 
         if self.norm is not None:

@@ -1,3 +1,4 @@
+"""Utility of downloading"""
 import hashlib
 import os
 import bz2
@@ -123,7 +124,7 @@ class DownLoad:
                 url = url.replace("https", "http")
                 try:
                     self.download_file(url, file_path)
-                except (urllib.error.URLError, IOError) as e:
+                except (urllib.error.URLError, IOError):
                     # pylint: disable=protected-access
                     ssl._create_default_https_context = ssl._create_unverified_context
                     self.download_file(url, file_path)

@@ -84,7 +84,7 @@ class InvertedResidual(nn.Cell):
                  stride: int,
                  expand_ratio: int,
                  ) -> None:
-        super(InvertedResidual, self).__init__()
+        super().__init__()
         assert stride in [1, 2]
         hidden_dim = round(in_channels * expand_ratio)
         self.use_res_connect = stride == 1 and in_channels == out_channels
@@ -111,8 +111,7 @@ class InvertedResidual(nn.Cell):
     def construct(self, x: Tensor) -> Tensor:
         if self.use_res_connect:
             return x + self.layers(x)
-        else:
-            return self.layers(x)
+        return self.layers(x)
 
 
 class MobileNetV2(nn.Cell):
@@ -132,7 +131,7 @@ class MobileNetV2(nn.Cell):
                  in_channels: int = 3,
                  num_classes: int = 1000
                  ) -> None:
-        super(MobileNetV2, self).__init__()
+        super().__init__()
         input_channels = make_divisible(32 * alpha, round_nearest)
         # Setting of inverted residual blocks.
         # t: The expansion factor.

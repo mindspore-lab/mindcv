@@ -40,6 +40,7 @@ default_cfgs = {
 
 
 class SelectiveKernelBasic(nn.Cell):
+    """build basic block of sknet"""
     expansion = 1
 
     def __init__(self,
@@ -52,7 +53,7 @@ class SelectiveKernelBasic(nn.Cell):
                  norm: Optional[nn.Cell] = None,
                  sk_kwargs: Optional[Dict] = None
                  ):
-        super(SelectiveKernelBasic, self).__init__()
+        super().__init__()
         if norm is None:
             norm = nn.BatchNorm2d
 
@@ -86,6 +87,7 @@ class SelectiveKernelBasic(nn.Cell):
 
 
 class SelectiveKernelBottleneck(nn.Cell):
+    """build the bottleneck of the sknet"""
     expansion = 4
 
     def __init__(self,
@@ -98,7 +100,7 @@ class SelectiveKernelBottleneck(nn.Cell):
                  norm: Optional[nn.Cell] = None,
                  sk_kwargs: Optional[Dict] = None,
                  ):
-        super(SelectiveKernelBottleneck, self).__init__()
+        super().__init__()
         if norm is None:
             norm = nn.BatchNorm2d
 
@@ -159,7 +161,7 @@ class SKNet(ResNet):
                  sk_kwargs: Optional[Dict] = None
                  ) -> None:
         self.sk_kwargs: Optional[Dict] = sk_kwargs  # make pylint happy
-        super(SKNet, self).__init__(block, layers, num_classes, in_channels, groups, base_width, norm)
+        super().__init__(block, layers, num_classes, in_channels, groups, base_width, norm)
 
     def _make_layer(self,
                     block: Type[Union[SelectiveKernelBasic, SelectiveKernelBottleneck]],
@@ -175,7 +177,7 @@ class SKNet(ResNet):
                 self.norm(channels * block.expansion)
             ])
 
-        layers = list()
+        layers = []
         layers.append(
             block(
                 self.input_channels,

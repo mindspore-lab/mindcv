@@ -1,11 +1,13 @@
-import mindspore.nn as nn
+"""Cosine Decay with Warmup Learning Rate Scheduler"""
+from mindspore import nn
 from mindspore.nn.learning_rate_schedule import LearningRateSchedule
 
 
 class WarmupCosineDecayLR(LearningRateSchedule):
     """ CosineDecayLR with warmup
-    The learning rate will increase from 0 to max_lr in `warmup_epochs` epochs, then decay to min_lr in `decay_epoches` epochs 
+    The learning rate will increase from 0 to max_lr in `warmup_epochs` epochs, then decay to min_lr in `decay_epoches` epochs
     """
+
     def __init__(self,
                  min_lr,
                  max_lr,
@@ -13,7 +15,7 @@ class WarmupCosineDecayLR(LearningRateSchedule):
                  decay_epochs,
                  steps_per_epoch
                  ):
-        super(WarmupCosineDecayLR, self).__init__()
+        super().__init__()
         self.warmup_steps = warmup_epochs * steps_per_epoch
         self.decay_steps = decay_epochs * steps_per_epoch
         if self.warmup_steps > 0:
@@ -24,7 +26,7 @@ class WarmupCosineDecayLR(LearningRateSchedule):
 
         if self.warmup_steps > 0:
             if global_step > self.warmup_steps:
-                lr = self.cosine_decay_lr(global_step-self.warmup_steps)
+                lr = self.cosine_decay_lr(global_step - self.warmup_steps)
             else:
                 lr = self.warmup_lr(global_step)
         else:

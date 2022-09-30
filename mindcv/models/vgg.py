@@ -50,6 +50,7 @@ cfgs: Dict[str, List[Union[str, int]]] = {
 def _make_layers(cfg: List[Union[str, int]],
                  batch_norm: bool = False,
                  in_channels: int = 3) -> nn.SequentialCell:
+    """define the basic block of VGG"""
     layers = []
     for v in cfg:
         if v == "M":
@@ -83,7 +84,7 @@ class VGG(nn.Cell):
                  num_classes: int = 1000,
                  in_channels: int = 3,
                  drop_rate: float = 0.5) -> None:
-        super(VGG, self).__init__()
+        super().__init__()
         cfg = cfgs[model_name]
         self.features = _make_layers(cfg, batch_norm=batch_norm, in_channels=in_channels)
         self.flatten = nn.Flatten()
