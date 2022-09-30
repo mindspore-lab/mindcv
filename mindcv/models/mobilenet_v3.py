@@ -51,7 +51,7 @@ class Bottleneck(nn.Cell):
                  stride: int = 1,
                  activation: str = 'relu',
                  use_se: bool = False) -> None:
-        super(Bottleneck, self).__init__()
+        super().__init__()
         self.use_se = use_se
         self.use_res_connect = stride == 1 and in_channels == out_channels
         assert activation in ['relu', 'hswish']
@@ -87,8 +87,7 @@ class Bottleneck(nn.Cell):
     def construct(self, x: Tensor) -> Tensor:
         if self.use_res_connect:
             return x + self.layers(x)
-        else:
-            return self.layers(x)
+        return self.layers(x)
 
 
 class MobileNetV3(nn.Cell):
@@ -110,7 +109,7 @@ class MobileNetV3(nn.Cell):
                  in_channels: int = 3,
                  num_classes: int = 1000
                  ) -> None:
-        super(MobileNetV3, self).__init__()
+        super().__init__()
         input_channels = make_divisible(16 * alpha, round_nearest)
         # Setting of bottleneck blocks. ex: [k, e, c, se, nl, s]
         # k: kernel size of depth-wise conv

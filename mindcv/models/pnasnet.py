@@ -16,7 +16,7 @@ from .registry import register_model
 from .utils import load_pretrained
 
 __all__ = [
-    'PNASNet5_Mobile',
+    'Pnasnet',
     'pnasnet'
 ]
 
@@ -44,7 +44,7 @@ class MaxPool(nn.Cell):
                  kernel_size: int,
                  stride: int = 1,
                  zero_pad: bool = False) -> None:
-        super(MaxPool, self).__init__()
+        super().__init__()
         self.pad = zero_pad
         if self.pad:
             self.zero_pad = nn.Pad(paddings=((0, 0), (0, 0), (1, 0), (1, 0)))
@@ -71,7 +71,7 @@ class SeparableConv2d(nn.Cell):
                  dw_kernel_size: int,
                  dw_stride: int,
                  dw_padding: int) -> None:
-        super(SeparableConv2d, self).__init__()
+        super().__init__()
         self.depthwise_conv2d = nn.Conv2d(in_channels=in_channels, out_channels=in_channels,
                                           kernel_size=dw_kernel_size, stride=dw_stride,
                                           pad_mode='pad', padding=dw_padding,
@@ -98,7 +98,7 @@ class BranchSeparables(nn.Cell):
                  stride: int = 1,
                  stem_cell: bool = False,
                  zero_pad: bool = False) -> None:
-        super(BranchSeparables, self).__init__()
+        super().__init__()
         padding = kernel_size // 2
         middle_channels = out_channels if stem_cell else in_channels
 
@@ -142,7 +142,7 @@ class ReluConvBn(nn.Cell):
                  out_channels: int,
                  kernel_size: int,
                  stride: int = 1) -> None:
-        super(ReluConvBn, self).__init__()
+        super().__init__()
         self.relu = nn.ReLU()
 
         self.conv = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size,
@@ -165,7 +165,7 @@ class FactorizedReduction(nn.Cell):
     def __init__(self,
                  in_channels: int,
                  out_channels: int) -> None:
-        super(FactorizedReduction, self).__init__()
+        super().__init__()
         self.relu = nn.ReLU()
 
         path_1 = OrderedDict([
@@ -247,7 +247,7 @@ class CellStem0(CellBase):
                  out_channels_left: int,
                  in_channels_right: int,
                  out_channels_right: int) -> None:
-        super(CellStem0, self).__init__()
+        super().__init__()
         self.conv_1x1 = ReluConvBn(in_channels_right, out_channels_right,
                                    kernel_size=1)
         self.comb_iter_0_left = BranchSeparables(in_channels_left,
@@ -303,7 +303,7 @@ class Cell(CellBase):
                  is_reduction: bool = False,
                  zero_pad: bool = False,
                  match_prev_layer_dimensions: bool = False) -> None:
-        super(Cell, self).__init__()
+        super().__init__()
 
         stride = 2 if is_reduction else 1
 
@@ -354,7 +354,7 @@ class Cell(CellBase):
         return x_out
 
 
-class PNASNet5_Mobile(nn.Cell):
+class Pnasnet(nn.Cell):
     r"""PNasNet model class, based on
     `"Progressive Neural Architecture Search" <https://arxiv.org/pdf/1712.00559.pdf>`_
     Args:
@@ -365,7 +365,7 @@ class PNASNet5_Mobile(nn.Cell):
     def __init__(self,
                  in_channels: int = 3,
                  num_classes: int = 1000) -> None:
-        super(PNASNet5_Mobile, self).__init__()
+        super().__init__()
         self.num_classes = num_classes
 
         self.conv_0 = nn.SequentialCell(OrderedDict([
@@ -472,11 +472,11 @@ class PNASNet5_Mobile(nn.Cell):
 
 
 @register_model
-def pnasnet(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PNASNet5_Mobile:
-    """Get PNASNet5_Mobile model.
-     Refer to the base class `models.PNASNet5_Mobile` for more details."""
+def pnasnet(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> Pnasnet:
+    """Get Pnasnet model.
+     Refer to the base class `models.Pnasnet` for more details."""
     default_cfg = default_cfgs['pnasnet']
-    model = PNASNet5_Mobile(in_channels=in_channels, num_classes=num_classes, **kwargs)
+    model = Pnasnet(in_channels=in_channels, num_classes=num_classes, **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
