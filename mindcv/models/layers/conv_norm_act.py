@@ -1,10 +1,11 @@
+""" Conv2d + BN + Act"""
 from typing import Optional
 
 from mindspore import nn
 
 
 class Conv2dNormActivation(nn.Cell):
-
+    """ Conv2d + BN + Act"""
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
@@ -18,7 +19,7 @@ class Conv2dNormActivation(nn.Cell):
                  activation: Optional[nn.Cell] = nn.ReLU,
                  has_bias: Optional[bool] = None,
                  **kwargs) -> None:
-        super(Conv2dNormActivation, self).__init__()
+        super().__init__()
 
         if pad_mode == "pad":
             if padding is None:
