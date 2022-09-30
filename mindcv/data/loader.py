@@ -1,8 +1,11 @@
+"""
+Create dataloader
+"""
+
 import warnings
 
 import mindspore as ms
-import mindspore.dataset.vision as vision
-import mindspore.dataset.transforms as transforms
+from mindspore.dataset import vision, transforms
 
 from .transforms_factory import create_transforms
 
@@ -38,8 +41,8 @@ def create_loader(
             be dropped and not propagated to the child node.
         is_training (bool): whether it is in train mode. Default: False.
         mixup (float): mixup alpha, mixup will be enbled if > 0. (default=0.0).
-        cutmix (float): cutmix alpha, cutmix will be enabled if > 0. (default=0.0). This operation is experimental. 
-        cutmix_prob (float): prob of doing cutmix for an image (default=0.0) 
+        cutmix (float): cutmix alpha, cutmix will be enabled if > 0. (default=0.0). This operation is experimental.
+        cutmix_prob (float): prob of doing cutmix for an image (default=0.0)
         num_classes (int): the number of classes. Default: 1000.
         transform (list or None): the list of transformations that wil be applied on the image,
             which is obtained by `create_transform`. If None, the default imagenet transformation
@@ -52,10 +55,10 @@ def create_loader(
             option could be beneficial if the Python operation is computational heavy (default=False).
 
     Note:
-        1. cutmix is now experimental (which means performance gain is not guarantee) and can not be used together with mixup due to the label int type conflict.   
+        1. cutmix is now experimental (which means performance gain is not guarantee) and can not be used together with mixup due to the label int type conflict.
         2. `is_training`, `mixup`, `num_classes` is used for MixUp, which is a kind of transform operation.
           However, we are not able to merge it into `transform`, due to the limitations of the `mindspore.dataset` API.
-        
+
 
     Returns:
         BatchDataset, dataset batched.

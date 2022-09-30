@@ -1,10 +1,14 @@
+"""
+Create dataset by name
+"""
+
 from typing import Optional
 import os
 
-from .dataset_download import MnistDownload, Cifar10Download, Cifar100Download
-
 from mindspore.dataset import MnistDataset, Cifar10Dataset, Cifar100Dataset, ImageFolderDataset
 import mindspore.dataset as ds
+
+from .dataset_download import MnistDownload, Cifar10Download, Cifar100Download
 
 __all__ = ["create_dataset"]
 
@@ -89,7 +93,7 @@ def create_dataset(
         dataset_new_path = None
         if download:
             if shard_id is not None:
-                root = os.path.join(root, 'dataset_{}'.format(str(shard_id)))
+                root = os.path.join(root, f'dataset_{str(shard_id)}')
             dataset_download = dataset_download(root)
             dataset_download.download()
             dataset_new_path = dataset_download.path
