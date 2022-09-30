@@ -1,17 +1,3 @@
-# Copyright 2020-2022 Huawei Technologies Co., Ltd
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ============================================================================
 """adan"""
 from __future__ import absolute_import
 
@@ -135,14 +121,14 @@ def _update_run_op(beta1, beta2, beta3, eps, lr, weight_decay, param, m, v, n, g
 
     success = True
 
-    #if global_step == 0.0: # init 
-    # TODO: use global_step==0 as the condition to init prev_gradient as gradient 
+    #if global_step == 0.0: # init
+    # TODO: use global_step==0 as the condition to init prev_gradient as gradient
     #if (F.reduce_min(prev_gradient) == 0.0) and (F.reduce_max(prev_gradient) == 0.0):
     if (F.reduce_sum(prev_gradient) == 0.0):
         success = F.depend(success, F.assign(prev_gradient, gradient))
 
 
-    # TODO: is casting needed? 
+    # TODO: is casting needed?
     param_fp32 = op_cast(param, mstype.float32)
     m_fp32 = op_cast(m, mstype.float32)
     v_fp32 = op_cast(v, mstype.float32)
@@ -154,7 +140,7 @@ def _update_run_op(beta1, beta2, beta3, eps, lr, weight_decay, param, m, v, n, g
 
     next_v = op_mul(F.tuple_to_array((1.0,)) - beta2, v_fp32) + op_mul(beta2, gradient_fp32 - prev_gradient_fp32)
 
-    next_n = op_mul(F.tuple_to_array((1.0,)) - beta3, n_fp32) + op_mul(beta3, 
+    next_n = op_mul(F.tuple_to_array((1.0,)) - beta3, n_fp32) + op_mul(beta3,
                     op_square(
                         gradient + op_mul(F.tuple_to_array((1.0,)) - beta2, gradient_fp32 - prev_gradient_fp32)
                         )
@@ -163,7 +149,7 @@ def _update_run_op(beta1, beta2, beta3, eps, lr, weight_decay, param, m, v, n, g
     lr_t = lr /  (eps + op_sqrt(next_n))
 
 
-    update = next_m + op_mul(F.tuple_to_array((1.0,)) - beta2, next_v)  
+    update = next_m + op_mul(F.tuple_to_array((1.0,)) - beta2, next_v)
 
     #if decay_flag:
     #    update = op_mul(weight_decay, param_fp32) + update
@@ -193,14 +179,14 @@ def _check_param_value(beta1, beta2, eps, prim_name):
 
 class Adan(Optimizer):
     '''
-    The Adan (ADAptive Nesterov momentum algorithm) Optimizer from https://arxiv.org/abs/2208.06677  
+    The Adan (ADAptive Nesterov momentum algorithm) Optimizer from https://arxiv.org/abs/2208.06677
 
-    Note: it is an experimental version. 
+    Note: it is an experimental version.
     '''
     @opt_init_args_register
     def __init__(self, params, learning_rate=1e-3, beta1=0.98, beta2=0.92, beta3=0.99, eps=1e-8, use_locking=False,
                  weight_decay=1e-6, loss_scale=1.0):
-        super(Adan, self).__init__(learning_rate, params, weight_decay=weight_decay, loss_scale=loss_scale) # Optimized inherit weight decay is bloaked. weight decay is computed in this py. 
+        super(Adan, self).__init__(learning_rate, params, weight_decay=weight_decay, loss_scale=loss_scale) # Optimized inherit weight decay is bloaked. weight decay is computed in this py.
 
         _check_param_value(beta1, beta2, eps, self.cls_name)
         validator.check_value_type("use_locking", use_locking, [bool], self.cls_name)
@@ -213,19 +199,19 @@ class Adan(Optimizer):
         #self.beta3_power = Parameter(initializer(1, [1], mstype.float32), name="beta3_power")
         self.eps = Tensor(eps, mstype.float32)
         self.use_locking = use_locking
-        self.moment1 = self._parameters.clone(prefix="moment1", init='zeros') # m 
+        self.moment1 = self._parameters.clone(prefix="moment1", init='zeros') # m
         self.moment2 = self._parameters.clone(prefix="moment2", init='zeros') # v
         self.moment3 = self._parameters.clone(prefix="moment3", init='zeros') # n
-        self.prev_gradient= self._parameters.clone(prefix="prev_gradient", init='zeros') 
+        self.prev_gradient= self._parameters.clone(prefix="prev_gradient", init='zeros')
         # print('prev g: ', type(self.prev_gradient))
-       
+
         self.weight_decay = Tensor(weight_decay, mstype.float32)
 
         #self.vhat = self._parameters.clone(prefix="vhat", init='zeros')
 
         #self._is_device = True
-        
-        # TODO: 
+
+        # TODO:
         #self.opt = P.Adam(use_locking, use_nesterov)
 
         #self.sparse_opt = P.FusedSparseAdam(use_locking, use_nesterov)
@@ -245,7 +231,7 @@ class Adan(Optimizer):
         moment3 = self.moment3
         #vhat = self.vhat
         gradients = self.flatten_gradients(gradients)
-        #gradients = self.decay_weight(gradients) # we decay weight in adan_opt func 
+        #gradients = self.decay_weight(gradients) # we decay weight in adan_opt func
         gradients = self.gradients_centralization(gradients)
         gradients = self.scale_grad(gradients)
         gradients = self._grad_sparse_indices_deduplicate(gradients)
@@ -255,7 +241,7 @@ class Adan(Optimizer):
         #if self.global_step == 0:
         #    success = F.depend(True, F.assign(self.prev_gradient, gradients))
 
-        #TODO: currently not support dist 
+        #TODO: currently not support dist
         success = self.map_(F.partial(_adan_opt, self.beta1, self.beta2, self.beta3, self.eps, lr, self.weight_decay),
                 params, moment1, moment2, moment3, gradients, self.prev_gradient)
                 #params, moment1, moment2, moment3, gradients, self.prev_gradient, self.global_step)

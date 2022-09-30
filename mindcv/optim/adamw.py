@@ -3,9 +3,9 @@
 import numpy as np
 
 import mindspore as ms
-import mindspore.ops as ops
+from mindspore import ops
 from mindspore._checkparam import Validator as validator
-
+from mindspore.common.api import ms_function
 from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
@@ -79,10 +79,10 @@ def _update_run_op(beta1_power, beta2_power, beta1, beta2, eps, lr, weight_decay
         gradient_fp32 = ops.cast(gradient, ms.float32)
 
         next_m = ops.mul(beta1, m_fp32) + ops.mul(ops.cast(ops.tuple_to_array((1.0,)), ms.float32)
-                                                - beta1, gradient_fp32)
+                                                  - beta1, gradient_fp32)
 
         next_v = ops.mul(beta2, v_fp32) + ops.mul(ops.cast(ops.tuple_to_array((1.0,)), ms.float32)
-                                                - beta2, ops.square(gradient_fp32))
+                                                  - beta2, ops.square(gradient_fp32))
 
         regulate_m = next_m / (_scaler_one - beta1_power)
         regulate_v = next_v / (_scaler_one - beta2_power)
@@ -123,6 +123,7 @@ class AdamW(Optimizer):
         self.reciprocal_scale = Tensor(1.0 / loss_scale, ms.float32)
         self.clip = clip
 
+    @ms_function
     def construct(self, gradients):
         lr = self.get_lr()
         gradients = scale_grad(gradients, self.reciprocal_scale)

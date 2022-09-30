@@ -1,3 +1,4 @@
+"""Callback related classes and functions"""
 import os
 import stat
 
@@ -31,7 +32,7 @@ class ValAccSaveMonitor(Callback):
         self.save_best_ckpt = save_best_ckpt
         self.metric_name = metric_name
         self.best_res = 0
-        self.interval=interval
+        self.interval = interval
         self.dataset_sink_mode = dataset_sink_mode
 
         if not os.path.isdir(ckpt_dir):
@@ -69,8 +70,8 @@ class ValAccSaveMonitor(Callback):
                     print(f"Save the best {self.metric_name} ckpt, the {self.metric_name} is {self.best_res}")
             print("-" * 80)
 
-    # pylint: disable=unused-argument
     def on_train_end(self, run_context):
+        """After the training, print the information"""
         print(f"End of validation the best {self.metric_name} is: {self.best_res}, "
               f"save the best ckpt file in {self.best_ckpt_path}", flush=True)
         print("=" * 80)

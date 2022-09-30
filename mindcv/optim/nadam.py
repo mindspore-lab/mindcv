@@ -1,7 +1,8 @@
+"""nadam optimizer"""
 import numpy as np
 
 import mindspore as ms
-import mindspore.ops as ops
+from mindspore import ops
 from mindspore._checkparam import Validator as validator
 
 from mindspore.common.api import ms_function
@@ -53,15 +54,15 @@ class NAdam(Optimizer):
         mu = self.beta1 * (_scaler_one - Tensor(0.5, ms.float32) *
                            ops.pow(Tensor(0.96, ms.float32), step * self.schedule_decay))
         mu_next = self.beta1 * (_scaler_one - Tensor(0.5, ms.float32) *
-                           ops.pow(Tensor(0.96, ms.float32),
-                                   (step + _scaler_one) * self.schedule_decay))
+                                ops.pow(Tensor(0.96, ms.float32),
+                                        (step + _scaler_one) * self.schedule_decay))
         mu_schedule = self.mu_schedule * mu
         mu_schedule_next = self.mu_schedule * mu * mu_next
         self.mu_schedule = mu_schedule
         beta2_power = self.beta2_power * self.beta2
         self.beta2_power = beta2_power
 
-        for i in range(len(params)):
+        for i, param in enumerate(params):
             ops.assign(self.moments1[i], self.beta1 * self.moments1[i] +
                        (_scaler_one - self.beta1) * gradients[i])
             ops.assign(self.moments2[i], self.beta2 * self.moments2[i] +
@@ -71,7 +72,7 @@ class NAdam(Optimizer):
                          (_scaler_one - mu) * gradients[i] / (_scaler_one - mu_schedule)
             regulate_v = self.moments2[i] / (_scaler_one - beta2_power)
 
-            update = params[i] - lr * regulate_m / (self.eps + ops.sqrt(regulate_v))
-            ops.assign(params[i], update)
+            update = param - lr * regulate_m / (self.eps + ops.sqrt(regulate_v))
+            ops.assign(param, update)
 
         return params

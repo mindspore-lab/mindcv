@@ -1,5 +1,9 @@
-import mindspore.nn as nn
+"""Create optimizer by parameters"""
+
 from typing import Optional
+
+from mindspore import nn
+
 from .adan import Adan
 from .adamw import AdamW
 from .nadam import NAdam
@@ -8,6 +12,7 @@ __all__ = ["create_optimizer"]
 
 
 def init_group_params(params, weight_decay):
+    """Group parameters"""
     decay_params = []
     no_decay_params = []
 
@@ -55,7 +60,6 @@ def create_optimizer(
 
     opt = opt.lower()
 
-    weight_decay = weight_decay
     if weight_decay and filter_bias_and_bn:
         params = init_group_params(params, weight_decay)
 
@@ -63,8 +67,8 @@ def create_optimizer(
     # if lr is not None:
     #    opt_args.setdefault('lr', lr)
 
-    # non-adaptive: SGD, momentum, and nesterov 
-    if opt == 'sgd' or opt == 'nesterov' or opt=='momentum':
+    # non-adaptive: SGD, momentum, and nesterov
+    if opt in ['sgd', 'nesterov', 'momentum']:
         optimizer = nn.SGD(params=params,
                            learning_rate=lr,
                            momentum=momentum,
@@ -73,8 +77,8 @@ def create_optimizer(
                            loss_scale=loss_scale,
                            **opt_args
                            )
-    
-    # adaptive 
+
+    # adaptive
     elif opt == 'adam':
         optimizer = nn.Adam(params=params,
                             learning_rate=lr,
@@ -84,23 +88,23 @@ def create_optimizer(
                             **opt_args)
     elif opt == 'adamw':
         optimizer = AdamW(params=params,
-                            learning_rate=lr,
-                            weight_decay=weight_decay,
-                            loss_scale=loss_scale,
-                            **opt_args)
+                          learning_rate=lr,
+                          weight_decay=weight_decay,
+                          loss_scale=loss_scale,
+                          **opt_args)
     elif opt == 'nadam':
         optimizer = NAdam(params=params,
-                            learning_rate=lr,
-                            weight_decay=weight_decay,
-                            loss_scale=loss_scale,
-                            schedule_decay=schedule_decay,
-                            **opt_args)
+                          learning_rate=lr,
+                          weight_decay=weight_decay,
+                          loss_scale=loss_scale,
+                          schedule_decay=schedule_decay,
+                          **opt_args)
     elif opt == 'adan':
         optimizer = Adan(params=params,
-                            learning_rate=lr,
-                            weight_decay=weight_decay,
-                            loss_scale=loss_scale,
-                            **opt_args)
+                         learning_rate=lr,
+                         weight_decay=weight_decay,
+                         loss_scale=loss_scale,
+                         **opt_args)
     elif opt == 'rmsprop':
         optimizer = nn.RMSProp(params=params,
                                learning_rate=lr,
