@@ -1,3 +1,4 @@
+"""Scheduler Factory"""
 from mindspore.nn import ExponentialDecayLR, PolynomialDecayLR
 
 from .warmup_cosine_decay_lr import WarmupCosineDecayLR
@@ -14,7 +15,7 @@ def create_scheduler(
         warmup_epochs: int = 3,
         decay_epochs: int = 10,
         decay_rate: float = 0.9,
-        milestones: list = []
+        milestones: list = None
 ):
     r"""Creates learning rate scheduler by name.
 
@@ -30,10 +31,13 @@ def create_scheduler(
             Default: 10.
         decay_rate: LR decay rate (default: 0.9)
         milestones: list of epoch milestones for multi_step_decay scheduler. Must be increasing.
-    
-    Returns: 
+
+    Returns:
         Cell object for computing LR with input of current global steps
     """
+
+    if milestones is None:
+        milestones = []
 
     if scheduler == 'warmup_cosine_decay':
         lr_scheduler = WarmupCosineDecayLR(min_lr=min_lr,

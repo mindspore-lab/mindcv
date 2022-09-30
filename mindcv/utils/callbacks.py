@@ -1,3 +1,4 @@
+"""Callbacks for mindspore.Model"""
 import os
 import stat
 
@@ -24,14 +25,14 @@ class ValAccSaveMonitor(Callback):
                  best_ckpt_name="best.ckpt",
                  metric_name="accuracy",
                  dataset_sink_mode=True):
-        super(ValAccSaveMonitor, self).__init__()
+        super().__init__()
         self.model = model
         self.dataset_val = dataset_val
         self.eval_start_epoch = eval_start_epoch
         self.save_best_ckpt = save_best_ckpt
         self.metric_name = metric_name
         self.best_res = 0
-        self.interval=interval
+        self.interval = interval
         self.dataset_sink_mode = dataset_sink_mode
 
         if not os.path.isdir(ckpt_dir):

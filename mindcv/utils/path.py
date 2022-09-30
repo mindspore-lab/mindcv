@@ -1,3 +1,4 @@
+"""Utility of file path"""
 import pathlib
 
 FILE_TYPE_ALIASES = {
