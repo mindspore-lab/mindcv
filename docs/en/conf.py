@@ -13,9 +13,10 @@
 import os
 import sys
 import shutil
-import pytorch_sphinx_theme
+import sphinx_rtd_theme
+import mindcv
 
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('../../'))
 
 # -- Project information -----------------------------------------------------
 
@@ -53,13 +54,27 @@ extensions = [
 autodoc_typehints = 'description'
 myst_heading_anchors = 4
 
-# Configuration for intersphinx
-intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
-    'numpy': ('https://numpy.org/doc/stable', None),
-    'torch': ('https://pytorch.org/docs/stable/', None),
-    'mmcv': ('https://mmcv.readthedocs.io/en/dev-2.x/', None),
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
 }
+
+# copy markdown files from outer directory
+if not os.path.exists('./tutorials'):
+    os.makedirs('./tutorials')
+shutil.copy('../../tutorials/deployment.md', './tutorials/deployment.md')
+shutil.copy('../../tutorials/finetune.md', './tutorials/finetune.md')
+shutil.copy('../../tutorials/Inference.md', './tutorials/Inference.md')
+shutil.copy('../../tutorials/learn_about_config.md', './tutorials/learn_about_config.md')
+shutil.copy('../../tutorials/output_8_0.png', './tutorials/output_8_0.png')
+shutil.copy('../../tutorials/output_11_0.png', './tutorials/output_11_0.png')
+shutil.copy('../../tutorials/output_23_0.png', './tutorials/output_23_0.png')
+shutil.copy('../../tutorials/output_30_0.png', './tutorials/output_30_0.png')
+if not os.path.exists('./quick_start'):
+    os.makedirs('./quick_start')
+shutil.copy('../../quick_start.md', './quick_start/quick_start.md')
+
+os.system('cp -R %s %s'% ('../../config', './'))
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -69,38 +84,13 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-source_encoding = 'UTF-8'
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'pytorch_sphinx_theme'
-html_theme_path = [pytorch_sphinx_theme.get_html_theme_path()]
-
-html_theme_options = {
-    'menu': [
-        {
-            'name': 'GitHub',
-            'url': 'https://github.com/mindlab-ai/mindcv'
-        },
-    ],
-    # Specify the language of shared menu
-    'menu_lang': 'en',
-}
-
-layout_target = os.path.join(os.path.dirname(pytorch_sphinx_theme.__file__), 'layout.html')
-layout_src = '../resource/_static/layout.html'
-if os.path.exists(layout_target):
-    os.remove(layout_target)
-shutil.copy(layout_src, layout_target)
-
-jinja_target = os.path.join(os.path.dirname(pytorch_sphinx_theme.__file__), 'theme_variables.jinja')
-jinja_src = '../resource/_static/theme_variables.jinja'
-if os.path.exists(jinja_target):
-    os.remove(jinja_target)
-shutil.copy(jinja_src, jinja_target)
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

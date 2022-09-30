@@ -1,11 +1,5 @@
-from . import data, loss, models, optim, scheduler, utils
+from . import data, loss, models, optim, scheduler
 
-from .data import *
-from .loss import *
-from .models import *
-from .optim import *
-from .scheduler import *
-from .utils import *
 from .version import __version__
 
 __all__ = []

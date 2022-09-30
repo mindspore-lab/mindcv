@@ -2,35 +2,6 @@ from . import layers, convnext, densenet, dpn, efficientnet, ghostnet, googlenet
     mobilenet_v1, mobilenet_v2, mobilenet_v3, model_factory, nasnet, pnasnet, registry, repvgg, res2net, resnet,\
     shufflenetv1, shufflenetv2, sknet, squeezenet, swin_transformer, utils, vgg, xception
 
-from .densenet import *
-from .googlenet import *
-from .inception_v3 import *
-from .inception_v4 import *
-from .mobilenet_v1 import *
-from .mobilenet_v2 import *
-from .mobilenet_v3 import *
-from .xception import *
-from .model_factory import *
-from .registry import *
-from .resnet import *
-from .shufflenetv1 import *
-from .shufflenetv2 import *
-from .squeezenet import *
-from .mnasnet import *
-from .sknet import *
-from .res2net import *
-from .utils import *
-from .vgg import *
-from .layers import *
-from .nasnet import *
-from .pnasnet import *
-from .convnext import *
-from .dpn import *
-from .efficientnet import *
-from .ghostnet import *
-from .repvgg import *
-from .swin_transformer import *
-
 __all__ = []
 __all__.extend(layers.__all__)
 __all__.extend(convnext.__all__)
@@ -57,6 +28,5 @@ __all__.extend(shufflenetv2.__all__)
 __all__.extend(sknet.__all__)
 __all__.extend(squeezenet.__all__)
 __all__.extend(swin_transformer.__all__)
-__all__.extend(utils.__all__)
 __all__.extend(vgg.__all__)
 __all__.extend(xception.__all__)
