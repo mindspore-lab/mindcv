@@ -7,8 +7,8 @@ from functools import partial
 import math
 import numpy as np
 from mindspore import Tensor
-import mindspore.nn as nn
-import mindspore.ops as ops
+from mindspore import nn
+from mindspore import ops
 from mindspore.common import initializer as weight_init
 from mindspore.common.initializer import Uniform, Normal
 
@@ -150,6 +150,7 @@ class MBConv(nn.Cell):
             self,
             cnf: MBConvConfig,
             keep_prob: float = 0.8,
+            norm: Optional[nn.Cell] = None,
             se_layer: Callable[..., nn.Cell] = SqueezeExcite,
     ) -> None:
         super().__init__()
@@ -163,7 +164,7 @@ class MBConv(nn.Cell):
         if expanded_channels != cnf.input_channels:
             layers.extend([
                 nn.Conv2d(cnf.input_channels, expanded_channels, kernel_size=1),
-                nn.BatchNorm2d(expanded_channels),
+                norm(expanded_channels),
                 Swish()
             ])
 
@@ -171,18 +172,18 @@ class MBConv(nn.Cell):
         layers.extend([
             nn.Conv2d(expanded_channels, expanded_channels, kernel_size=cnf.kernel_size,
                       stride=cnf.stride, group=expanded_channels),
-            nn.BatchNorm2d(expanded_channels),
+            norm(expanded_channels),
             Swish()
         ])
 
         # squeeze and excitation
         squeeze_channels = max(1, cnf.input_channels // 4)
-        layers.append(se_layer(expanded_channels, squeeze_channels, Swish, "sigmoid"))
+        layers.append(se_layer(in_channels=expanded_channels, rd_channels=squeeze_channels, act_layer=Swish))
 
         # project
         layers.extend([
             nn.Conv2d(expanded_channels, cnf.out_channels, kernel_size=1),
-            nn.BatchNorm2d(expanded_channels)
+            norm(cnf.out_channels)
         ])
 
         self.block = nn.SequentialCell(layers)
@@ -198,7 +199,8 @@ class MBConv(nn.Cell):
 
 
 class FusedMBConvConfig(MBConvConfig):
-    """Stores information listed at Table 4 of the EfficientNetV2 paper"""
+    """FusedMBConvConfig"""
+    # Stores information listed at Table 4 of the EfficientNetV2 paper
     def __init__(
             self,
             expand_ratio: float,
@@ -212,14 +214,16 @@ class FusedMBConvConfig(MBConvConfig):
 
 
 class FusedMBConv(nn.Cell):
+    """FusedMBConv"""
     def __init__(
             self,
             cnf: FusedMBConvConfig,
             keep_prob: float,
+            norm: Optional[nn.Cell] = None,
     ) -> None:
         super().__init__()
 
-        if not 1 <= cnf.stride <= 2:
+        if not(1 <= cnf.stride <= 2):
             raise ValueError("illegal stride value")
 
         self.shortcut = cnf.stride == 1 and cnf.input_channels == cnf.out_channels
@@ -232,20 +236,20 @@ class FusedMBConv(nn.Cell):
             layers.extend([
                 nn.Conv2d(cnf.input_channels, expanded_channels, kernel_size=cnf.kernel_size,
                           stride=cnf.stride),
-                nn.BatchNorm2d(expanded_channels),
+                norm(expanded_channels),
                 Swish()
             ])
 
             # project
             layers.extend([
                 nn.Conv2d(expanded_channels, cnf.out_channels, kernel_size=1),
-                nn.BatchNorm2d(cnf.out_channels)
+                norm(cnf.out_channels)
             ])
         else:
             layers.extend([
                 nn.Conv2d(cnf.input_channels, cnf.out_channels, kernel_size=cnf.kernel_size,
                           stride=cnf.stride),
-                nn.BatchNorm2d(cnf.out_channels),
+                norm(cnf.out_channels),
                 Swish()
             ])
 
@@ -396,7 +400,7 @@ class EfficientNet(nn.Cell):
                 # adjust dropout rate of blocks based on the depth of the stage block
                 sd_prob = keep_prob * float(stage_block_id + 0.00001) / total_stage_blocks
 
-                stage.append(block(block_cnf, sd_prob))
+                stage.append(block(block_cnf, sd_prob, norm_layer))
                 stage_block_id += 1
 
             layers.append(nn.SequentialCell(stage))
@@ -418,7 +422,7 @@ class EfficientNet(nn.Cell):
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)
 
-        x = self.adaptive_avg_pool2d(x, 1)
+        x = ops.adaptive_avg_pool2d(x, 1)
         x = ops.flatten(x)
 
         if self.training:
@@ -429,10 +433,12 @@ class EfficientNet(nn.Cell):
         return self.mlp_head(x)
 
     def construct(self, x: Tensor) -> Tensor:
+        """construct"""
         x = self.forward_features(x)
         return self.forward_head(x)
 
     def _initialize_weights(self) -> None:
+        """initialize_weights"""
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Dense):
                 init_range = 1.0 / np.sqrt(cell.weight.shape[0])
