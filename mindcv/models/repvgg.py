@@ -6,10 +6,8 @@ Refer to RepVGG: Making VGG_style ConvNets Great Again
 import copy
 import numpy as np
 
-import mindspore.nn as nn
-import mindspore.ops as ops
+from mindspore import nn, ops, Tensor, save_checkpoint
 import mindspore.common.initializer as init
-from mindspore import Tensor, save_checkpoint
 
 from .layers import Identity, SqueezeExcite, GlobalAvgPooling
 from .utils import load_pretrained

@@ -26,7 +26,7 @@ def load_pretrained(model, default_cfg, path='./', num_classes=1000, in_channels
 
     if in_channels == 1:
         conv1_name = default_cfg['first_conv']
-        logging.info('Converting first conv (%s) from 3 to 1 channel' % conv1_name)
+        logging.info('Converting first conv (%s) from 3 to 1 channel', conv1_name)
         con1_weight = param_dict[conv1_name + '.weight']
         con1_weight.set_data(con1_weight.sum(axis=1, keepdims=True), slice_shape=True)
     elif in_channels != 3:
@@ -52,6 +52,7 @@ def make_divisible(v: float,
                    divisor: int,
                    min_value: Optional[int] = None
                    ) -> int:
+    """"""
     if not min_value:
         min_value = divisor
     new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)

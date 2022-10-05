@@ -4,10 +4,8 @@ Refer to: Learning Transferable Architectures for Scalable Image Recognition
 """
 import math
 
-import mindspore.nn as nn
-import mindspore.ops as ops
+from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
-from mindspore import Tensor
 
 from .utils import load_pretrained
 from .registry import register_model
@@ -56,7 +54,7 @@ class SeparableConv2d(nn.Cell):
 
 
 class BranchSeparables(nn.Cell):
-
+    """NasNet model basic architecture"""
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
@@ -87,7 +85,7 @@ class BranchSeparables(nn.Cell):
 
 
 class BranchSeparablesStem(nn.Cell):
-
+    """NasNet model basic architecture"""
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
@@ -118,7 +116,7 @@ class BranchSeparablesStem(nn.Cell):
 
 
 class BranchSeparablesReduction(BranchSeparables):
-
+    """NasNet model Residual Connections"""
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
@@ -145,7 +143,7 @@ class BranchSeparablesReduction(BranchSeparables):
 
 
 class CellStem0(nn.Cell):
-
+    """NasNet model basic architecture"""
     def __init__(self,
                  stem_filters: int,
                  num_filters: int = 42) -> None:
@@ -210,7 +208,7 @@ class CellStem0(nn.Cell):
 
 
 class CellStem1(nn.Cell):
-
+    """NasNet model basic architecture"""
     def __init__(self,
                  stem_filters: int,
                  num_filters: int) -> None:
@@ -327,7 +325,7 @@ class CellStem1(nn.Cell):
 
 
 class FirstCell(nn.Cell):
-
+    """NasNet model basic architecture"""
     def __init__(self,
                  in_channels_left: int,
                  out_channels_left: int,
@@ -416,7 +414,7 @@ class FirstCell(nn.Cell):
 
 
 class NormalCell(nn.Cell):
-
+    """NasNet model basic architecture"""
     def __init__(self,
                  in_channels_left: int,
                  out_channels_left: int,
@@ -485,7 +483,7 @@ class NormalCell(nn.Cell):
 
 
 class ReductionCell0(nn.Cell):
-
+    """NasNet model Residual Connections"""
     def __init__(self,
                  in_channels_left: int,
                  out_channels_left: int,
@@ -556,7 +554,7 @@ class ReductionCell0(nn.Cell):
 
 
 class ReductionCell1(nn.Cell):
-
+    """NasNet model Residual Connections"""
     def __init__(self,
                  in_channels_left: int,
                  out_channels_left: int,
@@ -810,6 +808,7 @@ class NASNetAMobile(nn.Cell):
                                                         cell.bias.shape, cell.bias.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
+        """Network forward feature extraction."""
         x_conv0 = self.conv0(x)
         x_stem_0 = self.cell_stem_0(x_conv0)
         x_stem_1 = self.cell_stem_1(x_conv0, x_stem_0)

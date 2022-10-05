@@ -3,10 +3,8 @@ MindSpore implementation of Xception.
 Refer to Xception: Deep Learning with Depthwise Separable Convolutions.
 """
 
+from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
-import mindspore.nn as nn
-import mindspore.ops as ops
-from mindspore import Tensor
 
 from mindcv.models.registry import register_model
 from mindcv.models.utils import load_pretrained
