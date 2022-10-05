@@ -3,6 +3,7 @@
 import numpy as np
 
 import mindspore as ms
+from mindspore import ops
 from mindspore._checkparam import Validator as validator
 
 from mindspore.common.initializer import initializer
