@@ -5,10 +5,8 @@ Refer to Inception-v4, Inception-ResNet and the Impact of Residual Connections o
 
 from typing import Union, Tuple
 
-import mindspore.nn as nn
-import mindspore.ops as ops
+from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
-from mindspore import Tensor
 
 from .utils import load_pretrained
 from .registry import register_model
@@ -59,7 +57,7 @@ class BasicConv2d(nn.Cell):
 
 
 class Stem(nn.Cell):
-
+    """Inception V4 model blocks."""
     def __init__(self, in_channels: int) -> None:
         super().__init__()
         self.conv2d_1a_3x3 = BasicConv2d(in_channels, 32, kernel_size=3, stride=2, pad_mode='valid')
@@ -104,7 +102,7 @@ class Stem(nn.Cell):
 
 
 class InceptionA(nn.Cell):
-
+    """Inception V4 model basic architecture"""
     def __init__(self) -> None:
         super().__init__()
         self.branch_0 = BasicConv2d(384, 96, kernel_size=1, stride=1)
@@ -132,7 +130,7 @@ class InceptionA(nn.Cell):
 
 
 class InceptionB(nn.Cell):
-
+    """Inception V4 model basic architecture"""
     def __init__(self) -> None:
         super().__init__()
         self.branch_0 = BasicConv2d(1024, 384, kernel_size=1, stride=1)
@@ -163,7 +161,7 @@ class InceptionB(nn.Cell):
 
 
 class ReductionA(nn.Cell):
-
+    """Inception V4 model Residual Connections"""
     def __init__(self) -> None:
         super().__init__()
         self.branch_0 = BasicConv2d(384, 384, kernel_size=3, stride=2, pad_mode='valid')
@@ -183,7 +181,7 @@ class ReductionA(nn.Cell):
 
 
 class ReductionB(nn.Cell):
-
+    """Inception V4 model Residual Connections"""
     def __init__(self) -> None:
         super().__init__()
         self.branch_0 = nn.SequentialCell([
@@ -207,7 +205,7 @@ class ReductionB(nn.Cell):
 
 
 class InceptionC(nn.Cell):
-
+    """Inception V4 model basic architecture"""
     def __init__(self) -> None:
         super().__init__()
         self.branch_0 = BasicConv2d(1536, 256, kernel_size=1, stride=1)

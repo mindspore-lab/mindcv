@@ -3,9 +3,7 @@
 import math
 import numpy as np
 
-import mindspore.nn as nn
-import mindspore.ops as ops
-from mindspore import Tensor
+from mindspore import nn, ops, Tensor
 
 from .layers.squeeze_excite import SqueezeExcite
 from .layers.pooling import GlobalAvgPooling

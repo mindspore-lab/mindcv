@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 '''Models'''
+=======
+"""models init"""
+>>>>>>> a38ae57fc76bd5d3b9661c1e0c6e38f8fda310a0
 from . import layers, convnext, densenet, dpn, efficientnet, ghostnet, googlenet, inception_v3, inception_v4, mnasnet,\
     mobilenet_v1, mobilenet_v2, mobilenet_v3, model_factory, nasnet, pnasnet, registry, repvgg, res2net, resnet,\
     shufflenetv1, shufflenetv2, sknet, squeezenet, swin_transformer, vgg, xception

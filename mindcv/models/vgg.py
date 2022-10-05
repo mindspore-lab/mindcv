@@ -6,9 +6,8 @@ Refer to SqueezeNet: Very Deep Convolutional Networks for Large-Scale Image Reco
 from typing import List, Dict, Union
 import math
 
-import mindspore.nn as nn
+from mindspore import nn, Tensor
 import mindspore.common.initializer as init
-from mindspore import Tensor
 
 from .utils import load_pretrained
 from .registry import register_model

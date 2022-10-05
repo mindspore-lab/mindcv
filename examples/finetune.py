@@ -11,10 +11,16 @@ from mindcv.loss import create_loss
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
 from mindspore import Model, LossMonitor, TimeMonitor #, CheckpointConfig, ModelCheckpoint
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--freeze_backbone', type=int, default=0)
+parser.add_argument('--visualize', type=int, default=0)
+args = parser.parse_args()
 
 
-freeze_backbone = False
-visualize = False
+freeze_backbone =args.freeze_backbone 
+visualize = args.visualize
 
 dataset_url = "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/intermediate/Canidae_data.zip"
 root_dir = "./"

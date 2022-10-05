@@ -132,8 +132,6 @@ def main():
         print("Done!")
 
         acc = test_epoch(network, loader_test, loss)
-
-
     else:
         model = Model(network, loss_fn=loss, optimizer=opt, metrics={"Accuracy": nn.Accuracy()} )
         #model.train(epochs, loader_train, callbacks=[ValAccMonitor(model, ds_val, num_epochs)])

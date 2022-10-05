@@ -107,7 +107,7 @@ def create_parser():
                        help='checkpoint saving interval, unit: epoch, (default=1)')
     group.add_argument('--epoch_size', type=int, default=90,
                        help='Train epoch size (default=90)')
-    group.add_argument('--dataset_sink_mode', action='store_true', default=True,
+    group.add_argument('--dataset_sink_mode', action='store_true', default=False,
                        help='The dataset sink mode (default=True).')
     group.add_argument('--in_channels', type=int, default=3,
                        help='Input channels (default=3)')
@@ -136,12 +136,12 @@ def create_parser():
                        help='Type of scheduler (default="constant")')
     group.add_argument('--lr', type=float, default=0.001,
                        help='learning rate (default=0.001)')
-    group.add_argument('--min_lr', type=float, default=None,
-                       help='The minimum value of learning rate if scheduler supports (default=None)')
-    group.add_argument('--warmup_epochs', type=int, default=None,
-                       help='Warmup epochs (default=None)')
-    group.add_argument('--decay_epochs', type=int, default=None,
-                       help='Decay epochs (default=None)')
+    group.add_argument('--min_lr', type=float, default=1e-6,
+                       help='The minimum value of learning rate if scheduler supports (default=1e-6)')
+    group.add_argument('--warmup_epochs', type=int, default=3,
+                       help='Warmup epochs (default=3)')
+    group.add_argument('--decay_epochs', type=int, default=30,
+                       help='Decay epochs (default=30)')
     group.add_argument('--decay_rate', type=float, default=0.9,
                        help='LR decay rate if scheduler supports')
 

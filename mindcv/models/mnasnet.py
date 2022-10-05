@@ -5,9 +5,8 @@ Refer to MnasNet: Platform-Aware Neural Architecture Search for Mobile.
 
 from typing import List
 
-import mindspore.nn as nn
+from mindspore import nn, Tensor
 import mindspore.common.initializer as init
-from mindspore import Tensor
 
 from .layers.pooling import GlobalAvgPooling
 from .utils import make_divisible, load_pretrained

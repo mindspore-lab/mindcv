@@ -3,10 +3,8 @@ MindSpore implementation of `SqueezeNet`.
 Refer to SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size.
 """
 
-import mindspore.nn as nn
-import mindspore.ops as ops
+from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
-from mindspore import Tensor
 
 from .layers.pooling import GlobalAvgPooling
 from .utils import load_pretrained

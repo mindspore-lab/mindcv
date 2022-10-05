@@ -7,10 +7,8 @@ import math
 from collections import OrderedDict
 from typing import Tuple
 
-from mindspore import nn
-from mindspore import ops
+from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
-from mindspore import Tensor
 
 from .layers.pooling import GlobalAvgPooling
 from .utils import load_pretrained

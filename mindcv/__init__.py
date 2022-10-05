@@ -1,4 +1,4 @@
-'''MindCV'''
+"""mindcv init"""
 from .data import *
 from .loss import *
 from .models import *

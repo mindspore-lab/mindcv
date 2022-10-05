@@ -5,9 +5,7 @@ Refer to: A ConvNet for the 2020s
 from typing import List, Tuple
 import numpy as np
 
-from mindspore import nn
-from mindspore import ops
-from mindspore import Parameter, Tensor
+from mindspore import nn, ops, Parameter, Tensor
 from mindspore import dtype as mstype
 import mindspore.common.initializer as init
 

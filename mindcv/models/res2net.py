@@ -7,10 +7,8 @@ from typing import Optional, Type, List
 
 import math
 
-import mindspore.nn as nn
-import mindspore.ops as ops
+from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
-from mindspore import Tensor
 
 from .layers.pooling import GlobalAvgPooling
 from .utils import load_pretrained

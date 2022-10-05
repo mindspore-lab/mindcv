@@ -118,8 +118,8 @@ def train(args):
         model = Model(network, loss_fn=loss, optimizer=optimizer, metrics={'acc'}, amp_level=args.amp_level)
 
     # callback
-    loss_cb = LossMonitor(per_print_times=steps_per_epoch)
-    time_cb = TimeMonitor(data_size=steps_per_epoch)
+    loss_cb = LossMonitor(per_print_times=100) #steps_per_epoch)
+    time_cb = TimeMonitor(data_size=100) #teps_per_epoch)
     callbacks = [loss_cb, time_cb]
     ckpt_config = CheckpointConfig(
         save_checkpoint_steps=int(steps_per_epoch * args.ckpt_save_interval),

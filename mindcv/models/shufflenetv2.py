@@ -5,10 +5,8 @@ Refer to ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Desi
 
 from typing import Tuple
 
-import mindspore.nn as nn
-import mindspore.ops as ops
+from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
-from mindspore import Tensor
 
 from .layers.pooling import GlobalAvgPooling
 from .utils import load_pretrained
