@@ -43,7 +43,7 @@ def register_model(fn):
     return fn
 
 
-def list_models(filter: '', module: '', pretrained: False, exclude_filters: ''):
+def list_models(filter='', module='', pretrained=False, exclude_filters=''):
     if module:
         all_models = list(_module_to_models[module])
     else:
