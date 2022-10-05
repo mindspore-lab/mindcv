@@ -19,7 +19,7 @@ def create_loss(
         name:  loss name, : 'BCE' (binary cross entropy), 'CE' for cross_entropy. Default: 'CE'
         weight: The rescaling weight to each class. If the value is not None, the shape is (C,).
                 The data type only supports float32 or float16. Default: None.
-                For bce loss, it is a manual rescaling weight given to the loss of each batch element. If given, has to be a Tensor of size nbatch.
+                For BCE Loss, a rescaling weight applied to the loss of each batch element. And it must have the same shape and data type as `inputs`. Default: None
         reduction: Apply specific reduction method to the output: 'none', 'mean', or 'sum'.
             Default: 'mean'.
         label_smoothing: Label smoothing values, a regularization tool used to prevent the model
@@ -47,13 +47,16 @@ def create_loss(
         # fixme: support label smoothing for BCE loss
         loss = BCELoss(weight=weight, reduction=reduction)
         if label_smoothing > 0:
-            print(
-                "Warning: Label smoothing is NOT effect because BCELoss does not support label smoothing for now.")  # fixme: use log package to output warning
+            print("Warning: Label smoothing is NOT effect because BCELoss does not support label smoothing for now.")  # fixme: use log package to output warning
+        if aux_factor > 0:
+            print("Warning: Aux factor is NOT effect because BCELoss does not support aux factor.")  # fixme: use log package to output warning
 
     else:
         if aux_factor > 0:
             # fixme: 1) support reduction arg. 2) fixme: support class weight
             loss = CrossEntropySmooth(smooth_factor=label_smoothing, factor=aux_factor)
+            if weight is not None:
+                print("Warning: weight is NOT effect because CrossEntropySmooth does not class weight.")
         else:
             loss = CrossEntropyLoss(weight=weight, reduction=reduction, label_smoothing=label_smoothing)
             # loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
