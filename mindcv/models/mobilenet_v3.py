@@ -5,9 +5,8 @@ Refer to Searching for MobileNetV3.
 
 import math
 
-import mindspore.nn as nn
+from mindspore import nn, Tensor
 import mindspore.common.initializer as init
-from mindspore import Tensor
 
 from .layers.squeeze_excite import SqueezeExcite
 from .layers.pooling import GlobalAvgPooling

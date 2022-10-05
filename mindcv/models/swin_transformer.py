@@ -2,10 +2,8 @@
 from typing import Optional, List, Tuple
 import numpy as np
 
-import mindspore.nn as nn
-import mindspore.ops as ops
+from mindspore import nn, ops, Tensor, Parameter, numpy
 import mindspore.common.initializer as init
-from mindspore import Tensor, Parameter, numpy
 from mindspore import dtype as mstype
 
 from .utils import load_pretrained, _ntuple

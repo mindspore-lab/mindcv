@@ -1,3 +1,4 @@
+"""mindcv init"""
 from . import data, loss, models, optim, scheduler
 
 from .version import __version__

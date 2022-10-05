@@ -3,10 +3,8 @@ MindSpore implementation of `ShuffleNetV1`.
 Refer to ShuffleNet: An Extremely Efficient Convolutional Neural Network for Mobile Devices
 """
 
-import mindspore.nn as nn
-import mindspore.ops as ops
+from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
-from mindspore import Tensor
 
 from .utils import load_pretrained
 from .registry import register_model
@@ -182,6 +180,7 @@ class ShuffleNetV1(nn.Cell):
         self._initialize_weights()
 
     def _initialize_weights(self):
+        """Network parameters initialization."""
         for name, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 if 'first' in name:

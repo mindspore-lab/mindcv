@@ -3,9 +3,8 @@ MindSpore implementation of `MobileNetV1`.
 Refer to MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications.
 """
 
-import mindspore.nn as nn
+from mindspore import nn, Tensor
 import mindspore.common.initializer as init
-from mindspore import Tensor
 
 from .utils import load_pretrained
 from .registry import register_model

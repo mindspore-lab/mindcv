@@ -6,10 +6,8 @@ Refer to Progressive Neural Architecture Search.
 from collections import OrderedDict
 import math
 
+from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
-import mindspore.nn as nn
-import mindspore.ops as ops
-from mindspore import Tensor
 
 from .layers import GlobalAvgPooling
 from .registry import register_model

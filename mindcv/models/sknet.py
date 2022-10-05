@@ -5,8 +5,7 @@ Refer to Selective Kernel Networks.
 
 from typing import Optional, Type, List, Dict, Union
 
-import mindspore.nn as nn
-from mindspore import Tensor
+from mindspore import nn, Tensor
 
 from .layers.selective_kernel import SelectiveKernel
 from .utils import load_pretrained

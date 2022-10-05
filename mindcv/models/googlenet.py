@@ -5,10 +5,8 @@ Refer to Going deeper with convolutions.
 
 from typing import Union, Tuple
 
-import mindspore.nn as nn
-import mindspore.ops as ops
+from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
-from mindspore import Tensor
 
 from .utils import load_pretrained
 from .registry import register_model

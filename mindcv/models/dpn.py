@@ -7,10 +7,8 @@ import math
 from collections import OrderedDict
 from typing import Tuple
 
-import mindspore.nn as nn
-import mindspore.ops as ops
+from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
-from mindspore import Tensor
 
 from .utils import load_pretrained
 from .registry import register_model
@@ -217,6 +215,7 @@ class DPN(nn.Cell):
         self._initialize_weights()
 
     def _initialize_weights(self) -> None:
+        """Network parameters initialization."""
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 cell.weight.set_data(

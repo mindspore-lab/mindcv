@@ -5,8 +5,7 @@ Refer to Deep Residual Learning for Image Recognition.
 
 from typing import Optional, Type, List, Union
 
-import mindspore.nn as nn
-from mindspore import Tensor
+from mindspore import nn, Tensor
 
 from .layers.pooling import GlobalAvgPooling
 from .utils import load_pretrained
@@ -240,6 +239,7 @@ class ResNet(nn.Cell):
         return nn.SequentialCell(layers)
 
     def forward_features(self, x: Tensor) -> Tensor:
+        """Network forward feature extraction."""
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)

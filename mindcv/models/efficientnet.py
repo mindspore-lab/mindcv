@@ -223,7 +223,7 @@ class FusedMBConv(nn.Cell):
     ) -> None:
         super().__init__()
 
-        if not(1 <= cnf.stride <= 2):
+        if not 1 <= cnf.stride <= 2:
             raise ValueError("illegal stride value")
 
         self.shortcut = cnf.stride == 1 and cnf.input_channels == cnf.out_channels
