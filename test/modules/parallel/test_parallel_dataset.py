@@ -1,6 +1,6 @@
 from pickletools import uint8
 import sys
-sys.path.append('../..')
+sys.path.append('.')
 
 import pytest
 
