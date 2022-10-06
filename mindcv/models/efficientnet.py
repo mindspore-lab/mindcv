@@ -438,7 +438,7 @@ class EfficientNet(nn.Cell):
         return self.forward_head(x)
 
     def _initialize_weights(self) -> None:
-        """initialize_weights"""
+        """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Dense):
                 init_range = 1.0 / np.sqrt(cell.weight.shape[0])

@@ -52,7 +52,7 @@ def make_divisible(v: float,
                    divisor: int,
                    min_value: Optional[int] = None
                    ) -> int:
-    """"""
+    """Find the smallest integer larger than v and divisible by divisor."""
     if not min_value:
         min_value = divisor
     new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)

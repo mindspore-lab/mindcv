@@ -650,7 +650,7 @@ class SwinTransformer(nn.Cell):
         self._initialize_weights()
 
     def _initialize_weights(self) -> None:
-        """init_weights"""
+        """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Dense):
                 cell.weight.set_data(init.initializer(init.TruncatedNormal(sigma=0.02),

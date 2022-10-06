@@ -95,6 +95,7 @@ class RepVGGBlock(nn.Cell):
         return self.nonlinearity(self.se(self.rbr_dense(inputs) + self.rbr_1x1(inputs) + id_out))
 
     def get_custom_l2(self):
+        """This may improve the accuracy and facilitates quantization in some cases."""
         k3 = self.rbr_dense.conv.weight
         k1 = self.rbr_1x1.conv.weight
 
@@ -159,6 +160,7 @@ class RepVGGBlock(nn.Cell):
         return kernel * t, beta - moving_mean * gamma / std
 
     def switch_to_deploy(self):
+        """Model_convert"""
         if self.rbr_reparam is not None:
             return
         kernel, bias = self.get_equivalent_kernel_bias()
@@ -237,6 +239,7 @@ class RepVGG(nn.Cell):
         return nn.SequentialCell(blocks)
 
     def _initialize_weights(self):
+        """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
             if isinstance(cell, (nn.Dense, nn.Conv2d)):
                 cell.weight.set_data(init.initializer(init.TruncatedNormal(sigma=0.02),

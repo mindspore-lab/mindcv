@@ -230,6 +230,7 @@ class GhostNet(nn.Cell):
         self._initialize_weights()
 
     def _initialize_weights(self) -> None:
+        """Initialize weights for cells."""
         self.init_parameters_data()
         for _, m in self.cells_and_names():
             if isinstance(m, nn.Conv2d):

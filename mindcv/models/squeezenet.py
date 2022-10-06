@@ -121,6 +121,7 @@ class SqueezeNet(nn.Cell):
         self._initialize_weights()
 
     def _initialize_weights(self):
+        """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 if cell is self.final_conv:
