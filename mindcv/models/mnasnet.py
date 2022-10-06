@@ -139,6 +139,7 @@ class Mnasnet(nn.Cell):
         self._initialize_weights()
 
     def _initialize_weights(self) -> None:
+        """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 cell.weight.set_data(

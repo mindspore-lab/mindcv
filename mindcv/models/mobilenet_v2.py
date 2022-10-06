@@ -178,6 +178,7 @@ class MobileNetV2(nn.Cell):
         self._initialize_weights()
 
     def _initialize_weights(self) -> None:
+        """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 n = cell.kernel_size[0] * cell.kernel_size[1] * cell.out_channels

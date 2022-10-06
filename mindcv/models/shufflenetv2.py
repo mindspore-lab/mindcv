@@ -178,6 +178,7 @@ class ShuffleNetV2(nn.Cell):
         return x
 
     def _initialize_weights(self):
+        """Initialize weights for cells."""
         for name, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 if 'first' in name:
