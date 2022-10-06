@@ -58,8 +58,8 @@ def train(args):
                                      parallel_mode='data_parallel',
                                      gradients_mean=True)
     else:
-        device_num = 1
-        rank_id = 0
+        device_num = None
+        rank_id = None
 
     # create dataset
     dataset_train = create_dataset(
@@ -105,7 +105,7 @@ def train(args):
         transform=transform_list,
         num_parallel_workers=args.num_parallel_workers,
     )
-    steps_per_epoch = loader_train.get_dataset_size()
+    num_batches = loader_train.get_dataset_size()
 
     # create model
     network = create_model(model_name=args.model,
@@ -123,7 +123,7 @@ def train(args):
                        aux_factor=args.aux_factor)
 
     # create learning rate schedule
-    lr_scheduler = create_scheduler(steps_per_epoch,
+    lr_scheduler = create_scheduler(num_batches,
                                     scheduler=args.scheduler,
                                     lr=args.lr,
                                     min_lr=args.min_lr,
@@ -146,14 +146,14 @@ def train(args):
     print('Training...')
     epoch_time = time()
     for t in range(args.epoch_size):
-        train_epoch(network, loader_train, loss, optimizer, epoch=t, n_epochs=args.epoch_size)
+        train_epoch(network, loader_train, loss, optimizer, epoch=t, n_epochs=args.epoch_size, log_interval=num_batches)
         print(f'Epoch {t + 1} training time: {time() - epoch_time:.3f}s')
 
         # Save checkpoint
-        if (t + 1) % args.ckpt_save_interval == 0:
+        if ((t + 1) % args.ckpt_save_interval == 0) or (t+1 == args.epoch_size):
             if (not args.distribute) or (args.distribute and rank_id == 0):
                 os.makedirs(args.ckpt_save_dir, exist_ok=True)
-                save_path = os.path.join(args.ckpt_save_dir, f"{args.model}-{t + 1}.ckpt")
+                save_path = os.path.join(args.ckpt_save_dir, f"{args.model}-{t + 1}_{num_batches}.ckpt") # for consistency with train.py 
                 ms.save_checkpoint(network, save_path, async_save=True)
                 print(f"Saving model to {save_path}")
         epoch_time = time()
