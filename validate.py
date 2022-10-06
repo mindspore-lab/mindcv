@@ -56,8 +56,14 @@ def validate(args):
                        aux_factor=args.aux_factor) 
 
     # Define eval metrics.
-    eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy(),
-                    'Top_5_Accuracy': nn.Top5CategoricalAccuracy()}
+    if args.num_classes >= 5:
+        eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy(),
+                        'Top_5_Accuracy': nn.Top5CategoricalAccuracy(),
+                        'loss': nn.metrics.Loss()
+                        }
+    else:
+        eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy(), 
+                        'loss': nn.metrics.Loss()}
 
     # init model
     model = Model(network, loss_fn=loss, metrics=eval_metrics)
