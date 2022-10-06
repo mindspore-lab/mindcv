@@ -1,21 +1,20 @@
-from pickletools import uint8
+import os
 import sys
 sys.path.append('.')
 
 import pytest
 
 from mindcv.data import create_dataset
+from mindcv.utils.download import DownLoad
 import mindspore as ms
-from mindspore.communication import init, get_rank, get_group_size
-
 
 # test imagenet
 @pytest.mark.parametrize('mode', [0, 1])
 @pytest.mark.parametrize('name', ['ImageNet'])
 @pytest.mark.parametrize('split', ['train', 'val'])
 @pytest.mark.parametrize('shuffle', [True, False])
-@pytest.mark.parametrize('num_samples', [2, 8, None])
-@pytest.mark.parametrize('num_parallel_workers', [2, 4, 8, 16])
+@pytest.mark.parametrize('num_samples', [2, None])
+@pytest.mark.parametrize('num_parallel_workers', [2])
 def test_create_dataset_standalone_imagenet(mode, name, split, shuffle, num_samples, num_parallel_workers):
     '''
     test create_dataset API(standalone)
@@ -35,11 +34,15 @@ def test_create_dataset_standalone_imagenet(mode, name, split, shuffle, num_samp
     '''
 
     ms.set_context(mode=mode)
-    root = '/data0/dataset/imagenet2012/imagenet_original/'
-    
+    dataset_url = "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/intermediate/Canidae_data.zip"
+    root_dir = "./"
+
+    if not os.path.exists(os.path.join(root_dir, 'data/Canidae')):
+        DownLoad().download_and_extract_archive(dataset_url, root_dir)
+    data_dir = "./data/Canidae/"
     dataset = create_dataset(
         name=name,
-        root=root,
+        root=data_dir,
         split=split,
         shuffle=shuffle,
         num_samples=num_samples,
@@ -49,17 +52,16 @@ def test_create_dataset_standalone_imagenet(mode, name, split, shuffle, num_samp
 
     assert type(dataset) == ms.dataset.engine.datasets_vision.ImageFolderDataset
     assert dataset != None
-    print(dataset.output_types())
 
 
 # test MNIST CIFAR10
 @pytest.mark.parametrize('mode', [0, 1])
 @pytest.mark.parametrize('name', ['MNIST', 'CIFAR10'])
-@pytest.mark.parametrize('split', ['train', 'val'])
+@pytest.mark.parametrize('split', ['train', 'test'])
 @pytest.mark.parametrize('shuffle', [True, False])
-@pytest.mark.parametrize('num_samples', [2, 8, None])
-@pytest.mark.parametrize('num_parallel_workers', [2, 4, 8, 16])
-@pytest.mark.parametrize('download', [True, False])
+@pytest.mark.parametrize('num_samples', [2, None])
+@pytest.mark.parametrize('num_parallel_workers', [2])
+@pytest.mark.parametrize('download', [True])
 def test_create_dataset_standalone_mc(mode, name, split, shuffle, num_samples, num_parallel_workers, download):
     '''
     test create_dataset API(standalone)
@@ -89,6 +91,6 @@ def test_create_dataset_standalone_mc(mode, name, split, shuffle, num_samples, n
         download=download
     )
 
-    assert type(dataset) == ms.dataset.engine.datasets_vision.ImageFolderDataset
+    assert type(dataset) == ms.dataset.engine.datasets_vision.MnistDataset or \
+           type(dataset) == ms.dataset.engine.datasets_vision.Cifar10Dataset
     assert dataset != None
-    print(dataset.output_types())

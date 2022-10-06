@@ -1,28 +1,28 @@
+import os
 import sys
 sys.path.append('.')
 
 import pytest
 
 from mindcv.data import create_dataset, create_loader
+from mindcv.utils.download import DownLoad
 import mindspore as ms
-from mindspore.communication import init, get_rank, get_group_size
 from mindspore.dataset.transforms import OneHot
 
 
-MAX = 6250 # 160146
 num_classes = 1
 @pytest.mark.parametrize('mode', [0, 1])
 @pytest.mark.parametrize('split', ['train'])
-@pytest.mark.parametrize('batch_size', [1, MAX])
+@pytest.mark.parametrize('batch_size', [1, 16])
 @pytest.mark.parametrize('drop_remainder', [True, False])
 @pytest.mark.parametrize('is_training', [True, False])
 @pytest.mark.parametrize('transform', [None])
 @pytest.mark.parametrize('target_transform', [None, [OneHot(num_classes)]])
 @pytest.mark.parametrize('mixup', [0, 1])
-@pytest.mark.parametrize('num_classes', [1, MAX])
+@pytest.mark.parametrize('num_classes', [2])
 @pytest.mark.parametrize('num_parallel_workers', [None, 2])
 @pytest.mark.parametrize('python_multiprocessing', [True, False])
-def test_create_dataset_standalone(mode, split, batch_size, drop_remainder, is_training,
+def test_dataset_loader_standalone(mode, split, batch_size, drop_remainder, is_training,
                                    transform, target_transform, mixup, num_classes,
                                    num_parallel_workers, python_multiprocessing):
     '''
@@ -44,12 +44,16 @@ def test_create_dataset_standalone(mode, split, batch_size, drop_remainder, is_t
     ms.set_context(mode=mode)
     name = 'ImageNet'
     if name == 'ImageNet':
-        root = '/home/mindspore/dataset/imagenet2012/imagenet/imagenet_original'
-        download = False
+        dataset_url = "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/intermediate/Canidae_data.zip"
+        root_dir = "./"
+
+        if not os.path.exists(os.path.join(root_dir, 'data/Canidae')):
+            DownLoad().download_and_extract_archive(dataset_url, root_dir)
+        data_dir = "./data/Canidae/"
 
     dataset = create_dataset(
         name=name,
-        root=root,
+        root=data_dir,
         split=split,
         shuffle=False,
         num_parallel_workers=num_parallel_workers,
@@ -69,6 +73,7 @@ def test_create_dataset_standalone(mode, split, batch_size, drop_remainder, is_t
         num_parallel_workers=num_parallel_workers,
         python_multiprocessing=python_multiprocessing,
     )
-    steps_per_epoch = loader_train.get_dataset_size()
-    print(loader_train)
-    print(steps_per_epoch)
+    batch_size = loader_train.get_batch_size()
+    out_shapes = loader_train.output_shapes()[0]
+    assert batch_size == 1 or batch_size == 16
+    assert out_shapes == [1, 3, 224, 224] or out_shapes == [16, 3, 224, 224]
