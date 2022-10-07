@@ -14,7 +14,7 @@ from mindcv.scheduler import create_scheduler
 @pytest.mark.parametrize('min_lr', [0.00001, 0.00005])
 @pytest.mark.parametrize('lr', [0.1, 0.001])
 @pytest.mark.parametrize('sched', ['polynomial_decay', 'exponential_decay', 'step_decay'])
-def test_scheduler(sched, lr, min_lr, decay_rate, steps_per_epoch, decay_epochs):
+def test_scheduler_poly_exp_step(sched, lr, min_lr, decay_rate, steps_per_epoch, decay_epochs):
 
     warmup_epochs = 0
 
@@ -52,7 +52,7 @@ def test_scheduler(sched, lr, min_lr, decay_rate, steps_per_epoch, decay_epochs)
 @pytest.mark.parametrize('min_lr', [0.00001])
 @pytest.mark.parametrize('lr', [0.1, 0.001])
 @pytest.mark.parametrize('sched', ['constant'])
-def test_scheduler(sched, lr, min_lr, decay_rate, steps_per_epoch, decay_epochs):
+def test_scheduler_cons(sched, lr, min_lr, decay_rate, steps_per_epoch, decay_epochs):
 
     scheduler = create_scheduler(steps_per_epoch, sched, lr=lr, min_lr=min_lr,
                                  decay_epochs=decay_epochs, decay_rate=decay_rate)
@@ -66,7 +66,7 @@ def test_scheduler(sched, lr, min_lr, decay_rate, steps_per_epoch, decay_epochs)
 @pytest.mark.parametrize('decay_rate', [0.1, 0.5])
 @pytest.mark.parametrize('lr', [0.1, 0.001])
 @pytest.mark.parametrize('sched', ['multi_step_decay'])
-def test_scheduler(sched, lr, decay_rate, steps_per_epoch, milestones):
+def test_scheduler_multi_step(sched, lr, decay_rate, steps_per_epoch, milestones):
 
     warmup_epochs = 0
 
@@ -95,7 +95,7 @@ def test_scheduler(sched, lr, decay_rate, steps_per_epoch, milestones):
 @pytest.mark.parametrize('min_lr', [0.00001, 0.00005])
 @pytest.mark.parametrize('lr', [0.1, 0.001])
 @pytest.mark.parametrize('sched', ['warmup_cosine_decay'])
-def test_scheduler(sched, lr, min_lr, steps_per_epoch, decay_epochs, warmup_epochs):
+def test_scheduler_warm_cos(sched, lr, min_lr, steps_per_epoch, decay_epochs, warmup_epochs):
 
     warmup_epochs = warmup_epochs
 

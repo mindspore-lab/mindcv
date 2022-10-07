@@ -1,44 +1,46 @@
+import os
 import sys
 
 sys.path.append('.')
 
 import pytest
 
-from mindcv.models.model_factory import create_model
 import mindspore as ms
 import mindspore.nn as nn
 from mindspore import Model
 
+from mindcv.utils.download import DownLoad
 from mindcv.data import create_dataset, create_transforms, create_loader
 from mindcv.loss import create_loss
+from mindcv.models.model_factory import create_model
 from mindcv.models.registry import list_models
-from config import parse_args
+
 
 MAX=6250
 @pytest.mark.parametrize('mode', [0, 1])
 @pytest.mark.parametrize('in_channels', [3])
-@pytest.mark.parametrize('pretrained', [True, False])
-@pytest.mark.parametrize('num_classes', [1, 100, MAX])
-@pytest.mark.parametrize('checkpoint_path', [None])
-def test_create_model_standalone(mode, num_classes, 
-    in_channels, 
-    pretrained, checkpoint_path):
+@pytest.mark.parametrize('pretrained', [False])
+@pytest.mark.parametrize('num_classes', [2])
+def test_create_model_standalone(mode, num_classes, in_channels, pretrained):
     batch_size = 1
     ms.set_context(mode=mode)
     model_names = list_models()
+    dataset_url = "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/intermediate/Canidae_data.zip"
+    root_dir = "./"
+
+    if not os.path.exists(os.path.join(root_dir, 'data/Canidae')):
+        DownLoad().download_and_extract_archive(dataset_url, root_dir)
+    data_dir = "./data/Canidae/"
     for model_name in model_names:
-        if checkpoint_path != '':
-            pretrained = False
         network = create_model(model_name=model_name,
                             num_classes=num_classes,
                             in_channels=in_channels,
-                            pretrained=pretrained,
-                            checkpoint_path=checkpoint_path)
+                            pretrained=pretrained)
         
             # create dataset
         dataset_eval = create_dataset(
             name='ImageNet',
-            root='/home/mindspore/dataset/imagenet2012/imagenet/imagenet_original',
+            root=data_dir,
             split='val',
             num_samples=1,
             num_parallel_workers=1,
