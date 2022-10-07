@@ -73,7 +73,7 @@ def test_dataset_loader_standalone(mode, split, batch_size, drop_remainder, is_t
         num_parallel_workers=num_parallel_workers,
         python_multiprocessing=python_multiprocessing,
     )
-    batch_size = loader_train.get_batch_size()
+    out_batch_size = loader_train.get_batch_size()
     out_shapes = loader_train.output_shapes()[0]
-    assert batch_size == 1 or batch_size == 16
-    assert out_shapes == [1, 3, 224, 224] or out_shapes == [16, 3, 224, 224]
+    assert out_batch_size == batch_size
+    assert out_shapes == [batch_size, 3, 224, 224]
