@@ -14,10 +14,13 @@ def _kernel_valid(k):
     """
     Assert kernel size is valid or not.
     """
-    assert k >= 3 and k % 2
+    
     if isinstance(k, (list, tuple)):
         for ki in k:
+            assert ki >= 3 and ki % 2
             return _kernel_valid(ki)
+    else:
+        assert k >= 3 and k % 2
     return None
 
 class SelectiveKernelAttn(nn.Cell):
