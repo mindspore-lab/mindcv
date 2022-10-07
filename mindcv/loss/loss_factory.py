@@ -1,7 +1,7 @@
 ''' loss factory '''
 from typing import Optional
 from mindspore import Tensor
-from mindspore.nn import BCELoss, CrossEntropyLoss
+from mindspore.nn import CrossEntropyLoss #, BCELoss
 from .cross_entropy_smooth import CrossEntropySmooth
 
 __all__ = ["create_loss"]
@@ -16,7 +16,7 @@ def create_loss(
     r"""Creates loss by name.
 
     Args:
-        name:  loss name, : 'CE' for cross_entropy. Default: 'CE'. ('BCE': binary cross entropy is coming soon) 
+        name:  loss name, : 'CE' for cross_entropy. Default: 'CE'. ('BCE': binary cross entropy is coming soon)
         weight: The rescaling weight to each class. If the value is not None, the shape is (C,).
                 The data type only supports float32 or float16. Default: None.
                 For BCE Loss, a rescaling weight applied to the loss of each batch element. And it must have the same shape and data type as `inputs`. Default: None
@@ -35,14 +35,16 @@ def create_loss(
     Returns:
        Loss object that will be invoked to computed loss value.
     """
-
-    if aux_factor > 0:
-        # fixme: 1) support reduction arg. 2) fixme: support class weight
-        loss = CrossEntropySmooth(smooth_factor=label_smoothing, factor=aux_factor)
-        if weight is not None:
-            print("Warning: weight is NOT effect because CrossEntropySmooth does not class weight.")
+    if name.lower() == 'ce':
+        if aux_factor > 0:
+            # fixme: 1) support reduction arg. 2) fixme: support class weight
+            loss = CrossEntropySmooth(smooth_factor=label_smoothing, factor=aux_factor)
+            if weight is not None:
+                print("Warning: weight is NOT effect because CrossEntropySmooth does not class weight.")
+        else:
+            loss = CrossEntropyLoss(weight=weight, reduction=reduction, label_smoothing=label_smoothing)
+            # loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
     else:
-        loss = CrossEntropyLoss(weight=weight, reduction=reduction, label_smoothing=label_smoothing)
-        # loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+        raise NotImplementedError
 
     return loss
