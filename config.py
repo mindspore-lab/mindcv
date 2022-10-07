@@ -22,6 +22,11 @@ def create_parser():
                        help='Running in GRAPH_MODE(0) or PYNATIVE_MODE(1) (default=0)')
     group.add_argument('--distribute', action='store_true', default=False,
                        help='Run distribute (default=False)')
+    group.add_argument('--summary', action='store_true', default=True,
+                       help='collect loss and accuracy information (default=False)')
+    group.add_argument('--val_while_train', action='store_true', default=False,
+                       help='Verify accuracy while training (default=False)')
+
 
     # Dataset parameters
     group = parser.add_argument_group('Dataset parameters')
@@ -29,7 +34,7 @@ def create_parser():
                        help='Type of dataset (default="imagenet")')
     group.add_argument('--data_dir', type=str, default='./', help='Path to dataset')
     group.add_argument('--train_split', type=str, default='train', help='dataset train split name')
-    group.add_argument('--val_split', type=str, default='test', help='dataset validation split name')
+    group.add_argument('--val_split', type=str, default='val', help='dataset validation split name')
     group.add_argument('--dataset_download', action='store_true', default=False,
                        help='Download dataset (default=False)')
     group.add_argument('--num_parallel_workers', type=int, default=8,

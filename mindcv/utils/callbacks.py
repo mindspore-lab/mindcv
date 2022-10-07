@@ -1,16 +1,19 @@
 """Callbacks for mindspore.Model"""
 import os
 import stat
+import numpy as np
 
-from mindspore import save_checkpoint
+from mindspore import log as logger
+from mindspore.common.tensor import Tensor
+from mindspore import save_checkpoint, SummaryRecord
 from mindspore.train.callback import Callback
+from mindspore.train._utils import _make_directory
 
 
 class ValAccSaveMonitor(Callback):
     """
     Train loss and validation accuracy monitor, after each epoch save the
     best checkpoint file with highest validation accuracy.
-
     Usage:
         >>> monitor = ValAccSaveMonitor(model, dataset_val, ckpt_dir='./model_ckpt')
     """
@@ -75,3 +78,68 @@ class ValAccSaveMonitor(Callback):
         print(f"End of validation the best {self.metric_name} is: {self.best_res}, "
               f"save the best ckpt file in {self.best_ckpt_path}", flush=True)
         print("=" * 80)
+
+class LossAccSummary(Callback):
+    def __init__(self,
+                 summary_dir,
+                 model,
+                 dataset_val,
+                 interval=1,
+                 eval_start_epoch=1,
+                 metric_name="accuracy"):
+        super(LossAccSummary, self).__init__()
+        self._summary_dir = _make_directory(summary_dir,"summary_dir")
+        self.model = model
+        self.dataset_val = dataset_val
+        self.eval_start_epoch = eval_start_epoch
+        self.metric_name = metric_name
+        self.interval = interval
+
+    def __enter__(self):
+        self.summary_record = SummaryRecord(self._summary_dir)
+        return self
+
+    def __exit__(self, *exc_args):
+        self.summary_record.close()
+
+    def on_train_epoch_end(self, run_context):
+        cb_params = run_context.original_args()
+        loss = self._get_loss(cb_params)
+        cur_epoch = cb_params.cur_epoch_num
+        if cur_epoch >= self.eval_start_epoch and (cur_epoch - self.eval_start_epoch) % self.interval == 0:
+            test_acc = self.model.eval(self.dataset_val)[self.metric_name]
+            if not isinstance(test_acc, Tensor):
+                test_acc = Tensor(test_acc)
+            self.summary_record.add_value('scalar', 'test_dataset_' + self.metric_name, test_acc)
+        self.summary_record.add_value('scalar', 'loss/auto', loss)
+        self.summary_record.record(cb_params.cur_step_num)
+
+    def _get_loss(self, cb_params):
+        """
+        Get loss from the network output.
+        Args:
+            cb_params (_InternalCallbackParam): Callback parameters.
+        Returns:
+            Union[Tensor, None], if parse loss success, will return a Tensor value(shape is [1]), else return None.
+        """
+        output = cb_params.net_outputs
+        if output is None:
+            logger.warning("Can not find any output by this network, so SummaryCollector will not collect loss.")
+            return None
+
+        if isinstance(output, (int, float, Tensor)):
+            loss = output
+        elif isinstance(output, (list, tuple)) and output:
+            # If the output is a list, since the default network returns loss first,
+            # we assume that the first one is loss.
+            loss = output[0]
+        else:
+            logger.warning("The output type could not be identified, expect type is one of "
+                           "[int, float, Tensor, list, tuple], so no loss was recorded in SummaryCollector.")
+            return None
+
+        if not isinstance(loss, Tensor):
+            loss = Tensor(loss)
+
+        loss = Tensor(np.mean(loss.asnumpy()))
+        return loss
