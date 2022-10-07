@@ -1,17 +1,18 @@
+import os
 import sys
 sys.path.append('.')
 
 import pytest
 
 from mindcv.data import create_dataset, create_transforms, create_loader
+from mindcv.utils.download import DownLoad
 import mindspore as ms
-from mindspore.communication import init, get_rank, get_group_size
 
 
 # test imagenet
 @pytest.mark.parametrize('mode', [0, 1])
 @pytest.mark.parametrize('name', ['ImageNet'])
-@pytest.mark.parametrize('image_resize', [224, 256, 320])
+@pytest.mark.parametrize('image_resize', [224, 256])
 @pytest.mark.parametrize('is_training', [True, False])
 def test_transforms_standalone_imagenet(mode, name, image_resize, is_training):
     '''
@@ -25,15 +26,20 @@ def test_transforms_standalone_imagenet(mode, name, image_resize, is_training):
         **kwargs
     '''
     ms.set_context(mode=mode)
-    
-    root = '/data0/dataset/imagenet2012/imagenet_original/'
+
+    dataset_url = "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/intermediate/Canidae_data.zip"
+    root_dir = "./"
+
+    if not os.path.exists(os.path.join(root_dir, 'data/Canidae')):
+        DownLoad().download_and_extract_archive(dataset_url, root_dir)
+    data_dir = "./data/Canidae/"
     dataset = create_dataset(
         name=name,
-        root=root,
+        root=data_dir,
         split='train',
         shuffle=True,
         num_samples=None,
-        num_parallel_workers=8,
+        num_parallel_workers=2,
         download=False
     )
 
@@ -51,11 +57,8 @@ def test_transforms_standalone_imagenet(mode, name, image_resize, is_training):
         drop_remainder=True,
         is_training=is_training,
         transform=transform_list,
-        num_parallel_workers=8,
+        num_parallel_workers=2,
     )
-
-    print(loader)
-    print(loader.output_shapes())
 
     assert loader.output_shapes()[0][2] == image_resize, 'image_resize error !'
 
@@ -63,10 +66,10 @@ def test_transforms_standalone_imagenet(mode, name, image_resize, is_training):
 # test mnist cifar10
 @pytest.mark.parametrize('mode', [0, 1])
 @pytest.mark.parametrize('name', ['MNIST', 'CIFAR10'])
-@pytest.mark.parametrize('image_resize', [224, 256, 320])
+@pytest.mark.parametrize('image_resize', [224, 256])
 @pytest.mark.parametrize('is_training', [True, False])
-@pytest.mark.parametrize('download', [True, False])
-def test_transforms_standalone_imagenet_mc(mode, name, image_resize, is_training, download):
+@pytest.mark.parametrize('download', [True])
+def test_transforms_standalone_dataset_mc(mode, name, image_resize, is_training, download):
     '''
     test transform_list API(distribute)
     command: pytest -s test_transforms.py::test_transforms_standalone_imagenet_mc
@@ -84,7 +87,7 @@ def test_transforms_standalone_imagenet_mc(mode, name, image_resize, is_training
         split='train',
         shuffle=True,
         num_samples=None,
-        num_parallel_workers=8,
+        num_parallel_workers=2,
         download=download
     )
 
@@ -102,11 +105,8 @@ def test_transforms_standalone_imagenet_mc(mode, name, image_resize, is_training
         drop_remainder=True,
         is_training=is_training,
         transform=transform_list,
-        num_parallel_workers=8,
+        num_parallel_workers=2,
     )
-
-    print(loader)
-    print(loader.output_shapes())
 
     assert loader.output_shapes()[0][2] == image_resize, 'image_resize error !'
 
@@ -114,7 +114,7 @@ def test_transforms_standalone_imagenet_mc(mode, name, image_resize, is_training
 # test is_training
 @pytest.mark.parametrize('mode', [0, 1])
 @pytest.mark.parametrize('name', ['ImageNet'])
-@pytest.mark.parametrize('image_resize', [224, 256, 320])
+@pytest.mark.parametrize('image_resize', [224, 256])
 def test_transforms_standalone_imagenet_is_training(mode, name, image_resize):
     '''
     test transform_list API(distribute)
@@ -127,17 +127,6 @@ def test_transforms_standalone_imagenet_is_training(mode, name, image_resize):
         **kwargs
     '''
     ms.set_context(mode=mode)
-    
-    root = '/data0/dataset/imagenet2012/imagenet_original/'
-    dataset = create_dataset(
-        name=name,
-        root=root,
-        split='train',
-        shuffle=True,
-        num_samples=None,
-        num_parallel_workers=8,
-        download=False
-    )
 
     # create transforms
     transform_list_train = create_transforms(
