@@ -25,7 +25,7 @@ def test_train(mode,  model='resnet18', opt='adamw', scheduler='polynomial'):
     
     # ---------------- test running train.py using the toy data ---------  
     dataset = 'imagenet'
-    ckpt_dir = './test/ckpt_tmp'
+    ckpt_dir = './ckpt_tmp'
     num_samples = 160
     num_epochs = 5
     batch_size = 20
