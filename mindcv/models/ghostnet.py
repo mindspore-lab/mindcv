@@ -204,12 +204,12 @@ class GhostNet(nn.Cell):
         exp_size = 128
         for cfg in self.cfgs:
             layers = []
-            for k, exp_size, c, se_ratio, s in cfg:
-                output_channel = make_divisible(c * width, 4)
-                hidden_channel = make_divisible(exp_size * width, 4)
-                layers.append(block(input_channel, hidden_channel, output_channel, k, s,
-                                    se_ratio=se_ratio))
-                input_channel = output_channel
+            k, exp_size, c, se_ratio, s = cfg
+            output_channel = make_divisible(c * width, 4)
+            hidden_channel = make_divisible(exp_size * width, 4)
+            layers.append(block(input_channel, hidden_channel, output_channel, k, s,
+                                se_ratio=se_ratio))
+            input_channel = output_channel
             stages.append(nn.SequentialCell([*layers]))
 
         output_channel = make_divisible(exp_size * width, 4)
