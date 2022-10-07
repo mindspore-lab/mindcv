@@ -26,6 +26,8 @@ def create_parser():
                        help='collect loss and accuracy information (default=False)')
     group.add_argument('--val_while_train', action='store_true', default=False,
                        help='Verify accuracy while training (default=False)')
+    group.add_argument('--val_interval', type=int, default=1,
+            help='Interval for validation while training (in epoch), Default: 1')
 
 
     # Dataset parameters

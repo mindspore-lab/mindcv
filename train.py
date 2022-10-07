@@ -1,5 +1,6 @@
+''' Model training pipeline '''
 import mindspore as ms
-import mindspore.nn as nn
+from mindspore import nn
 from mindspore import FixedLossScaleManager, Model, LossMonitor, TimeMonitor, CheckpointConfig, ModelCheckpoint
 from mindspore.communication import init, get_rank, get_group_size
 
@@ -8,13 +9,14 @@ from mindcv.data import create_dataset, create_transforms, create_loader
 from mindcv.loss import create_loss
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
-from mindcv.utils import ValAccSaveMonitor, LossAccSummary
+from mindcv.utils import StateMonitor
 from config import parse_args
 
 ms.set_seed(1)
 
 
 def train(args):
+    ''' main train function'''
     ms.set_context(mode=args.mode)
 
     if args.distribute:
@@ -40,13 +42,6 @@ def train(args):
         num_parallel_workers=args.num_parallel_workers,
         download=args.dataset_download)
 
-    dataset_eval = create_dataset(
-        name=args.dataset,
-        root=args.data_dir,
-        split=args.val_split,
-        num_parallel_workers=args.num_parallel_workers,
-        download=args.dataset_download)
-
     # create transforms
     transform_list = create_transforms(
         dataset_name=args.dataset,
@@ -68,16 +63,6 @@ def train(args):
         re_max_attempts=args.re_max_attempts
     )
 
-    transform_list_eval = create_transforms(
-        dataset_name=args.dataset,
-        is_training=False,
-        image_resize=args.image_resize,
-        crop_pct=args.crop_pct,
-        interpolation=args.interpolation,
-        mean=args.mean,
-        std=args.std
-    )
-
     # load dataset
     loader_train = create_loader(
         dataset=dataset_train,
@@ -90,14 +75,34 @@ def train(args):
         num_parallel_workers=args.num_parallel_workers,
     )
 
-    loader_eval = create_loader(
-        dataset=dataset_eval,
-        batch_size=args.batch_size,
-        drop_remainder=False,
-        is_training=False,
-        transform=transform_list_eval,
-        num_parallel_workers=args.num_parallel_workers,
-    )
+    if args.val_while_train:
+        dataset_eval = create_dataset(
+            name=args.dataset,
+            root=args.data_dir,
+            split=args.val_split,
+            num_parallel_workers=args.num_parallel_workers,
+            download=args.dataset_download)
+
+        transform_list_eval = create_transforms(
+            dataset_name=args.dataset,
+            is_training=False,
+            image_resize=args.image_resize,
+            crop_pct=args.crop_pct,
+            interpolation=args.interpolation,
+            mean=args.mean,
+            std=args.std
+        )
+
+        loader_eval = create_loader(
+            dataset=dataset_eval,
+            batch_size=args.batch_size,
+            drop_remainder=False,
+            is_training=False,
+            transform=transform_list_eval,
+            num_parallel_workers=args.num_parallel_workers,
+        )
+    else:
+        loader_eval = None
 
     steps_per_epoch = loader_train.get_dataset_size()
 
@@ -126,8 +131,7 @@ def train(args):
                                     decay_rate=args.decay_rate)
 
     # create optimizer
-    #TODO: consistent naming opt, name, dataset_name 
-    #TODO: network as input param can be simpler.   
+    #TODO: consistent naming opt, name, dataset_name
     optimizer = create_optimizer(network.trainable_params(),
                                  opt=args.opt,
                                  lr=lr_scheduler,
@@ -136,11 +140,10 @@ def train(args):
                                  nesterov=args.use_nesterov,
                                  filter_bias_and_bn=args.filter_bias_and_bn,
                                  loss_scale=args.loss_scale)
-    
-    # TODO: this following code for training the network is too complex!! Needs to be simplified! warp into a trainer? 
+
     # Define eval metrics.
-    eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy(),
-                    'Top_5_Accuracy': nn.Top5CategoricalAccuracy()}
+    eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy()}
+
     # init model
     if args.loss_scale > 1.0:
         loss_scale_manager = FixedLossScaleManager(loss_scale=args.loss_scale, drop_overflow_update=False)
@@ -152,35 +155,32 @@ def train(args):
     # callback
     loss_cb = LossMonitor(per_print_times=steps_per_epoch)
     time_cb = TimeMonitor(data_size=steps_per_epoch)
-    callbacks = [loss_cb, time_cb]
     ckpt_config = CheckpointConfig(
         save_checkpoint_steps=int(steps_per_epoch * args.ckpt_save_interval),
         keep_checkpoint_max=args.keep_checkpoint_max)
     ckpt_cb = ModelCheckpoint(prefix=args.model,
                               directory=args.ckpt_save_dir,
                               config=ckpt_config)
-    if args.val_while_train:
-        val_cb = ValAccSaveMonitor(model, loader_eval, metric_name="Top_1_Accuracy",
-                                   ckpt_dir=args.ckpt_save_dir,
-                                   best_ckpt_name=args.model + '_best.ckpt',
-                                   dataset_sink_mode=args.dataset_sink_mode)
 
-    if args.summary:
-        summary_dir = "./summary_dir/summary"
-        summary_collector = LossAccSummary(summary_dir, model, loader_eval, metric_name="Top_1_Accuracy")
+    # summary training loss
+    # recorad val acc and do model selection if val dataset is availabe
+    summary_dir = f"{args.ckpt_save_dir}/summary"
+    state_cb = StateMonitor(model, summary_dir=summary_dir,
+                            dataset_val=loader_eval,
+                            val_interval=args.val_interval,
+                            metric_name="Top_1_Accuracy",
+                            ckpt_dir=args.ckpt_save_dir,
+                            best_ckpt_name=args.model + '_best.ckpt',
+                            dataset_sink_mode=args.dataset_sink_mode,
+                            rank_id=rank_id)
+
+    callbacks = [loss_cb, time_cb, state_cb]
+
     if args.distribute:
         if rank_id == 0:
             callbacks.append(ckpt_cb)
-            if args.val_while_train:
-                callbacks.append(val_cb)
-            if args.summary:
-                callbacks.append(summary_collector)
     else:
         callbacks.append(ckpt_cb)
-        if args.val_while_train:
-            callbacks.append(val_cb)
-        if args.summary:
-            callbacks.append(summary_collector)
 
     # train model
     model.train(args.epoch_size, loader_train, callbacks=callbacks, dataset_sink_mode=args.dataset_sink_mode)
