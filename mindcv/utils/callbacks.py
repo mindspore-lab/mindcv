@@ -80,6 +80,7 @@ class ValAccSaveMonitor(Callback):
         print("=" * 80)
 
 class LossAccSummary(Callback):
+    ''' A callback for recording loss and acc during training '''
     def __init__(self,
                  summary_dir,
                  model,
@@ -87,7 +88,7 @@ class LossAccSummary(Callback):
                  interval=1,
                  eval_start_epoch=1,
                  metric_name="accuracy"):
-        super(LossAccSummary, self).__init__()
+        super().__init__()
         self._summary_dir = _make_directory(summary_dir,"summary_dir")
         self.model = model
         self.dataset_val = dataset_val
