@@ -204,12 +204,12 @@ class GhostNet(nn.Cell):
         exp_size = 128
         for cfg in self.cfgs:
             layers = []
-            k, exp_size, c, se_ratio, s = cfg
-            output_channel = make_divisible(c * width, 4)
-            hidden_channel = make_divisible(exp_size * width, 4)
-            layers.append(block(input_channel, hidden_channel, output_channel, k, s,
-                                se_ratio=se_ratio))
-            input_channel = output_channel
+            for k, exp_size, c, se_ratio, s in cfg:
+                output_channel = make_divisible(c * width, 4)
+                hidden_channel = make_divisible(exp_size * width, 4)
+                layers.append(block(input_channel, hidden_channel, output_channel, k, s,
+                                    se_ratio=se_ratio))
+                input_channel = output_channel
             stages.append(nn.SequentialCell([*layers]))
 
         output_channel = make_divisible(exp_size * width, 4)
@@ -305,26 +305,27 @@ model_cfgs = {
         "cfg": [
             # k, exp, c,  se,     nl,  s,
             # stage1
-            [3, 16, 16, 0, 1],
+            [[3, 16, 16, 0, 1]],
             # stage2
-            [3, 48, 24, 0, 2],
-            [3, 72, 24, 0, 1],
+            [[3, 48, 24, 0, 2]],
+            [[3, 72, 24, 0, 1]],
             # stage3
-            [5, 72, 40, 0, 2],
-            [5, 120, 40, 0, 1],
+            [[5, 72, 40, 0, 2]],
+            [[5, 120, 40, 0, 1]],
             # stage4
-            [3, 240, 80, 0, 2],
-            [3, 200, 80, 0, 1],
+            [[3, 240, 80, 0, 2]],
+            [[3, 200, 80, 0, 1],
             [3, 184, 80, 0, 1],
             [3, 184, 80, 0, 1],
             [3, 480, 112, 0, 1],
             [3, 672, 112, 0, 1],
+            ],
             # stage5
-            [5, 672, 160, 0, 2],
+            [[5, 672, 160, 0, 2]],
+            [[5, 960, 160, 0, 1],
             [5, 960, 160, 0, 1],
             [5, 960, 160, 0, 1],
-            [5, 960, 160, 0, 1],
-            [5, 960, 160, 0, 1]],
+            [5, 960, 160, 0, 1]]],
         "cls_ch_squeeze": 960,
         "cls_ch_expand": 1280,
     }
