@@ -45,8 +45,9 @@ class SimpleCNN(nn.Cell):
         return x
 
 @pytest.mark.parametrize('mode', [0, 1])
-@pytest.mark.parametrize('name', ['CE', 'BCE'])
-@pytest.mark.parametrize('reduction', ['mean', 'sum', 'none'])
+#@pytest.mark.parametrize('name', ['CE', 'BCE'])
+@pytest.mark.parametrize('name', ['CE'])
+@pytest.mark.parametrize('reduction', ['mean', 'sum'])
 @pytest.mark.parametrize('label_smoothing', [0.0, 0.1])
 @pytest.mark.parametrize('aux_factor', [0.0, 0.2])
 def test_loss(mode, name, reduction, label_smoothing, aux_factor):
@@ -54,20 +55,25 @@ def test_loss(mode, name, reduction, label_smoothing, aux_factor):
     print(f'mode={mode}; loss_name={name}; has_weight=False; reduction={reduction};\
         label_smoothing={label_smoothing}; aux_factor={aux_factor}')
     ms.set_context(mode=mode)
-    num_classes = 10
+    num_classes = 2
     aux_head = False
-    if aux_factor:
+    if aux_factor and name=='CE':
         aux_head = True
     network = SimpleCNN(in_channels=1, num_classes=num_classes, aux_head=aux_head)
     
-    net_opt = create_optimizer(network.trainable_params(), 'momentum', lr=0.01, weight_decay=1e-5, momentum=0.9, nesterov=False)
+    net_opt = create_optimizer(network.trainable_params(), 'adam', lr=0.001, weight_decay=1e-7)
     net_loss = create_loss(name=name, weight=weight, reduction=reduction, label_smoothing=label_smoothing, aux_factor=aux_factor)
-    bs = 8
+    bs = 4
+
     input_data = Tensor(np.random.randn(bs, 1, 32, 32).astype(np.float32))
-    if name=='CE':
-        label = Tensor(np.random.randint(0, high=1, size=(bs)).astype(np.int32))
-    else:
-        label = Tensor(np.random.randint(0, high=1, size=(bs, num_classes)).astype(np.float32))
+    if name =='CE':
+        label = Tensor(np.random.randint(0, high=num_classes, size=(bs)), dtype=ms.int32)
+    if name=='BCE':
+        # convert to one hot 
+        # convert to float type 
+        #label = Tensor(np.random.randint(0, high=1, size=(bs, num_classes)), dtype=ms.float32)
+        label = Tensor([[0,1], [1,0], [0,1], [1,0]], dtype=ms.float32)
+
     net_with_loss = WithLossCell(network, net_loss)
     train_network = TrainOneStepCell(net_with_loss, net_opt)
 
@@ -82,38 +88,47 @@ def test_loss(mode, name, reduction, label_smoothing, aux_factor):
     assert cur_loss < begin_loss, 'Loss does NOT decrease'
 
 @pytest.mark.parametrize('mode', [0, 1])
-@pytest.mark.parametrize('name', ['CE', 'BCE'])
-@pytest.mark.parametrize('reduction', ['mean', 'sum', 'none'])
+#@pytest.mark.parametrize('name', ['CE', 'BCE'])
+@pytest.mark.parametrize('name', ['CE'])
+@pytest.mark.parametrize('reduction', ['mean', 'sum'])
 @pytest.mark.parametrize('label_smoothing', [0.0, 0.1])
 @pytest.mark.parametrize('aux_factor', [0.0, 0.2])
 def test_loss_with_weight(mode, name, reduction, label_smoothing, aux_factor):
     print(f'mode={mode}; loss_name={name}; has_weight=True; reduction={reduction};\
         label_smoothing={label_smoothing}; aux_factor={aux_factor}')
     ms.set_context(mode=mode)
-    num_classes = 10
-    weight = Tensor(np.random.randn(num_classes), dtype=ms.float32)
+    num_classes = 2
+    bs = 4
+    if name == 'CE':
+        weight = Tensor([0.7, 0.3], dtype=ms.float32)
+    else:
+        weight = Tensor([[0.7, 0.3],[0.7, 0.3],[0.7, 0.3],[0.7, 0.3],], dtype=ms.float32)
+
     aux_head = False
-    if aux_factor:
+    # TODO: now loss module does not support bce loss with aux head, to test it after implementation
+    if aux_factor and name=='CE':
         aux_head = True
     network = SimpleCNN(in_channels=1, num_classes=num_classes, aux_head=aux_head)
     
-    net_opt = create_optimizer(network.trainable_params(), 'momentum', lr=0.01, weight_decay=1e-5, momentum=0.9, nesterov=False)
+    net_opt = create_optimizer(network.trainable_params(), 'adam', lr=0.001, weight_decay=1e-7)
     net_loss = create_loss(name=name, weight=weight, reduction=reduction, label_smoothing=label_smoothing, aux_factor=aux_factor)
-    bs = 8
     input_data = Tensor(np.random.randn(bs, 1, 32, 32).astype(np.float32))
-    if name=='CE':
-        label = Tensor(np.random.randint(0, high=1, size=(bs)).astype(np.int32))
-    else:
-        label = Tensor(np.random.randint(0, high=1, size=(bs, num_classes)).astype(np.float32))
+    if name =='CE':
+        label = Tensor(np.random.randint(0, high=num_classes, size=(bs)), dtype=ms.int32)
+    if name=='BCE':
+        label = Tensor([[0,1], [1,0], [0,1], [1,0]], dtype=ms.float32)
     net_with_loss = WithLossCell(network, net_loss)
     train_network = TrainOneStepCell(net_with_loss, net_opt)
 
     train_network.set_train()
 
     begin_loss = train_network(input_data, label)
-    for _ in range(10):
+    for _ in range(20):
         cur_loss = train_network(input_data, label)
 
     print("begin loss: {}, end loss:  {}".format(begin_loss, cur_loss))
 
     assert cur_loss < begin_loss, 'Loss does NOT decrease'
+
+if __name__== '__main__':
+    test_loss_with_weight(1, 'CE', 'mean', 0, 0.0 )
