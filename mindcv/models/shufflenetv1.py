@@ -162,7 +162,7 @@ class ShuffleNetV1(nn.Cell):
         self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='same')
 
         features = []
-        for idxstage in self.stage_repeats:
+        for idxstage, _ in enumerate(self.stage_repeats):
             numrepeat = idxstage
             output_channel = self.stage_out_channels[idxstage + 2]
 
