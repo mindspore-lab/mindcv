@@ -19,7 +19,7 @@ def test_train_mnist(mode):
     '''
     test mobilenet_v1_train_gpu(single)
     '''
-    num_workers = 8
+    num_workers = 2
     num_classes = 10
     batch_size = 16
     num_epochs = 1
