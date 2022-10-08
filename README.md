@@ -63,7 +63,7 @@ Below is how to find and  create a deep vision model quickly.
 ```
 
 ### Training and Validation Scripts
-It is easy to train your model on standard datasets or your own dataset with MindCV. Model training, transfer learning, or evaluaiton can be done using one or a few line of code with flexible configuration. Below are the running examples for reference.  
+It is easy to train your model on standard datasets or your own dataset with MindCV. Model training, transfer learning, or evaluaiton can be done using one or a few line of code with flexible configuration. 
 
 - Standalone Training
 
