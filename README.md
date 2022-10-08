@@ -107,9 +107,7 @@ python validate.py --model=swin_tiny --dataset=imagenet --val_split=validation \
 >>> {'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
 ``` 
 
-You can use mindcv.list_models() to find out all supported models, and apply any of them for your own tasks easily with the above scripts. 
-
-For more scripts, see [examples/scripts](examples/scripts). 
+You can use `mindcv.list_models()` to find out all supported models. It is easy to apply any of them to your  tasks with these scripts. For more examples, see [examples/scripts](examples/scripts). 
 
 ## Tutorials
 We provide [jupyter notebook tutorials](tutorials) for  
