@@ -46,8 +46,12 @@ pip install git+https://github.com/mindlab-ai/mindcv.git
 
 ## Get Started 
 
-### Hands-on Demo
-Please see the [Quick Start Demo](quick_start.ipynb) to help you get started with MindCV and learn about the basic usage quickly. Below is how to create a deep vision model quickly.  
+### Quick Start Demo
+Please see the [Quick Start Demo](quick_start.ipynb) to help you get started with MindCV and learn about the basic usage quickly. 
+
+You can also see the [finetune tutorial](tutorials/finetune.ipynb) to learn how to apply a pretrained SoTA model to your own classification task. 
+
+Below is how to find and  create a deep vision model quickly.  
 
 ```python
 >>> import mindcv 
@@ -58,8 +62,8 @@ Please see the [Quick Start Demo](quick_start.ipynb) to help you get started wit
 >>> network = mindcv.create_model('densenet121', pretrained=True)
 ```
 
-### Quick Running Scripts
-It is easy to train your model on standard datasets or your own dataset with MindCV. Model training, transfer learning, or evaluaiton can be done using one or a few line of code with flexible configuration. Below are the running examples for reference.  
+### Training and Validation Scripts
+It is easy to train your model on standard datasets or your own dataset with MindCV. Model training, transfer learning, or evaluaiton can be done using one or a few line of code with flexible configuration. 
 
 - Standalone Training
 
@@ -91,12 +95,19 @@ mpirun --allow-run-as-root -n 4 python train.py -c config/squeezenet/squeezenet_
 
 - Validation
 
-To validate the model, you can use `validate.py`. Here is an example.
-```shell
-python validate.py --model=densenet121 --dataset=imagenet --val_split=val \
+To validate a trained/pretrained model, you can use `validate.py`. 
+```python
+# validate a trained checkpoint
+python validate.py --model=resnet50 --dataset=imagenet --val_split=validation \
 		           --ckpt_path='./ckpt/densenet121-best.ckpt' 
+
+# validate a pretrained SwinTransformer model 
+python validate.py --model=swin_tiny --dataset=imagenet --val_split=validation \
+		           --pretrained
+>>> {'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
 ``` 
 
+You can use `mindcv.list_models()` to find out all supported models. It is easy to apply any of them to your  tasks with these scripts. For more examples, see [examples/scripts](examples/scripts). 
 
 ## Tutorials
 We provide [jupyter notebook tutorials](tutorials) for  
