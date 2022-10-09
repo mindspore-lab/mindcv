@@ -1,5 +1,5 @@
 ''' 
-Test train and validate pipelines.
+Test training in parallel.
 For training, both graph mode and pynative mode with ms_function will be tested.
 '''
 import sys
@@ -10,6 +10,7 @@ from subprocess import Popen, PIPE
 import os
 import pytest
 from mindcv.utils.download import DownLoad
+import glob
 
 check_acc = True
 
@@ -25,19 +26,24 @@ def test_train(mode,  model='resnet18', opt='adamw', scheduler='polynomial'):
     
     # ---------------- test running train.py using the toy data ---------  
     dataset = 'imagenet'
-    ckpt_dir = './test/ckpt_tmp'
-    num_samples = 160
+    ckpt_dir = './tests/ckpt_tmp'
     num_epochs = 5
-    batch_size = 20
+    batch_size = 10
+    num_samples = 160
     if os.path.exists(ckpt_dir):
         os.system(f'rm {ckpt_dir} -rf')
     if os.path.exists(data_dir):
         download_str = f'--data_dir {data_dir}'
     else:
         download_str = '--download'
-    train_file = 'train.py' if mode=='GRAPH' else 'train_with_func.py' 
+    # pick gpu devices for parallel
+    #cmd = 'export CUDA_VISIBLE_DEVICES=0,1,2,3'
+    #subprocess.call(cmd, shell=True)
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
 
-    cmd = f'python {train_file} --dataset={dataset} --num_classes={num_classes} --model={model} --epoch_size={num_epochs}  --ckpt_save_interval=2 --lr=0.0001 --num_samples={num_samples} --loss=CE --weight_decay=1e-6 --ckpt_save_dir={ckpt_dir} {download_str} --train_split=train --batch_size={batch_size} --pretrained --num_parallel_workers=2'
+    # train
+    train_file = 'train.py' if mode=='GRAPH' else 'train_with_func.py' 
+    cmd = f'mpirun --allow-run-as-root -n 2 python {train_file} --dataset={dataset} --num_classes={num_classes} --model={model} --epoch_size={num_epochs}  --ckpt_save_interval=2 --lr=0.0001 --loss=CE --weight_decay=1e-6 --ckpt_save_dir={ckpt_dir} {download_str} --train_split=train --batch_size={batch_size} --pretrained --distribute'
     
     print(f'Running command: \n{cmd}')
     ret = subprocess.call(cmd.split(), stdout=sys.stdout, stderr=sys.stderr)
@@ -45,8 +51,9 @@ def test_train(mode,  model='resnet18', opt='adamw', scheduler='polynomial'):
     
     # --------- Test running validate.py using the trained model ------------- #
     #begin_ckpt = os.path.join(ckpt_dir, f'{model}-1_1.ckpt')
-    end_ckpt = os.path.join(ckpt_dir, f'{model}-{num_epochs}_{num_samples//batch_size}.ckpt')
-    cmd = f"python validate.py --model={model} --dataset={dataset} --val_split=val --data_dir={data_dir} --num_classes={num_classes} --ckpt_path={end_ckpt} --batch_size=40 --num_parallel_workers=2"
+    end_ckpt = os.path.join(ckpt_dir, f'{model}-{num_epochs}_*.ckpt')
+    end_ckpt = glob.glob(end_ckpt)[-1]
+    cmd = f"python validate.py --model={model} --dataset={dataset} --val_split=val --data_dir={data_dir} --num_classes={num_classes} --ckpt_path={end_ckpt} --batch_size=40"
     #ret = subprocess.call(cmd.split(), stdout=sys.stdout, stderr=sys.stderr)
     print(f'Running command: \n{cmd}')
     p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
