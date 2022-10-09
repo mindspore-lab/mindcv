@@ -28,7 +28,7 @@ Xception is another improved network of InceptionV3 in addition to inceptionV4, 
 
 ### Train
 
-- The [yaml config files](../../config) that yield competitive results on ImageNet for different models are listed in the `config` folder. To trigger training using preset yaml config. 
+- The [yaml config files](../../configs) that yield competitive results on ImageNet for different models are listed in the `configs` folder. To trigger training using preset yaml config. 
 
   ```shell
   comming soon

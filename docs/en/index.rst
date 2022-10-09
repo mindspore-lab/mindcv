@@ -48,17 +48,17 @@ You can switch between Chinese and English documents in the lower-left corner of
    :maxdepth: 1
    :caption: Examples
 
-   config/densenet/README.md
-   config/googlenet/README.md
-   config/inception_v3/README.md
-   config/inception_v4/README.md
-   config/mobilenetv1/README.md
-   config/mobilenetv3/README.md
-   config/repvgg/README.md
-   config/res2net/README.md
-   config/sknet/README.md
-   config/squeezenet/README.md
-   config/xception/README.md
+   configs/densenet/README.md
+   configs/googlenet/README.md
+   configs/inception_v3/README.md
+   configs/inception_v4/README.md
+   configs/mobilenetv1/README.md
+   configs/mobilenetv3/README.md
+   configs/repvgg/README.md
+   configs/res2net/README.md
+   configs/sknet/README.md
+   configs/squeezenet/README.md
+   configs/xception/README.md
 
 .. toctree::
    :caption: Switch Language

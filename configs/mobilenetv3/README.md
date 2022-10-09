@@ -35,7 +35,7 @@ Extensive experiments demonstrate the efficacy and value of MobileNetV3 on a wid
 
 ### Train
 
-- The [yaml config files](../../config) that yield competitive results on ImageNet for different models are listed in the `config` folder. To trigger training using preset yaml config. 
+- The [yaml config files](../../configs) that yield competitive results on ImageNet for different models are listed in the `configs` folder. To trigger training using preset yaml config. 
 
   ```shell
   comming soon

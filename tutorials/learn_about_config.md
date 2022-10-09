@@ -388,7 +388,7 @@ def train(args):
 使用parse设置参数可以覆盖yaml文件中的参数设置。以下面的shell命令为例，
 
 ```shell
-python train.py -c ./config/squeezenet/squeezenet_1.0_gpu.yaml --data_dir ./data
+python train.py -c ./configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir ./data
 ```
 上面的命令将`args.data_dir`参数的值由yaml文件中的"./imagenet2012"覆盖为"./data"。
 
