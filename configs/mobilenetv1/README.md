@@ -30,11 +30,11 @@ At the same time, two simple global hyperparameters are introduced, which can ef
 
 ### Train
 
-- The [yaml config files](../../config) that yield competitive results on ImageNet for different models are listed in the `config` folder. To trigger training using preset yaml config. 
+- The [yaml config files](../../configs) that yield competitive results on ImageNet for different models are listed in the `configs` folder. To trigger training using preset yaml config. 
 
   ```shell
   export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
-  mpirun --allow-run-as-root -n 8 python train.py -c config/mobilenetv1/mobilenetv1_075_gpu.yaml
+  mpirun --allow-run-as-root -n 8 python train.py -c configs/mobilenetv1/mobilenetv1_075_gpu.yaml
   ```
 
 

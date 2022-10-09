@@ -306,10 +306,10 @@ print(acc)
 
 
 ```python
-!python train.py -c config/squeezenet/squeezenet_1.0_gpu.yaml 
+!python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml 
 ```
 
 
 ```python
-!python validate.py -c config/squeezenet/squeezenet_1.0_gpu.yaml 
+!python validate.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml 
 ```

@@ -33,7 +33,7 @@ def test_train_mnist(mode):
     lr = 1e-3
     loss_name = 'CE'
     opt_name = 'adam'
-    #ckpt_save_dir = './test/ckpt_tmp'
+    #ckpt_save_dir = './tests/ckpt_tmp'
     data_dir 
 
     if not os.path.exists(data_dir):

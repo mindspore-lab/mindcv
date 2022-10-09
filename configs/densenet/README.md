@@ -33,11 +33,11 @@ Recent work has shown that convolutional networks can be substantially deeper, m
 
 ### Train
 
-- The [yaml config files](../../config) that yield competitive results on ImageNet for different models are listed in the `config` folder. To trigger training using preset yaml config. 
+- The [yaml config files](../../configs) that yield competitive results on ImageNet for different models are listed in the `configs` folder. To trigger training using preset yaml config. 
 
   ```shell
   export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
-  mpirun -n 8 python train.py -c config/densenet/densenet_121_gpu.yaml --data_dir /path/to/imagenet
+  mpirun -n 8 python train.py -c configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/imagenet
   ```
 
 

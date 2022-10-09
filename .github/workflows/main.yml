@@ -35,7 +35,7 @@ jobs:
         pylint mindcv --rcfile=.github/pylint.conf
     - name: Test with moudles pytest
       run: |
-        pytest test/modules/*.py
+        pytest tests/modules/*.py
     - name: Test with tasks pytest
       run: |
-        pytest test/tasks/*.py
+        pytest tests/tasks/*.py
