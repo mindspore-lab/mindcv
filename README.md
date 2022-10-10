@@ -35,7 +35,7 @@ The following instructions assume the desired dependency is fulfilled.
 ### Install with pip
 MindCV can be installed with pip. 
 ```shell
-pip install https://github.com/mindlab-ai/mindcv/releases/download/v0.0.1-alpha/mindcv-0.0.1a0-py3-none-any.whl
+pip install https://github.com/mindlab-ai/mindcv/releases/download/v0.0.1-beta/mindcv-0.0.1b0-py3-none-any.whl
 ```
 
 ### Install from source
