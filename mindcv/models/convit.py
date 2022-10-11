@@ -35,7 +35,7 @@ def _cfg(url='', **kwargs):
     return {
         'url': url,
         'num_classes': 1000,
-        'input_size': 224,
+        'input_size': (3, 224, 224),
         'first_conv': 'patch_embed.proj', 'classifier': 'classifier',
         **kwargs
     }
