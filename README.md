@@ -1,17 +1,17 @@
 # MindSpore Computer Vision
 
 ## Introduction
-MindSpore Computer Vision is an open source computer vision research toolbox based on MindSpore in computer vision direction. It is mainly used for the development of image tasks and includes a large number of classic and cutting-edge deep learning classification models, such as ResNet, ViT, and SwinTransformer.
-
+MindCV is an open source toolbox for computer vision research and development based on MindSpore. It collects a large number of classic and SoTA vision models such ResNet and SwinTransformer with pretrained weights, and algorithms like MixUp, AutoAugment for boosting performance. With the decoupled module design, it is easy to apply or adapt MindCV to your own deep learning tasks. 
 
 ### Major Features
-- Friendly modular design for the overal DL workflow, including constructing dataloader, models, optimizer, loss for training and testing. It is easy to customize your data transform and learning algorithms. 
-- State-of-art models, MindCV provides various SoTA CNN-based and Transformer-based models with pretrained weights including SwinTransformer and EfficientNet (See model list) 
+- Easy-to-use: Friendly modular design for the overal DL workflow, including constructing dataloader, models, optimizer, loss for training and testing. It is easy to customize thedata processing and learning pipeline. 
+- State-of-art models: MindCV provides various SoTA CNN-based and Transformer-based models with pretrained weights including SwinTransformer and EfficientNet (See model list) 
 - High efficiency, extensibility and compatibility for different hardware platform  (GPU/CPU/Ascend)
 
 ### Results
 
-Under construction... 
+Coming soon.
+
 
 ## Installation
 
