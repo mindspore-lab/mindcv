@@ -154,7 +154,7 @@ def create_parser():
     group = parser.add_argument_group('Loss parameters')
     # fixme: add options, bce_loss, ce_loss
     group.add_argument('--loss', type=str, default='CE', choices=['BCE', 'CE'],
-                       help='Type of loss, BCE or CE (default="CE")')
+                       help='Type of loss, BCE (BinaryCrossEntropy) or CE (CrossEntropy)  (default="CE")')
     group.add_argument('--label_smoothing', type=float, default=0.0,
                        help='Use label smoothing (default=0.0)')
     group.add_argument('--aux_factor', type=float, default=0.0,
