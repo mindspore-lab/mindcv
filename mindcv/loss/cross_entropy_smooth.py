@@ -1,5 +1,5 @@
 ''' cross entorpy smooth '''
-import warnings
+#import warnings
 from mindspore import nn
 from mindspore.ops import functional as F
 
@@ -38,9 +38,9 @@ class CrossEntropySmooth(nn.LossBase):
             if self.aux_factor > 0:
                 loss_aux = F.cross_entropy(aux, labels, weight=self.weight, reduction=self.reduction, label_smoothing=self.smoothing)
             else:
-                warnings.warn("There are two logit output, but the auxilary loss factor is 0.")
+                print("There are two logit output, but the auxilary loss factor is 0.")
         elif self.aux_factor > 0:
-            warnings.warn("aux_factor > 0 but there is no auxilary logits.")
+            print("aux_factor > 0 but there is no auxilary logits.")
 
         loss_logits = F.cross_entropy(logits, labels, weight=self.weight, reduction=self.reduction, label_smoothing=self.smoothing)
         loss = loss_logits + self.aux_factor * loss_aux
