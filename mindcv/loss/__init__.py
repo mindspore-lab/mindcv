@@ -1,5 +1,6 @@
 ''' loss init '''
 from .cross_entropy_smooth import CrossEntropySmooth
+from .binary_cross_entropy_smooth import BinaryCrossEntropySmooth
 from .loss_factory import create_loss
 
 __all__ = []
