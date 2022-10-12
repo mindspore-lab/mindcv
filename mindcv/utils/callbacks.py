@@ -3,9 +3,11 @@ import os
 #import stat
 import numpy as np
 
+import mindspore as ms
 from mindspore import log as logger
+from mindspore.ops import ReduceOp
 from mindspore.common.tensor import Tensor
-from mindspore import save_checkpoint, SummaryRecord
+from mindspore import ops, save_checkpoint, SummaryRecord
 from mindspore.train.callback import Callback
 from mindspore.train._utils import _make_directory
 
@@ -25,7 +27,9 @@ class StateMonitor(Callback):
                  best_ckpt_name="best.ckpt",
                  metric_name="accuracy",
                  dataset_sink_mode=True,
-                 rank_id=None
+                 rank_id=None,
+                 device_num=None,
+                 distribute=False
                  ):
         super().__init__()
         self.model = model
@@ -38,6 +42,8 @@ class StateMonitor(Callback):
         self.dataset_sink_mode = dataset_sink_mode
         self.summary_dir = summary_dir
         self.rank_id = rank_id if rank_id is not None else 0
+        self.device_num = device_num if device_num is not None else 1
+        self.distribute = distribute
 
         if not os.path.isdir(ckpt_dir):
             os.makedirs(ckpt_dir)
@@ -67,21 +73,26 @@ class StateMonitor(Callback):
         self.summary_record.add_value('scalar', f'train_loss_{self.rank_id}', loss)
 
         # val while training if validation loader is not None
-        if (self.dataset_val is not None) and (self.rank_id==0):
+        if self.dataset_val is not None:
             if cur_epoch >= self.val_start_epoch and (cur_epoch - self.val_start_epoch) % self.val_interval == 0:
                 # do validation
                 res = self.apply_eval()
-                print(f"Validation: epoch: {cur_epoch}, metrics: {res}")
 
                 # record val acc
                 val_acc = res[self.metric_name]
-                if not isinstance(val_acc, Tensor):
-                    val_acc = Tensor(val_acc)
-                self.summary_record.add_value('scalar', 'val_' + self.metric_name, val_acc)
+                if self.distribute:
+                    all_reduce = ops.AllReduce(ReduceOp.SUM)
+                    val_acc = all_reduce(Tensor(val_acc, ms.float32))
+                    val_acc /= self.device_num
+                if self.rank_id == 0:
+                    print(f"Validation: Epoch: {cur_epoch}, Metrics: [{self.metric_name}:{val_acc}]")
+                    if not isinstance(val_acc, Tensor):
+                        val_acc = Tensor(val_acc)
+                    self.summary_record.add_value('scalar', 'val_' + self.metric_name, val_acc)
 
                 # Save the best ckpt file
-                if res[self.metric_name] > self.best_res:
-                    self.best_res = res[self.metric_name]
+                if val_acc > self.best_res:
+                    self.best_res = val_acc
                     if self.save_best_ckpt and (self.rank_id==0):
                         save_checkpoint(callback_params.train_network, self.best_ckpt_path, async_save=True)
                         print(f"Save the best {self.metric_name} ckpt, the {self.metric_name} is {self.best_res}")

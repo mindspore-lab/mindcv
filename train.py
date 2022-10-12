@@ -164,6 +164,7 @@ def train(args):
 
     # summary training loss
     # recorad val acc and do model selection if val dataset is availabe
+    # if val acc, val data must be evenly distributed on each device when data_parallel.
     summary_dir = f"{args.ckpt_save_dir}/summary"
     state_cb = StateMonitor(model, summary_dir=summary_dir,
                             dataset_val=loader_eval,
@@ -172,7 +173,9 @@ def train(args):
                             ckpt_dir=args.ckpt_save_dir,
                             best_ckpt_name=args.model + '_best.ckpt',
                             dataset_sink_mode=args.dataset_sink_mode,
-                            rank_id=rank_id)
+                            rank_id=rank_id,
+                            device_num=device_num,
+                            distribute=args.distribute)
 
     callbacks = [loss_cb, time_cb, state_cb]
 
@@ -184,7 +187,6 @@ def train(args):
 
     # train model
     model.train(args.epoch_size, loader_train, callbacks=callbacks, dataset_sink_mode=args.dataset_sink_mode)
-
 
 if __name__ == '__main__':
     args = parse_args()
