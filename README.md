@@ -122,9 +122,10 @@ We provide [jupyter notebook tutorials](tutorials) for
 
 ## Notes
 ### What is New 
-
+- 2022/10/12
+1. Both BCE and CE loss now support class-weight config, label smoothing, and auxilary logit input (for networks like inception).
 - 2022/09/13
-1. Add Adan optimizer (experimental), tested in non-dist graph mode. 
+1. Add Adan optimizer (experimental) 
 
 ### License
 
