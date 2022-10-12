@@ -22,8 +22,6 @@ def create_parser():
                        help='Running in GRAPH_MODE(0) or PYNATIVE_MODE(1) (default=0)')
     group.add_argument('--distribute', action='store_true', default=False,
                        help='Run distribute (default=False)')
-    group.add_argument('--summary', action='store_true', default=True,
-                       help='collect loss and accuracy information (default=False)')
     group.add_argument('--val_while_train', action='store_true', default=False,
                        help='Verify accuracy while training (default=False)')
     group.add_argument('--val_interval', type=int, default=1,

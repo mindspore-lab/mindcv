@@ -9,11 +9,11 @@ pytest tests/modules/*.py
 
 To test the training process (in graph mode and pynative+ms_function mode) and the validation process, run
 ```shell
-pytest tests/task/test_train_val_imagenet_subset.py
+pytest tests/tasks/test_train_val_imagenet_subset.py
 ```
 
 To test training in distributed mode if you have multiple GPUs:
 
 ```shell
-pytest tests/task/parallel/test_parallel_train_val.py
+pytest tests/tasks/parallel/test_parallel_train_val.py
 ```

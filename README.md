@@ -56,7 +56,7 @@ Below is how to find and  create a deep vision model quickly.
 ```python
 >>> import mindcv 
 # Search a wanted pretrained model 
->>> mindcv.list_models("densenet*", pretrain=True)
+>>> mindcv.list_models("densenet*", pretrained=True)
 ['densenet201', 'densenet161', 'densenet169', 'densenet121']
 # Create the model object
 >>> network = mindcv.create_model('densenet121', pretrained=True)
