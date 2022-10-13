@@ -108,7 +108,8 @@ python validate.py --model=swin_tiny --dataset=imagenet --val_split=validation \
 ``` 
 
 - Validate during Training
-Validation during training can be enable by setting `--val_while_train` and `--val_split`.
+
+Validation during training can be enable by setting the `--val_while_train` argument.
 ```python
 python train.py --model=resnet18 --dataset=cifar10 --val_while_train --val_split=test --val_interval=1
 ``` 
