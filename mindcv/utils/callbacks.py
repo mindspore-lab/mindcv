@@ -44,8 +44,11 @@ class StateMonitor(Callback):
         self.rank_id = rank_id if rank_id is not None else 0
         self.device_num = device_num if device_num is not None else 1
         self.distribute = distribute
-        self.metric_log_fp = open(os.path.join(ckpt_dir, 'metric_log.txt'), 'w')
-        self.metric_log_fp.write('Epoch\tTrain loss\tVal acc\n')
+
+        self.log_txt_fp = os.path.join(ckpt_dir, 'metric_log.txt')
+        if self.rank_id == 0:
+            with open(self.log_txt_fp, 'w', encoding="utf-8") as fp:
+                fp.write('Epoch\tTrain loss\tVal acc\n')
 
         if not os.path.isdir(ckpt_dir):
             os.makedirs(ckpt_dir)
@@ -58,7 +61,6 @@ class StateMonitor(Callback):
 
     def __exit__(self, *exc_args):
         self.summary_record.close()
-        self.metric_log_fp.close()
 
     def apply_eval(self):
         """Model evaluation, return validation accuracy."""
@@ -103,7 +105,11 @@ class StateMonitor(Callback):
                         print(f"Save the best {self.metric_name} ckpt, the {self.metric_name} is {self.best_res}")
                 print("-" * 80)
 
-        self.metric_log_fp.write(f'{self.epoch_idx}\t{loss}\t{val_acc}\n')
+        if self.rank_id == 0:
+            #self.metric_log_fp.write(f'{self.epoch_idx}\t{loss}\t{val_acc}\n')
+            with open(self.log_txt_fp, 'a', encoding="utf-8") as fp:
+                fp.write(f'{self.epoch_idx}\t{loss}\t{val_acc}\n')
+
         self.epoch_idx += 1
         self.summary_record.record(callback_params.cur_step_num)
 
