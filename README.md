@@ -107,6 +107,14 @@ python validate.py --model=swin_tiny --dataset=imagenet --val_split=validation \
 >>> {'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
 ``` 
 
+- Validate during Training
+Validation during training can be enable by setting `--val_while_train` and `--val_split`.
+```python
+python train.py --model=resnet18 --dataset=cifar10 --val_while_train --val_split=test --val_interval=1
+``` 
+The training loss and validation accuracy for each epoch  will be saved in `./CKPT_NAME/metric_log.txt`.
+
+
 You can use `mindcv.list_models()` to find out all supported models. It is easy to apply any of them to your  tasks with these scripts. For more examples, see [examples/scripts](examples/scripts). 
 
 ## Tutorials
