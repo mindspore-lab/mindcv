@@ -40,7 +40,7 @@ class BinaryCrossEntropySmooth(nn.LossBase):
         aux_logits = None
 
         if isinstance(logits, tuple):
-            main_logits, aux_logits = logits
+            main_logits = logits[0]
         else:
             main_logits = logits
 
@@ -60,7 +60,8 @@ class BinaryCrossEntropySmooth(nn.LossBase):
             labels = labels * (1 - self.smoothing) + self.smoothing / n_classes
 
         if self.aux_factor > 0 and aux_logits is not None:
-            loss_aux = F.binary_cross_entropy_with_logits(aux_logits, labels, weight=weight, pos_weight=pos_weight, reduction=self.reduction)
+            for aux_logits in logits[1:]:
+                loss_aux += F.binary_cross_entropy_with_logits(aux_logits, labels, weight=weight, pos_weight=pos_weight, reduction=self.reduction)
         # else:
         #    warnings.warn("There are logit tuple input, but the auxilary loss factor is 0.")
 

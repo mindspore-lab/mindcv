@@ -18,7 +18,7 @@ class CrossEntropySmooth(nn.LossBase):
 
     Inputs:
         logits (Tensor or Tuple of Tensor): Input logits. Shape [N, C], where N is # samples, C is # classes.
-                Tuple of two input logits are supported in order (main_logits, aux_logits) for auxilary loss used in networks like inception_v3.
+                Tuple composed of mulitple logits are supported in order (main_logits, aux_logits) for auxilary loss used in networks like inception_v3.
         labels (Tensor): Ground truth label. Shape: [N] or [N, C].
                 (1) Shape (N), sparse labels representing the class indinces. Must be int type.
                 (2) Shape [N, C], dense labels representing the ground truth class probability values, or the one-hot labels. Must be float type.
@@ -34,14 +34,13 @@ class CrossEntropySmooth(nn.LossBase):
         loss_aux = 0
 
         if isinstance(logits, tuple):
-            logits, aux = logits
-            if self.aux_factor > 0:
-                loss_aux = F.cross_entropy(aux, labels, weight=self.weight, reduction=self.reduction, label_smoothing=self.smoothing)
-            else:
-                print("There are two logit output, but the auxilary loss factor is 0.")
-        elif self.aux_factor > 0:
-            print("aux_factor > 0 but there is no auxilary logits.")
+            main_logits = logits[0]
+            for aux in logits[1:]:
+                if self.aux_factor > 0:
+                    loss_aux += F.cross_entropy(aux, labels, weight=self.weight, reduction=self.reduction, label_smoothing=self.smoothing)
+        else:
+            main_logits = logits
 
-        loss_logits = F.cross_entropy(logits, labels, weight=self.weight, reduction=self.reduction, label_smoothing=self.smoothing)
+        loss_logits = F.cross_entropy(main_logits, labels, weight=self.weight, reduction=self.reduction, label_smoothing=self.smoothing)
         loss = loss_logits + self.aux_factor * loss_aux
         return loss
