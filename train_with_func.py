@@ -91,7 +91,7 @@ def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, summary_r
         correct /= total
 
     if rank_id in [0, None]:
-        print(f"Training accuracy: {(100 * correct):>0.1f}%")
+        print(f"Training accuracy: {(100 * correct):0.3f}")
         if not isinstance(correct, Tensor):
             correct = Tensor(correct)
         summary_record.add_value('scalar', 'train_dataset_accuracy', correct)
@@ -350,21 +350,21 @@ def train(args):
                     test_acc = test_epoch(network, loader_eval, loss, rank_id=rank_id)
                     if rank_id in [0, None]:
                         val_time = time()-val_start
-                        print(f"Val time: {val_time:.2f} \t Val acc: {(100 * test_acc):>0.1f}")
+                        print(f"Val time: {val_time:.2f} \t Val acc: {(100 * test_acc):0.3f}")
+                        if test_acc > best_acc:
+                            best_acc = test_acc
+                            save_best_path = os.path.join(args.ckpt_save_dir, f"{args.model}-best.ckpt")
+                            ms.save_checkpoint(network, save_best_path, async_save=True)
+                            print(f"=> New best accuracy: {100*test_acc:.3f}")
+                            #os.system(f'cp {save_path} {save_best_path}')
+                        print("-" * 80)
+                        
+                        # add to summary
                         current_step = (t + 1) * num_batches + begin_step
                         if not isinstance(test_acc, Tensor):
                             test_acc = Tensor(test_acc)
                         summary_record.add_value('scalar', 'test_dataset_accuracy', test_acc)
                         summary_record.record(int(current_step))
-
-                        if test_acc > best_acc:
-                            best_acc = test_acc
-                            save_best_path = os.path.join(args.ckpt_save_dir, f"{args.model}-best.ckpt")
-                            # TODO: no need to save again. resued the saved checkpoint. 
-                            ms.save_checkpoint(network, save_best_path, async_save=True)
-                            print(f"Saving best accuracy model to {save_best_path}")
-                            #os.system(f'cp {save_path} {save_best_path}')
-                        print("-" * 80)
 
             if rank_id in [None, 0]:
                 with open(log_path, 'a') as fp:

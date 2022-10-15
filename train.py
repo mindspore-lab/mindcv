@@ -188,7 +188,7 @@ def train(args):
                             distribute=args.distribute,
                             log_interval=args.log_interval,
                             model_name=args.model,
-                            begin_epoch=begin_epoch)
+                            last_epoch=begin_epoch)
 
     #callbacks = [loss_cb, time_cb, state_cb]
     callbacks = [state_cb]

@@ -35,7 +35,7 @@ class StateMonitor(Callback):
                  distribute=False,
                  log_interval=100,
                  model_name='',
-                 begin_epoch=0,
+                 last_epoch=0,
                  keep_checkpoint_max=10,
                  ):
         super().__init__()
@@ -55,7 +55,7 @@ class StateMonitor(Callback):
         self.model_name = model_name
         self.ckpt_dir = ckpt_dir
         self.ckpt_save_interval = ckpt_save_interval
-        self.begin_epoch = begin_epoch
+        self.last_epoch = last_epoch
 
         self.keep_checkpoint_max = keep_checkpoint_max
         self._manager = CheckpointManager()
@@ -90,8 +90,8 @@ class StateMonitor(Callback):
 
         cb_params = run_context.original_args()
         num_batches = cb_params.batch_num
-        global_step = cb_params.optimizer.global_step.asnumpy()[0]
-        cur_epoch = (global_step-1) // num_batches
+        #global_step = cb_params.optimizer.global_step.asnumpy()[0]
+        cur_epoch = cb_params.cur_epoch_num + self.last_epoch -1 #(global_step-1) // num_batches
         #cur_step_in_epoch = (global_step- 1) % cb_params.batch_num
         cur_step_in_epoch  = int((cb_params.cur_step_num - 1) % cb_params.batch_num)
 
@@ -113,7 +113,8 @@ class StateMonitor(Callback):
         cb_params = run_context.original_args()
         # the global step may larger than batch_size * epoch due to graph mode async
         global_step = cb_params.optimizer.global_step.asnumpy()[0]
-        cur_epoch = (global_step - 1) // cb_params.batch_num
+        #cur_epoch = (global_step - 1) // cb_params.batch_num
+        cur_epoch = cb_params.cur_epoch_num +  self.last_epoch
         cur_step_in_epoch = cb_params.batch_num #(global_step - 1) % cb_params.batch_num
 
         #print(global_step, cur_step_in_epoch)
@@ -124,11 +125,11 @@ class StateMonitor(Callback):
 
         # save checkpoint
         if self.rank_id in [0, None]:
-            if ((cur_epoch + 1) % self.ckpt_save_interval == 0) or (cur_epoch+1 == cb_params.epoch_num):
+            if (cur_epoch % self.ckpt_save_interval == 0) or (cur_epoch == cb_params.epoch_num):
                 if self._need_flush_from_cache:
                     self._flush_from_cache(cb_params)
 
-                cur_ckpoint_file = self.model_name + "-" + str(cur_epoch+1) + "_" \
+                cur_ckpoint_file = self.model_name + "-" + str(cur_epoch) + "_" \
                         + str(cur_step_in_epoch) + ".ckpt"
                 # update checkpoint file list.
                 self._manager.update_ckpoint_filelist(self.ckpt_dir, self.model_name)
@@ -157,8 +158,9 @@ class StateMonitor(Callback):
                     all_reduce = ops.AllReduce(ReduceOp.SUM)
                     val_acc = all_reduce(Tensor(val_acc, ms.float32))
                     val_acc /= self.device_num
+
                 if self.rank_id in [0, None]:
-                    print(f"Val {self.metric_name}: {val_acc}]")
+                    print(f"Validation {self.metric_name}: {100*val_acc:.3f}")
                     if not isinstance(val_acc, Tensor):
                         val_acc = Tensor(val_acc)
                     self.summary_record.add_value('scalar', 'val_' + self.metric_name, val_acc)
@@ -166,9 +168,10 @@ class StateMonitor(Callback):
                 # Save the best ckpt file
                 if val_acc > self.best_res:
                     self.best_res = val_acc
+                    self.best_epoch =cur_epoch
                     if self.save_best_ckpt and (self.rank_id==0):
                         save_checkpoint(cb_params.train_network, self.best_ckpt_path, async_save=True)
-                        print(f"Best epoch w.r.t. {self.metric_name} saved")
+                        print(f"=> New best val acc: {100*val_acc:.3f}")
 
                 # Save optim parameter for resume training
                 ms.save_checkpoint(cb_params.optimizer, os.path.join(self.ckpt_dir, f'{self.model_name}_optim.ckpt'), async_save=True)
@@ -182,8 +185,7 @@ class StateMonitor(Callback):
     # pylint: disable=unused-argument
     def on_train_end(self, run_context):
         if self.dataset_val is not None and self.rank_id==0:
-            print(f"End of validation the best {self.metric_name} is: {self.best_res}, "
-              f"save the best ckpt file in {self.best_ckpt_path}", flush=True)
+            print(f"\nFinish training!\nThe best validation {self.metric_name} is: {self.best_res} at epoch {self.best_epoch}, Model \rsaved in {self.best_ckpt_path}", flush=True)
         print("=" * 80)
 
     def _get_loss(self, cb_params):

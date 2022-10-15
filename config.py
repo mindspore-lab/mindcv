@@ -29,9 +29,9 @@ def create_parser():
     group = parser.add_argument_group('System parameters')
     group.add_argument('--mode', type=int, default=0,
                        help='Running in GRAPH_MODE(0) or PYNATIVE_MODE(1) (default=0)')
-    group.add_argument('--distribute', type=str2bool, default=False,
+    group.add_argument('--distribute', type=str2bool, nargs='?', const=True, default=False,
                        help='Run distribute (default=False)')
-    group.add_argument('--val_while_train', type=str2bool, default=False,
+    group.add_argument('--val_while_train', type=str2bool, nargs='?', const=True, default=False,
                        help='Verify accuracy while training (default=False)')
     group.add_argument('--val_interval', type=int, default=2,
             help='Interval for validation while training (in epoch), Default: 1')
@@ -46,17 +46,17 @@ def create_parser():
     group.add_argument('--data_dir', type=str, default='./', help='Path to dataset')
     group.add_argument('--train_split', type=str, default='train', help='dataset train split name')
     group.add_argument('--val_split', type=str, default='val', help='dataset validation split name')
-    group.add_argument('--dataset_download', type=str2bool, default=False,
+    group.add_argument('--dataset_download', type=str2bool, nargs='?', const=True, default=False,
                        help='Download dataset (default=False)')
     group.add_argument('--num_parallel_workers', type=int, default=8,
                        help='Number of parallel workers (default=8)')
-    group.add_argument('--shuffle', type=str2bool, default=True,
+    group.add_argument('--shuffle', type=str2bool, nargs='?', const=True, default=True,
                        help='Whether or not to perform shuffle on the dataset (default="True")')
     group.add_argument('--num_samples', type=int, default=None,
                        help='Number of elements to sample (default=None, which means sample all elements)')
     group.add_argument('--batch_size', type=int, default=128,
                        help='Number of batch size (default=128)')
-    group.add_argument('--drop_remainder', type=str2bool, default=True,
+    group.add_argument('--drop_remainder', type=str2bool, nargs='?', const=True, default=True,
                        help='Determines whether or not to drop the last block whose data '
                             'row number is less than batch size (default=True)')
 
@@ -76,7 +76,7 @@ def create_parser():
                        help='Color jitter factor (default=None)')
     group.add_argument('--interpolation', type=str, default='bilinear',
                        help='Image interpolation mode for resize operator(default="bilinear")')
-    group.add_argument('--auto_augment', type=str2bool, default=False,
+    group.add_argument('--auto_augment', type=str2bool, nargs='?', const=True, default=False,
                        help='Whether to use auto augmentation (default=False)')
     group.add_argument('--re_prob', type=float, default=0.,
                        help='Probability of performing erasing (default=0.)')
@@ -106,8 +106,7 @@ def create_parser():
                        help='Name of model')
     group.add_argument('--num_classes', type=int, default=None,
                        help='Number of label classes. If None, read from standard datasets. (default=None)')
-    group.add_argument('--pretrained', type=str2bool, default=False,
-                       help='Load pretrained model (default=False)')
+    group.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=False, help='Load pretrained model (default=False)')
     group.add_argument('--ckpt_path', type=str, default='',
                        help='Initialize model from this checkpoint (default='')')
     group.add_argument('--drop_rate', type=float, default=None,
@@ -123,7 +122,7 @@ def create_parser():
                        help='checkpoint saving interval, unit: epoch, (default=1)')
     group.add_argument('--epoch_size', type=int, default=90,
                        help='Train epoch size (default=90)')
-    group.add_argument('--dataset_sink_mode', type=str2bool, default=True,
+    group.add_argument('--dataset_sink_mode', type=str2bool, nargs='?', const=True, default=True,
                        help='The dataset sink mode (default=True).')
     group.add_argument('--in_channels', type=int, default=3,
                        help='Input channels (default=3)')
@@ -140,9 +139,9 @@ def create_parser():
                        help='Weight decay (default=1e-6)')
     group.add_argument('--loss_scale', type=float, default=1.0,
                        help='Loss scale (default=1.0)')
-    group.add_argument('--use_nesterov', type=str2bool, default=False,
+    group.add_argument('--use_nesterov', type=str2bool, nargs='?', const=True, default=False,
                        help='Enables the Nesterov momentum (default=False)')
-    group.add_argument('--filter_bias_and_bn', type=str2bool, default=True,
+    group.add_argument('--filter_bias_and_bn', type=str2bool, nargs='?', const=True, default=True,
                        help='Filter Bias and BatchNorm (default=True)')
 
     # Scheduler parameters
