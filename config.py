@@ -5,6 +5,15 @@ import argparse
 
 logger = logging.getLogger(__name__)
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', '1'):
+        return True
+    elif v.lower() in ('no', 'false', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 def create_parser():
     # The first arg parser parses out only the --config argument, this argument is used to
@@ -20,12 +29,14 @@ def create_parser():
     group = parser.add_argument_group('System parameters')
     group.add_argument('--mode', type=int, default=0,
                        help='Running in GRAPH_MODE(0) or PYNATIVE_MODE(1) (default=0)')
-    group.add_argument('--distribute', action='store_true', default=False,
+    group.add_argument('--distribute', type=str2bool, default=False,
                        help='Run distribute (default=False)')
-    group.add_argument('--val_while_train', action='store_true', default=False,
+    group.add_argument('--val_while_train', type=str2bool, default=False,
                        help='Verify accuracy while training (default=False)')
-    group.add_argument('--val_interval', type=int, default=1,
+    group.add_argument('--val_interval', type=int, default=2,
             help='Interval for validation while training (in epoch), Default: 1')
+    group.add_argument('--log_interval', type=int, default=100,
+            help='Interval for print training log (in step), if None, log every epoch. Default: 100')
 
 
     # Dataset parameters
@@ -35,17 +46,17 @@ def create_parser():
     group.add_argument('--data_dir', type=str, default='./', help='Path to dataset')
     group.add_argument('--train_split', type=str, default='train', help='dataset train split name')
     group.add_argument('--val_split', type=str, default='val', help='dataset validation split name')
-    group.add_argument('--dataset_download', action='store_true', default=False,
+    group.add_argument('--dataset_download', type=str2bool, default=False,
                        help='Download dataset (default=False)')
     group.add_argument('--num_parallel_workers', type=int, default=8,
                        help='Number of parallel workers (default=8)')
-    group.add_argument('--shuffle', action='store_true', default=True,
+    group.add_argument('--shuffle', type=str2bool, default=True,
                        help='Whether or not to perform shuffle on the dataset (default="True")')
     group.add_argument('--num_samples', type=int, default=None,
                        help='Number of elements to sample (default=None, which means sample all elements)')
-    group.add_argument('--batch_size', type=int, default=64,
-                       help='Number of batch size (default=64)')
-    group.add_argument('--drop_remainder', action='store_true', default=True,
+    group.add_argument('--batch_size', type=int, default=128,
+                       help='Number of batch size (default=128)')
+    group.add_argument('--drop_remainder', type=str2bool, default=True,
                        help='Determines whether or not to drop the last block whose data '
                             'row number is less than batch size (default=True)')
 
@@ -61,11 +72,11 @@ def create_parser():
                        help='Horizontal flip training aug probability (default=0.5)')
     group.add_argument('--vflip', type=float, default=0.,
                        help='Vertical flip training aug probability (default=0.)')
-    group.add_argument('--color_jitter', type=float, default=None,
+    group.add_argument('--color_jitter', type=float, default=0.4,
                        help='Color jitter factor (default=None)')
     group.add_argument('--interpolation', type=str, default='bilinear',
                        help='Image interpolation mode for resize operator(default="bilinear")')
-    group.add_argument('--auto_augment', action='store_true', default=False,
+    group.add_argument('--auto_augment', type=str2bool, default=False,
                        help='Whether to use auto augmentation (default=False)')
     group.add_argument('--re_prob', type=float, default=0.,
                        help='Probability of performing erasing (default=0.)')
@@ -93,9 +104,9 @@ def create_parser():
     group = parser.add_argument_group('Model parameters')
     group.add_argument('--model', type=str, default='mobilenet_v2_035_224',
                        help='Name of model')
-    group.add_argument('--num_classes', type=int, default=1000,
-                       help='Number of label classes (default=1000)')
-    group.add_argument('--pretrained', action='store_true', default=False,
+    group.add_argument('--num_classes', type=int, default=None,
+                       help='Number of label classes. If None, read from standard datasets. (default=None)')
+    group.add_argument('--pretrained', type=str2bool, default=False,
                        help='Load pretrained model (default=False)')
     group.add_argument('--ckpt_path', type=str, default='',
                        help='Initialize model from this checkpoint (default='')')
@@ -112,7 +123,7 @@ def create_parser():
                        help='checkpoint saving interval, unit: epoch, (default=1)')
     group.add_argument('--epoch_size', type=int, default=90,
                        help='Train epoch size (default=90)')
-    group.add_argument('--dataset_sink_mode', action='store_true', default=True,
+    group.add_argument('--dataset_sink_mode', type=str2bool, default=True,
                        help='The dataset sink mode (default=True).')
     group.add_argument('--in_channels', type=int, default=3,
                        help='Input channels (default=3)')
@@ -125,27 +136,27 @@ def create_parser():
     group.add_argument('--momentum', type=float, default=0.9,
                        help='Hyperparameter of type float, means momentum for the moving average. '
                             'It must be at least 0.0 (default=0.9)')
-    group.add_argument('--weight_decay', type=float, default=0.0,
-                       help='Weight decay (default=0.0)')
+    group.add_argument('--weight_decay', type=float, default=1e-6,
+                       help='Weight decay (default=1e-6)')
     group.add_argument('--loss_scale', type=float, default=1.0,
                        help='Loss scale (default=1.0)')
-    group.add_argument('--use_nesterov', action='store_true', default=False,
+    group.add_argument('--use_nesterov', type=str2bool, default=False,
                        help='Enables the Nesterov momentum (default=False)')
-    group.add_argument('--filter_bias_and_bn', action='store_true', default=True,
+    group.add_argument('--filter_bias_and_bn', type=str2bool, default=True,
                        help='Filter Bias and BatchNorm (default=True)')
 
     # Scheduler parameters
     group = parser.add_argument_group('Scheduler parameters')
-    group.add_argument('--scheduler', type=str, default='constant',
+    group.add_argument('--scheduler', type=str, default='warmup_cosine_decay',
                        choices=['constant', 'warmup_cosine_decay', 'exponential_decay', 'step_decay'],
                        help='Type of scheduler (default="constant")')
     group.add_argument('--lr', type=float, default=0.001,
                        help='learning rate (default=0.001)')
-    group.add_argument('--min_lr', type=float, default=None,
+    group.add_argument('--min_lr', type=float, default=1e-6,
                        help='The minimum value of learning rate if scheduler supports (default=None)')
-    group.add_argument('--warmup_epochs', type=int, default=None,
+    group.add_argument('--warmup_epochs', type=int, default=3,
                        help='Warmup epochs (default=None)')
-    group.add_argument('--decay_epochs', type=int, default=None,
+    group.add_argument('--decay_epochs', type=int, default=100,
                        help='Decay epochs (default=None)')
     group.add_argument('--decay_rate', type=float, default=0.9,
                        help='LR decay rate if scheduler supports')
