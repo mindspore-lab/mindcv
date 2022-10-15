@@ -1,6 +1,8 @@
 """Use the PYNATIVE mode to train the network"""
 import os
 from time import time
+import numpy as np
+from tqdm import tqdm
 
 import mindspore as ms
 from mindspore import nn, Tensor, ops, SummaryRecord
@@ -50,28 +52,35 @@ def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, summary_r
     n_steps = n_batches * n_epochs
     epoch_width, batch_width, step_width = len(str(n_epochs)), len(str(n_batches)), len(str(n_steps))
     total, correct = 0, 0
+    
+    start = time()
+
+    num_batches = dataset.get_dataset_size()
     for batch, (data, label) in enumerate(dataset.create_tuple_iterator()):
-        step_time = time()
         if args.distribute:
             loss, logits = train_step_parallel(data, label)
         else:
             loss, logits = train_step(data, label)
-        correct += (logits.argmax(1) == label).sum().asnumpy()
+
+        if len(label.shape) == 1: 
+            correct += (logits.argmax(1) == label).sum().asnumpy()
+        else: #one-hot or soft label
+            correct += (logits.argmax(1) == label.argmax(1)).sum().asnumpy()
         total += len(data)
 
-        if (batch + 1) % log_interval == 0:
+        if (batch + 1) % log_interval == 0 or (batch + 1) >= num_batches or batch==0:
             step = epoch * n_batches + batch + 1
+            cur_lr = optimizer.get_lr().asnumpy()
             print(f"Epoch:[{epoch+1:{epoch_width}d}/{n_epochs:{epoch_width}d}], "
                   f"batch:[{batch+1:{batch_width}d}/{n_batches:{batch_width}d}], "
-                  f"step:[{step:{step_width}d}/{n_steps:{step_width}d}], "
-                  f"loss:{loss.asnumpy():8.6f}, time:{time() - step_time:.6f}s")
-
-            if (not args.distribute) or (args.distribute and rank_id == 0):
+                  f"loss:{loss.asnumpy():8.6f}, lr: {cur_lr:.7f},  time:{time() - start:.6f}s")
+            start = time()
+            if rank_id in [0, None]:
                 if not isinstance(loss, Tensor):
                     loss = Tensor(loss)
                 summary_record.add_value('scalar', 'loss', loss)
                 summary_record.record(step)
-
+                
     if args.distribute:
         all_reduce = ops.AllReduce(ReduceOp.SUM)
         correct = all_reduce(Tensor(correct, ms.float32))
@@ -81,46 +90,55 @@ def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, summary_r
     else:
         correct /= total
 
-    if (not args.distribute) or (args.distribute and rank_id == 0):
-        print(f"Train Dataset: Epoch:[{epoch+1:{epoch_width}d}/{n_epochs:{epoch_width}d}],"
-              f"Accuracy: {(100 * correct):>0.1f}%")
+    if rank_id in [0, None]:
+        print(f"Training accuracy: {(100 * correct):0.3f}")
         if not isinstance(correct, Tensor):
             correct = Tensor(correct)
         summary_record.add_value('scalar', 'train_dataset_accuracy', correct)
         summary_record.record(step)
+    
+    return loss
 
-def test_loop(network, dataset, loss_fn, rank_id=None):
+def test_epoch(network, dataset, loss_fn, rank_id=None):
     """Test network accuracy and loss."""
     num_batches = dataset.get_dataset_size()
 
-    network.set_train(False)
-    total, test_loss, correct = 0, 0, 0
-    for data, label in dataset.create_tuple_iterator():
-        pred = network(data)
+    #@ms.ms_function
+    def test_forward_fn(data, label):
+        logits = network(data)
+        return logits
+
+    network.set_train(False) # TODO: check freeze 
+
+    total = ms.Parameter(default_input=ms.Tensor(0, ms.float32), requires_grad=False)
+    correct = ms.Parameter(default_input=ms.Tensor(0, ms.float32), requires_grad=False)
+    for data, label in tqdm(dataset.create_tuple_iterator()):
+        pred = test_forward_fn(data, label)
         total += len(data)
-        test_loss += loss_fn(pred, label).asnumpy()
-        correct += (pred.argmax(1) == label).sum().asnumpy()
+        if len(label.shape) == 1: 
+            correct += (pred.argmax(1) == label).sum()
+        else: #one-hot or soft label
+            correct += (pred.argmax(1) == label.argmax(1)).sum()
 
     if rank_id is not None:
         all_reduce = ops.AllReduce(ReduceOp.SUM)
-        test_loss = all_reduce(Tensor(test_loss, ms.float32))
         num_batches = all_reduce(Tensor(num_batches, ms.float32))
-        correct = all_reduce(Tensor(correct, ms.float32))
-        total = all_reduce(Tensor(total, ms.float32))
-        test_loss /= num_batches
+        correct = all_reduce(correct)
+        total = all_reduce(total)
         correct /= total
-        test_loss = test_loss.asnumpy()
-        correct = correct.asnumpy()
+        #correct = correct.asnumpy()
     else:
-        test_loss /= num_batches
         correct /= total
 
-    return correct, test_loss
+    return correct.asnumpy()
 
 
 def train(args):
     """Train network."""
-    ms.set_seed(1)
+    SEED = 1
+    ms.set_seed(SEED)
+    np.random.seed(SEED)
+
     ms.set_context(mode=ms.PYNATIVE_MODE)
 
     if args.distribute:
@@ -207,6 +225,8 @@ def train(args):
         )
 
     num_batches = loader_train.get_dataset_size()
+    num_samples = num_batches * args.batch_size *  device_num if device_num is not None else num_batches * args.batch_size
+
 
     # create model
     network = create_model(model_name=args.model,
@@ -216,6 +236,8 @@ def train(args):
                            drop_path_rate=args.drop_path_rate,
                            pretrained=args.pretrained,
                            checkpoint_path=args.ckpt_path)
+
+    num_params = sum([param.size for param in network.get_parameters()])
 
     # create loss
     loss = create_loss(name=args.loss,
@@ -240,49 +262,129 @@ def train(args):
                                  momentum=args.momentum,
                                  nesterov=args.use_nesterov,
                                  filter_bias_and_bn=args.filter_bias_and_bn,
-                                 loss_scale=args.loss_scale)
+                                 loss_scale=args.loss_scale,
+                                 checkpoint_path=os.path.join(
+                                     args.ckpt_save_dir, f'{args.model}_optim.ckpt'))
 
-    # training
-    # TODO: args.loss_scale is not making effect.
-    print('Training...')
+    # resume
+    begin_step = 0
+    begin_epoch = 0
+    if args.ckpt_path != '':
+            begin_step = optimizer.global_step.asnumpy()[0]
+            begin_epoch = args.ckpt_path.split('/')[-1].split('_')[0].split('-')[-1]
+            begin_epoch = int(begin_epoch)
+
+    # log
+    if rank_id in [None, 0]:
+        print('-'*40)
+        print('Num devices: ', device_num if device_num is not None else 1)
+        print('Distributed mode: ', args.distribute)
+        print('Num training samples: ', num_samples)
+        print('Num classes: ', args.num_classes) #dataset_train.num_classes())
+        print('Num batches: ', num_batches)
+        print('Batch size: ', args.batch_size)
+        print('Auto augment: ', args.auto_augment)
+        print('Model:', args.model)
+        print('Model param:', num_params)
+        print('Num epochs: ', args.epoch_size)
+        print('Optimizer: ', args.opt)
+        print('LR: ', args.lr)
+        print('LR Scheduler: ', args.scheduler)
+        print('-'*40)
+
+        if args.ckpt_path != '':
+            print(f'Resume training from {args.ckpt_path}, last step: {begin_step}, last epoch: {begin_epoch}')
+        else:
+            print('Start training')
+
+        if not os.path.exists(args.ckpt_save_dir): 
+            os.makedirs(args.ckpt_save_dir)
+
+        log_path = os.path.join(args.ckpt_save_dir, 'result.log')
+        if not (os.path.exists(log_path) and args.ckpt_path!=''): #if not resume training
+            with open(log_path, 'w') as fp: 
+                fp.write('Epoch\tTrain loss\tVal acc\n')
+
     best_acc = 0
-    summary_dir = "./summary_dir/summary_01"
+    summary_dir = "./{args.ckpt_save_dir}/summary_01"
+    
+    # Training 
+    # TODO: args.loss_scale is not making effect.
+    need_flush_from_cache = True
     with SummaryRecord(summary_dir) as summary_record:
-        for t in range(args.epoch_size):
+        for t in range(begin_epoch, args.epoch_size):
             epoch_time = time()
-            train_epoch(network, loader_train, loss, optimizer, epoch=t, n_epochs=args.epoch_size,
-                        summary_record=summary_record, rank_id=rank_id, log_interval=num_batches)
-            print(f'Epoch {t + 1} training time: {time() - epoch_time:.3f}s')
+
+            train_loss = train_epoch(network, 
+                    loader_train, 
+                    loss, 
+                    optimizer, 
+                    epoch=t, 
+                    n_epochs=args.epoch_size,
+                    summary_record=summary_record, 
+                    rank_id=rank_id, 
+                    log_interval=args.log_interval)
+
+            if rank_id in [None, 0]:
+                print(f'Epoch {t + 1} training time: {time() - epoch_time:.3f}s')
 
             # Save checkpoint
             if ((t + 1) % args.ckpt_save_interval == 0) or (t+1 == args.epoch_size):
                 if (not args.distribute) or (args.distribute and rank_id == 0):
-                    os.makedirs(args.ckpt_save_dir, exist_ok=True)
+                    
+                    if need_flush_from_cache:
+                        need_flush_from_cache = flush_from_cache(network)
+
                     save_path = os.path.join(args.ckpt_save_dir, f"{args.model}-{t + 1}_{num_batches}.ckpt") # for consistency with train.py
                     ms.save_checkpoint(network, save_path, async_save=True)
+                    ms.save_checkpoint(optimizer, os.path.join(args.ckpt_save_dir, f'{args.model}_optim.ckpt'), async_save=True)
                     print(f"Saving model to {save_path}")
-
+            
+            # val while train
+            test_acc = -1.0
             if args.val_while_train:
-                if ((t + 1) % args.ckpt_save_interval == 0) or (t+1 == args.epoch_size):
-                    test_acc, test_loss = test_loop(network, loader_eval, loss, rank_id=rank_id)
-                    if (not args.distribute) or (args.distribute and rank_id == 0):
-                        print(f"Test Dataset: Epoch: {t + 1}, Accuracy: {(100 * test_acc):>0.1f}%,"
-                              f"Avg loss: {test_loss:>8f}")
-                        current_step = (t + 1) * num_batches
-                        if not isinstance(test_acc, Tensor):
-                            test_acc = Tensor(test_acc)
-                        summary_record.add_value('scalar', 'test_dataset_accuracy', test_acc)
-                        summary_record.record(current_step)
-
+                if ((t + 1) % args.val_interval == 0) or (t+1 == args.epoch_size):
+                    if rank_id in [None, 0]:
+                        print('Validating...')
+                    val_start = time()
+                    test_acc = test_epoch(network, loader_eval, loss, rank_id=rank_id)
+                    if rank_id in [0, None]:
+                        val_time = time()-val_start
+                        print(f"Val time: {val_time:.2f} \t Val acc: {(100 * test_acc):0.3f}")
                         if test_acc > best_acc:
                             best_acc = test_acc
                             save_best_path = os.path.join(args.ckpt_save_dir, f"{args.model}-best.ckpt")
                             ms.save_checkpoint(network, save_best_path, async_save=True)
-                            print(f"Saving best accuracy model to {save_best_path}")
+                            print(f"=> New best accuracy: {100*test_acc:.3f}")
+                            #os.system(f'cp {save_path} {save_best_path}')
                         print("-" * 80)
+                        
+                        # add to summary
+                        current_step = (t + 1) * num_batches + begin_step
+                        if not isinstance(test_acc, Tensor):
+                            test_acc = Tensor(test_acc)
+                        summary_record.add_value('scalar', 'test_dataset_accuracy', test_acc)
+                        summary_record.record(int(current_step))
+
+            if rank_id in [None, 0]:
+                with open(log_path, 'a') as fp:
+                    fp.write(f'{t+1}\t{train_loss}\t{test_acc}\n')
 
     print("Done!")
 
+def flush_from_cache(network):
+    """Flush cache data to host if tensor is cache enable."""
+    has_cache_params = False
+    params = network.get_parameters()
+    for param in params:
+        if param.cache_enable:
+            has_cache_params = True
+            Tensor(param).flush_from_cache()
+    if not has_cache_params:
+        need_flush_from_cache = False
+    else:
+        need_flush_from_cache = True
+    return need_flush_from_cache
 
 if __name__ == '__main__':
     args = parse_args()

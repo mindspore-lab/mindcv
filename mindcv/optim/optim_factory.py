@@ -1,6 +1,8 @@
 ''' optim factory '''
+import os
 from typing import Optional
 from mindspore import nn
+from mindspore import load_checkpoint, load_param_into_net
 from .adan import Adan
 from .adamw import AdamW
 from .nadam import NAdam
@@ -34,6 +36,7 @@ def create_optimizer(
         filter_bias_and_bn: bool = True,
         loss_scale: float = 1.0,
         schedule_decay: float = 4e-3,
+        checkpoint_path: str = '',
         **kwargs):
     r"""Creates optimizer by name.
 
@@ -122,5 +125,9 @@ def create_optimizer(
                             **opt_args)
     else:
         raise ValueError(f'Invalid optimizer: {opt}')
+
+    if os.path.exists(checkpoint_path):
+        param_dict = load_checkpoint(checkpoint_path)
+        load_param_into_net(optimizer, param_dict)
 
     return optimizer
