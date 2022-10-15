@@ -1,5 +1,6 @@
 """Callbacks for mindspore.Model"""
 import os
+from time import time
 #import stat
 import numpy as np
 
@@ -10,6 +11,7 @@ from mindspore.common.tensor import Tensor
 from mindspore import ops, save_checkpoint, SummaryRecord
 from mindspore.train.callback import Callback
 from mindspore.train._utils import _make_directory
+from mindspore.train.callback._checkpoint import CheckpointManager
 
 class StateMonitor(Callback):
     """
@@ -24,12 +26,17 @@ class StateMonitor(Callback):
                  val_start_epoch=1,
                  save_best_ckpt=True,
                  ckpt_dir="./",
+                 ckpt_save_interval=1,
                  best_ckpt_name="best.ckpt",
                  metric_name="accuracy",
-                 dataset_sink_mode=True,
+                 dataset_sink_mode=False,
                  rank_id=None,
                  device_num=None,
-                 distribute=False
+                 distribute=False,
+                 log_interval=100,
+                 model_name='',
+                 begin_epoch=0,
+                 keep_checkpoint_max=10,
                  ):
         super().__init__()
         self.model = model
@@ -44,16 +51,28 @@ class StateMonitor(Callback):
         self.rank_id = rank_id if rank_id is not None else 0
         self.device_num = device_num if device_num is not None else 1
         self.distribute = distribute
+        self.log_interval = log_interval
+        self.model_name = model_name
+        self.ckpt_dir = ckpt_dir
+        self.ckpt_save_interval = ckpt_save_interval
+        self.begin_epoch = begin_epoch
 
-        self.log_txt_fp = os.path.join(ckpt_dir, 'metric_log.txt')
-        if self.rank_id == 0:
+        self.keep_checkpoint_max = keep_checkpoint_max
+        self._manager = CheckpointManager()
+        self._need_flush_from_cache = True
+
+        if self.rank_id in [0, None]:
+            if not os.path.isdir(ckpt_dir):
+                os.makedirs(ckpt_dir)
+            self.log_txt_fp = os.path.join(ckpt_dir, 'result.log')
+
             with open(self.log_txt_fp, 'w', encoding="utf-8") as fp:
                 fp.write('Epoch\tTrain loss\tVal acc\n')
 
-        if not os.path.isdir(ckpt_dir):
-            os.makedirs(ckpt_dir)
-        self.best_ckpt_path = os.path.join(ckpt_dir, best_ckpt_name)
-        self.epoch_idx = 1
+            self.best_ckpt_path = os.path.join(ckpt_dir, best_ckpt_name)
+
+        self.start = time()
+        self.epoch_start = time()
 
     def __enter__(self):
         self.summary_record = SummaryRecord(self.summary_dir)
@@ -66,16 +85,63 @@ class StateMonitor(Callback):
         """Model evaluation, return validation accuracy."""
         return self.model.eval(self.dataset_val, dataset_sink_mode=self.dataset_sink_mode)
 
+    def step_end(self, run_context):
+        #print('step time: ', time() - self.start)
+
+        cb_params = run_context.original_args()
+        num_batches = cb_params.batch_num
+        global_step = cb_params.optimizer.global_step.asnumpy()[0]
+        cur_epoch = (global_step-1) // num_batches
+        #cur_step_in_epoch = (global_step- 1) % cb_params.batch_num
+        cur_step_in_epoch  = int((cb_params.cur_step_num - 1) % cb_params.batch_num)
+
+        if (cur_step_in_epoch  + 1) % self.log_interval == 0 or (cur_step_in_epoch  + 1) >= num_batches or cur_step_in_epoch==0:
+            cur_lr = cb_params.optimizer.get_lr().asnumpy()
+            loss = self._get_loss(cb_params)
+
+            #print(f"Epoch: {cb_params.cur_epoch_num + self.begin_epoch}, "
+            print(f"Epoch: {cur_epoch+1}, "
+                  f"batch:[{cur_step_in_epoch+1}/{num_batches}], "
+                  f"loss:{loss.asnumpy():.6f}, lr: {cur_lr:.7f},  time:{time() - self.start:.6f}s")
+            self.start = time()
+
     def on_train_epoch_end(self, run_context):
         """
         After epoch, print train loss and val accuracy,
         save the best ckpt file with highest validation accuracy.
         """
-        callback_params = run_context.original_args()
-        cur_epoch = callback_params.cur_epoch_num
+        cb_params = run_context.original_args()
+        # the global step may larger than batch_size * epoch due to graph mode async
+        global_step = cb_params.optimizer.global_step.asnumpy()[0]
+        cur_epoch = (global_step - 1) // cb_params.batch_num
+        cur_step_in_epoch = cb_params.batch_num #(global_step - 1) % cb_params.batch_num
+
+        #print(global_step, cur_step_in_epoch)
+
+        # log
+        print(f'Total time since last epoch: {time()-self.epoch_start:.5f}')
+        self.epoch_start = time()
+
+        # save checkpoint
+        if self.rank_id in [0, None]:
+            if ((cur_epoch + 1) % self.ckpt_save_interval == 0) or (cur_epoch+1 == cb_params.epoch_num):
+                if self._need_flush_from_cache:
+                    self._flush_from_cache(cb_params)
+
+                cur_ckpoint_file = self.model_name + "-" + str(cur_epoch+1) + "_" \
+                        + str(cur_step_in_epoch) + ".ckpt"
+                # update checkpoint file list.
+                self._manager.update_ckpoint_filelist(self.ckpt_dir, self.model_name)
+                # keep checkpoint files number equal max number.
+                if self.keep_checkpoint_max and 0 < self.keep_checkpoint_max <= self._manager.ckpoint_num:
+                    self._manager.remove_oldest_ckpoint_file()
+
+                ckpt_save_path = os.path.join(self.ckpt_dir, cur_ckpoint_file)
+                ms.save_checkpoint(cb_params.train_network, ckpt_save_path , async_save=True)
+                print(f'Model saved in {ckpt_save_path}')
 
         # record loss curve
-        loss = self._get_loss(callback_params)
+        loss = self._get_loss(cb_params)
         self.summary_record.add_value('scalar', f'train_loss_{self.rank_id}', loss)
 
         # val while training if validation loader is not None
@@ -91,8 +157,8 @@ class StateMonitor(Callback):
                     all_reduce = ops.AllReduce(ReduceOp.SUM)
                     val_acc = all_reduce(Tensor(val_acc, ms.float32))
                     val_acc /= self.device_num
-                if self.rank_id == 0:
-                    print(f"Validation: Epoch: {cur_epoch}, Metrics: [{self.metric_name}:{val_acc}]")
+                if self.rank_id in [0, None]:
+                    print(f"Val {self.metric_name}: {val_acc}]")
                     if not isinstance(val_acc, Tensor):
                         val_acc = Tensor(val_acc)
                     self.summary_record.add_value('scalar', 'val_' + self.metric_name, val_acc)
@@ -101,17 +167,17 @@ class StateMonitor(Callback):
                 if val_acc > self.best_res:
                     self.best_res = val_acc
                     if self.save_best_ckpt and (self.rank_id==0):
-                        save_checkpoint(callback_params.train_network, self.best_ckpt_path, async_save=True)
-                        print(f"Save the best {self.metric_name} ckpt, the {self.metric_name} is {self.best_res}")
-                print("-" * 80)
+                        save_checkpoint(cb_params.train_network, self.best_ckpt_path, async_save=True)
+                        print(f"Best epoch w.r.t. {self.metric_name} saved")
 
-        if self.rank_id == 0:
-            #self.metric_log_fp.write(f'{self.epoch_idx}\t{loss}\t{val_acc}\n')
+                # Save optim parameter for resume training
+                ms.save_checkpoint(cb_params.optimizer, os.path.join(self.ckpt_dir, f'{self.model_name}_optim.ckpt'), async_save=True)
+
+        if self.rank_id in [0, None]:
             with open(self.log_txt_fp, 'a', encoding="utf-8") as fp:
-                fp.write(f'{self.epoch_idx}\t{loss}\t{val_acc}\n')
+                fp.write(f'{cur_epoch+1}\t{loss}\t{val_acc}\n')
 
-        self.epoch_idx += 1
-        self.summary_record.record(callback_params.cur_step_num)
+        self.summary_record.record(int(global_step))
 
     # pylint: disable=unused-argument
     def on_train_end(self, run_context):
@@ -150,6 +216,23 @@ class StateMonitor(Callback):
         loss = Tensor(np.mean(loss.asnumpy()))
         return loss
 
+    def _flush_from_cache(self, cb_params):
+        """Flush cache data to host if tensor is cache enable."""
+        has_cache_params = False
+        params = cb_params.train_network.get_parameters()
+        for param in params:
+            if param.cache_enable:
+                has_cache_params = True
+                Tensor(param).flush_from_cache()
+        if not has_cache_params:
+            self._need_flush_from_cache = False
+
+    def remove_oldest_ckpoint_file(self):
+        """Remove the oldest checkpoint file from this checkpoint manager and also from the directory."""
+        ckpoint_files = sorted(self._ckpoint_filelist, key=os.path.getmtime)
+        self.remove_ckpoint_file(ckpoint_files[0])
+
+
 class LossAccSummary(Callback):
     ''' A callback for recording loss and acc during training '''
     def __init__(self,
@@ -183,6 +266,7 @@ class LossAccSummary(Callback):
             if not isinstance(val_acc, Tensor):
                 val_acc = Tensor(val_acc)
             self.summary_record.add_value('scalar', 'test_dataset_' + self.metric_name, val_acc)
+
         self.summary_record.add_value('scalar', 'loss/auto', loss)
         self.summary_record.record(cb_params.cur_step_num)
 
