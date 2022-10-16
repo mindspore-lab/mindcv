@@ -164,9 +164,11 @@ class StateMonitor(Callback):
                     all_reduce = ops.AllReduce(ReduceOp.SUM)
                     val_acc = all_reduce(Tensor(val_acc, ms.float32))
                     val_acc /= self.device_num
+                    val_acc_val = (100*val_acc).asnumpy()
+                else:
+                    val_acc_val = 100*val_acc
 
                 if self.rank_id in [0, None]:
-                    val_acc_val = (100*val_acc).asnumpy()
                     print(f"Validation {self.metric_name}: {val_acc_val:.3f}")
                     # Save the best ckpt file
                     if val_acc > self.best_res:
