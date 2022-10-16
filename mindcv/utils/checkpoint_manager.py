@@ -1,5 +1,6 @@
 '''checkpoint manager '''
 import os
+import stat
 
 class CheckpointManager:
     """Manage checkpoint files according to train_config of checkpoint."""
