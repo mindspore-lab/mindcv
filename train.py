@@ -151,7 +151,7 @@ def train(args):
                                  filter_bias_and_bn=args.filter_bias_and_bn,
                                  loss_scale=args.loss_scale,
                                  checkpoint_path=os.path.join(
-                                     args.ckpt_save_dir, f'{args.model}_optim.ckpt'))
+                                     args.ckpt_save_dir, f'optim_{args.model}.ckpt'))
 
     # Define eval metrics.
     eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy()}
