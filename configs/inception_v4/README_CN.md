@@ -3,17 +3,16 @@
 ***
 > [InceptionV4: Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning](https://arxiv.org/pdf/1602.07261.pdf)
 
-## Introduction
+## 模型简介
 
 ***
-InceptionV4 studies whether the Inception module combined with Residual Connection can be improved. It is found that the
-structure of ResNet can greatly accelerate the training, and the performance is also improved. An Inception-ResNet v2
-network is obtained, and a deeper and more optimized Inception v4 model is also designed, which can achieve comparable
-performance with Inception-ResNet v2.
+
+在开发InceptionV4模型的过程中，研究人员探究了残差网络结合Inception模块是否可以增强模型的性能。结果显示该结构可以大大加速训练，性能得到了极大的提升。
+通过该研究，研究人员提出了Inception-ResNetV2模型，同时还基于该模型，设计了性能更好的InceptionV4模型。
 
 ![](./InceptionV4.jpg)
 
-## Benchmark
+## 性能指标
 
 ***
 
@@ -23,20 +22,21 @@ performance with Inception-ResNet v2.
 |  GPU   | inception_v4 |           |           |    1702.063     |            |    1895.667    |            | [model]() | [config]() |
 | Ascend | inception_v4 |           |           |                 |            |                |            |           |            |
 
-## Examples
+## 示例
 
 ***
 
-### Train
+### 训练
 
-- The [yaml config files](../../configs) that yield competitive results on ImageNet for different models are listed in
-  the `configs` folder. To trigger training using preset yaml config.
+- 下面是使用预设的yaml配置文件启动训练的示例.
+
+> [configs文件夹](../../configs)中列出了mindcv套件所包含的模型的各个规格的yaml配置文件(在ImageNet数据集上训练和验证的配置)。
 
   ```shell
   comming soon
   ```
 
-- Here is the example for finetuning a pretrained InceptionV3 on CIFAR10 dataset using Momentum optimizer.
+- 下面是使用在ImageNet上预训练的InceptionV3模型和Momentum优化器在CIFAR10数据集上进行微调的示例。
 
   ```shell
   python train.py --model=inception_v4 --pretrained --opt=momentum --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
@@ -44,7 +44,7 @@ performance with Inception-ResNet v2.
 
 Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
 
-### Eval
+### 验证
 
 - To validate the model, you can use `validate.py`. Here is an example to verify the accuracy of pretrained weights.
 
