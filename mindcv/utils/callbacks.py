@@ -161,17 +161,17 @@ class StateMonitor(Callback):
 
                 if self.rank_id in [0, None]:
                     print(f"Validation {self.metric_name}: {100*val_acc:.3f}")
+                    # Save the best ckpt file
+                    if val_acc > self.best_res:
+                        self.best_res = val_acc
+                        self.best_epoch =cur_epoch
+                        if self.save_best_ckpt and (self.rank_id==0):
+                            save_checkpoint(cb_params.train_network, self.best_ckpt_path, async_save=True)
+                            print(f"=> New best val acc: {100*val_acc:.3f}")
+
                     if not isinstance(val_acc, Tensor):
                         val_acc = Tensor(val_acc)
                     self.summary_record.add_value('scalar', 'val_' + self.metric_name, val_acc)
-
-                # Save the best ckpt file
-                if val_acc > self.best_res:
-                    self.best_res = val_acc
-                    self.best_epoch =cur_epoch
-                    if self.save_best_ckpt and (self.rank_id==0):
-                        save_checkpoint(cb_params.train_network, self.best_ckpt_path, async_save=True)
-                        print(f"=> New best val acc: {100*val_acc:.3f}")
 
                 # Save optim parameter for resume training
                 ms.save_checkpoint(cb_params.optimizer, os.path.join(self.ckpt_dir, f'{self.model_name}_optim.ckpt'), async_save=True)
