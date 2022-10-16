@@ -88,6 +88,8 @@ def train(args):
             name=args.dataset,
             root=args.data_dir,
             split=args.val_split,
+            num_shards=device_num,
+            shard_id=rank_id,
             num_parallel_workers=args.num_parallel_workers,
             download=args.dataset_download)
 
