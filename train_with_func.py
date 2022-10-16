@@ -154,6 +154,7 @@ def train(args):
         device_num = None
         rank_id = None
 
+
     # create dataset
     dataset_train = create_dataset(
         name=args.dataset,
@@ -255,7 +256,6 @@ def train(args):
                                     warmup_epochs=args.warmup_epochs,
                                     decay_epochs=args.decay_epochs,
                                     decay_rate=args.decay_rate)
-
     # create optimizer
     optimizer = create_optimizer(network.trainable_params(),
                                  opt=args.opt,
@@ -293,6 +293,8 @@ def train(args):
         print('LR: ', args.lr)
         print('LR Scheduler: ', args.scheduler)
         print('-'*40)
+        
+        assert args.loss_scale==1.0, 'loss_scale > 1.0 is not supported in train_with_func currently.'
 
         if args.ckpt_path != '':
             print(f'Resume training from {args.ckpt_path}, last step: {begin_step}, last epoch: {begin_epoch}')
