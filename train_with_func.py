@@ -18,7 +18,7 @@ from mindcv.scheduler import create_scheduler
 from config import parse_args
 
 
-def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, summary_record, rank_id=None, log_interval=100):
+def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, summary_record=None, rank_id=None, log_interval=100):
     """Training an epoch network"""
     # Define forward function
     def forward_fn(data, label):
@@ -78,8 +78,9 @@ def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, summary_r
             if rank_id in [0, None]:
                 if not isinstance(loss, Tensor):
                     loss = Tensor(loss)
-                summary_record.add_value('scalar', 'loss', loss)
-                summary_record.record(step)
+                if summary_record is not None:
+                    summary_record.add_value('scalar', 'loss', loss)
+                    summary_record.record(step)
                 
     if args.distribute:
         all_reduce = ops.AllReduce(ReduceOp.SUM)
@@ -94,8 +95,9 @@ def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, summary_r
         print(f"Training accuracy: {(100 * correct):0.3f}")
         if not isinstance(correct, Tensor):
             correct = Tensor(correct)
-        summary_record.add_value('scalar', 'train_dataset_accuracy', correct)
-        summary_record.record(step)
+        if summary_record is not None:
+            summary_record.add_value('scalar', 'train_dataset_accuracy', correct)
+            summary_record.record(step)
     
     return loss
 
@@ -355,7 +357,7 @@ def train(args):
                             best_acc = test_acc
                             save_best_path = os.path.join(args.ckpt_save_dir, f"{args.model}-best.ckpt")
                             ms.save_checkpoint(network, save_best_path, async_save=True)
-                            print(f"=> New best accuracy: {100*test_acc:.3f}")
+                            print(f"=> New best val acc: {100*test_acc:.3f}")
                             #os.system(f'cp {save_path} {save_best_path}')
                         print("-" * 80)
                         
@@ -363,8 +365,9 @@ def train(args):
                         current_step = (t + 1) * num_batches + begin_step
                         if not isinstance(test_acc, Tensor):
                             test_acc = Tensor(test_acc)
-                        summary_record.add_value('scalar', 'test_dataset_accuracy', test_acc)
-                        summary_record.record(int(current_step))
+                        if summary_record is not None:
+                            summary_record.add_value('scalar', 'test_dataset_accuracy', test_acc)
+                            summary_record.record(int(current_step))
 
             if rank_id in [None, 0]:
                 with open(log_path, 'a') as fp:

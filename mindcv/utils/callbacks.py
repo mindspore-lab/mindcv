@@ -13,6 +13,8 @@ from mindspore.train.callback import Callback
 from mindspore.train._utils import _make_directory
 from mindspore.train.callback._checkpoint import CheckpointManager
 
+from .checkpoint_manager import CheckpointManager
+
 class StateMonitor(Callback):
     """
     Train loss and validation accuracy monitor, after each epoch save the
@@ -120,8 +122,9 @@ class StateMonitor(Callback):
         #print(global_step, cur_step_in_epoch)
 
         # log
-        print(f'Total time since last epoch: {time()-self.epoch_start:.5f}')
-        self.epoch_start = time()
+        if self.rank_id in [0, None]:
+            print(f'Total time since last epoch: {time()-self.epoch_start:.5f}')
+            self.epoch_start = time()
 
         # save checkpoint
         if self.rank_id in [0, None]:
@@ -139,6 +142,9 @@ class StateMonitor(Callback):
 
                 ckpt_save_path = os.path.join(self.ckpt_dir, cur_ckpoint_file)
                 ms.save_checkpoint(cb_params.train_network, ckpt_save_path , async_save=True)
+		# save optim for resume
+                optim_save_path = os.path.join(self.ckpt_dir, f'optim_{self.model_name}.ckpt')
+                ms.save_checkpoint(cb_params.optimizer, optim_save_path, async_save=True)
                 print(f'Model saved in {ckpt_save_path}')
 
         # record loss curve
@@ -160,21 +166,19 @@ class StateMonitor(Callback):
                     val_acc /= self.device_num
 
                 if self.rank_id in [0, None]:
-                    print(f"Validation {self.metric_name}: {100*val_acc:.3f}")
+                    val_acc_val = (100*val_acc).asnumpy()
+                    print(f"Validation {self.metric_name}: {val_acc_val:.3f}")
+                    # Save the best ckpt file
+                    if val_acc > self.best_res:
+                        self.best_res = val_acc
+                        self.best_epoch =cur_epoch
+                        if self.save_best_ckpt and (self.rank_id==0):
+                            save_checkpoint(cb_params.train_network, self.best_ckpt_path, async_save=True)
+                            print(f"=> New best val acc: {val_acc_val:.3f}")
+
                     if not isinstance(val_acc, Tensor):
                         val_acc = Tensor(val_acc)
                     self.summary_record.add_value('scalar', 'val_' + self.metric_name, val_acc)
-
-                # Save the best ckpt file
-                if val_acc > self.best_res:
-                    self.best_res = val_acc
-                    self.best_epoch =cur_epoch
-                    if self.save_best_ckpt and (self.rank_id==0):
-                        save_checkpoint(cb_params.train_network, self.best_ckpt_path, async_save=True)
-                        print(f"=> New best val acc: {100*val_acc:.3f}")
-
-                # Save optim parameter for resume training
-                ms.save_checkpoint(cb_params.optimizer, os.path.join(self.ckpt_dir, f'{self.model_name}_optim.ckpt'), async_save=True)
 
         if self.rank_id in [0, None]:
             with open(self.log_txt_fp, 'a', encoding="utf-8") as fp:
@@ -185,7 +189,8 @@ class StateMonitor(Callback):
     # pylint: disable=unused-argument
     def on_train_end(self, run_context):
         if self.dataset_val is not None and self.rank_id==0:
-            print(f"\nFinish training!\nThe best validation {self.metric_name} is: {self.best_res} at epoch {self.best_epoch}, Model \rsaved in {self.best_ckpt_path}", flush=True)
+            print("Finish training!")
+            print(f"The best validation {self.metric_name} is: {self.best_res} at epoch {self.best_epoch}.")
         print("=" * 80)
 
     def _get_loss(self, cb_params):
@@ -233,7 +238,6 @@ class StateMonitor(Callback):
         """Remove the oldest checkpoint file from this checkpoint manager and also from the directory."""
         ckpoint_files = sorted(self._ckpoint_filelist, key=os.path.getmtime)
         self.remove_ckpoint_file(ckpoint_files[0])
-
 
 class LossAccSummary(Callback):
     ''' A callback for recording loss and acc during training '''
