@@ -11,9 +11,9 @@ from mindspore.common.tensor import Tensor
 from mindspore import ops, save_checkpoint, SummaryRecord
 from mindspore.train.callback import Callback
 from mindspore.train._utils import _make_directory
-#from mindspore.train.callback._checkpoint import CheckpointManager
+from mindspore.train.callback._checkpoint import CheckpointManager
 
-from .checkpoint_manager import CheckpointManager 
+from .checkpoint_manager import CheckpointManager
 
 class StateMonitor(Callback):
     """
@@ -142,6 +142,9 @@ class StateMonitor(Callback):
 
                 ckpt_save_path = os.path.join(self.ckpt_dir, cur_ckpoint_file)
                 ms.save_checkpoint(cb_params.train_network, ckpt_save_path , async_save=True)
+		# save optim for resume
+                optim_save_path = os.path.join(self.ckpt_dir, f'optim_{self.model_name}.ckpt')
+                ms.save_checkpoint(cb_params.optimizer, optim_save_path, async_save=True)
                 print(f'Model saved in {ckpt_save_path}')
 
         # record loss curve
@@ -177,12 +180,6 @@ class StateMonitor(Callback):
                         val_acc = Tensor(val_acc)
                     self.summary_record.add_value('scalar', 'val_' + self.metric_name, val_acc)
 
-                # Save optim parameter for resume training
-                optim_save_path = os.path.join(self.ckpt_dir, f'optim_{self.model_name}.ckpt')
-                #if os.path.exists(optim_save_path):
-                #    os.remove(optim_save_path)
-                ms.save_checkpoint(cb_params.optimizer, optim_save_path, async_save=True)
-
         if self.rank_id in [0, None]:
             with open(self.log_txt_fp, 'a', encoding="utf-8") as fp:
                 fp.write(f'{cur_epoch+1}\t{loss}\t{val_acc}\n')
@@ -192,8 +189,8 @@ class StateMonitor(Callback):
     # pylint: disable=unused-argument
     def on_train_end(self, run_context):
         if self.dataset_val is not None and self.rank_id==0:
-            print(f"\nFinish training!\n")
-            print(f"The best validation {self.metric_name} is: {self.best_res} at epoch {self.best_epoch}, Model \rsaved in {self.best_ckpt_path}")
+            print("Finish training!")
+            print(f"The best validation {self.metric_name} is: {self.best_res} at epoch {self.best_epoch}.")
         print("=" * 80)
 
     def _get_loss(self, cb_params):
