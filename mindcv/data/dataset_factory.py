@@ -101,6 +101,14 @@ def create_dataset(
         dataset = dataset_class(dataset_dir=dataset_new_path if dataset_new_path else root,
                                 usage=split,
                                 **mindspore_kwargs)
+        # address ms dataset num_classes empty issue
+        if name == 'mnist':
+            dataset.num_classes = lambda :10
+        elif name == 'cifar10':
+            dataset.num_classes = lambda :10
+        elif name == 'cifar100':
+            dataset.num_classes = lambda :100
+
     else:
         if name == "imagenet" and download:
             raise ValueError("Imagenet dataset download is not supported.")

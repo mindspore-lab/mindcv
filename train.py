@@ -78,7 +78,7 @@ def train(args):
         drop_remainder=args.drop_remainder,
         is_training=True,
         mixup=args.mixup,
-        num_classes=args.num_classes,
+        num_classes=num_classes,
         transform=transform_list,
         num_parallel_workers=args.num_parallel_workers,
     )
@@ -118,7 +118,7 @@ def train(args):
 
     # create model
     network = create_model(model_name=args.model,
-                           num_classes=args.num_classes,
+                           num_classes=num_classes,
                            in_channels=args.in_channels,
                            drop_rate=args.drop_rate,
                            drop_path_rate=args.drop_path_rate,
@@ -203,7 +203,7 @@ def train(args):
         print('Num devices: ', device_num if device_num is not None else 1)
         print('Distributed mode: ', args.distribute)
         print('Num training samples: ', num_samples)
-        print('Num classes: ', args.num_classes) #dataset_train.num_classes())
+        print('Num classes: ', num_classes) #dataset_train.num_classes())
         print('Num batches: ', num_batches)
         print('Batch size: ', args.batch_size)
         print('Auto augment: ', args.auto_augment)
