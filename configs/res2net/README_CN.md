@@ -4,17 +4,15 @@
 
 > [Res2Net: A New Multi-scale Backbone Architecture](https://arxiv.org/pdf/1904.01169.pdf)
 
-## Introduction
+## 模型简介
 
 ***
-We propose a novel building block for CNNs, namely Res2Net, by constructing hierarchical residual-like connections
-within one single residual block. The Res2Net represents multi-scale features at a granular level and increases the
-range of receptive fields for each network layer. The proposed Res2Net block can be plugged into the state-of-the-art
-backbone CNN models, e.g. , ResNet, ResNeXt, BigLittleNet, and DLA. We evaluate the Res2Net block on all these models
-and demonstrate consistent performance gains over baseline models.
+在本文中，我们通过在一个单个残差模块内构造分层的类残差连接，构建了一种新的CNN模块，我们将该网络命名为Res2Net。Res2Net以更细粒度的方式表示多尺度特征，并且还增加了每个网络层的感受野范围。Res2Net模块还可以融合到目前性能最佳的CNN模型（如ResNet，ResNeXt和DLA）的主干网络中。
+我们将这些融合了Res2Net模块的模型在主流的数据集（例如CIFAR-100和ImageNet）上进行了评估，结果表明，相较于基线模型，融合后的模型的性能获得了一致地提升。
+
 ![](res2net.png)
 
-## Benchmark
+## 性能指标
 
 ***
 
@@ -30,38 +28,37 @@ and demonstrate consistent performance gains over baseline models.
 |  GPU   | res2net101_v1b |           |           |                 |            |                |            | [model]() | [config]() |
 | Ascend | res2net101_v1b |           |           |                 |            |                |            |           |            |
 
-## Examples
+## 示例
 
 ***
 
-### Train
+### 训练
 
-- The [yaml config files](../../configs) that yield competitive results on ImageNet for different models are listed in
-  the `configs` folder. To trigger training using preset yaml config.
+- 下面是使用预设的yaml配置文件启动训练的示例.
+
+> [configs文件夹](../../configs)中列出了mindcv套件所包含的模型的各个规格的yaml配置文件(在ImageNet数据集上训练和验证的配置)。
 
   ```shell
   comming soon
   ```
 
-- Here is the example for finetuning a pretrained InceptionV3 on CIFAR10 dataset using Adam optimizer.
+- 下面是使用在ImageNet上预训练的Res2Net50模型和Momentum优化器在CIFAR10数据集上进行微调的示例。
 
   ```shell
   python train.py --model=res2net50 --pretrained --opt=momentum --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
   ```
 
-Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
+详细的可调参数及其默认值可以在[config.py](../../config.py)中查看。
 
-### Eval
+### 验证
 
-- To validate the model, you can use `validate.py`. Here is an example for res2net50 to verify the accuracy of
-  pretrained weights.
+- 下面是使用`validate.py`文件验证Res2Net50的预训练模型的精度的示例。
 
   ```shell
   python validate.py --model=res2net50 --dataset=imagenet --val_split=val --pretrained
   ```
 
-- To validate the model, you can use `validate.py`. Here is an example for res2net50 to verify the accuracy of your
-  training.
+- 下面是使用`validate.py`文件验证Res2Net50的自定义参数文件的精度的示例。
 
   ```shell
   python validate.py --model=res2net50 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/res2net50-best.ckpt'
