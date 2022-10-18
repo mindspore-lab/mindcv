@@ -154,7 +154,6 @@ def train(args):
         device_num = None
         rank_id = None
 
-
     # create dataset
     dataset_train = create_dataset(
         name=args.dataset,
@@ -166,6 +165,11 @@ def train(args):
         shard_id=rank_id,
         num_parallel_workers=args.num_parallel_workers,
         download=args.dataset_download)
+    
+    if args.num_classes is None:
+        num_classes = dataset_train.num_classes()
+    else:
+        num_classes = args.num_classes
 
     # create transforms
     transform_list = create_transforms(
@@ -195,7 +199,7 @@ def train(args):
         drop_remainder=False,
         is_training=True,
         mixup=args.mixup,
-        num_classes=args.num_classes,
+        num_classes=num_classes,
         transform=transform_list,
         num_parallel_workers=args.num_parallel_workers,
     )
@@ -205,6 +209,8 @@ def train(args):
             name=args.dataset,
             root=args.data_dir,
             split=args.val_split,
+            num_shards=device_num,
+            shard_id=rank_id,
             num_parallel_workers=args.num_parallel_workers,
             download=args.dataset_download)
 
@@ -233,7 +239,7 @@ def train(args):
 
     # create model
     network = create_model(model_name=args.model,
-                           num_classes=args.num_classes,
+                           num_classes=num_classes,
                            in_channels=args.in_channels,
                            drop_rate=args.drop_rate,
                            drop_path_rate=args.drop_path_rate,
@@ -282,7 +288,7 @@ def train(args):
         print('Num devices: ', device_num if device_num is not None else 1)
         print('Distributed mode: ', args.distribute)
         print('Num training samples: ', num_samples)
-        print('Num classes: ', args.num_classes) #dataset_train.num_classes())
+        print('Num classes: ', num_classes) #dataset_train.num_classes())
         print('Num batches: ', num_batches)
         print('Batch size: ', args.batch_size)
         print('Auto augment: ', args.auto_augment)
