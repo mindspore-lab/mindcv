@@ -65,9 +65,11 @@ def main():
         num_parallel_workers=args.num_parallel_workers,
     )
 
+    num_classes = dataset_eval.num_classes() if args.num_classes==None else args.num_classes
+
     # create model
     network = create_model(model_name=args.model,
-                           num_classes=args.num_classes,
+                           num_classes=num_classes,
                            drop_rate=args.drop_rate,
                            drop_path_rate=args.drop_path_rate,
                            pretrained=args.pretrained,
