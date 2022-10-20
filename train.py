@@ -1,8 +1,9 @@
 ''' Model training pipeline '''
 import os
+import logging
 import mindspore as ms
 import numpy as np
-from mindspore import nn
+from mindspore import nn, Tensor
 from mindspore import FixedLossScaleManager, Model, LossMonitor, TimeMonitor, CheckpointConfig, ModelCheckpoint
 from mindspore.communication import init, get_rank, get_group_size
 
@@ -11,12 +12,18 @@ from mindcv.data import create_dataset, create_transforms, create_loader
 from mindcv.loss import create_loss
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
-from mindcv.utils import StateMonitor
+from mindcv.utils import StateMonitor, Allreduce
 from config import parse_args
 
 ms.set_seed(1)
 np.random.seed(1)
 
+logger = logging.getLogger('train')
+logger.setLevel(logging.INFO)
+h1 = logging.StreamHandler()
+formatter1 = logging.Formatter('%(message)s',)
+logger.addHandler(h1)
+h1.setFormatter(formatter1)
 
 def train(args):
     ''' main train function'''
@@ -82,39 +89,53 @@ def train(args):
         transform=transform_list,
         num_parallel_workers=args.num_parallel_workers,
     )
-
+    device_target = ms.get_context("device_target")
+    #TODO: Implement parallel mode on Ascend
     if args.val_while_train:
-        dataset_eval = create_dataset(
-            name=args.dataset,
-            root=args.data_dir,
-            split=args.val_split,
-            num_shards=device_num,
-            shard_id=rank_id,
-            num_parallel_workers=args.num_parallel_workers,
-            download=args.dataset_download)
+        if args.distribute and device_target == 'Ascend':
+            loader_eval = None
+        else:
+            dataset_eval = create_dataset(
+                name=args.dataset,
+                root=args.data_dir,
+                split=args.val_split,
+                num_shards=device_num,
+                shard_id=rank_id,
+                num_parallel_workers=args.num_parallel_workers,
+                download=args.dataset_download)
 
-        transform_list_eval = create_transforms(
-            dataset_name=args.dataset,
-            is_training=False,
-            image_resize=args.image_resize,
-            crop_pct=args.crop_pct,
-            interpolation=args.interpolation,
-            mean=args.mean,
-            std=args.std
-        )
+            transform_list_eval = create_transforms(
+                dataset_name=args.dataset,
+                is_training=False,
+                image_resize=args.image_resize,
+                crop_pct=args.crop_pct,
+                interpolation=args.interpolation,
+                mean=args.mean,
+                std=args.std
+            )
 
-        loader_eval = create_loader(
-            dataset=dataset_eval,
-            batch_size=args.batch_size,
-            drop_remainder=False,
-            is_training=False,
-            transform=transform_list_eval,
-            num_parallel_workers=args.num_parallel_workers,
-        )
+            loader_eval = create_loader(
+                dataset=dataset_eval,
+                batch_size=args.batch_size,
+                drop_remainder=False,
+                is_training=False,
+                transform=transform_list_eval,
+                num_parallel_workers=args.num_parallel_workers,
+            )
+            # validation dataset count
+            eval_count = dataset_eval.get_dataset_size()
+            if args.distribute:
+                all_reduce = Allreduce()
+                eval_count = all_reduce(Tensor(eval_count, ms.int32))
     else:
         loader_eval = None
 
     num_batches = loader_train.get_dataset_size()
+    # Train dataset count
+    train_count = dataset_train.get_dataset_size()
+    if args.distribute:
+        all_reduce = Allreduce()
+        train_count = all_reduce(Tensor(train_count, ms.int32))
 
     # create model
     network = create_model(model_name=args.model,
@@ -176,7 +197,7 @@ def train(args):
             begin_epoch = args.ckpt_path.split('/')[-1].split('-')[1].split('_')[0]
             begin_epoch = int(begin_epoch)
 
-    summary_dir = f"{args.ckpt_save_dir}/summary"
+    summary_dir = f"./{args.ckpt_save_dir}/summary"
     state_cb = StateMonitor(model, summary_dir=summary_dir,
                             dataset_val=loader_eval,
                             val_interval=args.val_interval,
@@ -189,36 +210,37 @@ def train(args):
                             device_num=device_num,
                             distribute=args.distribute,
                             log_interval=args.log_interval,
+                            keep_checkpoint_max=args.keep_checkpoint_max,
                             model_name=args.model,
-                            last_epoch=begin_epoch)
+                            last_epoch=begin_epoch,
+                            save_strategy='latest_K')
 
-    #callbacks = [loss_cb, time_cb, state_cb]
     callbacks = [state_cb]
-
-    # train model
-    num_samples = num_batches * args.batch_size *  device_num if device_num is not None else num_batches * args.batch_size
     # log
     if rank_id in [None, 0]:
-        print('-'*40)
-        print('Num devices: ', device_num if device_num is not None else 1)
-        print('Distributed mode: ', args.distribute)
-        print('Num training samples: ', num_samples)
-        print('Num classes: ', num_classes) #dataset_train.num_classes())
-        print('Num batches: ', num_batches)
-        print('Batch size: ', args.batch_size)
-        print('Auto augment: ', args.auto_augment)
-        print('Model:', args.model)
-        print('Model param:', num_params)
-        print('Num epochs: ', args.epoch_size)
-        print('Optimizer: ', args.opt)
-        print('LR: ', args.lr)
-        print('LR Scheduler: ', args.scheduler)
-        print('-'*40)
-        
+        logger.info(f"-" * 40)
+        logger.info(f"Num devices: {device_num if device_num is not None else 1} \n"
+                    f"Distributed mode: {args.distribute} \n"
+                    f"Num training samples: {train_count}")
+        if args.val_while_train:
+            if not args.distribute or device_target != 'Ascend':
+                logger.info(f"Num validation samples: {eval_count}")
+        logger.info(f"Num classes: {num_classes} \n"
+                    f"Num batches: {num_batches} \n"
+                    f"Batch size: {args.batch_size} \n"
+                    f"Auto augment: {args.auto_augment} \n"
+                    f"Model: {args.model} \n"
+                    f"Model param: {num_params} \n"
+                    f"Num epochs: {args.epoch_size} \n"
+                    f"Optimizer: {args.opt} \n"
+                    f"LR: {args.lr} \n"
+                    f"LR Scheduler: {args.scheduler}")
+        logger.info(f"-" * 40)
+
         if args.ckpt_path != '':
-            print(f'Resume training from {args.ckpt_path}, last step: {begin_step}, last epoch: {begin_epoch}')
+            logger.info(f"Resume training from {args.ckpt_path}, last step: {begin_step}, last epoch: {begin_epoch}")
         else:
-            print('Start training')
+            logger.info('Start training')
 
     model.train(args.epoch_size, loader_train, callbacks=callbacks, dataset_sink_mode=args.dataset_sink_mode)
 

@@ -6,9 +6,8 @@ import numpy as np
 
 import mindspore as ms
 from mindspore import log as logger
+from mindspore import ops, Tensor, save_checkpoint, SummaryRecord
 from mindspore.ops import ReduceOp
-from mindspore.common.tensor import Tensor
-from mindspore import ops, save_checkpoint, SummaryRecord
 from mindspore.train.callback import Callback
 from mindspore.train._utils import _make_directory
 from mindspore.train.callback._checkpoint import CheckpointManager
@@ -39,6 +38,7 @@ class StateMonitor(Callback):
                  model_name='',
                  last_epoch=0,
                  keep_checkpoint_max=10,
+                 save_strategy=None
                  ):
         super().__init__()
         self.model = model
@@ -60,8 +60,11 @@ class StateMonitor(Callback):
         self.last_epoch = last_epoch
 
         self.keep_checkpoint_max = keep_checkpoint_max
-        self._manager = CheckpointManager()
+        self.save_strategy = save_strategy
+        self._manager = CheckpointManager(save_strategy=self.save_strategy)
         self._need_flush_from_cache = True
+        if self.distribute:
+            self.allreduce_sum = ops.AllReduce(ReduceOp.SUM)
 
         if self.rank_id in [0, None]:
             if not os.path.isdir(ckpt_dir):
@@ -88,20 +91,19 @@ class StateMonitor(Callback):
         return self.model.eval(self.dataset_val, dataset_sink_mode=self.dataset_sink_mode)
 
     def step_end(self, run_context):
-        #print('step time: ', time() - self.start)
 
         cb_params = run_context.original_args()
         num_batches = cb_params.batch_num
         #global_step = cb_params.optimizer.global_step.asnumpy()[0]
         cur_epoch = cb_params.cur_epoch_num + self.last_epoch -1 #(global_step-1) // num_batches
         #cur_step_in_epoch = (global_step- 1) % cb_params.batch_num
-        cur_step_in_epoch  = int((cb_params.cur_step_num - 1) % cb_params.batch_num)
+        cur_step_in_epoch = int((cb_params.cur_step_num - 1) % cb_params.batch_num)
 
-        if (cur_step_in_epoch  + 1) % self.log_interval == 0 or (cur_step_in_epoch  + 1) >= num_batches or cur_step_in_epoch==0:
+        if (cur_step_in_epoch  + 1) % self.log_interval == 0 or \
+                (cur_step_in_epoch  + 1) >= num_batches or cur_step_in_epoch == 0:
             cur_lr = cb_params.optimizer.get_lr().asnumpy()
             loss = self._get_loss(cb_params)
 
-            #print(f"Epoch: {cb_params.cur_epoch_num + self.begin_epoch}, "
             print(f"Epoch: {cur_epoch+1}, "
                   f"batch:[{cur_step_in_epoch+1}/{num_batches}], "
                   f"loss:{loss.asnumpy():.6f}, lr: {cur_lr:.7f},  time:{time() - self.start:.6f}s")
@@ -119,8 +121,6 @@ class StateMonitor(Callback):
         cur_epoch = cb_params.cur_epoch_num +  self.last_epoch
         cur_step_in_epoch = cb_params.batch_num #(global_step - 1) % cb_params.batch_num
 
-        #print(global_step, cur_step_in_epoch)
-
         # log
         if self.rank_id in [0, None]:
             print(f'Total time since last epoch: {time()-self.epoch_start:.5f}')
@@ -134,15 +134,12 @@ class StateMonitor(Callback):
 
                 cur_ckpoint_file = self.model_name + "-" + str(cur_epoch) + "_" \
                         + str(cur_step_in_epoch) + ".ckpt"
-                # update checkpoint file list.
-                self._manager.update_ckpoint_filelist(self.ckpt_dir, self.model_name)
-                # keep checkpoint files number equal max number.
-                if self.keep_checkpoint_max and 0 < self.keep_checkpoint_max <= self._manager.ckpoint_num:
-                    self._manager.remove_oldest_ckpoint_file()
 
+                # keep checkpoint files number equal max number.
                 ckpt_save_path = os.path.join(self.ckpt_dir, cur_ckpoint_file)
-                ms.save_checkpoint(cb_params.train_network, ckpt_save_path , async_save=True)
-		# save optim for resume
+                self._manager.save_ckpoint(cb_params.train_network, num_ckpt=self.keep_checkpoint_max,
+                                           save_path=ckpt_save_path)
+		        # save optim for resume
                 optim_save_path = os.path.join(self.ckpt_dir, f'optim_{self.model_name}.ckpt')
                 ms.save_checkpoint(cb_params.optimizer, optim_save_path, async_save=True)
                 print(f'Model saved in {ckpt_save_path}')
@@ -161,8 +158,7 @@ class StateMonitor(Callback):
                 # record val acc
                 val_acc = res[self.metric_name]
                 if self.distribute:
-                    all_reduce = ops.AllReduce(ReduceOp.SUM)
-                    val_acc = all_reduce(Tensor(val_acc, ms.float32))
+                    val_acc = self.allreduce_sum(Tensor(val_acc, ms.float32))
                     val_acc /= self.device_num
                     val_acc_val = (100*val_acc).asnumpy()
                 else:
@@ -173,8 +169,8 @@ class StateMonitor(Callback):
                     # Save the best ckpt file
                     if val_acc > self.best_res:
                         self.best_res = val_acc
-                        self.best_epoch =cur_epoch
-                        if self.save_best_ckpt and (self.rank_id==0):
+                        self.best_epoch = cur_epoch
+                        if self.save_best_ckpt and (self.rank_id == 0):
                             save_checkpoint(cb_params.train_network, self.best_ckpt_path, async_save=True)
                             print(f"=> New best val acc: {val_acc_val:.3f}")
 
@@ -190,7 +186,7 @@ class StateMonitor(Callback):
 
     # pylint: disable=unused-argument
     def on_train_end(self, run_context):
-        if self.dataset_val is not None and self.rank_id==0:
+        if self.dataset_val is not None and self.rank_id == 0:
             print("Finish training!")
             print(f"The best validation {self.metric_name} is: {self.best_res} at epoch {self.best_epoch}.")
         print("=" * 80)
@@ -251,7 +247,7 @@ class LossAccSummary(Callback):
                  val_start_epoch=1,
                  metric_name="accuracy"):
         super().__init__()
-        self._summary_dir = _make_directory(summary_dir,"summary_dir")
+        self._summary_dir = _make_directory(summary_dir, "summary_dir")
         self.model = model
         self.dataset_val = dataset_val
         self.val_start_epoch = val_start_epoch

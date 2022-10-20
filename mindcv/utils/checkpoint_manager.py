@@ -1,12 +1,22 @@
 '''checkpoint manager '''
 import os
 import stat
+import mindspore as ms
+from mindspore import log as logger
+from mindspore import ops, Tensor
 
 class CheckpointManager:
-    """Manage checkpoint files according to train_config of checkpoint."""
+    """
+    Manage checkpoint files according to save_strategy of checkpoint.
+    Args:
+        save_strategy (str): Checkpoint saving strategy. The optional values is None, "top_K" or "latest_K".
+        None means to save each checkpoint, top_ K means to save K checkpoints with the highest accuracy,
+        and latest_K means saving the latest K checkpoint. Default: None.
+    """
 
-    def __init__(self):
+    def __init__(self, save_strategy=None):
         self._ckpoint_filelist = []
+        self.save_strategy = save_strategy
 
     @property
     def ckpoint_filelist(self):
@@ -34,7 +44,6 @@ class CheckpointManager:
         try:
             os.chmod(file_name, stat.S_IWRITE)
             os.remove(file_name)
-            self._ckpoint_filelist.remove(file_name)
         except OSError:
             logger.warning("OSError, failed to remove the older ckpt file %s.", file_name)
         except ValueError:
@@ -44,6 +53,7 @@ class CheckpointManager:
         """Remove the oldest checkpoint file from this checkpoint manager and also from the directory."""
         ckpoint_files = sorted(self._ckpoint_filelist, key=os.path.getmtime)
         self.remove_ckpoint_file(ckpoint_files[0])
+        self._ckpoint_filelist.remove(ckpoint_files[0])
 
     def keep_one_ckpoint_per_minutes(self, minutes, cur_time):
         """Only keep the latest one ckpt file per minutes, remove other files generated in [last_time, cur_time]."""
@@ -63,3 +73,44 @@ class CheckpointManager:
             if mv_file == oldest_file:
                 continue
             self.remove_ckpoint_file(mv_file)
+
+    def top_K_checkpoint(self, network, K=10, metric=None, save_path=''):
+        """ Save and return Top K checkpoint address and accuracy. """
+        last_file = self._ckpoint_filelist[-1] if self._ckpoint_filelist else None
+        if self.ckpoint_num < K or ops.gt(metric, last_file[1]):
+            if self.ckpoint_num >= K:
+                delete = K - 1
+                if delete < 0 or self.ckpoint_num <= delete:
+                    return
+                to_delete = self._ckpoint_filelist[delete:]
+                for d in to_delete:
+                    self.remove_ckpoint_file(d[0])
+                self._ckpoint_filelist = self._ckpoint_filelist[:delete]
+            ms.save_checkpoint(network, save_path, async_save=True)
+            self._ckpoint_filelist.append((save_path, float(metric)))
+            self._ckpoint_filelist = sorted(self._ckpoint_filelist, key=lambda x: x[1], reverse=True)
+
+    def latest_K_checkpoint(self, network, K=10, save_path=''):
+        """ Save latest K checkpoint. """
+        if K and 0 < K <= self.ckpoint_num:
+            self.remove_oldest_ckpoint_file()
+        ms.save_checkpoint(network, save_path, async_save=True)
+        self._ckpoint_filelist.append(save_path)
+
+    def save_ckpoint(self, network, num_ckpt=10, metric=None, save_path=''):
+        """ Save checkpoint according to different save strategy. """
+        if self.save_strategy is None:
+            ms.save_checkpoint(network, save_path, async_save=True)
+        elif self.save_strategy == 'top_K':
+            if metric is None:
+                raise ValueError(f"The expected 'metric' is not None, but got: {metric}.")
+            if not isinstance(metric, Tensor):
+                metric = Tensor(metric)
+            self.top_K_checkpoint(network, K=num_ckpt, metric=metric, save_path=save_path)
+            return self._ckpoint_filelist
+        elif self.save_strategy == 'latest_K':
+            self.latest_K_checkpoint(network, K=num_ckpt, save_path=save_path)
+            return self._ckpoint_filelist
+        else:
+            raise ValueError(f"The expected 'save_strategy' is None, top_K or latest_K,"
+                             f"but got: {self.save_strategy}.")
