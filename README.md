@@ -37,11 +37,11 @@ MindCV is an open source toolbox for computer vision research and development ba
 >>> network = mindcv.create_model('resnet50', pretrained=True)
 ```
 
-MindCV also provides strong train and validatio engines, which allow users custmize each component easily and complete their training or transfer learning task in one line of script.
+Transfer learning or training can be done easily with the provided scripts.
 
 ```
 # transfer learning in one command line
-python train.py --model=swin_tiny --pretrained --opt=adamw --lr=0.001 --dataset=cifar10 --dataset_download 
+python train.py --model=swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir=data/my_dataset 
 ```
 
 - **State-of-art models and methods.** MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model: 
