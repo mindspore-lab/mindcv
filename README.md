@@ -195,6 +195,44 @@ We provide [jupyter notebook tutorials](tutorials) for
 - [Optimizing performance for vision transformer] //coming soon
 - [Deployment demo](tutorials/deployment.ipynb) 
 
+## Model List
+
+Currently, MindCV supports the model families listed below. More models with pretrained weights are under development and will be released soon.
+
+<details open>
+<summary> Supported models </summary>
+
+* ConvNeXt - https://arxiv.org/abs/2201.03545
+* ConViT (Soft Convolutional Inductive Biases Vision Transformers)- https://arxiv.org/abs/2103.10697
+* DenseNet - https://arxiv.org/abs/1608.06993
+* DPN (Dual-Path Network) - https://arxiv.org/abs/1707.01629
+* EfficientNet (MBConvNet Family) https://arxiv.org/abs/1905.11946
+* EfficientNet V2 - https://arxiv.org/abs/2104.00298
+* GhostNet - https://arxiv.org/abs/1911.11907
+* GoogleNet - https://arxiv.org/abs/1409.4842
+* Inception-V3 - https://arxiv.org/abs/1512.00567
+* Inception-ResNet-V2 and Inception-V4 - https://arxiv.org/abs/1602.07261
+* MobileNet-V1 - https://arxiv.org/abs/1704.04861
+* MobileNet-V2 - https://arxiv.org/abs/1801.04381
+* MobileNet-V3 (MBConvNet w/ Efficient Head) - https://arxiv.org/abs/1905.02244
+* NASNet - https://arxiv.org/abs/1707.07012
+* PNasNet - https://arxiv.org/abs/1712.00559
+* RepVGG - https://arxiv.org/abs/2101.03697
+* ResMLP - https://arxiv.org/abs/2105.03404
+* ResNet (v1b/v1.5) - https://arxiv.org/abs/1512.03385
+* ResNeXt - https://arxiv.org/abs/1611.05431
+* Res2Net - https://arxiv.org/abs/1904.01169
+* ShuffleNet v1 - https://arxiv.org/abs/1707.01083
+* ShuffleNet v2 - https://arxiv.org/abs/1807.11164
+* SKNet - https://arxiv.org/abs/1903.06586
+* SqueezeNet - https://arxiv.org/abs/1602.07360
+* Swin Transformer - https://arxiv.org/abs/2103.14030
+* VGG - https://arxiv.org/abs/1409.1556
+* Xception - https://arxiv.org/abs/1610.02357
+
+Please see [configs](./configs) for the details about model performance and pretrained weights.
+
+</details>
 
 ## Notes
 ### What is New 
