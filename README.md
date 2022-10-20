@@ -36,7 +36,7 @@ MindCV is an open source toolbox for computer vision research and development ba
 ```python
 >>> import mindcv 
 # create a dataset
->>> network = mindcv.create_dataset('cifar10', download=True)
+>>> dataset = mindcv.create_dataset('cifar10', download=True)
 # create a model
 >>> network = mindcv.create_model('resnet50', pretrained=True)
 ```
