@@ -6,6 +6,7 @@ from mindcv.models import create_model
 from mindcv.data import create_dataset, create_transforms, create_loader
 from mindcv.loss import create_loss
 from config import parse_args
+from mindcv.utils.utils import check_batch_size
 
 
 def validate(args):
@@ -19,6 +20,7 @@ def validate(args):
         num_parallel_workers=args.num_parallel_workers,
         download=args.dataset_download)
 
+
     # create transform
     transform_list = create_transforms(
         dataset_name=args.dataset,
@@ -29,11 +31,17 @@ def validate(args):
         mean=args.mean,
         std=args.std
     )
-
+    
+    # read num clases
+    num_classes = dataset_eval.num_classes() if args.num_classes==None else args.num_classes
+    
+    # check batch size
+    batch_size = check_batch_size(dataset_eval.get_dataset_size(), args.batch_size)
+        
     # load dataset
     loader_eval = create_loader(
         dataset=dataset_eval,
-        batch_size=args.batch_size,
+        batch_size=batch_size,
         drop_remainder=False,
         is_training=False,
         transform=transform_list,
@@ -42,7 +50,7 @@ def validate(args):
 
     # create model
     network = create_model(model_name=args.model,
-                           num_classes=args.num_classes,
+                           num_classes=num_classes,
                            drop_rate=args.drop_rate,
                            drop_path_rate=args.drop_path_rate,
                            pretrained=args.pretrained,
@@ -56,7 +64,7 @@ def validate(args):
                        aux_factor=args.aux_factor) 
 
     # Define eval metrics.
-    if args.num_classes >= 5:
+    if num_classes >= 5:
         eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy(),
                         'Top_5_Accuracy': nn.Top5CategoricalAccuracy(),
                         'loss': nn.metrics.Loss()
