@@ -45,11 +45,6 @@ python train.py --model=swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir
 ```
 
 - **State-of-art models and methods.** MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model: 
-```
-# validate the pretrained swin transformer (tiny)
-python validate.py --model=swin_tiny --pretrained --dataset=imagenet --val_split=validation
->>> {'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
-``` 
 
 - **Flexibility and efficiency.** MindCV is bulit on MindSpore which is an efficent DL framework that can run on different hardward platforms (GPU/CPU/Ascend). It supports both graph mode for high efficiency and pynative mode for flexibity.
 	
@@ -94,31 +89,54 @@ pip install git+https://github.com/mindlab-ai/mindcv.git
 ## Get Started 
 
 ### Hands-on Tutorial
-Please see the [Quick Start Demo](quick_start.ipynb) to help you get started with MindCV and learn about the basic usage quickly. 
 
-You can also see the [finetune tutorial](tutorials/finetune.ipynb) to learn how to apply a pretrained SoTA model to your own classification task. 
+To get started with MindCV, please see the [transfer learning tutorial](tutorials/finetune.ipynb), which will give a quick tour on each key component and the train/validate/predict pipelines in MindCV. 
 
-Below is how to find and  create a deep vision model quickly.  
+Below is a few code snippets for your taste. 
 
 ```python
 >>> import mindcv 
-# Search a wanted pretrained model 
->>> mindcv.list_models("densenet*", pretrained=True)
-['densenet201', 'densenet161', 'densenet169', 'densenet121']
+# List and find a pretrained vision model 
+>>> mindcv.list_models("swin*", pretrained=True)
+['swin_tiny']
 # Create the model object
->>> network = mindcv.create_model('densenet121', pretrained=True)
+>>> network = mindcv.create_model('swin_tiny', pretrained=True)
+# Validate its accuracy
+>>> !python validate.py --model=swin_tiny --pretrained --dataset=imagenet --val_split=validation
+{'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
 ```
+
+**Image classification demo**
+
+<p align="left">
+  <img src="./tutorials/dog.jpg" width=360 />
+</p>
+
+```python
+>>> !python infer.py --model=swin_tiny --image_path='./tutorials/dog.jpg'
+{'Labrador retriever': 0.5700152, 'golden retriever': 0.034551315, 'kelpie': 0.010108651, 'Chesapeake Bay retriever': 0.008229004, 'Walker hound, Walker foxhound': 0.007791956}
+```
+The top-1 prediction is labrador retriever (拉布拉多犬), which is the right breed of the cut dog.
 
 ### Useful Scripts
 It is easy to train your model on standard datasets or your own dataset with MindCV. Model training, transfer learning, or evaluaiton can be done using one or a few line of code with flexible configuration. 
 
 - Standalone Training
 
-`train.py` is the main script for model training, where you can set the dataset, data transformation, model, loss, LR scheduler, and optimizier easily. Here is the example for finetuning a pretrained DenseNet on CIFAR10 dataset using Adam optimizer.
+`train.py` is the main script for model training, where you can configure each component of the training pipline easily. Here is the example for finetuning a pretrained DenseNet on CIFAR10 dataset using Adam optimizer.
 ``` shell
-python train.py --model=densenet121 --pretrained --opt=adam --lr=0.001 \
-		--dataset=cifar10 --num_classes=10 --dataset_download    
+python train.py --model=resnet50 --pretrained --opt=adam --lr=0.0001 \
+		--dataset=cifar10 --dataset_download  --epoch_size=10  
 ```
+
+**Validation while training.** To track the validation accuracy change during traing, please enable `--val_while_train`, for example
+
+```python
+python train.py --model=resnet50 --pretrained --dataset=cifar10 \
+		--val_while_train --val_split=test --val_interval=1
+``` 
+
+The training loss and validation accuracy for each epoch  will be saved in `{ckpt_save_dir}/results.log`.
 
 Detailed adjustable parameters and their default value can be seen in [config.py](config.py)
 
@@ -132,17 +150,20 @@ mpirun --allow-run-as-root -n 4 python train.py --distribute \
 	--model=densenet121 --dataset=imagenet --data_dir=./datasets/imagenet   
 ```
 
-- Train with Yaml Config
+- Configuration
 
-The [yaml config files](configs) that yield competitive results on ImageNet for different models are listed in the `configs` folder. To trigger training using preset yaml config, 
+You can either configure your model or other components by specifying external parameters or a yaml config file, for example:
 
 ```shell
 mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
 
+Reference [yaml config files](configs) that yield competitive results on ImageNet are in the `configs` folder. 
+
+
 - Validation
 
-To validate a trained/pretrained model, you can use `validate.py`. 
+It is easy to validate a trained model with `validate.py`. 
 ```python
 # validate a trained checkpoint
 python validate.py --model=resnet50 --dataset=imagenet --val_split=validation \
@@ -151,19 +172,9 @@ python validate.py --model=resnet50 --dataset=imagenet --val_split=validation \
 # validate a pretrained SwinTransformer model 
 python validate.py --model=swin_tiny --dataset=imagenet --val_split=validation \
 		           --pretrained
->>> {'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
 ``` 
 
-- Validate during Training
-
-Validation during training can be enabled by setting the `--val_while_train` argument, e.g.,
-```python
-python train.py --model=resnet18 --dataset=cifar10 --val_while_train --val_split=test --val_interval=1
-``` 
-The training loss and validation accuracy for each epoch  will be saved in `./CKPT_NAME/metric_log.txt`.
-
-
-You can use `mindcv.list_models()` to find out all supported models. It is easy to apply any of them to your  tasks with these scripts. For more examples, see [examples/scripts](examples/scripts). 
+For more examples, see [examples/scripts](examples/scripts). 
 
 ## Tutorials
 We provide [jupyter notebook tutorials](tutorials) for  
