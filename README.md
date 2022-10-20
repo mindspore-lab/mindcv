@@ -40,7 +40,7 @@ MindCV is an open source toolbox for computer vision research and development ba
 >>> network = mindcv.create_model('resnet50', pretrained=True)
 ```
 
-Transfer learning or training can be done easily with the provided scripts.
+Users can customize and launch their transfer learning or training task in one command line.
 
 ``` python
 # transfer learning in one command line
