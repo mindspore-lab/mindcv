@@ -1,16 +1,36 @@
 # MindCV
 
+<p align="left">
+    <a href="https://mindcv-ai.readthedocs.io/en/latest">
+        <img alt="docs" src="https://img.shields.io/badge/docs-latest-blue">
+    </a>
+    <a href="https://github.com/IDEA-Research/detrex/blob/main/LICENSE">
+        <img alt="GitHub" src="https://img.shields.io/github/license/mindspore-ecosystem/mindcv.svg?color=blue">
+    </a>
+    <a href="https://github.com/mindspore-ecosystem/mindcv/pulls">
+        <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-pink.svg">
+    </a>
+    <a href="https://github.com/mindspore-ecosystem/mindcv/issues">
+        <img alt="open issues" src="https://img.shields.io/github/issues/mindspore-ecosystem/mindcv">
+    </a>
+    <a href="https://github.com/mindspore-ecosystem/mindcv/tags">
+        <img alt="GitHub tags" src="https://img.shields.io/github/tag/mindspore-ecosystem/mindcv.svg">
+    </a>
+</p>
+
 [Introduction](#introduction) |
 [Installation](#installation) |
-[Quick Start](#get started) |
+[Get Started](#get-started) |
 [Tutorials](#tutorials) |
-[How to contribute](#notes) 
+[Notes](#notes) 
 
 ## Introduction
-MindCV is an open source toolbox for computer vision research and development based on MindSpore. It collects a large number of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pretrained weights.SoTA methods like MixUp, AutoAugment are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks. 
+MindCV is an open source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pretrained weights. SoTA methods like MixUp, AutoAugment are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks. 
 
+<details open>
 <summary> Major Features </summary>
-- **Easy-to-use.** MindCV decomposes the vision framework into multiple components, each of which can be configured in one line of code. It is easy to build your data pipeline, models, and learning pipeline with MindCV: 
+	
+- **Easy-to-use.** MindCV decomposes the vision framework into multiple components, each of which can be configured in one line of code. It is easy to customize your data pipeline, models, and learning pipeline with MindCV: 
 
 ```python
 >>> import mindcv 
@@ -20,19 +40,22 @@ MindCV is an open source toolbox for computer vision research and development ba
 MindCV also provides strong train and validatio engines, which allow users custmize each component easily and complete their training or transfer learning task in one line of script.
 
 ```
-python train.py --model=swin_tiny --pretrained --opt=adam --lr=0.001 \
-		--dataset=cifar10 --dataset_download 
+# transfer learning in one command line
+python train.py --model=swin_tiny --pretrained --opt=adamw --lr=0.001 --dataset=cifar10 --dataset_download 
 ```
 
-- **State-of-art models and methods.**: MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model: 
+- **State-of-art models and methods.** MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model: 
 ```
+# validate the pretrained swin transformer (tiny)
 python validate.py --model=swin_tiny --pretrained --dataset=imagenet --val_split=validation
 >>> {'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
 ``` 
 
 - **Flexibility and efficiency.** MindCV is bulit on MindSpore which is an efficent DL framework that can run on different hardward platforms (GPU/CPU/Ascend). It supports both graph mode for high efficiency and pynative mode for flexibity.
-
-### Results
+	
+</details>
+	
+### Benchmark Results
 
 Coming soon.
 
@@ -70,7 +93,7 @@ pip install git+https://github.com/mindlab-ai/mindcv.git
 
 ## Get Started 
 
-### Quick Start Demo
+### Hands-on Tutorial
 Please see the [Quick Start Demo](quick_start.ipynb) to help you get started with MindCV and learn about the basic usage quickly. 
 
 You can also see the [finetune tutorial](tutorials/finetune.ipynb) to learn how to apply a pretrained SoTA model to your own classification task. 
@@ -86,7 +109,7 @@ Below is how to find and  create a deep vision model quickly.
 >>> network = mindcv.create_model('densenet121', pretrained=True)
 ```
 
-### Training and Validation Scripts
+### Useful Scripts
 It is easy to train your model on standard datasets or your own dataset with MindCV. Model training, transfer learning, or evaluaiton can be done using one or a few line of code with flexible configuration. 
 
 - Standalone Training
