@@ -154,7 +154,7 @@ mpirun --allow-run-as-root -n 4 python train.py --distribute \
 	--model=densenet121 --dataset=imagenet --data_dir=./datasets/imagenet   
 ```
 
-- Configuration
+- Configuration with Yaml
 
 You can configure your model and other components either by specifying external parameters or by using a yaml config file. Here is an example for training using a preset yaml file.
 
@@ -162,7 +162,7 @@ You can configure your model and other components either by specifying external 
 mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
 
-More [yaml config files](configs) that yield competitive results on ImageNet can be found in the `configs` folder. 
+More [yaml config files](configs) used to yield competitive results on ImageNet training can be found in the `configs` folder. 
 
 
 - Validation
