@@ -11,17 +11,14 @@ from ..utils import make_divisible
 
 
 def _kernel_valid(k):
-    """
-    Assert kernel size is valid or not.
-    """
-    
+    """Checks kernel size is valid or not."""
     if isinstance(k, (list, tuple)):
         for ki in k:
-            assert ki >= 3 and ki % 2
-            return _kernel_valid(ki)
+            # check if each element is valid, instead of early returning if the first element is valid.
+            _kernel_valid(ki)
     else:
         assert k >= 3 and k % 2
-    return None
+
 
 class SelectiveKernelAttn(nn.Cell):
     """ Selective Kernel Attention Module
