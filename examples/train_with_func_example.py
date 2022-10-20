@@ -142,10 +142,13 @@ def test_epoch(network, dataset):
     for data, label in dataset.create_tuple_iterator():
         pred = network(data)
         total += len(data)
-        correct += (pred.argmax(1) == label).sum().asnumpy()
+        if len(label.shape) == 1:
+            correct += (pred.argmax(1) == label).asnumpy().sum()
+        else:  # one-hot or soft label
+            correct += (pred.argmax(1) == label.argmax(1)).asnumpy().sum()
     correct /= total
-    acc = 100 * correct.asnumpy()
-    print(f"Test Accuracy: {correct:>0.2f}% \n")
+    acc = 100 * correct
+    print(f"Test Accuracy: {acc:>0.2f}% \n")
     return acc 
 
 if __name__ == '__main__':
