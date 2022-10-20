@@ -25,26 +25,29 @@
 [Notes](#notes) 
 
 ## Introduction
-MindCV is an open source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pretrained weights. SoTA methods like MixUp, AutoAugment are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks. 
+MindCV is an open source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pretrained weights. SoTA methods such as AutoAugment are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks. 
 
 <details open>
 <summary> Major Features </summary>
 	
-- **Easy-to-use.** MindCV decomposes the vision framework into multiple components, each of which can be configured in one line of code. It is easy to customize your data pipeline, models, and learning pipeline with MindCV: 
+- **Easy-to-Use.** MindCV decomposes the vision framework into various configurable components. It is easy to customize your data pipeline, models, and learning pipeline with MindCV: 
 
 ```python
 >>> import mindcv 
+# create a dataset
+>>> network = mindcv.create_dataset('cifar10', download=True)
+# create a model
 >>> network = mindcv.create_model('resnet50', pretrained=True)
 ```
 
 Transfer learning or training can be done easily with the provided scripts.
 
-```
+``` python
 # transfer learning in one command line
-python train.py --model=swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir=data/my_dataset 
+>>> !python train.py --model=swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir={data_dir} 
 ```
 
-- **State-of-art models and methods.** MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model: 
+- **State-of-The-Art.** MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model: 
 
 - **Flexibility and efficiency.** MindCV is bulit on MindSpore which is an efficent DL framework that can run on different hardward platforms (GPU/CPU/Ascend). It supports both graph mode for high efficiency and pynative mode for flexibity.
 	
@@ -123,22 +126,21 @@ It is easy to train your model on standard datasets or your own dataset with Min
 
 - Standalone Training
 
-`train.py` is the main script for model training, where you can configure each component of the training pipline easily. Here is the example for finetuning a pretrained DenseNet on CIFAR10 dataset using Adam optimizer.
+It is easy to do model training with `train.py`. Here is an example for training a DenseNet on CIFAR10 dataset using one computing device (i.e., standalone GPU).
 ``` shell
-python train.py --model=resnet50 --pretrained --opt=adam --lr=0.0001 \
-		--dataset=cifar10 --dataset_download  --epoch_size=10  
+python train.py --model=resnet50 --dataset=cifar10 --dataset_download
 ```
+
+For more parameter description, please run `python train.py --help'. You can define change model, optimizer, and other hyper-parameters easily.
 
 **Validation while training.** To track the validation accuracy change during traing, please enable `--val_while_train`, for example
 
 ```python
-python train.py --model=resnet50 --pretrained --dataset=cifar10 \
+python train.py --model=resnet50 --dataset=cifar10 \
 		--val_while_train --val_split=test --val_interval=1
 ``` 
 
 The training loss and validation accuracy for each epoch  will be saved in `{ckpt_save_dir}/results.log`.
-
-Detailed adjustable parameters and their default value can be seen in [config.py](config.py)
 
 - Distributed Training
 
@@ -166,13 +168,17 @@ Reference [yaml config files](configs) that yield competitive results on ImageNe
 It is easy to validate a trained model with `validate.py`. 
 ```python
 # validate a trained checkpoint
-python validate.py --model=resnet50 --dataset=imagenet --val_split=validation \
-		           --ckpt_path='./ckpt/densenet121-best.ckpt' 
-
-# validate a pretrained SwinTransformer model 
-python validate.py --model=swin_tiny --dataset=imagenet --val_split=validation \
-		           --pretrained
+python validate.py --model=resnet50 --dataset=imagenet --val_split=validation --ckpt_path='./ckpt/densenet121-best.ckpt' 
 ``` 
+
+- Pynative mode with ms_function (Advanced)
+By default, the training pipeline (`train.py`) is run in [graph mode](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html), which is optimized for efficienty and speed but may not be flexible enough for debugging. You may alter the parameter `--mode` to switch to pure pynative mode for debugging purpose.
+
+[Pynative mode with ms_function ](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) is a mixed mode for comprising flexibity and efficiency in MindSpore. To switch to pynative mode with ms_function, please use `train_with_func.py` instead, for example:
+
+``` shell
+python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download  --epoch_size=10  
+```
 
 For more examples, see [examples/scripts](examples/scripts). 
 
