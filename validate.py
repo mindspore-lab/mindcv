@@ -35,7 +35,7 @@ def validate(args):
     # read num clases
     num_classes = dataset_eval.num_classes() if args.num_classes==None else args.num_classes
     
-    # check batch size, and refine it to make the last batch 
+    # check batch size
     batch_size = check_batch_size(dataset_eval.get_dataset_size(), args.batch_size)
         
     # load dataset
