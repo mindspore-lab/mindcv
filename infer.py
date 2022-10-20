@@ -16,8 +16,9 @@ from mindcv.models import create_model
 from mindcv.data import create_transforms
 
 parser = argparse.ArgumentParser(description='MindSpore Inference Demo')
-parser.add_argument('--image-path', type=str, help='path to image')
+parser.add_argument('--image_path', type=str, help='path to image')
 parser.add_argument('--model', type=str, help='name of model')
+parser.add_argument('--ckpt_path', type=str, help='checkpoint path')
 
 
 def main():
@@ -47,9 +48,13 @@ def main():
     probs = logits[preds]
     with open("./tutorials/imagenet1000_clsidx_to_labels.txt", encoding='utf-8') as f:
         idx2label = ast.literal_eval(f.read())
-    print(f"Predict result of {args.image_path}:")
+    #print(f"Predict result of {args.image_path}:")
+    cls_prob = {}
     for pred, prob in zip(preds, probs):
-        print(f'label: {idx2label[pred]:64s} probability: {prob:.4f}')
+        cls_name = idx2label[pred]
+        cls_prob[cls_name] = prob
+    print(cls_prob)
+        
 
 
 if __name__ == '__main__':
