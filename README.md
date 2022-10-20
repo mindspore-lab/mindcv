@@ -1,12 +1,36 @@
-# MindSpore Computer Vision
+# MindCV
+
+[Introduction](#introduction) |
+[Installation](#installation) |
+[Quick Start](#get started) |
+[Tutorials](#tutorials) |
+[How to contribute](#notes) 
 
 ## Introduction
-MindCV is an open source toolbox for computer vision research and development based on MindSpore. It collects a large number of classic and SoTA vision models such ResNet and SwinTransformer with pretrained weights, and algorithms like MixUp, AutoAugment for boosting performance. With the decoupled module design, it is easy to apply or adapt MindCV to your own deep learning tasks. 
+MindCV is an open source toolbox for computer vision research and development based on MindSpore. It collects a large number of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pretrained weights.SoTA methods like MixUp, AutoAugment are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks. 
 
-### Major Features
-- Easy-to-use: Friendly modular design for the overal DL workflow, including constructing dataloader, models, optimizer, loss for training and testing. It is easy to customize thedata processing and learning pipeline. 
-- State-of-art models: MindCV provides various SoTA CNN-based and Transformer-based models with pretrained weights including SwinTransformer and EfficientNet (See model list) 
-- High efficiency, extensibility and compatibility for different hardware platform  (GPU/CPU/Ascend)
+<summary> Major Features </summary>
+- **Easy-to-use.** MindCV decomposes the vision framework into multiple components, each of which can be configured in one line of code. It is easy to build your data pipeline, models, and learning pipeline with MindCV: 
+
+```python
+>>> import mindcv 
+>>> network = mindcv.create_model('resnet50', pretrained=True)
+```
+
+MindCV also provides strong train and validatio engines, which allow users custmize each component easily and complete their training or transfer learning task in one line of script.
+
+```
+python train.py --model=swin_tiny --pretrained --opt=adam --lr=0.001 \
+		--dataset=cifar10 --dataset_download 
+```
+
+- **State-of-art models and methods.**: MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model: 
+```
+python validate.py --model=swin_tiny --pretrained --dataset=imagenet --val_split=validation
+>>> {'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
+``` 
+
+- **Flexibility and efficiency.** MindCV is bulit on MindSpore which is an efficent DL framework that can run on different hardward platforms (GPU/CPU/Ascend). It supports both graph mode for high efficiency and pynative mode for flexibity.
 
 ### Results
 
