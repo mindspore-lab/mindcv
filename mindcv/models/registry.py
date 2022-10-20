@@ -1,3 +1,4 @@
+'''model registry and list'''
 import sys
 import fnmatch
 from collections import defaultdict
@@ -42,7 +43,6 @@ def register_model(fn):
         _model_has_pretrained.add(model_name)
     return fn
 
-
 def list_models(filter='', module='', pretrained=False, exclude_filters=''):
     if module:
         all_models = list(_module_to_models[module])
@@ -70,7 +70,9 @@ def list_models(filter='', module='', pretrained=False, exclude_filters=''):
     if pretrained:
         models = _model_has_pretrained.intersection(models)
 
-    return list(models)
+    models = sorted(list(models))
+
+    return models
 
 
 def is_model(model_name):
