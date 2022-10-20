@@ -22,6 +22,7 @@
 [Installation](#installation) |
 [Get Started](#get-started) |
 [Tutorials](#tutorials) |
+[Model List](#model-list) |
 [Notes](#notes) 
 
 ## Introduction
