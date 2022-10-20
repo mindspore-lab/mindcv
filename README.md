@@ -22,29 +22,33 @@
 [Installation](#installation) |
 [Get Started](#get-started) |
 [Tutorials](#tutorials) |
+[Model List](#model-list) |
 [Notes](#notes) 
 
 ## Introduction
-MindCV is an open source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pretrained weights. SoTA methods like MixUp, AutoAugment are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks. 
+MindCV is an open source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pretrained weights. SoTA methods such as AutoAugment are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks. 
 
 <details open>
 <summary> Major Features </summary>
 	
-- **Easy-to-use.** MindCV decomposes the vision framework into multiple components, each of which can be configured in one line of code. It is easy to customize your data pipeline, models, and learning pipeline with MindCV: 
+- **Easy-to-Use.** MindCV decomposes the vision framework into various configurable components. It is easy to customize your data pipeline, models, and learning pipeline with MindCV: 
 
 ```python
 >>> import mindcv 
+# create a dataset
+>>> dataset = mindcv.create_dataset('cifar10', download=True)
+# create a model
 >>> network = mindcv.create_model('resnet50', pretrained=True)
 ```
 
-Transfer learning or training can be done easily with the provided scripts.
+Users can customize and launch their transfer learning or training task in one command line.
 
-```
+``` python
 # transfer learning in one command line
-python train.py --model=swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir=data/my_dataset 
+>>> !python train.py --model=swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir={data_dir} 
 ```
 
-- **State-of-art models and methods.** MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model: 
+- **State-of-The-Art.** MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model: 
 
 - **Flexibility and efficiency.** MindCV is bulit on MindSpore which is an efficent DL framework that can run on different hardward platforms (GPU/CPU/Ascend). It supports both graph mode for high efficiency and pynative mode for flexibity.
 	
@@ -112,33 +116,34 @@ Below is a few code snippets for your taste.
   <img src="./tutorials/dog.jpg" width=360 />
 </p>
 
+Infer the input image with a pretrained SoTA model,
+
 ```python
 >>> !python infer.py --model=swin_tiny --image_path='./tutorials/dog.jpg'
 {'Labrador retriever': 0.5700152, 'golden retriever': 0.034551315, 'kelpie': 0.010108651, 'Chesapeake Bay retriever': 0.008229004, 'Walker hound, Walker foxhound': 0.007791956}
 ```
-The top-1 prediction is labrador retriever (拉布拉多犬), which is the right breed of the cut dog.
+The top-1 prediction result is labrador retriever (拉布拉多犬), which is the breed of this cut dog.
 
-### Useful Scripts
+### Useful Script Guidelines
 It is easy to train your model on standard datasets or your own dataset with MindCV. Model training, transfer learning, or evaluaiton can be done using one or a few line of code with flexible configuration. 
 
 - Standalone Training
 
-`train.py` is the main script for model training, where you can configure each component of the training pipline easily. Here is the example for finetuning a pretrained DenseNet on CIFAR10 dataset using Adam optimizer.
+It is easy to do model training with `train.py`. Here is an example for training a DenseNet on CIFAR10 dataset using one computing device (i.e., standalone GPU).
 ``` shell
-python train.py --model=resnet50 --pretrained --opt=adam --lr=0.0001 \
-		--dataset=cifar10 --dataset_download  --epoch_size=10  
+python train.py --model=resnet50 --dataset=cifar10 --dataset_download
 ```
+
+For more parameter description, please run `python train.py --help'. You can define change model, optimizer, and other hyper-parameters easily.
 
 **Validation while training.** To track the validation accuracy change during traing, please enable `--val_while_train`, for example
 
 ```python
-python train.py --model=resnet50 --pretrained --dataset=cifar10 \
+python train.py --model=resnet50 --dataset=cifar10 \
 		--val_while_train --val_split=test --val_interval=1
 ``` 
 
 The training loss and validation accuracy for each epoch  will be saved in `{ckpt_save_dir}/results.log`.
-
-Detailed adjustable parameters and their default value can be seen in [config.py](config.py)
 
 - Distributed Training
 
@@ -150,15 +155,15 @@ mpirun --allow-run-as-root -n 4 python train.py --distribute \
 	--model=densenet121 --dataset=imagenet --data_dir=./datasets/imagenet   
 ```
 
-- Configuration
+- Configuration with Yaml
 
-You can either configure your model or other components by specifying external parameters or a yaml config file, for example:
+You can configure your model and other components either by specifying external parameters or by using a yaml config file. Here is an example for training using a preset yaml file.
 
 ```shell
 mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
 
-Reference [yaml config files](configs) that yield competitive results on ImageNet are in the `configs` folder. 
+More [yaml config files](configs) used to yield competitive results on ImageNet training can be found in the `configs` folder. 
 
 
 - Validation
@@ -166,13 +171,18 @@ Reference [yaml config files](configs) that yield competitive results on ImageNe
 It is easy to validate a trained model with `validate.py`. 
 ```python
 # validate a trained checkpoint
-python validate.py --model=resnet50 --dataset=imagenet --val_split=validation \
-		           --ckpt_path='./ckpt/densenet121-best.ckpt' 
-
-# validate a pretrained SwinTransformer model 
-python validate.py --model=swin_tiny --dataset=imagenet --val_split=validation \
-		           --pretrained
+python validate.py --model=resnet50 --dataset=imagenet --val_split=validation --ckpt_path='./ckpt/densenet121-best.ckpt' 
 ``` 
+
+- Pynative mode with ms_function (Advanced)
+
+By default, the training pipeline (`train.py`) is run in [graph mode](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html), which is optimized for efficienty and speed but may not be flexible enough for debugging. You may alter the parameter `--mode` to switch to pure pynative mode for debugging purpose.
+
+[Pynative mode with ms_function ](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) is a mixed mode for comprising flexibity and efficiency in MindSpore. To switch to pynative mode with ms_function, please use `train_with_func.py` instead, for example:
+
+``` shell
+python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download  --epoch_size=10  
+```
 
 For more examples, see [examples/scripts](examples/scripts). 
 
@@ -186,6 +196,44 @@ We provide [jupyter notebook tutorials](tutorials) for
 - [Optimizing performance for vision transformer] //coming soon
 - [Deployment demo](tutorials/deployment.ipynb) 
 
+## Model List
+
+Currently, MindCV supports the model families listed below. More models with pretrained weights are under development and will be released soon.
+
+<details open>
+<summary> Supported models </summary>
+
+* ConvNeXt - https://arxiv.org/abs/2201.03545
+* ConViT (Soft Convolutional Inductive Biases Vision Transformers)- https://arxiv.org/abs/2103.10697
+* DenseNet - https://arxiv.org/abs/1608.06993
+* DPN (Dual-Path Network) - https://arxiv.org/abs/1707.01629
+* EfficientNet (MBConvNet Family) https://arxiv.org/abs/1905.11946
+* EfficientNet V2 - https://arxiv.org/abs/2104.00298
+* GhostNet - https://arxiv.org/abs/1911.11907
+* GoogleNet - https://arxiv.org/abs/1409.4842
+* Inception-V3 - https://arxiv.org/abs/1512.00567
+* Inception-ResNet-V2 and Inception-V4 - https://arxiv.org/abs/1602.07261
+* MobileNet-V1 - https://arxiv.org/abs/1704.04861
+* MobileNet-V2 - https://arxiv.org/abs/1801.04381
+* MobileNet-V3 (MBConvNet w/ Efficient Head) - https://arxiv.org/abs/1905.02244
+* NASNet - https://arxiv.org/abs/1707.07012
+* PNasNet - https://arxiv.org/abs/1712.00559
+* RepVGG - https://arxiv.org/abs/2101.03697
+* ResMLP - https://arxiv.org/abs/2105.03404
+* ResNet (v1b/v1.5) - https://arxiv.org/abs/1512.03385
+* ResNeXt - https://arxiv.org/abs/1611.05431
+* Res2Net - https://arxiv.org/abs/1904.01169
+* ShuffleNet v1 - https://arxiv.org/abs/1707.01083
+* ShuffleNet v2 - https://arxiv.org/abs/1807.11164
+* SKNet - https://arxiv.org/abs/1903.06586
+* SqueezeNet - https://arxiv.org/abs/1602.07360
+* Swin Transformer - https://arxiv.org/abs/2103.14030
+* VGG - https://arxiv.org/abs/1409.1556
+* Xception - https://arxiv.org/abs/1610.02357
+
+Please see [configs](./configs) for the details about model performance and pretrained weights.
+
+</details>
 
 ## Notes
 ### What is New 
@@ -194,21 +242,19 @@ We provide [jupyter notebook tutorials](tutorials) for
 - 2022/09/13
 1. Add Adan optimizer (experimental) 
 
+### How to Contribute
+
+We appreciate all contributions including issues and PRs to make MindCV better. 
+
+Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline.
+
 ### License
 
 This project is released under the [Apache License 2.0](LICENSE.md).
 
-### Feedbacks and Contact
-
-The dynamic version is still under development, if you find any issue or have an idea on new features, please don't hesitate to contact us via [issue](https://github.com/mindlab-ai/mindcv/issues).
-
 ### Acknowledgement
 
 MindCV is an open source project that welcome any contribution and feedback. We wish that the toolbox and benchmark could serve the growing research community by providing a flexible as well as standardized toolkit to reimplement existing methods and develop their own new computer vision methods.
-
-### Contributing
-
-We appreciate all contributions to improve MindCV. Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline.
 
 ### Citation
 
@@ -218,7 +264,7 @@ If you find this project useful in your research, please consider citing:
 @misc{MindSpore Computer Vision 2022,
     title={{MindSpore Computer  Vision}:MindSpore Computer Vision Toolbox and Benchmark},
     author={MindSpore Vision Contributors},
-    howpublished = {\url{https://github.com/mindlab-ai/mindcv/}},
+    howpublished = {\url{https://github.com/mindlab-ecosystem/mindcv/}},
     year={2022}
 }
 ```
