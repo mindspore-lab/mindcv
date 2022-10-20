@@ -115,11 +115,13 @@ Below is a few code snippets for your taste.
   <img src="./tutorials/dog.jpg" width=360 />
 </p>
 
+Infer the input image with a pretrained SoTA model,
+
 ```python
 >>> !python infer.py --model=swin_tiny --image_path='./tutorials/dog.jpg'
 {'Labrador retriever': 0.5700152, 'golden retriever': 0.034551315, 'kelpie': 0.010108651, 'Chesapeake Bay retriever': 0.008229004, 'Walker hound, Walker foxhound': 0.007791956}
 ```
-The top-1 prediction is labrador retriever (拉布拉多犬), which is the right breed of the cut dog.
+The top-1 prediction result is labrador retriever (拉布拉多犬), which is the breed of this cut dog.
 
 ### Useful Scripts
 It is easy to train your model on standard datasets or your own dataset with MindCV. Model training, transfer learning, or evaluaiton can be done using one or a few line of code with flexible configuration. 
