@@ -123,7 +123,7 @@ Infer the input image with a pretrained SoTA model,
 ```
 The top-1 prediction result is labrador retriever (拉布拉多犬), which is the breed of this cut dog.
 
-### Useful Scripts
+### Useful Script Guidelines
 It is easy to train your model on standard datasets or your own dataset with MindCV. Model training, transfer learning, or evaluaiton can be done using one or a few line of code with flexible configuration. 
 
 - Standalone Training
@@ -156,13 +156,13 @@ mpirun --allow-run-as-root -n 4 python train.py --distribute \
 
 - Configuration
 
-You can either configure your model or other components by specifying external parameters or a yaml config file, for example:
+You can configure your model and other components either by specifying external parameters or by using a yaml config file. Here is an example for training using a preset yaml file.
 
 ```shell
 mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
 
-Reference [yaml config files](configs) that yield competitive results on ImageNet are in the `configs` folder. 
+More [yaml config files](configs) that yield competitive results on ImageNet can be found in the `configs` folder. 
 
 
 - Validation
@@ -174,6 +174,7 @@ python validate.py --model=resnet50 --dataset=imagenet --val_split=validation --
 ``` 
 
 - Pynative mode with ms_function (Advanced)
+
 By default, the training pipeline (`train.py`) is run in [graph mode](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html), which is optimized for efficienty and speed but may not be flexible enough for debugging. You may alter the parameter `--mode` to switch to pure pynative mode for debugging purpose.
 
 [Pynative mode with ms_function ](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) is a mixed mode for comprising flexibity and efficiency in MindSpore. To switch to pynative mode with ms_function, please use `train_with_func.py` instead, for example:
@@ -202,21 +203,19 @@ We provide [jupyter notebook tutorials](tutorials) for
 - 2022/09/13
 1. Add Adan optimizer (experimental) 
 
+### How to Contribute
+
+We appreciate all contributions including issues and PRs to make MindCV better. 
+
+Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline.
+
 ### License
 
 This project is released under the [Apache License 2.0](LICENSE.md).
 
-### Feedbacks and Contact
-
-The dynamic version is still under development, if you find any issue or have an idea on new features, please don't hesitate to contact us via [issue](https://github.com/mindlab-ai/mindcv/issues).
-
 ### Acknowledgement
 
 MindCV is an open source project that welcome any contribution and feedback. We wish that the toolbox and benchmark could serve the growing research community by providing a flexible as well as standardized toolkit to reimplement existing methods and develop their own new computer vision methods.
-
-### Contributing
-
-We appreciate all contributions to improve MindCV. Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline.
 
 ### Citation
 
@@ -226,7 +225,7 @@ If you find this project useful in your research, please consider citing:
 @misc{MindSpore Computer Vision 2022,
     title={{MindSpore Computer  Vision}:MindSpore Computer Vision Toolbox and Benchmark},
     author={MindSpore Vision Contributors},
-    howpublished = {\url{https://github.com/mindlab-ai/mindcv/}},
+    howpublished = {\url{https://github.com/mindlab-ecosystem/mindcv/}},
     year={2022}
 }
 ```
