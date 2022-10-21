@@ -72,7 +72,7 @@ class StateMonitor(Callback):
             self.log_txt_fp = os.path.join(ckpt_dir, 'result.log')
 
             with open(self.log_txt_fp, 'w', encoding="utf-8") as fp:
-                fp.write('Epoch\tTrain loss\tVal acc\n')
+                fp.write('Epoch\tTrainLoss\tValAcc\tTime\n')
 
             self.best_ckpt_path = os.path.join(ckpt_dir, best_ckpt_name)
 
@@ -121,11 +121,6 @@ class StateMonitor(Callback):
         cur_epoch = cb_params.cur_epoch_num +  self.last_epoch
         cur_step_in_epoch = cb_params.batch_num #(global_step - 1) % cb_params.batch_num
 
-        # log
-        if self.rank_id in [0, None]:
-            print(f'Total time since last epoch: {time()-self.epoch_start:.5f}')
-            self.epoch_start = time()
-
         # save checkpoint
         if self.rank_id in [0, None]:
             if (cur_epoch % self.ckpt_save_interval == 0) or (cur_epoch == cb_params.epoch_num):
@@ -149,7 +144,7 @@ class StateMonitor(Callback):
         self.summary_record.add_value('scalar', f'train_loss_{self.rank_id}', loss)
 
         # val while training if validation loader is not None
-        val_acc = -1.0
+        val_acc_val = -1.0
         if self.dataset_val is not None:
             if cur_epoch >= self.val_start_epoch and (cur_epoch - self.val_start_epoch) % self.val_interval == 0:
                 # do validation
@@ -178,9 +173,14 @@ class StateMonitor(Callback):
                         val_acc = Tensor(val_acc)
                     self.summary_record.add_value('scalar', 'val_' + self.metric_name, val_acc)
 
+        # log
         if self.rank_id in [0, None]:
+            epoch_time = time() - self.epoch_start
+            print(f'Total time since last epoch: {epoch_time:.3f}')
+            self.epoch_start = time()
+
             with open(self.log_txt_fp, 'a', encoding="utf-8") as fp:
-                fp.write(f'{cur_epoch+1}\t{loss}\t{val_acc}\n')
+                fp.write(f'{cur_epoch}\t{loss.asnumpy():.7f}\t{val_acc_val:.3f}\t{epoch_time:.2f}\n')
 
         self.summary_record.record(int(global_step))
 
