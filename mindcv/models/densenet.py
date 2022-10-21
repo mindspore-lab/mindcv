@@ -109,7 +109,7 @@ class _Transition(nn.Cell):
             ('norm', nn.BatchNorm2d(num_input_features)),
             ('relu', nn.ReLU()),
             ('conv', nn.Conv2d(num_input_features, num_output_features, kernel_size=1, stride=1)),
-            ('pool', nn.MaxPool2d(kernel_size=2, stride=2))
+            ('pool', nn.AvgPool2d(kernel_size=2, stride=2))
         ]))
 
     def construct(self, x: Tensor) -> Tensor:
@@ -147,7 +147,10 @@ class DenseNet(nn.Cell):
         layers['conv0'] = nn.Conv2d(in_channels, num_features, kernel_size=7, stride=2, pad_mode='pad', padding=3)
         layers['norm0'] = nn.BatchNorm2d(num_features)
         layers['relu0'] = nn.ReLU()
-        layers['pool0'] = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='same')
+        layers['pool0'] = nn.SequentialCell([
+            nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)), mode="CONSTANT"),
+            nn.MaxPool2d(kernel_size=3, stride=2)
+            ])
 
         # DenseBlock
         for i, num_layers in enumerate(block_config):

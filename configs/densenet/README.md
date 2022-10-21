@@ -8,9 +8,9 @@
 ***
 Recent work has shown that convolutional networks can be substantially deeper, more accurate, and efficient to train if
 they contain shorter connections between layers close to the input and those close to the output. Dense Convolutional
-Network (DenseNet) is introduced based on this observation，which connects each layer to every other layer in a
-feed-forward fashion. Whereas traditional convolutional networks with $L$ layers have $L$ connections—one between each
-layer and its subsequent layer—our network has $\frac{L(L+1)}{2}$ direct connections. For each layer, the feature-maps
+Network (DenseNet) is introduced based on this observation, which connects each layer to every other layer in a
+feed-forward fashion. Whereas traditional convolutional networks with $L$ layers have $L$ connections-one between each
+layer and its subsequent layer, our network has $\frac{L(L+1)}{2}$ direct connections. For each layer, the feature-maps
 of all preceding layers are used as inputs, and its own feature-maps are used as inputs into all subsequent layers.
 DenseNets have several compelling advantages: they alleviate the vanishing-gradient problem, strengthen feature
 propagation, encourage feature reuse, and substantially reduce the number of parameters.
