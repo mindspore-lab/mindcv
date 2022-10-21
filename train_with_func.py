@@ -218,7 +218,7 @@ def train(args):
         log_path = os.path.join(args.ckpt_save_dir, 'result.log')
         if not (os.path.exists(log_path) and args.ckpt_path != ''):  # if not resume training
             with open(log_path, 'w') as fp:
-                fp.write('Epoch\tTrain loss\tVal acc\n')
+                fp.write('Epoch\tTrainLoss\tValAcc\tTime\n')
 
     best_acc = 0
     summary_dir = f"./{args.ckpt_save_dir}/summary_01"
@@ -230,7 +230,7 @@ def train(args):
     manager_2 = CheckpointManager(save_strategy='latest_K')
     with SummaryRecord(summary_dir) as summary_record:
         for t in range(begin_epoch, args.epoch_size):
-            epoch_time = time()
+            epoch_start = time()
 
             train_loss = train_epoch(network,
                                      loader_train,
@@ -242,8 +242,6 @@ def train(args):
                                      rank_id=rank_id,
                                      log_interval=args.log_interval)
 
-            if rank_id in [None, 0]:
-                logger.info(f'Epoch {t + 1} training time: {time() - epoch_time:.3f}s')
 
             # Save checkpoint
             if ((t + 1) % args.ckpt_save_interval == 0) or (t + 1 == args.epoch_size):
@@ -294,8 +292,10 @@ def train(args):
                         logger.info("-" * 80)
 
             if rank_id in [None, 0]:
+                epoch_time = time() - epoch_start
+                logger.info(f'Epoch {t + 1} time:{epoch_time:.3f}s')
                 with open(log_path, 'a') as fp:
-                    fp.write(f'{t + 1}\t{train_loss}\t{test_acc}\n')
+                    fp.write(f'{t+1}\t{train_loss.asnumpy():.7f}\t{test_acc:.3f}\t{epoch_time:.2f}\n')
 
     logger.info("Done!")
 
