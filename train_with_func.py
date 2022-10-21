@@ -226,8 +226,9 @@ def train(args):
     # Training
     # TODO: args.loss_scale is not making effect.
     need_flush_from_cache = True
-    manager_1 = CheckpointManager(save_strategy='top_K')
-    manager_2 = CheckpointManager(save_strategy='latest_K')
+    assert (args.ckpt_save_policy != 'top_k' or args.val_while_train == True), \
+        "ckpt_save_policy is top_k, val_while_train must be True."
+    manager = CheckpointManager(ckpt_save_policy=args.ckpt_save_policy)
     with SummaryRecord(summary_dir) as summary_record:
         for t in range(begin_epoch, args.epoch_size):
             epoch_start = time()
@@ -242,23 +243,8 @@ def train(args):
                                      rank_id=rank_id,
                                      log_interval=args.log_interval)
 
-
-            # Save checkpoint
-            if ((t + 1) % args.ckpt_save_interval == 0) or (t + 1 == args.epoch_size):
-                if rank_id in [None, 0]:
-                    if need_flush_from_cache:
-                        need_flush_from_cache = flush_from_cache(network)
-
-                    save_path = os.path.join(args.ckpt_save_dir,
-                                             f"{args.model}-{t + 1}_{num_batches}.ckpt")  # for consistency with train.py
-                    ms.save_checkpoint(optimizer, os.path.join(args.ckpt_save_dir, f'{args.model}_optim.ckpt'),
-                                       async_save=True)
-                    if not args.val_while_train:
-                        manager_2.save_ckpoint(network, num_ckpt=args.keep_checkpoint_max, save_path=save_path)
-                        logger.info(f"Saving model to {save_path}")
-
             # val while train
-            test_acc = -1.0
+            test_acc = Tensor(-1.0)
             if args.val_while_train:
                 if ((t + 1) % args.val_interval == 0) or (t + 1 == args.epoch_size):
                     if rank_id in [None, 0]:
@@ -274,7 +260,6 @@ def train(args):
                             save_best_path = os.path.join(args.ckpt_save_dir, f"{args.model}-best.ckpt")
                             ms.save_checkpoint(network, save_best_path, async_save=True)
                             logger.info(f"=> New best val acc: {test_acc:0.3f}")
-                            # os.system(f'cp {save_path} {save_best_path}')
 
                         # add to summary
                         current_step = (t + 1) * num_batches + begin_step
@@ -283,19 +268,31 @@ def train(args):
                         if summary_record is not None:
                             summary_record.add_value('scalar', 'test_dataset_accuracy', test_acc)
                             summary_record.record(int(current_step))
-                        ckpoint_filelist = manager_1.save_ckpoint(network, num_ckpt=args.keep_checkpoint_max,
-                                                                  metric=test_acc, save_path=save_path)
+
+            # Save checkpoint
+            if rank_id in [0, None]:
+                if ((t + 1) % args.ckpt_save_interval == 0) or (t + 1 == args.epoch_size):
+                    if need_flush_from_cache:
+                        need_flush_from_cache = flush_from_cache(network)
+
+                    ms.save_checkpoint(optimizer, os.path.join(args.ckpt_save_dir, f'{args.model}_optim.ckpt'),
+                                       async_save=True)
+                    save_path = os.path.join(args.ckpt_save_dir, f"{args.model}-{t + 1}_{num_batches}.ckpt")
+                    ckpoint_filelist = manager.save_ckpoint(network, num_ckpt=args.keep_checkpoint_max,
+                                                              metric=test_acc, save_path=save_path)
+                    if args.ckpt_save_policy == 'top_k':
                         checkpoints_str = "Top K accuracy checkpoints: \n"
                         for ch in ckpoint_filelist:
                             checkpoints_str += '{}\n'.format(ch)
                         logger.info(checkpoints_str)
-                        logger.info("-" * 80)
+                    else:
+                        logger.info(f"Saving model to {save_path}")
 
-            if rank_id in [None, 0]:
                 epoch_time = time() - epoch_start
                 logger.info(f'Epoch {t + 1} time:{epoch_time:.3f}s')
+                logger.info("-" * 80)
                 with open(log_path, 'a') as fp:
-                    fp.write(f'{t+1}\t{train_loss.asnumpy():.7f}\t{test_acc:.3f}\t{epoch_time:.2f}\n')
+                    fp.write(f'{t+1}\t{train_loss.asnumpy():.7f}\t{test_acc.asnumpy():.3f}\t{epoch_time:.2f}\n')
 
     logger.info("Done!")
 
@@ -344,9 +341,9 @@ def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, summary_r
             loss, logits = train_step(data, label)
 
         if len(label.shape) == 1: 
-            correct += (logits.argmax(1) == label).sum().asnumpy()
+            correct += (logits.argmax(1) == label).asnumpy().sum()
         else: #one-hot or soft label
-            correct += (logits.argmax(1) == label.argmax(1)).sum().asnumpy()
+            correct += (logits.argmax(1) == label.argmax(1)).asnumpy().sum()
         total += len(data)
 
         if (batch + 1) % log_interval == 0 or (batch + 1) >= num_batches or batch==0:
@@ -392,25 +389,25 @@ def test_epoch(network, dataset, rank_id=None):
 
     network.set_train(False) # TODO: check freeze 
 
-    total = ms.Parameter(default_input=ms.Tensor(0, ms.float32), requires_grad=False)
-    correct = ms.Parameter(default_input=ms.Tensor(0, ms.float32), requires_grad=False)
+    correct, total = 0, 0
     for data, label in tqdm(dataset.create_tuple_iterator()):
         pred = test_forward_fn(data)
         total += len(data)
         if len(label.shape) == 1: 
-            correct += (pred.argmax(1) == label).sum()
+            correct += (pred.argmax(1) == label).asnumpy().sum()
         else: #one-hot or soft label
-            correct += (pred.argmax(1) == label.argmax(1)).sum()
+            correct += (pred.argmax(1) == label.argmax(1)).asnumpy().sum()
 
     if rank_id is not None:
         all_reduce = Allreduce()
-        correct = all_reduce(correct)
-        total = all_reduce(total)
+        correct = all_reduce(Tensor(correct, ms.float32))
+        total = all_reduce(Tensor(total, ms.float32))
         correct /= total
+        correct = correct.asnumpy()
     else:
         correct /= total
 
-    return correct.asnumpy()
+    return correct
 
 
 def flush_from_cache(network):

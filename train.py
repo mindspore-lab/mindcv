@@ -89,44 +89,35 @@ def train(args):
         transform=transform_list,
         num_parallel_workers=args.num_parallel_workers,
     )
-    device_target = ms.get_context("device_target")
-    #TODO: Implement parallel mode on Ascend
-    if args.val_while_train:
-        if args.distribute and device_target == 'Ascend':
-            loader_eval = None
-        else:
-            dataset_eval = create_dataset(
-                name=args.dataset,
-                root=args.data_dir,
-                split=args.val_split,
-                num_shards=device_num,
-                shard_id=rank_id,
-                num_parallel_workers=args.num_parallel_workers,
-                download=args.dataset_download)
+    # TODO: fix val_while_train on PYNATIVE_MODE.
+    if args.val_while_train and args.mode == 0:
+        dataset_eval = create_dataset(
+            name=args.dataset,
+            root=args.data_dir,
+            split=args.val_split,
+            num_parallel_workers=args.num_parallel_workers,
+            download=args.dataset_download)
 
-            transform_list_eval = create_transforms(
-                dataset_name=args.dataset,
-                is_training=False,
-                image_resize=args.image_resize,
-                crop_pct=args.crop_pct,
-                interpolation=args.interpolation,
-                mean=args.mean,
-                std=args.std
-            )
+        transform_list_eval = create_transforms(
+            dataset_name=args.dataset,
+            is_training=False,
+            image_resize=args.image_resize,
+            crop_pct=args.crop_pct,
+            interpolation=args.interpolation,
+            mean=args.mean,
+            std=args.std
+        )
 
-            loader_eval = create_loader(
-                dataset=dataset_eval,
-                batch_size=args.batch_size,
-                drop_remainder=False,
-                is_training=False,
-                transform=transform_list_eval,
-                num_parallel_workers=args.num_parallel_workers,
-            )
-            # validation dataset count
-            eval_count = dataset_eval.get_dataset_size()
-            if args.distribute:
-                all_reduce = Allreduce()
-                eval_count = all_reduce(Tensor(eval_count, ms.int32))
+        loader_eval = create_loader(
+            dataset=dataset_eval,
+            batch_size=args.batch_size,
+            drop_remainder=False,
+            is_training=False,
+            transform=transform_list_eval,
+            num_parallel_workers=args.num_parallel_workers,
+        )
+        # validation dataset count
+        eval_count = dataset_eval.get_dataset_size()
     else:
         loader_eval = None
 
@@ -198,6 +189,8 @@ def train(args):
             begin_epoch = int(begin_epoch)
 
     summary_dir = f"./{args.ckpt_save_dir}/summary"
+    assert (args.ckpt_save_policy != 'top_k' or args.val_while_train == True), \
+        "ckpt_save_policy is top_k, val_while_train must be True."
     state_cb = StateMonitor(model, summary_dir=summary_dir,
                             dataset_val=loader_eval,
                             val_interval=args.val_interval,
@@ -207,13 +200,11 @@ def train(args):
                             best_ckpt_name=args.model + '_best.ckpt',
                             dataset_sink_mode=args.dataset_sink_mode,
                             rank_id=rank_id,
-                            device_num=device_num,
-                            distribute=args.distribute,
                             log_interval=args.log_interval,
                             keep_checkpoint_max=args.keep_checkpoint_max,
                             model_name=args.model,
                             last_epoch=begin_epoch,
-                            save_strategy='latest_K')
+                            ckpt_save_policy=args.ckpt_save_policy)
 
     callbacks = [state_cb]
     # log
@@ -222,9 +213,8 @@ def train(args):
         logger.info(f"Num devices: {device_num if device_num is not None else 1} \n"
                     f"Distributed mode: {args.distribute} \n"
                     f"Num training samples: {train_count}")
-        if args.val_while_train:
-            if not args.distribute or device_target != 'Ascend':
-                logger.info(f"Num validation samples: {eval_count}")
+        if args.val_while_train and args.mode == 0:
+            logger.info(f"Num validation samples: {eval_count}")
         logger.info(f"Num classes: {num_classes} \n"
                     f"Num batches: {num_batches} \n"
                     f"Batch size: {args.batch_size} \n"
