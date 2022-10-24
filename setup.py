@@ -9,8 +9,8 @@ from setuptools import setup
 from setuptools.command.build_py import build_py
 from setuptools.command.egg_info import egg_info
 
-from mindcv.version import __version__
 
+exec(open('mindcv/version.py').read())
 version = __version__
 package_name = 'mindcv'
 cur_dir = os.path.dirname(os.path.realpath(__file__))
