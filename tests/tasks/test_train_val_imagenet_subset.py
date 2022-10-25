@@ -14,7 +14,8 @@ from mindcv.utils.download import DownLoad
 check_acc = True
 
 @pytest.mark.parametrize('mode', ['GRAPH', 'PYNATIVE_FUNC'])
-def test_train(mode,  model='resnet18', opt='adamw', scheduler='polynomial'):
+@pytest.mark.parametrize('val_while_train', [True, False])
+def test_train(mode, val_while_train,  model='resnet18', opt='adamw', scheduler='polynomial'):
     ''' train on a imagenet subset dataset '''
     # prepare data 
     data_dir = 'data/Canidae'
@@ -37,7 +38,7 @@ def test_train(mode,  model='resnet18', opt='adamw', scheduler='polynomial'):
         download_str = '--download'
     train_file = 'train.py' if mode=='GRAPH' else 'train_with_func.py' 
 
-    cmd = f'python {train_file} --dataset={dataset} --num_classes={num_classes} --model={model} --epoch_size={num_epochs}  --ckpt_save_interval=2 --lr=0.0001 --num_samples={num_samples} --loss=CE --weight_decay=1e-6 --ckpt_save_dir={ckpt_dir} {download_str} --train_split=train --batch_size={batch_size} --pretrained --num_parallel_workers=2'
+    cmd = f'python {train_file} --dataset={dataset} --num_classes={num_classes} --model={model} --epoch_size={num_epochs}  --ckpt_save_interval=2 --lr=0.0001 --num_samples={num_samples} --loss=CE --weight_decay=1e-6 --ckpt_save_dir={ckpt_dir} {download_str} --train_split=train --batch_size={batch_size} --pretrained --num_parallel_workers=2 --val_while_train={val_while_train} --val_split=val --val_interval=1'
     
     print(f'Running command: \n{cmd}')
     ret = subprocess.call(cmd.split(), stdout=sys.stdout, stderr=sys.stderr)
