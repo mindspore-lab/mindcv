@@ -6,7 +6,7 @@ Deep Networks with Stochastic Depth (https://arxiv.org/abs/1603.09382)
 from mindspore import nn
 from mindspore import ops
 from mindspore import Tensor
-from mindspore.numpy import empty
+from mindspore.numpy import ones
 
 
 def drop_path(x: Tensor,
@@ -18,7 +18,8 @@ def drop_path(x: Tensor,
         return x
     keep_prob = 1 - drop_prob
     shape = (x.shape[0],) + (1,) * (x.ndim - 1)
-    random_tensor = ops.bernoulli(empty(shape), p=keep_prob)
+    random_tensor = ops.Dropout(keep_prob=keep_prob)(ones(shape))[1]
+    random_tensor = ops.Cast()(random_tensor, x.dtype)
     if keep_prob > 0. and scale_by_keep:
         random_tensor = ops.div(random_tensor, keep_prob)
     return x * random_tensor
