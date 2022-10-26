@@ -51,6 +51,21 @@ default_cfgs = {
 }
 
 
+@constexpr
+def get_rel_indices(num_patches: int = 196) -> Tensor:
+    img_size = int(num_patches**.5)
+    rel_indices = ops.Zeros()((1, num_patches, num_patches, 3), ms.float32)
+    ind = ms.numpy.arange(img_size).view(1, -1) - ms.numpy.arange(img_size).view(-1, 1)
+    indx = ms.numpy.tile(ind, (img_size, img_size))
+    indy_ = ops.repeat_elements(ind, rep=img_size, axis=0)
+    indy = ops.repeat_elements(indy_, rep=img_size, axis=1)
+    indd = indx**2 + indy**2
+    rel_indices[:, :, :, 2] = ops.expand_dims(indd, 0)
+    rel_indices[:, :, :, 1] = ops.expand_dims(indy, 0)
+    rel_indices[:, :, :, 0] = ops.expand_dims(indx, 0)
+    return rel_indices
+
+
 class GPSA(nn.Cell):
 
     def __init__(self, 
@@ -58,8 +73,7 @@ class GPSA(nn.Cell):
                  num_heads: int, 
                  qkv_bias: bool = False, 
                  attn_drop: float = 0., 
-                 proj_drop: float = 0.,
-                 locality_strength: float = 1.) -> None:
+                 proj_drop: float = 0.) -> None:
         super().__init__()
 
         self.dim = dim
@@ -67,7 +81,8 @@ class GPSA(nn.Cell):
         head_dim = dim // num_heads
         self.scale = head_dim ** -0.5
 
-        self.qk = nn.Dense(in_channels=dim, out_channels=dim * 2, has_bias=qkv_bias)
+        self.q = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
+        self.k = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.v = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
 
         self.attn_drop = nn.Dropout(keep_prob=1.0 - attn_drop)
@@ -75,16 +90,16 @@ class GPSA(nn.Cell):
         self.pos_proj = nn.Dense(in_channels=3, out_channels=num_heads)
         self.proj_drop = nn.Dropout(keep_prob=1.0 - proj_drop)
         self.gating_param = Parameter(ops.ones((num_heads), ms.float32))
-        self.rel_indices = self.get_rel_indices()
-        self.local_init(locality_strength=locality_strength)
+        self.softmax = nn.Softmax(axis=-1)
+        self.batch_matmul = ops.BatchMatMul()
+        self.rel_indices = get_rel_indices()
 
     def construct(self, x: Tensor) -> Tensor:
         B, N, C = x.shape
         attn = self.get_attention(x)
-        v = self.v(x)
-        v = ops.reshape(v, (B, N, self.num_heads, C // self.num_heads))
+        v = ops.reshape(self.v(x), (B, N, self.num_heads, C // self.num_heads))
         v = ops.transpose(v, (0, 2, 1, 3))
-        x = ops.transpose(ops.BatchMatMul()(attn, v), (0, 2, 1, 3))
+        x = ops.transpose(self.batch_matmul(attn, v), (0, 2, 1, 3))
         x = ops.reshape(x, (B, N, C))
         x = self.proj(x)
         x = self.proj_drop(x)
@@ -92,52 +107,23 @@ class GPSA(nn.Cell):
 
     def get_attention(self, x: Tensor) -> Tensor:
         B, N, C = x.shape
-        qk = self.qk(x)
-        qk = ops.reshape(qk, (B, N, 2, self.num_heads, C // self.num_heads))
-        qk = ops.transpose(qk, (2, 0, 3, 1, 4))
-        q, k = qk[0], qk[1]
-        pos_score = ops.tile(self.rel_indices, (B, 1, 1, 1))
-        pos_score = self.pos_proj(pos_score)
-        pos_score = ops.transpose(pos_score, (0, 3, 1, 2))
-        patch_score = ops.BatchMatMul(transpose_b=True)(q, k) * self.scale
-        patch_score = nn.Softmax(axis=-1)(patch_score)
-        pos_score = nn.Softmax(axis=-1)(pos_score)
+        q = ops.reshape(self.q(x), (B, N, self.num_heads, C // self.num_heads))
+        q = ops.transpose(q, (0, 2, 1, 3))
+        k = ops.reshape(self.k(x), (B, N, self.num_heads, C // self.num_heads))
+        k = ops.transpose(k, (0, 2, 3, 1))
 
-        gating = self.gating_param.view((1, -1, 1, 1))
-        attn = (1.-ops.Sigmoid()(gating)) * patch_score + ops.Sigmoid()(gating) * pos_score
-        attn /= ops.expand_dims(attn.sum(axis=-1), -1)
+        pos_score = self.pos_proj(self.rel_indices)
+        pos_score = ops.transpose(pos_score, (0, 3, 1, 2))
+        pos_score = self.softmax(pos_score)
+        patch_score = self.batch_matmul(q, k)
+        patch_score = ops.mul(patch_score, self.scale)
+        patch_score = self.softmax(patch_score)        
+
+        gating = ops.reshape(self.gating_param, (1, -1, 1, 1))
+        gating = ops.Sigmoid()(gating)
+        attn = (1.-gating) * patch_score + gating * pos_score
         attn = self.attn_drop(attn)
         return attn
-
-    def local_init(self, locality_strength: float) -> None:
-        self.v.weight.set_data(ops.eye(self.dim, self.dim, ms.float32), slice_shape=True)
-        locality_distance = 1
-        kernel_size = int(self.num_heads**.5)
-        center = (kernel_size - 1) / 2 if kernel_size % 2 == 0 else kernel_size // 2
-
-        pos_weight_data = self.pos_proj.weight.data
-        for h1 in range(kernel_size):
-            for h2 in range(kernel_size):
-                position = h1+kernel_size*h2
-                pos_weight_data[position,2] = -1
-                pos_weight_data[position,1] = 2*(h1-center)*locality_distance
-                pos_weight_data[position,0] = 2*(h2-center)*locality_distance
-        pos_weight_data = pos_weight_data * locality_strength
-        self.pos_proj.weight.set_data(self.pos_proj.weight.data)
-
-    @constexpr
-    def get_rel_indices(num_patches: int = 196) -> Tensor:
-        img_size = int(num_patches**.5)
-        rel_indices = ops.Zeros()((1, num_patches, num_patches, 3), ms.float32)
-        ind = ms.numpy.arange(img_size).view(1, -1) - ms.numpy.arange(img_size).view(-1, 1)
-        indx = ms.numpy.tile(ind, (img_size, img_size))
-        indy_ = ops.repeat_elements(ind, rep=img_size, axis=0)
-        indy = ops.repeat_elements(indy_, rep=img_size, axis=1)
-        indd = indx**2 + indy**2
-        rel_indices[:, :, :, 2] = ops.expand_dims(indd, 0)
-        rel_indices[:, :, :, 1] = ops.expand_dims(indy, 0)
-        rel_indices[:, :, :, 0] = ops.expand_dims(indx, 0)
-        return rel_indices
 
 
 class MHSA(nn.Cell):
@@ -154,23 +140,30 @@ class MHSA(nn.Cell):
         head_dim = dim // num_heads
         self.scale = head_dim ** -0.5
 
-        self.qkv = nn.Dense(in_channels=dim, out_channels=dim * 3, has_bias=qkv_bias)
+        self.q = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
+        self.k = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
+        self.v = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.attn_drop = nn.Dropout(keep_prob=1.0 - attn_drop)
         self.proj = nn.Dense(in_channels=dim, out_channels=dim)
         self.proj_drop = nn.Dropout(keep_prob=1.0 - proj_drop)
+        self.softmax = nn.Softmax(axis=-1)
+        self.batch_matmul = ops.BatchMatMul()
 
     def construct(self, x: Tensor) -> Tensor:
         B, N, C = x.shape
-        qkv = self.qkv(x)
-        qkv = ops.reshape(qkv, (B, N, 3, self.num_heads, C // self.num_heads))
-        qkv = ops.transpose(qkv, (2, 0, 3, 1, 4))
-        q, k, v = qkv[0], qkv[1], qkv[2]
+        q = ops.reshape(self.q(x), (B, N, self.num_heads, C // self.num_heads))
+        q = ops.transpose(q, (0, 2, 1, 3))
+        k = ops.reshape(self.k(x), (B, N, self.num_heads, C // self.num_heads))
+        k = ops.transpose(k, (0, 2, 3, 1))
+        v = ops.reshape(self.v(x), (B, N, self.num_heads, C // self.num_heads))
+        v = ops.transpose(v, (0, 2, 1, 3))
 
-        attn = ops.BatchMatMul(transpose_b=True)(q, k) * self.scale
-        attn = nn.Softmax(axis=-1)(attn)
+        attn = self.batch_matmul(q, k)
+        attn = ops.mul(attn, self.scale)
+        attn = self.softmax(attn)
         attn = self.attn_drop(attn)
 
-        x = ops.transpose(ops.BatchMatMul()(attn, v), (0, 2, 1, 3))
+        x = ops.transpose(self.batch_matmul(attn, v), (0, 2, 1, 3))
         x = ops.reshape(x, (B, N, C))
         x = self.proj(x)
         x = self.proj_drop(x)
@@ -202,7 +195,7 @@ class Block(nn.Cell):
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
         self.norm2 = nn.LayerNorm((dim,))
         mlp_hidden_dim = int(dim * mlp_ratio)
-        self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, drop=drop)
+        self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer = nn.GELU, drop=drop)
 
     def construct(self, x: Tensor) -> Tensor:
         x = x + self.drop_path(self.attn(self.norm1(x)))
@@ -245,13 +238,16 @@ class ConViT(nn.Cell):
                  mlp_ratio: float = 4., 
                  qkv_bias: bool = False, 
                  attn_drop_rate: float = 0.,
-                 locality_strength: float = 1., 
                  local_up_to_layer: int = 10, 
-                 use_pos_embed: bool = True) -> None:
+                 use_pos_embed: bool = True,
+                 locality_strength: float = 1.) -> None:
         super().__init__()
 
         self.local_up_to_layer = local_up_to_layer
         self.use_pos_embed = use_pos_embed
+        self.num_heads = num_heads
+        self.locality_strength = locality_strength
+        self.embed_dim = embed_dim
 
         self.patch_embed = PatchEmbed(
             image_size=image_size, patch_size=patch_size, in_chans=in_channels, embed_dim=embed_dim)
@@ -269,7 +265,7 @@ class ConViT(nn.Cell):
             Block(
                 dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, 
                 drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i], 
-                use_gpsa=True, locality_strength=locality_strength)
+                use_gpsa=True)
             if i<local_up_to_layer else
             Block(
                 dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, 
@@ -291,6 +287,21 @@ class ConViT(nn.Cell):
             elif isinstance(cell, nn.LayerNorm):
                 cell.gamma.set_data(init.initializer(init.Constant(1), cell.gamma.shape))
                 cell.beta.set_data(init.initializer(init.Constant(0), cell.beta.shape))
+        # local init
+        for i in range(self.local_up_to_layer):
+            self.blocks[i].attn.v.weight.set_data(ops.eye(self.embed_dim, self.embed_dim, ms.float32), slice_shape=True)
+            locality_distance = 1
+            kernel_size = int(self.num_heads**.5)
+            center = (kernel_size - 1) / 2 if kernel_size % 2 == 0 else kernel_size // 2
+            pos_weight_data = self.blocks[i].attn.pos_proj.weight.data
+            for h1 in range(kernel_size):
+                for h2 in range(kernel_size):
+                    position = h1+kernel_size*h2
+                    pos_weight_data[position,2] = -1
+                    pos_weight_data[position,1] = 2*(h1-center)*locality_distance
+                    pos_weight_data[position,0] = 2*(h2-center)*locality_distance
+            pos_weight_data = pos_weight_data * self.locality_strength
+            self.blocks[i].attn.pos_proj.weight.set_data(pos_weight_data)
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.patch_embed(x)
@@ -299,8 +310,9 @@ class ConViT(nn.Cell):
         x = self.pos_drop(x)
         cls_tokens = ops.tile(self.cls_token, (x.shape[0], 1, 1))
         for u,blk in enumerate(self.blocks):
-            if u == self.local_up_to_layer :
-                x = ops.Concat(1)((cls_tokens, x))
+            if u == self.local_up_to_layer:
+                x = ops.Cast()(x, cls_tokens.dtype)
+                x = ops.concat((cls_tokens, x), 1)
             x = blk(x)
         x = self.norm(x)
         return x[:, 0]
