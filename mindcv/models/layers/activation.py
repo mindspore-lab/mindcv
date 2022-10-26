@@ -30,8 +30,3 @@ class Swish(nn.Cell):
     def construct(self, x):
         result = x * self.sigmoid(x)
         return result
-
-    def bprop(self, x, dout):
-        sigmoid_x = self.sigmoid(x)
-        result = dout * (sigmoid_x * (1 + x * (1 - sigmoid_x)))
-        return result
