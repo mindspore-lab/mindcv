@@ -26,9 +26,9 @@ class WarmupCosineDecayLR(LearningRateSchedule):
 
         if self.warmup_steps > 0:
             if global_step > self.warmup_steps:
-                lr = self.cosine_decay_lr(global_step - self.warmup_steps)
+                learning_rate = self.cosine_decay_lr(global_step - self.warmup_steps)
             else:
-                lr = self.warmup_lr(global_step)
+                learning_rate = self.warmup_lr(global_step)
         else:
-            lr = self.cosine_decay_lr(global_step)
-        return lr
+            learning_rate = self.cosine_decay_lr(global_step)
+        return learning_rate

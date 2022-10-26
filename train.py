@@ -152,7 +152,10 @@ def train(args):
                                     min_lr=args.min_lr,
                                     warmup_epochs=args.warmup_epochs,
                                     decay_epochs=args.decay_epochs,
-                                    decay_rate=args.decay_rate)
+                                    decay_rate=args.decay_rate,
+                                    milestones=args.multi_step_decay_milestones,
+                                    num_epochs=args.epoch_size)
+    
 
     # create optimizer
     #TODO: consistent naming opt, name, dataset_name
