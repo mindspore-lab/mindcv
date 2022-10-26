@@ -6,11 +6,9 @@ import numpy as np
 
 import mindspore as ms
 from mindspore import log as logger
-from mindspore import ops, Tensor, save_checkpoint, SummaryRecord
-from mindspore.ops import ReduceOp
+from mindspore import Tensor, save_checkpoint, SummaryRecord
 from mindspore.train.callback import Callback
 from mindspore.train._utils import _make_directory
-from mindspore.train.callback._checkpoint import CheckpointManager
 
 from .checkpoint_manager import CheckpointManager
 
@@ -32,13 +30,11 @@ class StateMonitor(Callback):
                  metric_name="accuracy",
                  dataset_sink_mode=False,
                  rank_id=None,
-                 device_num=None,
-                 distribute=False,
                  log_interval=100,
                  model_name='',
                  last_epoch=0,
                  keep_checkpoint_max=10,
-                 save_strategy=None
+                 ckpt_save_policy=None
                  ):
         super().__init__()
         self.model = model
@@ -51,20 +47,17 @@ class StateMonitor(Callback):
         self.dataset_sink_mode = dataset_sink_mode
         self.summary_dir = summary_dir
         self.rank_id = rank_id if rank_id is not None else 0
-        self.device_num = device_num if device_num is not None else 1
-        self.distribute = distribute
         self.log_interval = log_interval
         self.model_name = model_name
         self.ckpt_dir = ckpt_dir
         self.ckpt_save_interval = ckpt_save_interval
         self.last_epoch = last_epoch
+        self.best_epoch= -1
 
         self.keep_checkpoint_max = keep_checkpoint_max
-        self.save_strategy = save_strategy
-        self._manager = CheckpointManager(save_strategy=self.save_strategy)
+        self.ckpt_save_policy = ckpt_save_policy
+        self._manager = CheckpointManager(ckpt_save_policy=self.ckpt_save_policy)
         self._need_flush_from_cache = True
-        if self.distribute:
-            self.allreduce_sum = ops.AllReduce(ReduceOp.SUM)
 
         if self.rank_id in [0, None]:
             if not os.path.isdir(ckpt_dir):
@@ -117,70 +110,68 @@ class StateMonitor(Callback):
         cb_params = run_context.original_args()
         # the global step may larger than batch_size * epoch due to graph mode async
         global_step = cb_params.optimizer.global_step.asnumpy()[0]
-        #cur_epoch = (global_step - 1) // cb_params.batch_num
-        cur_epoch = cb_params.cur_epoch_num +  self.last_epoch
+        cur_epoch = cb_params.cur_epoch_num + self.last_epoch
         cur_step_in_epoch = cb_params.batch_num #(global_step - 1) % cb_params.batch_num
 
-        # save checkpoint
-        if self.rank_id in [0, None]:
-            if (cur_epoch % self.ckpt_save_interval == 0) or (cur_epoch == cb_params.epoch_num):
-                if self._need_flush_from_cache:
-                    self._flush_from_cache(cb_params)
-
-                cur_ckpoint_file = self.model_name + "-" + str(cur_epoch) + "_" \
-                        + str(cur_step_in_epoch) + ".ckpt"
-
-                # keep checkpoint files number equal max number.
-                ckpt_save_path = os.path.join(self.ckpt_dir, cur_ckpoint_file)
-                self._manager.save_ckpoint(cb_params.train_network, num_ckpt=self.keep_checkpoint_max,
-                                           save_path=ckpt_save_path)
-		        # save optim for resume
-                optim_save_path = os.path.join(self.ckpt_dir, f'optim_{self.model_name}.ckpt')
-                ms.save_checkpoint(cb_params.optimizer, optim_save_path, async_save=True)
-                print(f'Model saved in {ckpt_save_path}')
-
-        # record loss curve
         loss = self._get_loss(cb_params)
         self.summary_record.add_value('scalar', f'train_loss_{self.rank_id}', loss)
 
         # val while training if validation loader is not None
-        val_acc_val = -1.0
+        val_acc_val = Tensor(-1.0)
         if self.dataset_val is not None:
             if cur_epoch >= self.val_start_epoch and (cur_epoch - self.val_start_epoch) % self.val_interval == 0:
-                # do validation
-                res = self.apply_eval()
-
                 # record val acc
-                val_acc = res[self.metric_name]
-                if self.distribute:
-                    val_acc = self.allreduce_sum(Tensor(val_acc, ms.float32))
-                    val_acc /= self.device_num
-                    val_acc_val = (100*val_acc).asnumpy()
-                else:
-                    val_acc_val = 100*val_acc
-
                 if self.rank_id in [0, None]:
-                    print(f"Validation {self.metric_name}: {val_acc_val:.3f}")
+                    val_time = time()
+                    res = self.apply_eval()[self.metric_name]
+                    val_acc_val = 100 * res
+                    print(f"Validation {self.metric_name}: {val_acc_val:.3f}, time:{time() - val_time:.6f}s")
                     # Save the best ckpt file
-                    if val_acc > self.best_res:
-                        self.best_res = val_acc
+                    if val_acc_val > self.best_res:
+                        self.best_res = val_acc_val
                         self.best_epoch = cur_epoch
                         if self.save_best_ckpt and (self.rank_id == 0):
                             save_checkpoint(cb_params.train_network, self.best_ckpt_path, async_save=True)
                             print(f"=> New best val acc: {val_acc_val:.3f}")
 
-                    if not isinstance(val_acc, Tensor):
-                        val_acc = Tensor(val_acc)
-                    self.summary_record.add_value('scalar', 'val_' + self.metric_name, val_acc)
+                    if not isinstance(val_acc_val, Tensor):
+                        val_acc_val = Tensor(val_acc_val)
+                    self.summary_record.add_value('scalar', 'val_' + self.metric_name, val_acc_val)
 
         # log
         if self.rank_id in [0, None]:
+            if (cur_epoch % self.ckpt_save_interval == 0) or (cur_epoch == cb_params.epoch_num):
+                if self._need_flush_from_cache:
+                    self._flush_from_cache(cb_params)
+
+                # save optim for resume
+                optim_save_path = os.path.join(self.ckpt_dir, f'optim_{self.model_name}.ckpt')
+                ms.save_checkpoint(cb_params.optimizer, optim_save_path, async_save=True)
+
+                cur_ckpoint_file = self.model_name + "-" + str(cur_epoch) + "_" \
+                                   + str(cur_step_in_epoch) + ".ckpt"
+
+                # keep checkpoint files number equal max number.
+                ckpt_save_path = os.path.join(self.ckpt_dir, cur_ckpoint_file)
+                ckpoint_filelist = self._manager.save_ckpoint(cb_params.train_network,
+                                                              num_ckpt=self.keep_checkpoint_max,
+                                                              metric=val_acc_val,
+                                                              save_path=ckpt_save_path)
+                if self.ckpt_save_policy == 'top_k':
+                    checkpoints_str = "Top K accuracy checkpoints: \n"
+                    for ch in ckpoint_filelist:
+                        checkpoints_str += '{}\n'.format(ch)
+                    print(checkpoints_str)
+                else:
+                    print(f"Saving model to {ckpt_save_path}")
+
             epoch_time = time() - self.epoch_start
             print(f'Total time since last epoch: {epoch_time:.3f}')
+            print("-" * 80)
             self.epoch_start = time()
 
             with open(self.log_txt_fp, 'a', encoding="utf-8") as fp:
-                fp.write(f'{cur_epoch}\t{loss.asnumpy():.7f}\t{val_acc_val:.3f}\t{epoch_time:.2f}\n')
+                fp.write(f'{cur_epoch}\t{loss.asnumpy():.7f}\t{val_acc_val.asnumpy():.3f}\t{epoch_time:.2f}\n')
 
         self.summary_record.record(int(global_step))
 

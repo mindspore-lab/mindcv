@@ -1,22 +1,23 @@
 '''checkpoint manager '''
 import os
 import stat
+import numpy as np
 import mindspore as ms
 from mindspore import log as logger
 from mindspore import ops, Tensor
 
 class CheckpointManager:
     """
-    Manage checkpoint files according to save_strategy of checkpoint.
+    Manage checkpoint files according to ckpt_save_policy of checkpoint.
     Args:
-        save_strategy (str): Checkpoint saving strategy. The optional values is None, "top_K" or "latest_K".
-        None means to save each checkpoint, top_ K means to save K checkpoints with the highest accuracy,
-        and latest_K means saving the latest K checkpoint. Default: None.
+        ckpt_save_policy (str): Checkpoint saving strategy. The optional values is None, "top_k" or "latest_k".
+        None means to save each checkpoint, top_k means to save K checkpoints with the highest accuracy,
+        and latest_k means saving the latest K checkpoint. Default: None.
     """
 
-    def __init__(self, save_strategy=None):
+    def __init__(self, ckpt_save_policy=None):
         self._ckpoint_filelist = []
-        self.save_strategy = save_strategy
+        self.ckpt_save_policy = ckpt_save_policy
 
     @property
     def ckpoint_filelist(self):
@@ -77,7 +78,9 @@ class CheckpointManager:
     def top_K_checkpoint(self, network, K=10, metric=None, save_path=''):
         """ Save and return Top K checkpoint address and accuracy. """
         last_file = self._ckpoint_filelist[-1] if self._ckpoint_filelist else None
-        if self.ckpoint_num < K or ops.gt(metric, last_file[1]):
+        if type(metric) is not np.ndarray:
+            metric = metric.asnumpy()
+        if self.ckpoint_num < K or np.greater(metric, last_file[1]):
             if self.ckpoint_num >= K:
                 delete = K - 1
                 if delete < 0 or self.ckpoint_num <= delete:
@@ -99,18 +102,16 @@ class CheckpointManager:
 
     def save_ckpoint(self, network, num_ckpt=10, metric=None, save_path=''):
         """ Save checkpoint according to different save strategy. """
-        if self.save_strategy is None:
+        if self.ckpt_save_policy is None:
             ms.save_checkpoint(network, save_path, async_save=True)
-        elif self.save_strategy == 'top_K':
+        elif self.ckpt_save_policy == 'top_k':
             if metric is None:
                 raise ValueError(f"The expected 'metric' is not None, but got: {metric}.")
-            if not isinstance(metric, Tensor):
-                metric = Tensor(metric)
             self.top_K_checkpoint(network, K=num_ckpt, metric=metric, save_path=save_path)
             return self._ckpoint_filelist
-        elif self.save_strategy == 'latest_K':
+        elif self.ckpt_save_policy == 'latest_k':
             self.latest_K_checkpoint(network, K=num_ckpt, save_path=save_path)
             return self._ckpoint_filelist
         else:
-            raise ValueError(f"The expected 'save_strategy' is None, top_K or latest_K,"
-                             f"but got: {self.save_strategy}.")
+            raise ValueError(f"The expected 'ckpt_save_policy' is None, top_k or latest_k,"
+                             f"but got: {self.ckpt_save_policy}.")
