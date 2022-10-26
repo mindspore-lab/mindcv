@@ -126,6 +126,8 @@ def create_parser():
                        help='The dataset sink mode (default=True).')
     group.add_argument('--in_channels', type=int, default=3,
                        help='Input channels (default=3)')
+    group.add_argument('--ckpt_save_policy', type=str, default='latest_k',
+                       help='Checkpoint saving strategy. The optional values is None, "top_k" or "latest_k".')
 
     # Optimize parameters
     group = parser.add_argument_group('Optimizer parameters')

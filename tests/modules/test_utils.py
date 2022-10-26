@@ -53,8 +53,8 @@ def validate(model, data, label):
     return acc
 
 @pytest.mark.parametrize('mode', [0, 1])
-@pytest.mark.parametrize('save_strategy', ['top_K', 'latest_K'])
-def test_checkpoint_manager(mode, save_strategy):
+@pytest.mark.parametrize('ckpt_save_policy', ['top_k', 'latest_k'])
+def test_checkpoint_manager(mode, ckpt_save_policy):
     ms.set_context(mode=mode)
 
     bs = 8
@@ -74,7 +74,7 @@ def test_checkpoint_manager(mode, save_strategy):
     net_opt = create_optimizer(network.trainable_params(), 'adam', lr=0.001, weight_decay=1e-7)
     train_network = TrainOneStepCell(net_with_loss, net_opt)
     train_network.set_train()
-    manager = CheckpointManager(save_strategy=save_strategy)
+    manager = CheckpointManager(ckpt_save_policy=ckpt_save_policy)
     for t in range(3):
         train_network(x, label)
         acc = validate(network, test_data, test_label)
