@@ -32,6 +32,7 @@ __all__.extend(squeezenet.__all__)
 __all__.extend(swin_transformer.__all__)
 __all__.extend(vgg.__all__)
 __all__.extend(xception.__all__)
+__all__.extend(convit.__all__)
 
 #fixme: since googlenet is used as both the file and function name, we need to import * after __all__ 
 
@@ -64,3 +65,4 @@ from .efficientnet import *
 from .ghostnet import *
 from .repvgg import *
 from .swin_transformer import *
+from .convit import *
