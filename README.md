@@ -145,11 +145,11 @@ python train.py --model=resnet50 --dataset=cifar10 \
 
 The training loss and validation accuracy for each epoch  will be saved in `{ckpt_save_dir}/results.log`.
 
-**Resume training.** To resume training, please specify `--ckpt_path` for the checkpoint where you want to resume. The optimizer state including learning rate of the last epoch will also be recovered. 
+**Resume training.** To resume training, please specify `--ckpt_path` for the checkpoint where you want to resume and `--ckpt_save_dir`. The optimizer state including learning rate of the last epoch will also be recovered. 
 
 ```python
 python train.py --model=resnet50 --dataset=cifar10 \
-		--ckpt_path='checkpoints/resnet50_30-100.ckpt'
+		--ckpt_save_dir=checkpoints --ckpt_path=checkpoints/resnet50_30-100.ckpt
 ``` 
 
 - Distributed Training
