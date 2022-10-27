@@ -161,7 +161,16 @@ def train(args):
                                     min_lr=args.min_lr,
                                     warmup_epochs=args.warmup_epochs,
                                     decay_epochs=args.decay_epochs,
-                                    decay_rate=args.decay_rate)
+                                    decay_rate=args.decay_rate,
+                                    milestones=args.multi_step_decay_milestones,
+                                    num_epochs=args.epoch_size)
+
+    # resume training if ckpt_path is given
+    if args.ckpt_path != '' and args.resume_opt:
+        opt_ckpt_path = os.path.join(args.ckpt_save_dir, f'optim_{args.model}.ckpt')
+    else:
+        opt_ckpt_path = ''
+
     # create optimizer
     optimizer = create_optimizer(network.trainable_params(),
                                  opt=args.opt,
@@ -171,8 +180,7 @@ def train(args):
                                  nesterov=args.use_nesterov,
                                  filter_bias_and_bn=args.filter_bias_and_bn,
                                  loss_scale=args.loss_scale,
-                                 checkpoint_path=os.path.join(
-                                     args.ckpt_save_dir, f'{args.model}_optim.ckpt'))
+                                 checkpoint_path=opt_ckpt_path)
 
     # resume
     begin_step = 0
