@@ -127,6 +127,7 @@ def create_optimizer(
                                loss_scale=loss_scale,
                                **opt_args)
     elif opt == 'lamb':
+        assert loss_scale == 1.0, 'Loss scaler is not supported by Lamb optimizer'
         optimizer = nn.Lamb(params=params,
                             learning_rate=lr,
                             weight_decay=weight_decay,

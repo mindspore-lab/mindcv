@@ -15,7 +15,8 @@ def create_scheduler(
         warmup_epochs: int = 3,
         decay_epochs: int = 10,
         decay_rate: float = 0.9,
-        milestones: list = None
+        milestones: list = None,
+        num_epochs: int = 200,
 ):
     r"""Creates learning rate scheduler by name.
 
@@ -69,14 +70,13 @@ def create_scheduler(
                                           decay_steps,
                                           is_stair=True
                                           )
-
     elif scheduler == 'multi_step_decay':
-        decay_step_indices = [epoch * steps_per_epoch for epoch in milestones]
-        # decay LR by decay_rate once the step reaches `decay_step_indices`
         lr_scheduler = MultiStepDecayLR(lr,
-                                        decay_rate,
-                                        decay_step_indices
-                                        )
+                            decay_rate,
+                            milestones,
+                            steps_per_epoch,
+                            num_epochs
+                            )
 
     elif scheduler == 'constant':
         lr_scheduler = lr

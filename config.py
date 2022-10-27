@@ -33,7 +33,7 @@ def create_parser():
                        help='Run distribute (default=False)')
     group.add_argument('--val_while_train', type=str2bool, nargs='?', const=True, default=False,
                        help='Verify accuracy while training (default=False)')
-    group.add_argument('--val_interval', type=int, default=2,
+    group.add_argument('--val_interval', type=int, default=1,
             help='Interval for validation while training (in epoch), Default: 1')
     group.add_argument('--log_interval', type=int, default=100,
             help='Interval for print training log (in step), if None, log every epoch. Default: 100')
@@ -113,7 +113,7 @@ def create_parser():
                        help='Drop rate (default=None)')
     group.add_argument('--drop_path_rate', type=float, default=None,
                        help='Drop path rate (default=None)')
-    group.add_argument('--amp_level', type=str, default='O0', help='Amp level (default="O0").')
+    group.add_argument('--amp_level', type=str, default='O0', help='Amp level - Auto Mixed Precision level for saving memory and acceleration. choice: O0 - all FP32, O1 - only cast ops in white-list to FP16, O2 - cast all ops except for blacklist to FP16, O3 - cast all ops to FP16.   (default="O0").')
     group.add_argument('--keep_checkpoint_max', type=int, default=10,
                        help='Max number of checkpoint files (default=10)')
     group.add_argument('--ckpt_save_dir', type=str, default="./ckpt",
@@ -139,6 +139,7 @@ def create_parser():
                             'It must be at least 0.0 (default=0.9)')
     group.add_argument('--weight_decay', type=float, default=1e-6,
                        help='Weight decay (default=1e-6)')
+    #group.add_argument('--loss_scaler', type=str, default='static', help='Loss scaler, static or dynamic (default=static)')
     group.add_argument('--loss_scale', type=float, default=1.0,
                        help='Loss scale (default=1.0)')
     group.add_argument('--use_nesterov', type=str2bool, nargs='?', const=True, default=False,
@@ -149,8 +150,8 @@ def create_parser():
     # Scheduler parameters
     group = parser.add_argument_group('Scheduler parameters')
     group.add_argument('--scheduler', type=str, default='warmup_cosine_decay',
-                       choices=['constant', 'warmup_cosine_decay', 'exponential_decay', 'step_decay'],
-                       help='Type of scheduler (default="constant")')
+                       choices=['constant', 'warmup_cosine_decay', 'exponential_decay', 'step_decay', 'multi_step_decay'],
+                       help='Type of scheduler (default="warmup_consine_decay")')
     group.add_argument('--lr', type=float, default=0.001,
                        help='learning rate (default=0.001)')
     group.add_argument('--min_lr', type=float, default=1e-6,
@@ -161,6 +162,8 @@ def create_parser():
                        help='Decay epochs (default=None)')
     group.add_argument('--decay_rate', type=float, default=0.9,
                        help='LR decay rate if scheduler supports')
+    group.add_argument('--multi_step_decay_milestones', type=list, default=[30, 60, 90],
+                       help='list of epoch milestones for MultStepDecayLR, decay LR by decay_rate at the milestone epoch.')
 
     # Loss parameters
     group = parser.add_argument_group('Loss parameters')

@@ -145,6 +145,13 @@ python train.py --model=resnet50 --dataset=cifar10 \
 
 The training loss and validation accuracy for each epoch  will be saved in `{ckpt_save_dir}/results.log`.
 
+**Resume training.** To resume training, please specify `--ckpt_path` for the checkpoint where you want to resume and `--ckpt_save_dir`. The optimizer state including learning rate of the last epoch will also be recovered. 
+
+```python
+python train.py --model=resnet50 --dataset=cifar10 \
+		--ckpt_save_dir=checkpoints --ckpt_path=checkpoints/resnet50_30-100.ckpt
+``` 
+
 - Distributed Training
 
 For large datasets like ImageNet, it is necessary to do training in distributed mode on multiple devices, which is well supported in MindCV. The following script is an example for training DenseNet121 on ImageNet with 4 GPUs.   
