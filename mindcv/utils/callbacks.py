@@ -83,14 +83,14 @@ class StateMonitor(Callback):
         """Model evaluation, return validation accuracy."""
         return self.model.eval(self.dataset_val, dataset_sink_mode=self.dataset_sink_mode)
 
-    def step_end(self, run_context):
-
+    def on_train_step_end(self, run_context):
         cb_params = run_context.original_args()
         num_batches = cb_params.batch_num
         #global_step = cb_params.optimizer.global_step.asnumpy()[0]
         cur_epoch = cb_params.cur_epoch_num + self.last_epoch -1 #(global_step-1) // num_batches
         #cur_step_in_epoch = (global_step- 1) % cb_params.batch_num
         cur_step_in_epoch = int((cb_params.cur_step_num - 1) % cb_params.batch_num)
+
 
         if (cur_step_in_epoch  + 1) % self.log_interval == 0 or \
                 (cur_step_in_epoch  + 1) >= num_batches or cur_step_in_epoch == 0:
@@ -158,10 +158,8 @@ class StateMonitor(Callback):
                                                               metric=val_acc_val,
                                                               save_path=ckpt_save_path)
                 if self.ckpt_save_policy == 'top_k':
-                    checkpoints_str = "Top K accuracy checkpoints: \n"
-                    for ch in ckpoint_filelist:
-                        checkpoints_str += '{}\n'.format(ch)
-                    print(checkpoints_str)
+                    print("Top K accuracy checkpoints:")
+                    print('\n'.join(ckpoint_filelist))
                 else:
                     print(f"Saving model to {ckpt_save_path}")
 

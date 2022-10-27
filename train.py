@@ -156,6 +156,11 @@ def train(args):
                                     milestones=args.multi_step_decay_milestones,
                                     num_epochs=args.epoch_size)
     
+    # resume training if ckpt_path is given
+    if args.ckpt_path != '' and args.resume_opt: 
+        opt_ckpt_path = os.path.join(args.ckpt_save_dir, f'optim_{args.model}.ckpt')
+    else:
+        opt_ckpt_path = '' 
 
     # create optimizer
     #TODO: consistent naming opt, name, dataset_name
@@ -167,8 +172,7 @@ def train(args):
                                  nesterov=args.use_nesterov,
                                  filter_bias_and_bn=args.filter_bias_and_bn,
                                  loss_scale=args.loss_scale,
-                                 checkpoint_path=os.path.join(
-                                     args.ckpt_save_dir, f'optim_{args.model}.ckpt'))
+                                 checkpoint_path=opt_ckpt_path)
 
     # Define eval metrics.
     eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy()}

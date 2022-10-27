@@ -37,6 +37,10 @@ def create_parser():
             help='Interval for validation while training (in epoch), Default: 1')
     group.add_argument('--log_interval', type=int, default=100,
             help='Interval for print training log (in step), if None, log every epoch. Default: 100')
+    group.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=False, help='Load pretrained model (default=False)')
+    group.add_argument('--ckpt_path', type=str, default='',
+                       help='Initialize model from this checkpoint. If resume training, specify the checkpoint path. (default='')')
+    group.add_argument('--resume_opt', type=str2bool, nargs='?', const=True, default=False, help='Resume optimizer state including LR (default=False)')
 
 
     # Dataset parameters
@@ -106,9 +110,6 @@ def create_parser():
                        help='Name of model')
     group.add_argument('--num_classes', type=int, default=None,
                        help='Number of label classes. If None, read from standard datasets. (default=None)')
-    group.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=False, help='Load pretrained model (default=False)')
-    group.add_argument('--ckpt_path', type=str, default='',
-                       help='Initialize model from this checkpoint (default='')')
     group.add_argument('--drop_rate', type=float, default=None,
                        help='Drop rate (default=None)')
     group.add_argument('--drop_path_rate', type=float, default=None,
