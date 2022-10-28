@@ -104,23 +104,23 @@ class ReXNetV1(nn.Cell):
         num_classes (int) : number of classification classes. Default: 1000.
         use_se (bool): use SENet in LinearBottleneck. Default: True.
         se_ratio: (float): SENet reduction ratio. Default 1/12.
-        dropout_ratio (float): dropout ratio. Default: 0.2.
+        drop_rate (float): dropout ratio. Default: 0.2.
         ch_div (int): divisible by ch_div. Default: 1.
         act_layer (nn.Cell): activation function in ConvNormAct. Default: nn.SiLU.
         dw_act_layer (nn.Cell): activation function after dw_conv. Default: nn.ReLU6.
         cls_useconv (bool): use conv in classification. Default: False.
     """
 
-    def __init__(self, 
-                 in_channels=3, 
+    def __init__(self,
+                 in_channels=3,
                  fi_channels=180,
                  initial_channels = 16,
-                 width_mult=1.0, 
-                 depth_mult=1.0, 
+                 width_mult=1.0,
+                 depth_mult=1.0,
                  num_classes=1000,
                  use_se=True,
                  se_ratio=1/12,
-                 dropout_ratio=0.2,
+                 drop_rate=0.2,
                  ch_div=1,
                  act_layer=nn.SiLU,
                  dw_act_layer=nn.ReLU6,
@@ -156,7 +156,7 @@ class ReXNetV1(nn.Cell):
                 in_channels_group.append(int(round(inplanes * width_mult)))
                 inplanes += fi_channels / (self.depth // 3 * 1.0)
                 out_channels_group.append(int(round(inplanes * width_mult)))
-        print(out_channels_group[-1])
+
         stem_chs = make_divisible(round(stem_channel * width_mult), divisor=ch_div)
         self.stem = Conv2dNormActivation(in_channels, stem_chs, stride=2, padding=1, activation=act_layer)
 
@@ -175,9 +175,9 @@ class ReXNetV1(nn.Cell):
                                              dw_act_layer=dw_act_layer))
 
         pen_channels = make_divisible(int(1280 * width_mult), divisor=ch_div)
-        features.append(Conv2dNormActivation(out_channels_group[-1], 
-                                             pen_channels, 
-                                             kernel_size=1, 
+        features.append(Conv2dNormActivation(out_channels_group[-1],
+                                             pen_channels,
+                                             kernel_size=1,
                                              activation=act_layer))
 
         features.append(GlobalAvgPooling())
@@ -185,11 +185,11 @@ class ReXNetV1(nn.Cell):
         self.features = nn.SequentialCell(*features)
         if self.useconv:
             self.cls = nn.SequentialCell(
-                nn.Dropout(dropout_ratio),
+                nn.Dropout(drop_rate),
                 nn.Conv2d(pen_channels, num_classes, 1, has_bias=True))
         else:
             self.cls = nn.SequentialCell(
-                nn.Dropout(dropout_ratio),
+                nn.Dropout(drop_rate),
                 nn.Dense(pen_channels, num_classes))
 
     def construct(self, x):

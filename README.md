@@ -4,8 +4,8 @@
     <a href="https://mindcv-ai.readthedocs.io/en/latest">
         <img alt="docs" src="https://img.shields.io/badge/docs-latest-blue">
     </a>
-    <a href="https://github.com/IDEA-Research/detrex/blob/main/LICENSE">
-        <img alt="GitHub" src="https://img.shields.io/github/license/mindspore-ecosystem/mindcv.svg?color=blue">
+    <a href="https://github.com/mindspore-ecosystem/mindcv/blob/main/LICENSE">
+        <img alt="GitHub" src="https://img.shields.io/github/license/mindspore-ecosystem/mindcv.svg">
     </a>
     <a href="https://github.com/mindspore-ecosystem/mindcv/pulls">
         <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-pink.svg">
@@ -13,9 +13,11 @@
     <a href="https://github.com/mindspore-ecosystem/mindcv/issues">
         <img alt="open issues" src="https://img.shields.io/github/issues/mindspore-ecosystem/mindcv">
     </a>
+    <!---
     <a href="https://github.com/mindspore-ecosystem/mindcv/tags">
-        <img alt="GitHub tags" src="https://img.shields.io/github/tag/mindspore-ecosystem/mindcv.svg">
+        <img alt="GitHub tags" src="https://img.shields.io/github/tags/mindspore-ecosystem/mindcv">
     </a>
+    -->
 </p>
 
 [Introduction](#introduction) |
@@ -77,17 +79,18 @@ pip install -r requirements.txt
 MindSpore can be easily installed by following the official [instruction](https://www.mindspore.cn/install) where you can select your hardware platform for the best fit. To run in distributed mode, [openmpi](https://www.open-mpi.org/software/ompi/v4.0/) is required to install.   
 
 The following instructions assume the desired dependency is fulfilled. 
-
+<!---
 ### Install with pip
 MindCV can be installed with pip. 
 ```shell
-pip install https://github.com/mindlab-ai/mindcv/releases/download/v0.0.1-beta/mindcv-0.0.1b0-py3-none-any.whl
+pip install https://github.com/mindspore-ecosystem/mindcv/releases/download/v0.0.1-beta/mindcv-0.0.1b0-py3-none-any.whl
 ```
+-->
 
 ### Install from source
 To install MindCV from source, please run,
 ```shell
-pip install git+https://github.com/mindlab-ai/mindcv.git
+pip install git+https://github.com/mindspore-ecosystem/mindcv.git
 ```
 
 ## Get Started 

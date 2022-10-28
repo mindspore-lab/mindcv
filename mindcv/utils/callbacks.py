@@ -11,6 +11,7 @@ from mindspore.train.callback import Callback
 from mindspore.train._utils import _make_directory
 
 from .checkpoint_manager import CheckpointManager
+from .reduce_manager import Allreduce
 
 class StateMonitor(Callback):
     """
@@ -28,8 +29,8 @@ class StateMonitor(Callback):
                  ckpt_save_interval=1,
                  best_ckpt_name="best.ckpt",
                  metric_name="accuracy",
-                 dataset_sink_mode=False,
                  rank_id=None,
+                 device_num=None,
                  log_interval=100,
                  model_name='',
                  last_epoch=0,
@@ -44,9 +45,9 @@ class StateMonitor(Callback):
         self.metric_name = metric_name
         self.best_res = 0
         self.val_interval = val_interval
-        self.dataset_sink_mode = dataset_sink_mode
         self.summary_dir = summary_dir
         self.rank_id = rank_id if rank_id is not None else 0
+        self.device_num = device_num if rank_id is not None else 1
         self.log_interval = log_interval
         self.model_name = model_name
         self.ckpt_dir = ckpt_dir
@@ -69,6 +70,9 @@ class StateMonitor(Callback):
 
             self.best_ckpt_path = os.path.join(ckpt_dir, best_ckpt_name)
 
+        if self.device_num > 1:
+            self.all_reduce = Allreduce()
+
         self.start = time()
         self.epoch_start = time()
 
@@ -81,7 +85,7 @@ class StateMonitor(Callback):
 
     def apply_eval(self):
         """Model evaluation, return validation accuracy."""
-        return self.model.eval(self.dataset_val, dataset_sink_mode=self.dataset_sink_mode)
+        return self.model.eval(self.dataset_val, dataset_sink_mode=False)
 
     def on_train_step_end(self, run_context):
         cb_params = run_context.original_args()
@@ -120,11 +124,14 @@ class StateMonitor(Callback):
         val_acc_val = Tensor(-1.0)
         if self.dataset_val is not None:
             if cur_epoch >= self.val_start_epoch and (cur_epoch - self.val_start_epoch) % self.val_interval == 0:
+                val_time = time()
+                res = self.apply_eval()[self.metric_name]
+                if self.device_num > 1:
+                    res = self.all_reduce(Tensor(res, ms.float32)).asnumpy()
+                    res /= self.device_num
+                val_acc_val = 100 * res
                 # record val acc
                 if self.rank_id in [0, None]:
-                    val_time = time()
-                    res = self.apply_eval()[self.metric_name]
-                    val_acc_val = 100 * res
                     print(f"Validation {self.metric_name}: {val_acc_val:.3f}, time:{time() - val_time:.6f}s")
                     # Save the best ckpt file
                     if val_acc_val > self.best_res:
@@ -159,7 +166,7 @@ class StateMonitor(Callback):
                                                               save_path=ckpt_save_path)
                 if self.ckpt_save_policy == 'top_k':
                     print("Top K accuracy checkpoints:")
-                    print('\n'.join(ckpoint_filelist))
+                    print('\n'.join(ckpt for ckpt,_ in ckpoint_filelist))
                 else:
                     print(f"Saving model to {ckpt_save_path}")
 
