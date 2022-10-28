@@ -5,7 +5,7 @@
         <img alt="docs" src="https://img.shields.io/badge/docs-latest-blue">
     </a>
     <a href="https://github.com/mindspore-ecosystem/mindcv/blob/main/LICENSE">
-        <img alt="GitHub" src="https://img.shields.io/github/license/mindspore-ecosystem/mindcv.svg?color=blue">
+        <img alt="GitHub" src="https://img.shields.io/github/license/mindspore-ecosystem/mindcv.svg">
     </a>
     <a href="https://github.com/mindspore-ecosystem/mindcv/pulls">
         <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-pink.svg">
@@ -13,9 +13,11 @@
     <a href="https://github.com/mindspore-ecosystem/mindcv/issues">
         <img alt="open issues" src="https://img.shields.io/github/issues/mindspore-ecosystem/mindcv">
     </a>
+    <!---
     <a href="https://github.com/mindspore-ecosystem/mindcv/tags">
-        <img alt="GitHub tags" src="https://img.shields.io/github/tag/mindspore-ecosystem/mindcv.svg">
+        <img alt="GitHub tags" src="https://img.shields.io/github/tags/mindspore-ecosystem/mindcv">
     </a>
+    -->
 </p>
 
 [Introduction](#introduction) |
