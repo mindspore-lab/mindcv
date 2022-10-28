@@ -9,30 +9,21 @@ from mindspore import Tensor
 from mindspore.numpy import ones
 
 
-def drop_path(x: Tensor,
-              drop_prob: float = 0.,
-              training: bool = False,
-              scale_by_keep: bool = True) -> Tensor:
-    """ DropPath (Stochastic Depth) regularization layers """
-    if drop_prob == 0. or not training:
-        return x
-    keep_prob = 1 - drop_prob
-    shape = (x.shape[0],) + (1,) * (x.ndim - 1)
-    random_tensor = ops.Dropout(keep_prob=keep_prob)(ones(shape))[1]
-    random_tensor = ops.Cast()(random_tensor, x.dtype)
-    if keep_prob > 0. and scale_by_keep:
-        random_tensor = ops.div(random_tensor, keep_prob)
-    return x * random_tensor
-
-
 class DropPath(nn.Cell):
     """ DropPath (Stochastic Depth) regularization layers """
     def __init__(self,
                  drop_prob: float = 0.,
                  scale_by_keep: bool = True) -> None:
         super().__init__()
-        self.drop_prob = drop_prob
+        self.keep_prob = 1. - drop_prob
         self.scale_by_keep = scale_by_keep
+        self.dropout = nn.Dropout(self.keep_prob)
 
     def construct(self, x: Tensor) -> Tensor:
-        return drop_path(x, self.drop_prob, self.training, self.scale_by_keep)
+        if self.keep_prob == 1. or not self.training:
+            return x
+        shape = (x.shape[0],) + (1,) * (x.ndim - 1)
+        random_tensor = self.dropout(ones(shape))
+        if not self.scale_by_keep:
+            random_tensor = ops.mul(random_tensor, self.keep_prob)
+        return x * random_tensor
