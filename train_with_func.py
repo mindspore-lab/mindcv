@@ -18,6 +18,8 @@ from mindcv.scheduler import create_scheduler
 from mindcv.utils import CheckpointManager, Allreduce
 from config import parse_args
 
+from mindspore import amp
+from mindspore.amp import StaticLossScaler, DynamicLossScaler, all_finite
 
 logger = logging.getLogger('train')
 logger.setLevel(logging.INFO)
@@ -26,7 +28,6 @@ formatter1 = logging.Formatter('%(message)s',)
 logger.addHandler(h1)
 h1.setFormatter(formatter1)
 
-
 def train(args):
     """Train network."""
     SEED = 1
@@ -34,6 +35,7 @@ def train(args):
     np.random.seed(SEED)
 
     ms.set_context(mode=ms.PYNATIVE_MODE)
+
 
     if args.distribute:
         init()
@@ -148,6 +150,14 @@ def train(args):
 
     num_params = sum([param.size for param in network.get_parameters()])
 
+    # mixed precision (optional)
+    amp.auto_mixed_precision(network, args.amp_level)
+    if args.loss_scale > 1.0:
+        loss_scaler = StaticLossScaler(scale_value=args.loss_scale)
+        #loss_scaler = DynamicLossScaler(scale_value=args.loss_scale, scale_factor=2, scale_window=1000)
+    else:
+        loss_scaler = None
+
     # create loss
     loss = create_loss(name=args.loss,
                        reduction=args.reduction,
@@ -200,12 +210,13 @@ def train(args):
                     f"Num epochs: {args.epoch_size} \n"
                     f"Optimizer: {args.opt} \n"
                     f"LR: {args.lr} \n"
-                    f"LR Scheduler: {args.scheduler}")
+                    f"LR Scheduler: {args.scheduler} \n"
+                    f"AMP level: {args.amp_level} \n"
+                    f"Loss scale: {args.loss_scale}"
+                    )
         logger.info(f"-" * 40)
 
-
-        assert args.loss_scale == 1.0, 'loss_scale > 1.0 is not supported in train_with_func currently.'
-
+        #assert args.loss_scale == 1.0, 'loss_scale > 1.0 is not supported in train_with_func currently.'
 
         if args.ckpt_path != '':
             logger.info(f"Resume training from {args.ckpt_path}, last step: {begin_step}, last epoch: {begin_epoch}")
@@ -238,7 +249,8 @@ def train(args):
                                      loss,
                                      optimizer,
                                      epoch=t,
-                                     n_epochs=args.epoch_size,
+				     n_epochs=args.epoch_size,
+                                     loss_scaler=loss_scaler,
                                      summary_record=summary_record,
                                      rank_id=rank_id,
                                      log_interval=args.log_interval)
@@ -296,13 +308,17 @@ def train(args):
 
     logger.info("Done!")
 
-def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, summary_record=None, rank_id=None, log_interval=100):
+def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, loss_scaler=None, summary_record=None, rank_id=None, log_interval=100):
     """Training an epoch network"""
     # Define forward function
     def forward_fn(data, label):
         logits = network(data)
         loss = loss_fn(logits, label)
-        return loss, logits
+        # scale up the loss
+        if loss_scaler is not None:
+            return loss_scaler.scale(loss), logits
+        else:
+            return loss, logits
 
     # Get gradient function
     grad_fn = ops.value_and_grad(forward_fn, None, optimizer.parameters, has_aux=True)
@@ -315,14 +331,36 @@ def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, summary_r
     @ms.ms_function
     def train_step_parallel(data, label):
         (loss, logits), grads = grad_fn(data, label)
+        # merge grads of all devices 
         grads = grad_reducer(grads)
-        loss = ops.depend(loss, optimizer(grads))
+        # if grads not overflow, backprop
+        if loss_scaler is not None:
+            # unscale loss
+            loss = loss_scaler.unscale(loss)
+            is_finite = all_finite(grads)
+            if is_finite:
+                grads = loss_scaler.unscale(grads)
+                loss = ops.depend(loss, optimizer(grads))
+            loss_scaler.adjust(is_finite)
+        else:
+            loss = ops.depend(loss, optimizer(grads))
+
         return loss, logits
 
     @ms.ms_function
     def train_step(data, label):
         (loss, logits), grads = grad_fn(data, label)
-        loss = ops.depend(loss, optimizer(grads))
+
+        if loss_scaler is not None:
+            loss = loss_scaler.unscale(loss)
+            is_finite = all_finite(grads)
+            if is_finite:
+                grads = loss_scaler.unscale(grads)
+                loss = ops.depend(loss, optimizer(grads))
+            loss_scaler.adjust(is_finite)
+        else:
+            loss = ops.depend(loss, optimizer(grads))
+
         return loss, logits
 
     network.set_train()
