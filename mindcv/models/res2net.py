@@ -72,13 +72,15 @@ class Bottle2neck(nn.Cell):
         else:
             self.nums = scale - 1
         if stype == 'stage':
-            self.pool = nn.AvgPool2d(
-                kernel_size=3, stride = stride, pad_mode='same')
+            self.pool = nn.SequentialCell([
+            nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)), mode="CONSTANT"),
+            nn.AvgPool2d(kernel_size=3, stride=stride)
+            ])
 
         self.convs = nn.CellList()
         self.bns = nn.CellList()
         for _ in range(self.nums):
-            self.convs.append(nn.Conv2d(width, width, kernel_size=3, stride = stride, padding=0, pad_mode='same'))
+            self.convs.append(nn.Conv2d(width, width, kernel_size=3, stride = stride, padding=1, pad_mode='pad'))
             self.bns.append(norm(width))
 
         self.conv3 = nn.Conv2d(width * scale, out_channels * self.expansion,
@@ -177,24 +179,27 @@ class Res2Net(nn.Cell):
         self.scale = scale
         if self.version == 'res2net':
             self.conv1 = nn.Conv2d(in_channels, self.input_channels, kernel_size=7,
-                                stride=2, padding=0, pad_mode='same')
+                                stride=2, padding=3, pad_mode='pad')
         elif self.version == 'res2net_v1b':
             self.conv1 = nn.SequentialCell([
                 nn.Conv2d(in_channels, self.input_channels // 2, kernel_size=3,
-                                stride=2, padding=0, pad_mode='same'),
+                                stride=2, padding=1, pad_mode='pad'),
                 norm(self.input_channels // 2),
                 nn.ReLU(),
                 nn.Conv2d(self.input_channels // 2, self.input_channels // 2, kernel_size=3,
-                                stride=1, padding=0, pad_mode='same'),
+                                stride=1, padding=1, pad_mode='pad'),
                 norm(self.input_channels // 2),
                 nn.ReLU(),
                 nn.Conv2d(self.input_channels // 2, self.input_channels, kernel_size=3,
-                                stride=1, padding=0, pad_mode='same'),
+                                stride=1, padding=1, pad_mode='pad'),
             ])
 
         self.bn1 = norm(self.input_channels)
         self.relu = nn.ReLU()
-        self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='same')
+        self.max_pool = nn.SequentialCell([
+            nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)), mode="CONSTANT"),
+            nn.MaxPool2d(kernel_size=3, stride=2)
+            ])
         self.layer1 = self._make_layer(block, 64, layer_nums[0])
         self.layer2 = self._make_layer(block, 128, layer_nums[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layer_nums[2], stride=2)
@@ -242,7 +247,7 @@ class Res2Net(nn.Cell):
                 ])
             else:
                 down_sample = nn.SequentialCell([
-                    nn.MaxPool2d(kernel_size=stride, stride=stride, pad_mode='same'), # 论文中使用nn.AvgPool2d
+                    nn.AvgPool2d(kernel_size=stride, stride=stride, pad_mode='same'), # 论文中使用nn.AvgPool2d
                     nn.Conv2d(self.input_channels, channels * block.expansion, kernel_size=1, stride=1),
                     self.norm(channels * block.expansion)
                 ])
