@@ -247,7 +247,7 @@ class Res2Net(nn.Cell):
                 ])
             else:
                 down_sample = nn.SequentialCell([
-                    nn.AvgPool2d(kernel_size=stride, stride=stride, pad_mode='same'), # 论文中使用nn.AvgPool2d
+                    nn.AvgPool2d(kernel_size=stride, stride=stride, pad_mode='same'),
                     nn.Conv2d(self.input_channels, channels * block.expansion, kernel_size=1, stride=1),
                     self.norm(channels * block.expansion)
                 ])
