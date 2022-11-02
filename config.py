@@ -80,8 +80,9 @@ def create_parser():
                        help='Color jitter factor (default=None)')
     group.add_argument('--interpolation', type=str, default='bilinear',
                        help='Image interpolation mode for resize operator(default="bilinear")')
-    group.add_argument('--auto_augment', type=str2bool, nargs='?', const=True, default=False,
-                       help='Whether to use auto augmentation (default=False)')
+    group.add_argument('--auto_augment', type=str, default=None,
+                       help='Use auto augment policy. Optional: "randaug", "autoaug", "autoaugr" or None, (defalt: None).'
+                            'Example: "randaug-m10-n2-w0-mstd0.5-mmax10-inc0", "autoaug-mstd0.5" or autoaugr-mstd0.5.')
     group.add_argument('--re_prob', type=float, default=0.,
                        help='Probability of performing erasing (default=0.)')
     group.add_argument('--re_scale', type=tuple, default=(0.02, 0.33),
