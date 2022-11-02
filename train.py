@@ -4,7 +4,7 @@ import logging
 import mindspore as ms
 import numpy as np
 from mindspore import nn, Tensor
-from mindspore import FixedLossScaleManager, Model, LossMonitor, TimeMonitor, CheckpointConfig, ModelCheckpoint
+from mindspore import FixedLossScaleManager, Model
 from mindspore.communication import init, get_rank, get_group_size
 
 from mindcv.models import create_model
@@ -89,8 +89,8 @@ def train(args):
         transform=transform_list,
         num_parallel_workers=args.num_parallel_workers,
     )
-    # TODO: fix val_while_train on PYNATIVE_MODE.
-    if args.val_while_train and args.mode == 0:
+
+    if args.val_while_train:
         dataset_eval = create_dataset(
             name=args.dataset,
             root=args.data_dir,
@@ -120,6 +120,9 @@ def train(args):
         )
         # validation dataset count
         eval_count = dataset_eval.get_dataset_size()
+        if args.distribute:
+            all_reduce = Allreduce()
+            eval_count = all_reduce(Tensor(eval_count, ms.int32))
     else:
         loader_eval = None
 
@@ -207,7 +210,6 @@ def train(args):
                             ckpt_dir=args.ckpt_save_dir,
                             ckpt_save_interval=args.ckpt_save_interval,
                             best_ckpt_name=args.model + '_best.ckpt',
-                            dataset_sink_mode=args.dataset_sink_mode,
                             rank_id=rank_id,
                             device_num=device_num,
                             log_interval=args.log_interval,
@@ -223,7 +225,7 @@ def train(args):
         logger.info(f"Num devices: {device_num if device_num is not None else 1} \n"
                     f"Distributed mode: {args.distribute} \n"
                     f"Num training samples: {train_count}")
-        if args.val_while_train and args.mode == 0:
+        if args.val_while_train:
             logger.info(f"Num validation samples: {eval_count}")
         logger.info(f"Num classes: {num_classes} \n"
                     f"Num batches: {num_batches} \n"
