@@ -95,6 +95,8 @@ def train(args):
             name=args.dataset,
             root=args.data_dir,
             split=args.val_split,
+            num_shards=device_num,
+            shard_id=rank_id,
             num_parallel_workers=args.num_parallel_workers,
             download=args.dataset_download)
 
@@ -207,6 +209,7 @@ def train(args):
                             best_ckpt_name=args.model + '_best.ckpt',
                             dataset_sink_mode=args.dataset_sink_mode,
                             rank_id=rank_id,
+                            device_num=device_num,
                             log_interval=args.log_interval,
                             keep_checkpoint_max=args.keep_checkpoint_max,
                             model_name=args.model,
