@@ -268,7 +268,7 @@ Please see [configs](./configs) for the details about model performance and pret
 	* SGD
 	* NAdam
 * LR Scheduler
-	* Warmup Cosine Deay
+	* Warmup Cosine Decay
 	* Step LR
 	* Polynomial Decay
 	* Exponential Decay
