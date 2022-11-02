@@ -27,7 +27,7 @@ propagation, encourage feature reuse, and substantially reduce the number of par
 - All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
 - Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
 
-## Usage
+## Quick Start
 ***
 ### Preparation
 
