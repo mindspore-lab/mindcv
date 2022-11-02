@@ -245,6 +245,41 @@ Please see [configs](./configs) for the details about model performance and pret
 
 </details>
 
+## Supported Algorithms
+<details open>
+<summary> Supported algorithms </summary>
+
+* Augmentation
+	* [AutoAugment](https://arxiv.org/abs/1805.09501)
+	* [RandAugment](https://arxiv.org/abs/1909.13719) (coming soon)
+	* RandErasing (Cutout)
+	* CutMix
+	* Mixup
+	* RandomResizeCrop
+	* Color Jitter, Flip, etc
+* Optimizer
+	* Adam
+	* Adamw
+	* Adan (experimental)
+	* AdaGrad
+	* LAMB
+	* Momentum
+	* RMSProp
+	* SGD
+	* NAdam
+	* AdamP
+* LR Scheduler
+	* Warmup Cosine Deay
+	* Step LR
+	* Polynomial Decay
+	* Exponential Decay
+* Regularization
+	* Weight Decay
+	* Label Smoothing
+	* Stochastic Depth (depends on networks)
+	* Dropout (depends on networks)
+</details>
+
 ## Notes
 ### What is New 
 - 2022/10/12
