@@ -267,7 +267,6 @@ Please see [configs](./configs) for the details about model performance and pret
 	* RMSProp
 	* SGD
 	* NAdam
-	* AdamP
 * LR Scheduler
 	* Warmup Cosine Deay
 	* Step LR
