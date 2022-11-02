@@ -29,7 +29,6 @@ class StateMonitor(Callback):
                  ckpt_save_interval=1,
                  best_ckpt_name="best.ckpt",
                  metric_name="accuracy",
-                 dataset_sink_mode=False,
                  rank_id=None,
                  device_num=None,
                  log_interval=100,
@@ -46,7 +45,6 @@ class StateMonitor(Callback):
         self.metric_name = metric_name
         self.best_res = 0
         self.val_interval = val_interval
-        self.dataset_sink_mode = dataset_sink_mode
         self.summary_dir = summary_dir
         self.rank_id = rank_id if rank_id is not None else 0
         self.device_num = device_num if rank_id is not None else 1
@@ -87,7 +85,7 @@ class StateMonitor(Callback):
 
     def apply_eval(self):
         """Model evaluation, return validation accuracy."""
-        return self.model.eval(self.dataset_val, dataset_sink_mode=self.dataset_sink_mode)
+        return self.model.eval(self.dataset_val, dataset_sink_mode=False)
 
     def on_train_step_end(self, run_context):
         cb_params = run_context.original_args()
@@ -128,11 +126,9 @@ class StateMonitor(Callback):
             if cur_epoch >= self.val_start_epoch and (cur_epoch - self.val_start_epoch) % self.val_interval == 0:
                 val_time = time()
                 res = self.apply_eval()[self.metric_name]
-
                 if self.device_num > 1:
                     res = self.all_reduce(Tensor(res, ms.float32)).asnumpy()
                     res /= self.device_num
-
                 val_acc_val = 100 * res
                 # record val acc
                 if self.rank_id in [0, None]:
