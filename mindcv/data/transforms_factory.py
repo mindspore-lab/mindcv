@@ -8,7 +8,7 @@ from mindspore.dataset import vision
 from mindspore.dataset.vision import Inter
 
 from .constants import DEFAULT_CROP_PCT, IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
-from .auto_augment import imagenet_policy
+from .auto_augment import auto_augment_transform, rand_augment_transform
 
 __all__ = ["create_transforms"]
 
@@ -48,7 +48,22 @@ def transforms_imagenet_train(
         trans_list += [vision.RandomVerticalFlip(prob=vflip)]
 
     if auto_augment:
-        trans_list += [vision.RandomSelectSubpolicy(imagenet_policy)]
+        assert isinstance(auto_augment, str)
+        if isinstance(image_resize, (tuple, list)):
+            image_resize_min = min(image_resize)
+        else:
+            image_resize_min = image_resize
+        augement_params = dict(
+            translate_const=int(image_resize_min * 0.45),
+            img_mean=tuple([min(255, round(x)) for x in mean]),
+        )
+        augement_params['interpolation'] = interpolation
+        if auto_augment.startswith('randaug'):
+            trans_list += [rand_augment_transform(auto_augment, augement_params)]
+        elif auto_augment.startswith('autoaug') or auto_augment.startswith('autoaugr'):
+            trans_list += [auto_augment_transform(auto_augment, augement_params)]
+        else:
+            assert False, 'Unknown auto augment policy (%s)' % auto_augment
     elif color_jitter is not None:
         if isinstance(color_jitter, (list, tuple)):
             # color jitter shoulf be a 3-tuple/list for brightness/contrast/saturation
