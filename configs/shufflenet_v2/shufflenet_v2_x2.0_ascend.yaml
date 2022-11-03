@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ num_parallel_workers: 8
 
 # dataset config
 dataset: 'imagenet'
-data_dir: ''
+data_dir: '/tmp/dataset/imagenet'
 shuffle: True
 dataset_download: False
 batch_size: 64
@@ -28,22 +28,23 @@ drop_remainder: True
 
 # Augmentation config
 image_resize: 224
-scale: [0.08, 1.0]
-ratio: [0.75, 1.333]
 hflip: 0.5
+color_jitter: 0.4
 interpolation: 'bilinear'
 crop_pct: 0.875
+re_prob: 0.5
 
 # model config
-model: 'mobilenet_v1_050_224'
-num_classes: 1001
+model: 'shufflenet_v2_x2_0'
+num_classes: 1000
 pretrained: False
-ckpt_path: ''
-keep_checkpoint_max: 80
-ckpt_save_dir: './v1_050_ckpt'
-epoch_size: 200
+ckpt_path: ""
+keep_checkpoint_max: 30
+save_checkpoint: True
+ckpt_save_dir: './ckpt_v2_2.0'
+epoch_size: 300
 dataset_sink_mode: True
-amp_level: 'O2'
+amp_level: 'O0'
 
 # loss config
 loss: 'CE'
@@ -52,19 +53,14 @@ label_smoothing: 0.1
 # lr scheduler config
 scheduler: 'warmup_cosine_decay'
 min_lr: 0.0
-lr: 0.4
-warmup_epochs: 2
-decay_epochs: 198
+lr: 0.5
+warmup_epochs: 5
+decay_epochs: 295
 
 # optimizer config
 opt: 'momentum'
-filter_bias_and_bn: True
+filter_bias_and_bn: False
 momentum: 0.9
-weight_decay: 0.00003  # 改变
-loss_scale: 1024  # 改变
+weight_decay: 0.00004
+loss_scale: 1
 use_nesterov: False
-
-
-
-
-

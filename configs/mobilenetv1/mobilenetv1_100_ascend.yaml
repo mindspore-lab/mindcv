@@ -35,12 +35,12 @@ interpolation: 'bilinear'
 crop_pct: 0.875
 
 # model config
-model: 'mobilenet_v1_050_224'
+model: 'mobilenet_v1_100_224'
 num_classes: 1001
 pretrained: False
 ckpt_path: ''
 keep_checkpoint_max: 80
-ckpt_save_dir: './v1_050_ckpt'
+ckpt_save_dir: './v1_100_ckpt'
 epoch_size: 200
 dataset_sink_mode: True
 amp_level: 'O2'
@@ -60,8 +60,8 @@ decay_epochs: 198
 opt: 'momentum'
 filter_bias_and_bn: True
 momentum: 0.9
-weight_decay: 0.00003  # 改变
-loss_scale: 1024  # 改变
+weight_decay: 0.00003
+loss_scale: 1024
 use_nesterov: False
 
 

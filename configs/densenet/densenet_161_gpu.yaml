@@ -25,6 +25,7 @@ shuffle: True
 dataset_download: False
 batch_size: 32
 drop_remainder: True
+val_split: val
 
 # Augmentation config
 image_resize: 224

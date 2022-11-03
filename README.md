@@ -4,8 +4,8 @@
     <a href="https://mindcv-ai.readthedocs.io/en/latest">
         <img alt="docs" src="https://img.shields.io/badge/docs-latest-blue">
     </a>
-    <a href="https://github.com/IDEA-Research/detrex/blob/main/LICENSE">
-        <img alt="GitHub" src="https://img.shields.io/github/license/mindspore-ecosystem/mindcv.svg?color=blue">
+    <a href="https://github.com/mindspore-ecosystem/mindcv/blob/main/LICENSE">
+        <img alt="GitHub" src="https://img.shields.io/github/license/mindspore-ecosystem/mindcv.svg">
     </a>
     <a href="https://github.com/mindspore-ecosystem/mindcv/pulls">
         <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-pink.svg">
@@ -13,17 +13,26 @@
     <a href="https://github.com/mindspore-ecosystem/mindcv/issues">
         <img alt="open issues" src="https://img.shields.io/github/issues/mindspore-ecosystem/mindcv">
     </a>
+    <!---
     <a href="https://github.com/mindspore-ecosystem/mindcv/tags">
-        <img alt="GitHub tags" src="https://img.shields.io/github/tag/mindspore-ecosystem/mindcv.svg">
+        <img alt="GitHub tags" src="https://img.shields.io/github/tags/mindspore-ecosystem/mindcv">
     </a>
+    -->
 </p>
+
+
+| **Build Type**   |`Linux`           |`MacOS`           |`Windows`         |
+| :---:            | :---:            | :---:            | :---:            |
+| **Build Status** | [![Status](https://github.com/mindspore-ecosystem/mindcv/actions/workflows/main.yml/badge.svg)](https://github.com/mindspore-ecosystem/mindcv/actions) | [![Status](https://github.com/mindspore-ecosystem/mindcv/actions/workflows/mac_ci.yaml/badge.svg)](https://github.com/mindspore-ecosystem/mindcv/actions) | [![Status](https://github.com/mindspore-ecosystem/mindcv/actions/workflows/win_ci.yaml/badge.svg)](https://github.com/mindspore-ecosystem/mindcv/actions) |
 
 [Introduction](#introduction) |
 [Installation](#installation) |
 [Get Started](#get-started) |
 [Tutorials](#tutorials) |
 [Model List](#model-list) |
+[Supported Algorithms](#supported-algorithms) |
 [Notes](#notes) 
+
 
 ## Introduction
 MindCV is an open source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pretrained weights. SoTA methods such as AutoAugment are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks. 
@@ -77,18 +86,22 @@ pip install -r requirements.txt
 MindSpore can be easily installed by following the official [instruction](https://www.mindspore.cn/install) where you can select your hardware platform for the best fit. To run in distributed mode, [openmpi](https://www.open-mpi.org/software/ompi/v4.0/) is required to install.   
 
 The following instructions assume the desired dependency is fulfilled. 
-
+<!---
 ### Install with pip
 MindCV can be installed with pip. 
 ```shell
-pip install https://github.com/mindlab-ai/mindcv/releases/download/v0.0.1-beta/mindcv-0.0.1b0-py3-none-any.whl
+pip install https://github.com/mindspore-ecosystem/mindcv/releases/download/v0.0.1-beta/mindcv-0.0.1b0-py3-none-any.whl
 ```
+-->
 
 ### Install from source
-To install MindCV from source, please run,
+To install MindCV from source, please run:
 ```shell
-pip install git+https://github.com/mindlab-ai/mindcv.git
+pip install git+https://github.com/mindspore-ecosystem/mindcv.git
 ```
+
+#### Notes: 
+* MindCV can be installed on Linux and Mac but not on Windows currently.
 
 ## Get Started 
 
@@ -240,6 +253,40 @@ Currently, MindCV supports the model families listed below. More models with pre
 
 Please see [configs](./configs) for the details about model performance and pretrained weights.
 
+</details>
+
+## Supported Algorithms
+<details open>
+<summary> Supported algorithms </summary>
+
+* Augmentation
+	* [AutoAugment](https://arxiv.org/abs/1805.09501)
+	* [RandAugment](https://arxiv.org/abs/1909.13719) 
+	* RandErasing (Cutout)
+	* CutMix
+	* Mixup
+	* RandomResizeCrop
+	* Color Jitter, Flip, etc
+* Optimizer
+	* Adam
+	* Adamw
+	* Adan (experimental)
+	* AdaGrad
+	* LAMB
+	* Momentum
+	* RMSProp
+	* SGD
+	* NAdam
+* LR Scheduler
+	* Warmup Cosine Decay
+	* Step LR
+	* Polynomial Decay
+	* Exponential Decay
+* Regularization
+	* Weight Decay
+	* Label Smoothing
+	* Stochastic Depth (depends on networks)
+	* Dropout (depends on networks)
 </details>
 
 ## Notes
