@@ -20,12 +20,18 @@
     -->
 </p>
 
+
+| **Build Type**   |`Linux`           |`MacOS`           |`Windows`         |
+| :---:            | :---:            | :---:            | :---:            |
+| **Build Status** | [![Status](https://github.com/mindspore-ecosystem/mindcv/actions/workflows/main.yml/badge.svg)](https://github.com/mindspore-ecosystem/mindcv/actions) | [![Status](https://github.com/mindspore-ecosystem/mindcv/actions/workflows/main.yml/badge.svg)](https://github.com/mindspore-ecosystem/mindcv/actions) | Not tested |
+
 [Introduction](#introduction) |
 [Installation](#installation) |
 [Get Started](#get-started) |
 [Tutorials](#tutorials) |
 [Model List](#model-list) |
 [Notes](#notes) 
+
 
 ## Introduction
 MindCV is an open source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pretrained weights. SoTA methods such as AutoAugment are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks. 
@@ -94,7 +100,7 @@ pip install git+https://github.com/mindspore-ecosystem/mindcv.git
 ```
 
 #### Notes: 
-* Mac and Linux are supported. Windows is not supported currently.
+* MindCV can be installed on Linux and Mac but not on Windows currently.
 
 ## Get Started 
 
