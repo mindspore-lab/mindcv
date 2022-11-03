@@ -352,9 +352,8 @@ def auto_augment_transform(configs, hparams):
     Args:
         configs: A string that defines the automatic augmentation configuration.
             It is composed of multiple parts separated by dashes ("-"). The first part defines
-            the AutoAugment policy (one of 'autoaug' or 'autoaugr', the difference between
-            the two is that the parameter of autoaug policy is PosterizeOriginal,
-            and the parameter of autoaugr policy is PosterizeIncreasing).
+            the AutoAugment policy ('autoaug' or 'autoaugr', 'autoaug' for the original AutoAugment policy with PosterizeOriginal,
+            'autoaugr' for the AutoAugment policy with PosterizeIncreasing operation).
             There is no order requirement for the remaining config parts.
 
             - mstd: Float standard deviation of applied magnitude noise.
