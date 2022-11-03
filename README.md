@@ -30,6 +30,7 @@
 [Get Started](#get-started) |
 [Tutorials](#tutorials) |
 [Model List](#model-list) |
+[Supported Algorithms](#supported-algorithms) |
 [Notes](#notes) 
 
 
@@ -260,7 +261,7 @@ Please see [configs](./configs) for the details about model performance and pret
 
 * Augmentation
 	* [AutoAugment](https://arxiv.org/abs/1805.09501)
-	* [RandAugment](https://arxiv.org/abs/1909.13719) (coming soon)
+	* [RandAugment](https://arxiv.org/abs/1909.13719) 
 	* RandErasing (Cutout)
 	* CutMix
 	* Mixup
