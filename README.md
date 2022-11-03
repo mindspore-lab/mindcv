@@ -88,10 +88,13 @@ pip install https://github.com/mindspore-ecosystem/mindcv/releases/download/v0.0
 -->
 
 ### Install from source
-To install MindCV from source, please run,
+To install MindCV from source, please run:
 ```shell
 pip install git+https://github.com/mindspore-ecosystem/mindcv.git
 ```
+
+#### Notes: 
+* Mac and Linux are supported. Windows is not supported currently.
 
 ## Get Started 
 
