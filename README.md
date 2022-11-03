@@ -23,7 +23,7 @@
 
 | **Build Type**   |`Linux`           |`MacOS`           |`Windows`         |
 | :---:            | :---:            | :---:            | :---:            |
-| **Build Status** | [![Status](https://github.com/mindspore-ecosystem/mindcv/actions/workflows/main.yml/badge.svg)](https://github.com/mindspore-ecosystem/mindcv/actions) | [![Status](https://github.com/mindspore-ecosystem/mindcv/actions/workflows/mac_ci.yaml/badge.svg)](https://github.com/mindspore-ecosystem/mindcv/actions) | [![Status](https://github.com/mindspore-ecosystem/mindcv/actions/workflows/win_ci.yaml/badge.svg)](https://github.com/mindspore-ecosystem/mindcv/actions) |
+| **Build Status** | [![Status](https://github.com/mindspore-ecosystem/mindcv/actions/workflows/main.yml/badge.svg)](https://github.com/mindspore-ecosystem/mindcv/actions) | [![Status](https://github.com/mindspore-ecosystem/mindcv/actions/workflows/mac_ci.yaml/badge.svg)](https://github.com/mindspore-ecosystem/mindcv/actions)| Not tested |
 
 [Introduction](#introduction) |
 [Installation](#installation) |
