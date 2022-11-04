@@ -32,6 +32,7 @@ def create_scheduler(
             Default: 10.
         decay_rate: LR decay rate (default: 0.9)
         milestones: list of epoch milestones for multi_step_decay scheduler. Must be increasing.
+        num_epochs: number of total epochs.
 
     Returns:
         Cell object for computing LR with input of current global steps
@@ -72,11 +73,12 @@ def create_scheduler(
                                           )
     elif scheduler == 'multi_step_decay':
         lr_scheduler = MultiStepDecayLR(lr,
-                            decay_rate,
-                            milestones,
-                            steps_per_epoch,
-                            num_epochs
-                            )
+                                        warmup_epochs,
+                                        decay_rate,
+                                        milestones,
+                                        steps_per_epoch,
+                                        num_epochs
+                                        )
 
     elif scheduler == 'constant':
         lr_scheduler = lr
