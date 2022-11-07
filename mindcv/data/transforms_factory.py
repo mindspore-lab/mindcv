@@ -20,7 +20,7 @@ def transforms_imagenet_train(
         hflip=0.5,
         vflip=0.0,
         color_jitter=None,
-        auto_augment=False,
+        auto_augment=None,
         interpolation='bilinear',
         mean=IMAGENET_DEFAULT_MEAN,
         std=IMAGENET_DEFAULT_STD,
@@ -47,7 +47,7 @@ def transforms_imagenet_train(
     if vflip > 0.:
         trans_list += [vision.RandomVerticalFlip(prob=vflip)]
 
-    if auto_augment:
+    if auto_augment is not None:
         assert isinstance(auto_augment, str)
         if isinstance(image_resize, (tuple, list)):
             image_resize_min = min(image_resize)
