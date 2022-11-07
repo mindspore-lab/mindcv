@@ -31,16 +31,13 @@ propagation, encourage feature reuse, and substantially reduce the number of par
 ***
 ### Preparation
 
-#### Dependency
-  ```shell
-  pip install mindcv
-  ```
+#### Installation
+Please refer to the [installation instruction](https://github.com/mindspore-ecosystem/mindcv#installation) in MindCV.
   
-#### Dataset
-```shell
-  wget imagenet1k.zip
-  ```
-### Train
+#### Dataset Preparation
+Please download the [ImageNet-1K](https://www.image-net.org/download.php) dataset for model training and validation.
+
+### Training
 
 - The [yaml config files](../../configs) that yield competitive results on ImageNet for different models are listed in
   the `configs` folder. To trigger training using preset yaml config.
@@ -58,7 +55,7 @@ propagation, encourage feature reuse, and substantially reduce the number of par
 
 Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
 
-### Eval
+### Validation
 
 - To validate the model, you can use `validate.py`. Here is an example for densenet121 to verify the accuracy of
   pretrained weights.
@@ -74,11 +71,9 @@ Detailed adjustable parameters and their default value can be seen in [config.py
   python validate.py --model=densenet121 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/densenet121-best.ckpt'
   ```
 
-### Deploy (optional)
+### Deployment (optional)
 
-  ```shell
-  python ms_serving.py --model=densenet121 --ckpt_path='./ckpt/densenet121-best.ckpt'
-  ```
+Please refer to the deployment tutorial in MindCV.
 
 
   
