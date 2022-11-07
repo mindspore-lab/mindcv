@@ -39,15 +39,17 @@ Please download the [ImageNet-1K](https://www.image-net.org/download.php) datase
 
 ### Training
 
-- The [yaml config files](../../configs) that yield competitive results on ImageNet for different models are listed in
-  the `configs` folder. To trigger training using preset yaml config.
+- **Hyper-parameters.** The hyper-parameter configurations for producing the reported results are stored in the yaml files in `mindcv/configs/densenet` folder. For example, to train with one of these configurations, you can run:
 
   ```shell
+  # train densenet121 on 8 GPUs
   export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
   mpirun -n 8 python train.py -c configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/imagenet
   ```
+  
+  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascneds** with the same batch size.
 
-- Here is the example for finetuning a pretrained densenet121 on CIFAR10 dataset using Momentum optimizer.
+- **Finetuning.** Here is an example for finetuning a pretrained densenet121 on CIFAR10 dataset using Momentum optimizer.
 
   ```shell
   python train.py --model=densenet121 --pretrained --opt=momentum --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
@@ -57,7 +59,7 @@ Detailed adjustable parameters and their default value can be seen in [config.py
 
 ### Validation
 
-- To validate the model, you can use `validate.py`. Here is an example for densenet121 to verify the accuracy of
+- To validate the trained model, you can use `validate.py`. Here is an example for densenet121 to verify the accuracy of
   pretrained weights.
 
   ```shell
