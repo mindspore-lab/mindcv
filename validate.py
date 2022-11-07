@@ -7,6 +7,7 @@ from mindcv.data import create_dataset, create_transforms, create_loader
 from mindcv.loss import create_loss
 from config import parse_args
 from mindcv.utils.utils import check_batch_size
+from mindcv.utils.callbacks import ValCallback
 
 
 def validate(args):
@@ -75,9 +76,17 @@ def validate(args):
 
     # init model
     model = Model(network, loss_fn=loss, metrics=eval_metrics)
+    
+    # log
+    num_batches = loader_eval.get_dataset_size()
+    print(f"Model: {args.model}")
+    print(f"Num batches: {num_batches}")
+    print(f"Start validating...")
 
     # validate
-    result = model.eval(loader_eval)
+    result = model.eval(loader_eval, 
+            dataset_sink_mode=False,
+            callbacks=[ValCallback(args.log_interval)])
     print(result)
 
 

@@ -299,3 +299,14 @@ class LossAccSummary(Callback):
 
         loss = Tensor(np.mean(loss.asnumpy()))
         return loss
+
+class ValCallback(Callback):
+    def __init__(self, log_step_interval=100):
+        super().__init__()
+        self.log_step_interval = log_step_interval
+
+    def on_eval_step_end(self, run_context):
+        cb_params = run_context.original_args()
+        #cur_step_in_epoch = int((cb_params.cur_step_num - 1) % cb_params.batch_num)
+        if cb_params.cur_step_num % self.log_step_interval == 0:
+            print(f'{cb_params.cur_step_num }/{cb_params.batch_num}')
