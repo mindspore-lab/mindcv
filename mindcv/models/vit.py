@@ -13,9 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """ViT"""
-
 from typing import Optional, Union, List
-import ml_collections as collections
 import numpy as np
 
 import mindspore as ms
@@ -26,7 +24,7 @@ from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
 from mindspore import Tensor
 
-from .utils import load_pretrained
+from .utils import load_pretrained, ConfigDict
 from .registry import register_model
 
 __all__ = ['ViT',
@@ -676,7 +674,7 @@ def vit_b_16_224(
     Supported Platforms:
         ``GPU``
     """
-    config = collections.ConfigDict()
+    config = ConfigDict()
     config.image_size = image_size
     config.num_classes = num_classes
     config.patch_size = 16
@@ -708,7 +706,7 @@ def vit_b_16_384(
              drop_path_dropout: float = 0.0
              ) -> ViT:
     '''construct and return a ViT network'''
-    config = collections.ConfigDict()
+    config = ConfigDict()
     config.image_size = image_size
     config.num_classes = num_classes
     config.patch_size = 16
@@ -741,7 +739,7 @@ def vit_l_16_224(
              ) -> ViT:
     '''construct and return a ViT network'''
 
-    config = collections.ConfigDict()
+    config = ConfigDict()
     config.image_size = image_size
     config.num_classes = num_classes
     config.patch_size = 16
@@ -774,7 +772,7 @@ def vit_l_16_384(
              ) -> ViT:
     '''construct and return a ViT network'''
 
-    config = collections.ConfigDict()
+    config = ConfigDict()
     config.image_size = image_size
     config.num_classes = num_classes
     config.patch_size = 16
@@ -804,7 +802,7 @@ def vit_b_32_224(num_classes: int = 1000,
              drop_path_dropout: float = 0.0
              ) -> ViT:
     '''construct and return a ViT network'''
-    config = collections.ConfigDict()
+    config = ConfigDict()
     config.image_size = image_size
     config.num_classes = num_classes
     config.patch_size = 32
@@ -834,7 +832,7 @@ def vit_b_32_384(num_classes: int = 1000,
              drop_path_dropout: float = 0.0
              ) -> ViT:
     '''construct and return a ViT network'''
-    config = collections.ConfigDict()
+    config = ConfigDict()
     config.image_size = image_size
     config.num_classes = num_classes
     config.patch_size = 32
@@ -864,7 +862,7 @@ def vit_l_32_224(num_classes: int = 1000,
              drop_path_dropout: float = 0.0
              ) -> ViT:
     '''construct and return a ViT network'''
-    config = collections.ConfigDict()
+    config = ConfigDict()
     config.image_size = image_size
     config.num_classes = num_classes
     config.patch_size = 32
