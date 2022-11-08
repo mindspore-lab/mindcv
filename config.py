@@ -102,8 +102,12 @@ def create_parser():
                             'with respect to channel order (default=[0.229 * 255, 0.224 * 255, 0.225 * 255])')
     group.add_argument('--crop_pct', type=float, default=0.875,
                        help='Input image center crop percent (default=0.875)')
+    group.add_argument('--cutmix', type=float, default=0.,
+                       help='Hyperparameter of beta distribution of cutmix(default=0.)')
+    group.add_argument('--cutmix_prob', type=float, default=0.,
+                       help='probability of applying cutmix and/or mixup (default=0.)')
     group.add_argument('--mixup', type=float, default=0.,
-                       help='Hyperparameter of beta distribution (default=0.)')
+                       help='Hyperparameter of beta distribution of mixup (default=0.)')
 
     # Model parameters
     group = parser.add_argument_group('Model parameters')
