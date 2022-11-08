@@ -2,7 +2,6 @@ mindspore
 numpy >= 1.17.0
 pyyaml >= 5.3
 tqdm
-ml-collections
 sphinx_markdown_tables
 myst_parser
 sphinx_copybutton
