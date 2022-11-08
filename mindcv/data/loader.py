@@ -88,7 +88,7 @@ def create_loader(
 
     if is_training:
         trans_batch = []
-        if mixup + cutmix > 0.0:
+        if (mixup + cutmix > 0.0) and batch_size > 1:
             #TODO: use mindspore vision cutmix and mixup after the confliction fixed in later release
             # set label_smoothing 0 here since label smoothing is computed in loss module
             mixup_fn = Mixup(
@@ -100,10 +100,10 @@ def create_loader(
                 label_smoothing=0.0,
                 num_classes=num_classes)
             trans_batch = mixup_fn
-
-            #one_hot_encode = transforms.OneHot(num_classes)
-            #dataset = dataset.map(operations=one_hot_encode, input_columns=[target_input_columns])
             #trans_batch = vision.MixUpBatch(alpha=mixup)
+        else:
+            one_hot_encode = transforms.OneHot(num_classes)
+            dataset = dataset.map(operations=one_hot_encode, input_columns=[target_input_columns])
 
         if trans_batch != []:
             dataset = dataset.map(input_columns=["image", target_input_columns],
