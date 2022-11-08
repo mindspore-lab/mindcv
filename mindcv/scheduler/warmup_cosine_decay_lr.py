@@ -24,9 +24,8 @@ class WarmupCosineDecayLR(LearningRateSchedule):
         self.cosine_decay_lr = nn.CosineDecayLR(min_lr, max_lr, self.decay_steps)
 
     def construct(self, global_step):
-        greater = ops.gt(global_step, self.warmup_steps)
         if self.warmup_steps > 0:
-            if greater:
+            if global_step > self.warmup_steps:
                 lr = self.cosine_decay_lr(global_step - self.warmup_steps)
             else:
                 lr = self.warmup_lr(global_step)

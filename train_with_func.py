@@ -355,8 +355,11 @@ def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, summary_r
         total += len(data)
 
         if (batch + 1) % log_interval == 0 or (batch + 1) >= num_batches or batch==0:
-            step = epoch * n_batches + batch + 1
-            cur_lr = optimizer.get_lr().asnumpy()
+            step = epoch * n_batches + batch
+            if optimizer.dynamic_lr:
+                cur_lr = optimizer.learning_rate(Tensor(step)).asnumpy()
+            else:
+                cur_lr = optimizer.learning_rate.asnumpy()
             logger.info(f"Epoch:[{epoch+1:{epoch_width}d}/{n_epochs:{epoch_width}d}], "
                         f"batch:[{batch+1:{batch_width}d}/{n_batches:{batch_width}d}], "
                         f"loss:{loss.asnumpy():8.6f}, lr: {cur_lr:.7f},  time:{time() - start:.6f}s")

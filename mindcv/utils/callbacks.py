@@ -98,7 +98,11 @@ class StateMonitor(Callback):
 
         if (cur_step_in_epoch  + 1) % self.log_interval == 0 or \
                 (cur_step_in_epoch  + 1) >= num_batches or cur_step_in_epoch == 0:
-            cur_lr = cb_params.optimizer.get_lr().asnumpy()
+            step = cb_params.optimizer.global_step
+            if cb_params.optimizer.dynamic_lr:
+                cur_lr = cb_params.optimizer.learning_rate(step-1)[0].asnumpy()
+            else:
+                cur_lr = cb_params.optimizer.learning_rate.asnumpy()
             loss = self._get_loss(cb_params)
 
             print(f"Epoch: {cur_epoch+1}, "
