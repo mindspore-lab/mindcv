@@ -520,6 +520,7 @@ class ViT(nn.Cell):
         super().__init__()
 
         #Validator.check_string(pool, ["cls", "mean"], "pool type")
+        #self.image_size = image_size
 
         self.patch_embedding = PatchEmbedding(image_size=image_size,
                                               patch_size=patch_size,
@@ -624,6 +625,7 @@ def vit(image_size: int,
                          num_classes=num_classes)
 
     model = BaseClassifier(backbone=backbone, head=head)
+    model.image_size = image_size
 
     if pretrained:
         # Download the pre-trained checkpoint file from url, and load ckpt file.
@@ -793,10 +795,12 @@ def vit_l_16_384(
     return vit(**config)
 
 @register_model
-def vit_b_32_224(num_classes: int = 1000,
+def vit_b_32_224(
+             pretrained: bool = False,
+             num_classes: int = 1000,
+             in_channels: int = 3,
              image_size: int = 224,
              has_logits: bool = False,
-             pretrained: bool = False,
              drop_out: float = 0.0,
              attention_dropout: float = 0.0,
              drop_path_dropout: float = 0.0
@@ -823,10 +827,12 @@ def vit_b_32_224(num_classes: int = 1000,
     return vit(**config)
 
 @register_model
-def vit_b_32_384(num_classes: int = 1000,
+def vit_b_32_384(
+             pretrained: bool = False,
+             num_classes: int = 1000,
+             in_channels: int = 3,
              image_size: int = 384,
              has_logits: bool = False,
-             pretrained: bool = False,
              drop_out: float = 0.0,
              attention_dropout: float = 0.0,
              drop_path_dropout: float = 0.0
@@ -853,10 +859,12 @@ def vit_b_32_384(num_classes: int = 1000,
     return vit(**config)
 
 @register_model
-def vit_l_32_224(num_classes: int = 1000,
+def vit_l_32_224(
+             pretrained: bool = False,
+             num_classes: int = 1000,
+             in_channels: int = 3,
              image_size: int = 224,
              has_logits: bool = False,
-             pretrained: bool = False,
              drop_out: float = 0.0,
              attention_dropout: float = 0.0,
              drop_path_dropout: float = 0.0
