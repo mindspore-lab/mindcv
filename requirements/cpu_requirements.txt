@@ -1,5 +1,6 @@
 pyyaml >= 5.3
 tqdm
 mindspore-dev
+ml-collections
 pylint
 pytest
