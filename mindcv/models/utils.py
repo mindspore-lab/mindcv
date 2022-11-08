@@ -11,6 +11,11 @@ from mindspore import load_checkpoint, load_param_into_net
 
 from mindcv.utils.download import DownLoad
 
+class ConfigDict(dict):
+    """dot.notation access to dictionary attributes"""
+    __getattr__ = dict.get
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
 
 def load_pretrained(model, default_cfg, path='./', num_classes=1000, in_channels=3, filter_fn=None):
     '''load pretrained model depending on cfgs of model'''

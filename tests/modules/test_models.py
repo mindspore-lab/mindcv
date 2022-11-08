@@ -26,7 +26,11 @@ def test_model_forward(name):
     bs = 8
     c = 10
     model= create_model(model_name=name, num_classes=c)
-    dummy_input = Tensor(np.random.rand(bs, 3, 224, 224), dtype=mindspore.float32)
+    if hasattr(model, 'image_size'):
+        image_size = model.image_size
+    else:
+        image_size = 224
+    dummy_input = Tensor(np.random.rand(bs, 3, image_size, image_size), dtype=mindspore.float32)
     y = model(dummy_input)
     assert y.shape==(bs, 10), 'output shape not match'
 
@@ -100,6 +104,6 @@ def test_is_model_pretrained():
 
 if __name__== '__main__':
     for model in model_name_list: 
-        if 'densenet' in model:
+        if '384' in model:
             print(model)
-            #test_model_backward(model)
+            test_model_forward(model)
