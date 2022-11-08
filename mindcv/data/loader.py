@@ -96,12 +96,13 @@ def create_loader(
             #TODO: use mindspore vision cutmix and mixup after the confliction fixed in later release
             # set label_smoothing 0 here since label smoothing is computed in loss module
             mixup_fn = Mixup(
-                mixup_alpha=mix_up,
+                mixup_alpha=mixup,
                 cutmix_alpha=cutmix,
                 cutmix_minmax=None,
                 prob=cutmix_prob,
                 switch_prob=0.5,
-                label_smoothing=0.0, num_classes=num_clases)
+                label_smoothing=0.0, 
+                num_classes=num_classes)
             trans_batch = mixup_fn
 
 
