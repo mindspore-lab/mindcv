@@ -5,7 +5,7 @@ Create dataloader
 import warnings
 
 import mindspore as ms
-from mindspore.dataset import transforms #,vision
+from mindspore.dataset import transforms#, vision
 
 from .transforms_factory import create_transforms
 from .mixup import Mixup
@@ -82,17 +82,13 @@ def create_loader(
                           num_parallel_workers=num_parallel_workers,
                           python_multiprocessing=python_multiprocessing)
 
-    if is_training and (mixup > 0 or cutmix > 0):
-        one_hot_encode = transforms.OneHot(num_classes)
-        dataset = dataset.map(operations=one_hot_encode, input_columns=[target_input_columns])
-
     dataset = dataset.batch(batch_size=batch_size, drop_remainder=drop_remainder)
 
     #assert (mixup * cutmix == 0), 'Currently, mixup and cutmix cannot be applied together'
 
     if is_training:
         trans_batch = []
-        if mixup * cutmix > 0:
+        if mixup + cutmix > 0.0:
             #TODO: use mindspore vision cutmix and mixup after the confliction fixed in later release
             # set label_smoothing 0 here since label smoothing is computed in loss module
             mixup_fn = Mixup(
@@ -101,10 +97,13 @@ def create_loader(
                 cutmix_minmax=None,
                 prob=cutmix_prob,
                 switch_prob=0.5,
-                label_smoothing=0.0, 
+                label_smoothing=0.0,
                 num_classes=num_classes)
             trans_batch = mixup_fn
 
+            #one_hot_encode = transforms.OneHot(num_classes)
+            #dataset = dataset.map(operations=one_hot_encode, input_columns=[target_input_columns])
+            #trans_batch = vision.MixUpBatch(alpha=mixup)
 
         if trans_batch != []:
             dataset = dataset.map(input_columns=["image", target_input_columns],
