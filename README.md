@@ -291,9 +291,11 @@ Please see [configs](./configs) for the details about model performance and pret
 
 ## Notes
 ### What is New 
-- 2022/11/08
-1. Add 7 pretrained ViT models
+- 2022/11/09
+1. Add 7 pretrained ViT models.
 2. Add RandAugment augmentation.
+3. Fix CutMix efficiency issue and CutMix and Mixup can be used together. 
+4. Fix lr plot and scheduling bug.
 - 2022/10/12
 1. Both BCE and CE loss now support class-weight config, label smoothing, and auxilary logit input (for networks like inception).
 - 2022/09/13
