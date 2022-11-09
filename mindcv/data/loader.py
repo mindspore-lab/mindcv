@@ -5,9 +5,10 @@ Create dataloader
 import warnings
 
 import mindspore as ms
-from mindspore.dataset import vision, transforms
+from mindspore.dataset import transforms#, vision
 
 from .transforms_factory import create_transforms
+from .mixup import Mixup
 
 __all__ = ["create_loader"]
 
@@ -81,20 +82,29 @@ def create_loader(
                           num_parallel_workers=num_parallel_workers,
                           python_multiprocessing=python_multiprocessing)
 
-    if is_training and (mixup > 0 or cutmix > 0):
-        one_hot_encode = transforms.OneHot(num_classes)
-        dataset = dataset.map(operations=one_hot_encode, input_columns=[target_input_columns])
-
     dataset = dataset.batch(batch_size=batch_size, drop_remainder=drop_remainder)
 
-    assert (mixup * cutmix == 0), 'Currently, mixup and cutmix cannot be applied together'
+    #assert (mixup * cutmix == 0), 'Currently, mixup and cutmix cannot be applied together'
 
     if is_training:
         trans_batch = []
-        if mixup > 0:
-            trans_batch = vision.MixUpBatch(alpha=mixup)
-        elif cutmix > 0:
-            trans_batch = vision.CutMixBatch(vision.ImageBatchFormat.NCHW, cutmix, cutmix_prob)
+        if (mixup + cutmix > 0.0) and batch_size > 1:
+            #TODO: use mindspore vision cutmix and mixup after the confliction fixed in later release
+            # set label_smoothing 0 here since label smoothing is computed in loss module
+            mixup_fn = Mixup(
+                mixup_alpha=mixup,
+                cutmix_alpha=cutmix,
+                cutmix_minmax=None,
+                prob=cutmix_prob,
+                switch_prob=0.5,
+                label_smoothing=0.0,
+                num_classes=num_classes)
+            trans_batch = mixup_fn
+            #trans_batch = vision.MixUpBatch(alpha=mixup)
+        else:
+            one_hot_encode = transforms.OneHot(num_classes)
+            dataset = dataset.map(operations=one_hot_encode, input_columns=[target_input_columns])
+
         if trans_batch != []:
             dataset = dataset.map(input_columns=["image", target_input_columns],
                                   num_parallel_workers=num_parallel_workers, operations=trans_batch)

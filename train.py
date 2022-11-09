@@ -85,6 +85,8 @@ def train(args):
         drop_remainder=args.drop_remainder,
         is_training=True,
         mixup=args.mixup,
+        cutmix=args.cutmix,
+        cutmix_prob=args.cutmix_prob,
         num_classes=num_classes,
         transform=transform_list,
         num_parallel_workers=args.num_parallel_workers,
