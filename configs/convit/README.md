@@ -22,7 +22,7 @@ ConViT combines e the strengths of convolutional architectures and Vision Transf
 | :----: | ----------------- | :-------: | :-------: | :-------------: | :--------: | :------------: | :--------: | :------: | :----: |
 |        | Model             | Top-1 (%) | Top-5 (%) | train (s/epoch) | Infer (ms) | train(s/epoch) | Infer (ms) | Download | Config |
 |  GPU   | convit_tiny       |           |           |                 |            |                |            |          |        |
-| Ascend | convit_tiny       |           |           |                 |            |                |            |          |        |
+| Ascend | convit_tiny       |  73.66    |  91.72    |                 |            |         240    |            |          |        |
 |  GPU   | convit_tiny_plus  |           |           |                 |            |                |            |          |        |
 | Ascend | convit_tiny_plus  |           |           |                 |            |                |            |          |        |
 |  GPU   | convit_small      |           |           |                 |            |                |            |          |        |
