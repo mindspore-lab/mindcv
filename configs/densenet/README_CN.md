@@ -15,17 +15,17 @@
 
 ***
 
-|        |              |           |           |    Pynative     |  Pynative  |     Graph      |   Graph    |           |            |
-| :----: | ------------ | :-------: | :-------: | :-------------: | :--------: | :------------: | :--------: | :-------: | :--------: |
-|        | Model        | Top-1 (%) | Top-5 (%) | train (s/epoch) | Infer (ms) | train(s/epoch) | Infer (ms) | Download  |   Config   |
-| GPU | DenseNet121 | 75.60 | 92.73 |  |  |  |  | [model]() | [config]() |
-| Ascend | DenseNet121 | 75.60 | 92.73 |  |  |  |  |  |  |
-|  GPU   | DenseNet161 | 79.10 | 94.65 |                 |            |                |            | [model]() | [config]() |
-| Ascend | DenseNet161  | 79.10 | 94.64 |                 |            |                |            |           |            |
-| GPU | DenseNet169 | 76.38 | 93.34 | | | | | [model]() | [config]() |
-| Ascend | DenseNet169 | 76.37 | 93.33 | | | | | | |
-| GPU | DenseNet201 | 78.08 | 94.13 | | | | | [model]() | [config]() |
-| Ascend | DenseNet201 | 78.08 | 94.12 | | | | | | |
+| Model       | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Train T.   | Infer T.   | Download  | Config  | Log     |
+| ----------- | -------- | --------- | --------- | ---------- | ---------- | ---------- | --------- | ------- | ------- |
+| DenseNet121 | D910x8-G | 75.64     | 92.84     | 8.06       | 238s/epoch | 10.5s/step | [model]() | [cfg]() | [log]() |
+| DenseNet161 | D910x8-G | 79.09     | 94.66     | 28.90      | 472s/epoch | 13.6s/step | [model]() | [cfg]() | [log]() |
+| DenseNet169 | D910x8-G | 77.26     | 93.71     | 14.30      | 313s/epoch | 11.5s/step | [model]() | [cfg]() | [log]() |
+| DenseNet201 | D910x8-G | 78.14     | 94.08     | 20.24      | 394s/epoch | 12.4s/step | [model]() | [cfg]() | [log]() |
+
+#### 备注
+
+- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
+- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
 
 ## 示例
 

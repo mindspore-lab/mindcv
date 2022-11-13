@@ -18,13 +18,15 @@ propagation, encourage feature reuse, and substantially reduce the number of par
 ## Results
 ***
 
-| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |  
+| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
 |-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
-| DenseNet121     |  D910x8-G  | 75.60 | 92.73 | 7.05 |  2min/epoch  | 20ms/step | [model]() | [cfg]()    | [log]() |
-| DenseNet169     |  V100x8-F  |       |      | 3.54 | | | [model]() | [cfg]()    | [log]() |
+| DenseNet121 | D910x8-G | 75.64     | 92.84     | 8.06       | 238s/epoch | 10.5s/step | [model]() | [cfg]() | [log]() |
+| DenseNet161 | D910x8-G | 79.09     | 94.66     | 28.90      | 472s/epoch | 13.6s/step | [model]() | [cfg]() | [log]() |
+| DenseNet169 | D910x8-G | 77.26 | 93.71 | 14.30 | 313s/epoch | 11.5s/step | [model]() | [cfg]() | [log]() |
+| DenseNet201 | D910x8-G | 78.14 | 94.08 | 20.24 | 394s/epoch | 12.4s/step | [model]() | [cfg]() | [log]() |
 
 #### Notes
-- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
+- 以上模型均在ImageNet-1K数据集上训练和验证。
 - Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
 
 ## Quick Start
@@ -33,7 +35,7 @@ propagation, encourage feature reuse, and substantially reduce the number of par
 
 #### Installation
 Please refer to the [installation instruction](https://github.com/mindspore-ecosystem/mindcv#installation) in MindCV.
-  
+
 #### Dataset Preparation
 Please download the [ImageNet-1K](https://www.image-net.org/download.php) dataset for model training and validation.
 
@@ -78,4 +80,4 @@ Detailed adjustable parameters and their default value can be seen in [config.py
 Please refer to the deployment tutorial in MindCV.
 
 
-  
+
