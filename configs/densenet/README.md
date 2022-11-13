@@ -20,10 +20,10 @@ propagation, encourage feature reuse, and substantially reduce the number of par
 
 | Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
 |-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
-| DenseNet121 | D910x8-G | 75.64     | 92.84     | 8.06       | 238s/epoch | 10.5s/step | [model]() | [cfg]() | [log]() |
-| DenseNet161 | D910x8-G | 79.09     | 94.66     | 28.90      | 472s/epoch | 13.6s/step | [model]() | [cfg]() | [log]() |
-| DenseNet169 | D910x8-G | 77.26 | 93.71 | 14.30 | 313s/epoch | 11.5s/step | [model]() | [cfg]() | [log]() |
-| DenseNet201 | D910x8-G | 78.14 | 94.08 | 20.24 | 394s/epoch | 12.4s/step | [model]() | [cfg]() | [log]() |
+| DenseNet121 | D910x8-G | 75.64     | 92.84     | 8.06       | 238s/epoch | 6.7ms/step | [model]() | [cfg]() | [log]() |
+| DenseNet161 | D910x8-G | 79.09     | 94.66     | 28.90      | 472s/epoch | 8.7ms/step | [model]() | [cfg]() | [log]() |
+| DenseNet169 | D910x8-G | 77.26 | 93.71 | 14.30 | 313s/epoch | 7.4ms/step | [model]() | [cfg]() | [log]() |
+| DenseNet201 | D910x8-G | 78.14 | 94.08 | 20.24 | 394s/epoch | 7.9ms/step | [model]() | [cfg]() | [log]() |
 
 #### Notes
 - 以上模型均在ImageNet-1K数据集上训练和验证。
