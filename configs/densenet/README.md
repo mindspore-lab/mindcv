@@ -26,7 +26,8 @@ propagation, encourage feature reuse, and substantially reduce the number of par
 | DenseNet201 | D910x8-G | 78.14 | 94.08 | 20.24 | 394s/epoch | 7.9ms/step | [model]() | [cfg]() | [log]() |
 
 #### Notes
-- 以上模型均在ImageNet-1K数据集上训练和验证。
+
+- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
 - Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
 
 ## Quick Start
