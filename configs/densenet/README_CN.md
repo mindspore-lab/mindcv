@@ -19,7 +19,7 @@
 | ----------- | -------- | --------- | --------- | ---------- | ---------- | ---------- | --------- | ------- | ------- |
 | DenseNet121 | D910x8-G | 75.64     | 92.84     | 8.06       | 238s/epoch | 6.7ms/step | [model]() | [cfg]() | [log]() |
 | DenseNet161 | D910x8-G | 79.09     | 94.66     | 28.90      | 472s/epoch | 8.7ms/step | [model]() | [cfg]() | [log]() |
-| DenseNet169 | D910x8-G | 77.26     | 93.71     | 14.30      | 313s/epoch | 7.3ms/step | [model]() | [cfg]() | [log]() |
+| DenseNet169 | D910x8-G | 77.26     | 93.71     | 14.30      | 313s/epoch | 7.4ms/step | [model]() | [cfg]() | [log]() |
 | DenseNet201 | D910x8-G | 78.14     | 94.08     | 20.24      | 394s/epoch | 7.9ms/step | [model]() | [cfg]() | [log]() |
 
 #### 备注
