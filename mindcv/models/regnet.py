@@ -5,10 +5,71 @@ import numpy as np
 from mindspore import dtype as mstype
 from mindspore.nn import Cell
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
-    'regnet200mf',
+    'regnetx200mf',
+    'regnetx400mf',
+    'regnetx600mf',
+    'regnetx800mf',
+    'regnetx1_6gf',
+    'regnetx3_2gf',
+    'regnetx4_0gf',
+    'regnetx6_4gf',
+    'regnetx8_0gf',
+    'regnetx12gf',
+    'regnetx16gf',
+    'regnetx32gf',
+    'regnety200mf',
+    'regnety400mf',
+    'regnety600mf',
+    'regnety800mf',
+    'regnety1_6gf',
+    'regnety3_2gf',
+    'regnety4_0gf',
+    'regnety6_4gf',
+    'regnety8_0gf',
+    'regnety12gf',
+    'regnety16gf',
+    'regnety32gf'
 ]
+
+
+def _cfg(url='', **kwargs):
+    return {
+        'url': url,
+        'num_classes': 1000,
+        'first_conv': '', 'classifier': 'classifier',
+        **kwargs
+    }
+
+
+default_cfgs = {
+    'regnetx200mf': _cfg(url=''),
+    'regnetx400mf': _cfg(url=''),
+    'regnetx600mf': _cfg(url=''),
+    'regnetx800mf': _cfg(url=''),
+    'regnetx1_6gf': _cfg(url=''),
+    'regnetx3_2gf': _cfg(url=''),
+    'regnetx4_0gf': _cfg(url=''),
+    'regnetx6_4gf': _cfg(url=''),
+    'regnetx8_0gf': _cfg(url=''),
+    'regnetx12gf': _cfg(url=''),
+    'regnetx16gf': _cfg(url=''),
+    'regnetx32gf': _cfg(url=''),
+    'regnety200mf': _cfg(url=''),
+    'regnety400mf': _cfg(url=''),
+    'regnety600mf': _cfg(url=''),
+    'regnety800mf': _cfg(url=''),
+    'regnety1_6gf': _cfg(url=''),
+    'regnety3_2gf': _cfg(url=''),
+    'regnety4_0gf': _cfg(url=''),
+    'regnety6_4gf': _cfg(url=''),
+    'regnety8_0gf': _cfg(url=''),
+    'regnety12gf': _cfg(url=''),
+    'regnety16gf': _cfg(url=''),
+    'regnety32gf': _cfg(url=''),
+}
 
 
 def conv2d(w_in, w_out, k, *, stride=1, groups=1, bias=False):
@@ -50,51 +111,6 @@ def activation():
     return nn.ReLU()
 
 
-# --------------------------- Complexity (cx) calculations --------------------------- #
-
-
-def conv2d_cx(cx, w_in, w_out, k, *, stride=1, groups=1, bias=False):
-    """Accumulates complexity of conv2d into cx = (h, w, flops, params, acts)."""
-    assert k % 2 == 1, "Only odd size kernels supported to avoid padding issues."
-    h, w, flops, params, acts = cx["h"], cx["w"], cx["flops"], cx["params"], cx["acts"]
-    h, w = (h - 1) // stride + 1, (w - 1) // stride + 1
-    flops += k * k * w_in * w_out * h * w // groups + (w_out * h * w if bias else 0)
-    params += k * k * w_in * w_out // groups + (w_out if bias else 0)
-    acts += w_out * h * w
-    return {"h": h, "w": w, "flops": flops, "params": params, "acts": acts}
-
-
-def norm2d_cx(cx, w_in):
-    """Accumulates complexity of norm2d into cx = (h, w, flops, params, acts)."""
-    h, w, flops, params, acts = cx["h"], cx["w"], cx["flops"], cx["params"], cx["acts"]
-    params += 2 * w_in
-    return {"h": h, "w": w, "flops": flops, "params": params, "acts": acts}
-
-
-def pool2d_cx(cx, w_in, k, *, stride=1):
-    """Accumulates complexity of pool2d into cx = (h, w, flops, params, acts)."""
-    assert k % 2 == 1, "Only odd size kernels supported to avoid padding issues."
-    h, w, flops, params, acts = cx["h"], cx["w"], cx["flops"], cx["params"], cx["acts"]
-    h, w = (h - 1) // stride + 1, (w - 1) // stride + 1
-    acts += w_in * h * w
-    return {"h": h, "w": w, "flops": flops, "params": params, "acts": acts}
-
-
-def gap2d_cx(cx, _w_in):
-    """Accumulates complexity of gap2d into cx = (h, w, flops, params, acts)."""
-    flops, params, acts = cx["flops"], cx["params"], cx["acts"]
-    return {"h": 1, "w": 1, "flops": flops, "params": params, "acts": acts}
-
-
-def linear_cx(cx, w_in, w_out, *, bias=False, num_locations=1):
-    """Accumulates complexity of linear into cx = (h, w, flops, params, acts)."""
-    h, w, flops, params, acts = cx["h"], cx["w"], cx["flops"], cx["params"], cx["acts"]
-    flops += w_in * w_out * num_locations + (w_out * num_locations if bias else 0)
-    params += w_in * w_out + (w_out if bias else 0)
-    acts += w_out * num_locations
-    return {"h": h, "w": w, "flops": flops, "params": params, "acts": acts}
-
-
 # ---------------------------------- Shared blocks ----------------------------------- #
 
 
@@ -113,15 +129,6 @@ class SE(nn.Cell):
 
     def construct(self, x):
         return x * self.f_ex(self.avg_pool(x))
-
-    @staticmethod
-    def complexity(cx, w_in, w_se):
-        h, w = cx["h"], cx["w"]
-        cx = gap2d_cx(cx, w_in)
-        cx = conv2d_cx(cx, w_in, w_se, 1, bias=True)
-        cx = conv2d_cx(cx, w_se, w_in, 1, bias=True)
-        cx["h"], cx["w"] = h, w
-        return cx
 
 
 # ---------------------------------- Miscellaneous ----------------------------------- #
@@ -196,12 +203,6 @@ class ResStemCifar(Cell):
         #     x = layer(x)
         return x
 
-    @staticmethod
-    def complexity(cx, w_in, w_out):
-        cx = conv2d_cx(cx, w_in, w_out, 3)
-        cx = norm2d_cx(cx, w_out)
-        return cx
-
 
 class ResStem(Cell):
     """ResNet stem for ImageNet: 7x7, BN, AF, MaxPool."""
@@ -221,13 +222,6 @@ class ResStem(Cell):
         # for layer in self.cells():
         #     x = layer(x)
         return x
-
-    @staticmethod
-    def complexity(cx, w_in, w_out):
-        cx = conv2d_cx(cx, w_in, w_out, 7, stride=2)
-        cx = norm2d_cx(cx, w_out)
-        cx = pool2d_cx(cx, w_out, 3, stride=2)
-        return cx
 
 
 class SimpleStem(Cell):
@@ -302,7 +296,7 @@ class ResBasicBlock(Cell):
         self.af = activation()
 
     def construct(self, x):
-        x_p = self.bn(self.proj(x)) if self.proj else x
+        x_p = self.bn(self.proj(x)) if self.proj is not None else x
         return self.af(x_p + self.f(x))
 
 
@@ -332,7 +326,7 @@ class BottleneckTransform(Cell):
         x = self.b(x)
         x = self.b_bn(x)
         x = self.b_af(x)
-        x = self.se(x) if self.se else x
+        x = self.se(x) if self.se is not None else x
         x = self.c(x)
         x = self.c_bn(x)
         return x
@@ -398,7 +392,7 @@ class AnyStage(Cell):
     def __init__(self, w_in, w_out, stride, d, block_fun, params, bn_eps, bn_mom):
         super(AnyStage, self).__init__()
         self.blocks = nn.CellList()
-        for i in range(d):
+        for _ in range(d):
             block = block_fun(w_in, w_out, stride, params, bn_eps, bn_mom)
             self.blocks.append(block)
             stride, w_in = 1, w_out
@@ -407,13 +401,6 @@ class AnyStage(Cell):
         for block in self.blocks:
             x = block(x)
         return x
-
-    @staticmethod
-    def complexity(cx, w_in, w_out, stride, d, block_fun, params):
-        for _ in range(d):
-            cx = block_fun.complexity(cx, w_in, w_out, stride, params)
-            stride, w_in = 1, w_out
-        return cx
 
 
 class AnyHead(Cell):
@@ -437,23 +424,13 @@ class AnyHead(Cell):
         x = self.fc(x)
         return x
 
-    @staticmethod
-    def complexity(cx, w_in, head_width, num_classes):
-        if head_width > 0:
-            cx = conv2d_cx(cx, w_in, head_width, 1)
-            cx = norm2d_cx(cx, head_width)
-            w_in = head_width
-        cx = gap2d_cx(cx, w_in)
-        cx = linear_cx(cx, w_in, num_classes, bias=True)
-        return cx
-
 
 class AnyNet(nn.Cell):
     """AnyNet model."""
 
     @staticmethod
     def anynet_get_params(depths, stem_type, stem_w, block_type, widths, strides, bot_muls, group_ws, head_w,
-                          num_classes):
+                          num_classes, se_r):
         nones = [None for _ in depths]
         return {
             "stem_type": stem_type,
@@ -465,18 +442,18 @@ class AnyNet(nn.Cell):
             "bot_muls": bot_muls if bot_muls else nones,
             "group_ws": group_ws if group_ws else nones,
             "head_w": head_w,
-            "se_r": 0,
+            "se_r": se_r,
             "num_classes": num_classes,
         }
 
     def __init__(self, depths, stem_type, stem_w, block_type, widths, strides, bot_muls, group_ws, head_w, num_classes,
-                 bn_eps, bn_mom):
+                 bn_eps, bn_mom, se_r, in_channels):
         super(AnyNet, self).__init__()
         p = AnyNet.anynet_get_params(depths, stem_type, stem_w, block_type, widths, strides, bot_muls, group_ws, head_w,
-                                     num_classes)
+                                     num_classes, se_r)
         stem_fun = get_stem_fun(p["stem_type"])
         block_fun = get_block_fun(p["block_type"])
-        self.stem = stem_fun(3, p["stem_w"], bn_eps, bn_mom)
+        self.stem = stem_fun(in_channels, p["stem_w"], bn_eps, bn_mom)
         prev_w = p["stem_w"]
         keys = ["depths", "widths", "strides", "bot_muls", "group_ws"]
         self.stages = nn.CellList()
@@ -500,7 +477,7 @@ class RegNet(AnyNet):
 
     @staticmethod
     def regnet_get_params(w_a, w_0, w_m, d, stride, bot_mul, group_w, stem_type, stem_w, block_type, head_w,
-                          num_classes):
+                          num_classes, se_r):
         """Get AnyNet parameters that correspond to the RegNet."""
         ws, ds, ss, bs, gs = generate_regnet_full(w_a, w_0, w_m, d, stride, bot_mul, group_w)
         return {
@@ -513,17 +490,19 @@ class RegNet(AnyNet):
             "bot_muls": bs,
             "group_ws": gs,
             "head_w": head_w,
-            "se_r": 0,
+            "se_r": se_r,
             "num_classes": num_classes,
         }
 
-    def __init__(self, w_a, w_0, w_m, d, stride, bot_mul, group_w, stem_type, stem_w, block_type, head_w, num_classes,
-                 bn_eps, bn_mom):
+    def __init__(self, w_a, w_0, w_m, d, group_w, stride=2, bot_mul=1.0, stem_type='simple_stem_in', stem_w=32,
+                 block_type='res_bottleneck_block', head_w=0, num_classes=1000,
+                 bn_eps=1e-5, bn_mom=0.1, se_r=0, in_channels=3):
         params = RegNet.regnet_get_params(w_a, w_0, w_m, d, stride, bot_mul, group_w, stem_type, stem_w, block_type,
-                                          head_w, num_classes)
+                                          head_w, num_classes, se_r)
         super(RegNet, self).__init__(params['depths'], params['stem_type'], params['stem_w'], params['block_type'],
                                      params['widths'], params['strides'], params['bot_muls'], params['group_ws'],
-                                     params['head_w'], params['num_classes'], bn_eps, bn_mom)
+                                     params['head_w'], params['num_classes'], bn_eps, bn_mom, params['se_r'],
+                                     in_channels)
 
     def construct(self, x):
         x = self.stem(x)
@@ -534,6 +513,240 @@ class RegNet(AnyNet):
 
 
 @register_model
-def regnet200mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    model = RegNet(36.44, 24, 2.49, 13, 2, 1.0, 8, 'simple_stem_in', 32, 'res_bottleneck_block', 0, 1000, 1e-5, 0.9)
+def regnetx200mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnetx200mf']
+    model = RegNet(36.44, 24, 2.49, 13, 8, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnetx400mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnetx400mf']
+    model = RegNet(24.48, 24, 2.54, 22, 16, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnetx600mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnetx600mf']
+    model = RegNet(36.97, 48, 2.24, 16, 24, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnetx800mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnetx800mf']
+    model = RegNet(35.73, 56, 2.28, 16, 16, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnetx1_6gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnetx1_6gf']
+    model = RegNet(34.01, 80, 2.25, 18, 24, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnetx3_2gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnetx3_2gf']
+    model = RegNet(26.31, 88, 2.25, 25, 48, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnetx4_0gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnetx4_0gf']
+    model = RegNet(38.65, 96, 2.43, 23, 40, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnetx6_4gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnetx6_4gf']
+    model = RegNet(60.83, 184, 2.07, 17, 56, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnetx8_0gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnetx8_0gf']
+    model = RegNet(49.56, 80, 2.88, 23, 120, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnetx12gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnetx12gf']
+    model = RegNet(73.36, 168, 2.37, 19, 112, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnetx16gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnetx16gf']
+    model = RegNet(55.59, 216, 2.1, 22, 128, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnetx32gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnetx32gf']
+    model = RegNet(69.86, 320, 2.0, 23, 168, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnety200mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnety200mf']
+    model = RegNet(36.44, 24, 2.49, 13, 8, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnety400mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnety400mf']
+    model = RegNet(27.89, 48, 2.09, 16, 8, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnety600mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnety600mf']
+    model = RegNet(32.54, 48, 2.32, 15, 16, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnety800mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnety800mf']
+    model = RegNet(38.84, 56, 2.4, 14, 16, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnety1_6gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnety1_6gf']
+    model = RegNet(20.71, 48, 2.65, 27, 24, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnety3_2gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnety3_2gf']
+    model = RegNet(42.63, 80, 2.66, 21, 24, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnety4_0gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnety4_0gf']
+    model = RegNet(31.41, 96, 2.24, 22, 64, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnety6_4gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnety6_4gf']
+    model = RegNet(33.22, 112, 2.27, 25, 72, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnety8_0gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnety8_0gf']
+    model = RegNet(76.82, 192, 2.19, 17, 56, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnety12gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnety12gf']
+    model = RegNet(73.36, 168, 2.37, 19, 112, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnety16gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnety16gf']
+    model = RegNet(106.23, 200, 2.48, 18, 112, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def regnety32gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    default_cfg = default_cfgs['regnety32gf']
+    model = RegNet(115.89, 232, 2.53, 20, 232, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
