@@ -1,0 +1,28 @@
+name: sync_to_gitee
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  repo-sync:
+    env:
+      dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+      dst_token: ${{ secrets.GITEE_TOKEN }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: sync github -> gitee
+        uses: Yikun/hub-mirror-action@master
+        # if: env.dst_key && env.dst_token
+        with:
+          src: 'github/mindspore-ecosystem'
+          dst: 'gitee/mindspore-ecosystem'
+          dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+          dst_token:  ${{ secrets.GITEE_TOKEN }}
+          account_type: org
+          static_list: ${{ github.event.repository.name }}
