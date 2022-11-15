@@ -16,17 +16,17 @@
 
 ***
 
-|        |                |           |           |    Pynative     |  Pynative  |     Graph      |   Graph    |           |            |
-| :----: | -------------- | :-------: | :-------: | :-------------: | :--------: | :------------: | :--------: | :-------: | :--------: |
-|        | Model          | Top-1 (%) | Top-5 (%) | train (s/epoch) | Infer (ms) | train(s/epoch) | Infer (ms) | Download  |   Config   |
-|  GPU   | res2net50      |           |           |                 |            |                |            | [model]() | [config]() |
-| Ascend | res2net50      |           |           |                 |            |                |            |           |            |
-|  GPU   | res2net101     |           |           |                 |            |                |            | [model]() | [config]() |
-| Ascend | res2net101     |           |           |                 |            |                |            |           |            |
-|  GPU   | res2net50_v1b  |           |           |                 |            |                |            | [model]() | [config]() |
-| Ascend | res2net50_v1b  |           |           |                 |            |                |            |           |            |
-|  GPU   | res2net101_v1b |           |           |                 |            |                |            | [model]() | [config]() |
-| Ascend | res2net101_v1b |           |           |                 |            |                |            |           |            |
+| Model          | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Train T.   | Infer T.   | Download  | Config  | Log     |
+| -------------- | -------- | --------- | --------- | ---------- | ---------- | ---------- | --------- | ------- | ------- |
+| Res2Net50      | D910x8-G | 79.35     | 94.64     | 25.76      | 246s/epoch | 28.5ms/step | [model]() | [cfg]() | [log]() |
+| Res2Net101     | D910x8-G | 79.56     | 94.70     | 45.33      | 467s/epoch | 46.0ms/step | [model]() | [cfg]() | [log]() |
+| Res2Net50      | D910x8-G | 80.32     | 95.09     | 25.77      | 250s/epoch | 29.6ms/step | [model]() | [cfg]() | [log]() |
+| Res2Net101-v1b | D910x8-G | 81.26     | 95.41     | 45.35      | 435s/epoch | 42.4ms/step | [model]() | [cfg]() | [log]() |
+
+#### 备注
+
+- 以上模型均在ImageNet-1K数据集上训练和验证。
+- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
 
 ## 示例
 
@@ -39,7 +39,7 @@
 > [configs文件夹](../../configs)中列出了mindcv套件所包含的模型的各个规格的yaml配置文件(在ImageNet数据集上训练和验证的配置)。
 
   ```shell
-  comming soon
+  mpirun --allow-run-as-root -n 8 python train.py -c configs/res2net/res2net_50_gpu.yaml --data_dir /path/to/imagenet
   ```
 
 - 下面是使用在ImageNet上预训练的Res2Net50模型和Momentum优化器在CIFAR10数据集上进行微调的示例。
