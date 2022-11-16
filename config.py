@@ -104,7 +104,7 @@ def create_parser():
                        help='Input image center crop percent (default=0.875)')
     group.add_argument('--cutmix', type=float, default=0.,
                        help='Hyperparameter of beta distribution of cutmix. (default=0.)')
-    group.add_argument('--cutmix_prob', type=float, default=0.,
+    group.add_argument('--cutmix_prob', type=float, default=1.0,
                        help='probability of applying cutmix and/or mixup (default=0.)')
     group.add_argument('--mixup', type=float, default=0.,
                        help='Hyperparameter of beta distribution of mixup. Recommended value is 0.2 for ImageNet. (default=0.)')
