@@ -22,8 +22,8 @@ check_loss_decrease = False
 #@pytest.mark.parametrize('mode', [ms.PYNATIVE_MODE, ms.GRAPH_MODE])
 @pytest.mark.parametrize('name', model_name_list)
 def test_model_forward(name):
-    #ms.set_context(mode=ms.GRAPH_MODE)
-    bs = 8
+    #ms.set_context(mode=ms.PYNATIVE_MODE)
+    bs = 2
     c = 10
     model= create_model(model_name=name, num_classes=c)
     if hasattr(model, 'image_size'):
@@ -103,7 +103,10 @@ def test_is_model_pretrained():
     assert num_pretrained > 0, 'No pretrained models'
 
 if __name__== '__main__':
+    test_model_forward('pnasnet')
+    '''
     for model in model_name_list: 
         if '384' in model:
             print(model)
             test_model_forward(model)
+    '''
