@@ -101,9 +101,6 @@ def create_loader(
                 num_classes=num_classes)
             trans_batch = mixup_fn
             #trans_batch = vision.MixUpBatch(alpha=mixup)
-        else:
-            one_hot_encode = transforms.OneHot(num_classes)
-            dataset = dataset.map(operations=one_hot_encode, input_columns=[target_input_columns])
 
         if trans_batch != []:
             dataset = dataset.map(input_columns=["image", target_input_columns],

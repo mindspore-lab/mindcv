@@ -1,3 +1,4 @@
+import os
 from mindspore import load_checkpoint, load_param_into_net
 from .registry import is_model, model_entrypoint
 
@@ -33,7 +34,7 @@ def create_model(
     create_fn = model_entrypoint(model_name)
     model = create_fn(**model_args, **kwargs)
 
-    if checkpoint_path:
+    if os.path.exists(checkpoint_path):
         param_dict = load_checkpoint(checkpoint_path)
         load_param_into_net(model, param_dict)
 
