@@ -224,7 +224,7 @@ class CellBase(nn.Cell):
         x_comb_iter_3 = x_comb_iter_3_left + x_comb_iter_3_right
 
         x_comb_iter_4_left = self.comb_iter_4_left(x_left)
-        if self.comb_iter_4_right:
+        if self.comb_iter_4_right is not None:
             x_comb_iter_4_right = self.comb_iter_4_right(x_right)
         else:
             x_comb_iter_4_right = x_right
