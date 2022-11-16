@@ -78,7 +78,7 @@ class SelectiveKernelBasic(nn.Cell):
         out = self.conv1(x)
         out = self.conv2(out)
 
-        if self.down_sample:
+        if self.down_sample is not None:
             identity = self.down_sample(x)
         out += identity
         out = self.relu(out)
