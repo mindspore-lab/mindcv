@@ -1,27 +1,35 @@
 # MobileNetV3
 
 ***
-> [MobileNetV3: Searching for MobileNetV3](https://arxiv.org/pdf/1512.00567.pdf)
+> [Searching for MobileNetV3](https://arxiv.org/pdf/1905.02244v5.pdf)
 
 ## 模型简介
 
 ***
-本文的目标是开发最佳的移动计算机视觉架构，来优化在移动设备上的预测精度与延迟的问题。为了实现这一点，我们引入了：(1)互补搜索技术，(2)适用于移动设备的非线性的模型规格，(3)高效的网络设计，(4)
-一个高效的分割解码器。我们对每种技术都进行了大量的实验，并在多种用例和移动电话上验证了它们的有效性。
+MobileNet v3发表于2019年，该v3版本结合了v1的深度可分离卷积、v2的Inverted Residuals和Linear Bottleneck、SE模块，利用NAS（神经结构搜索）来搜索网络的配置和参数。MobileNetV3 首先使用 MnasNet 进行粗略结构的搜索，然后使用强化学习从一组离散的选择中选择最优配置。之后，MobileNetV3 再使用 NetAdapt 对体系结构进行微调，这体现了 NetAdapt 的补充功能，它能够以较小的降幅对未充分利用的激活通道进行调整。
+
+mobilenet-v3提供了两个版本，分别为mobilenet-v3 large 以及mobilenet-v3 small，分别适用于对资源不同要求的情况，论文中提到，mobilenet-v3 small在imagenet分类任务上，较mobilenet-v2，精度提高了大约3.2%，时间却减少了15%，mobilenet-v3 large在imagenet分类任务上，较mobilenet-v2，精度提高了大约4.6%，时间减少了5%，mobilenet-v3 large 与v2相比，在COCO上达到相同的精度，速度快了25%，同时在分割算法上也有一定的提高。
+
+![](./MobileNetV3_Block.png)
 
 ## 性能指标
 
 ***
 
-|        |           |           |           |    Pynative     |  Pynative  |     Graph      |   Graph    |           |            |
-| :----: | --------- | :-------: | :-------: | :-------------: | :--------: | :------------: | :--------: | :-------: | :--------: |
-|        | Model     | Top-1 (%) | Top-5 (%) | train (s/epoch) | Infer (ms) | train(s/epoch) | Infer (ms) | Download  |   Config   |
-|  GPU   | MobileNet_v3_large | 74.56     | 91.79     |                 |            |                |            | [model]() | [config]() |
-| Ascend | MobileNet_v3_large | 74.61     | 91.82     |                 |            |                |            |           |            |
-|  GPU   | MobileNet_v3_small | 67.46     | 87.07     |                 |            |                |            | [model]() | [config]() |
-| Ascend | MobileNet_v3_small | 67.49     | 87.13     |                 |            |                |            |           |            |
+| Model                 | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Train T.   | Infer T. | Download  | Config  | Log     |
+| --------------------- | -------- | --------- | --------- | ---------- | ---------- | -------- | --------- | ------- | ------- |
+| MobileNetV3_large_100 | D910x8-G | 75.14     | 92.33     | 5.51       | 225s/epoch |          | [model]() | [cfg]() | [log]() |
+| MobileNetV3_small_100 | D910x8-G | 67.34     | 87.49     | 2.55       | 118s/epoch |          | [model]() | [cfg]() | [log]() |
+
+#### 备注
+
+- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
+- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
 
 ## 示例
+
+- 以上模型均在ImageNet-1K数据集上训练和验证。
+- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
 
 ***
 
@@ -32,27 +40,28 @@
 > [configs文件夹](../../configs)中列出了mindcv套件所包含的模型的各个规格的yaml配置文件(在ImageNet数据集上训练和验证的配置)。
 
   ```shell
-  comming soon
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+pirun -n 8 python train.py -c configs/mobilenetv3/mobienet_v3_large.yaml --data_dir /path/to/imagenet
   ```
 
-- 下面是使用在ImageNet上预训练的MobileNetV3_Large_100模型和Adam优化器在CIFAR10数据集上进行微调的示例。
+- 下面是使用在ImageNet上预训练的mobilenet_v3_large_100模型和Momentum优化器在CIFAR10数据集上进行微调的示例。	
 
   ```shell
-  python train.py --model=mobilenet_v3_large_100 --pretrained --opt=adam --lr=0.001 ataset=cifar10 --num_classes=10 --dataset_download
+  python train.py --model=mobilenet_v3_large_100 --pretrained --opt=momentum --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
   ```
 
 详细的可调参数及其默认值可以在[config.py](../../config.py)中查看。
 
 ### 验证
 
-- 下面是使用`validate.py`文件验证MobileNetV3_Large_100的预训练模型的精度的示例。
-
-```shell
-python validate.py --model=mobilenet_v3_large_100 --dataset=imagenet --val_split=val --pretrained
-```
-
-- 下面是使用`validate.py`文件验证MobileNetV3_Large_100的自定义参数文件的精度的示例。
+- 下面是使用`validate.py`文件验证densenet121的预训练模型的精度的示例。
 
   ```shell
-  python validate.py --model=mobilenet_v3_large_100 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/mobilenet_v3_large_100-best.ckpt' 
+  python validate.py --model=mobilenet_v3_large_100 --dataset=imagenet --val_split=val --pretrained
+  ```
+
+- 下面是使用`validate.py`文件验证densenet121的自定义参数文件的精度的示例。
+
+  ```shell
+  python validate.py --model=mobilenet_v3_large_100 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/mobilenet_v3_large_100-best.ckpt'
   ```
