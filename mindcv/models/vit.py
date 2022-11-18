@@ -23,6 +23,7 @@ from mindspore.common.initializer import Normal
 from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
 from mindspore import Tensor
+from mindspore import ops as P
 
 from .utils import load_pretrained, ConfigDict
 from .registry import register_model
@@ -30,11 +31,11 @@ from .registry import register_model
 __all__ = ['ViT',
         'vit_b_16_224',
         'vit_b_16_384',
-        'vit_l_16_224',
+        'vit_l_16_224', #train
         'vit_l_16_384',
-        'vit_b_32_224',
+        'vit_b_32_224', #train
         'vit_b_32_384',
-        'vit_l_32_224',
+        'vit_l_32_224', #train
 ]
 
 def _cfg(url='', **kwargs):
@@ -592,7 +593,7 @@ def vit(image_size: int,
         mlp_dim: int,
         dropout: float = 0.,
         attention_dropout: float = 0.,
-        drop_path_dropout: float = 0.,
+        drop_path_rate: float = 0.,
         activation: nn.Cell = nn.GELU,
         norm: nn.Cell = nn.LayerNorm,
         pool: str = 'cls',
@@ -609,7 +610,7 @@ def vit(image_size: int,
                    mlp_dim=mlp_dim,
                    keep_prob=1.0 - dropout,
                    attention_keep_prob=1.0 - attention_dropout,
-                   drop_path_keep_prob=1.0 - drop_path_dropout,
+                   drop_path_keep_prob=1.0 - drop_path_rate,
                    activation=activation,
                    norm=norm,
                    pool=pool,
@@ -640,9 +641,9 @@ def vit_b_16_224(
              in_channels: int = 3,
              image_size: int = 224,
              has_logits: bool = False,
-             drop_out: float = 0.0,
-             attention_dropout: float = 0.0,
-             drop_path_dropout: float = 0.0
+             drop_rate: float = 0.0,
+             #attention-dropout: float = 0.0,
+             drop_path_rate: float = 0.0
              ) -> ViT:
     """
     Constructs a vit_b_16 architecture from
@@ -653,9 +654,9 @@ def vit_b_16_224(
         num_classes (int): The number of classification. Default: 1000.
         has_logits (bool): Whether has logits or not. Default: False.
         pretrained (bool): Whether to download and load the pre-trained model. Default: False.
-        drop_out (float): The drop out rate. Default: 0.0.
+        drop_rate (float): The drop out rate. Default: 0.0.
         attention_dropout (float): The attention dropout rate. Default: 0.0.
-        drop_path_dropout (float): The stochastic depth rate. Default: 0.0.
+        drop_path_rate (float): The stochastic depth rate. Default: 0.0.
 
     Returns:
         ViT network, MindSpore.nn.Cell
@@ -684,9 +685,9 @@ def vit_b_16_224(
     config.mlp_dim = 3072
     config.num_heads = 12
     config.num_layers = 12
-    config.dropout = drop_out
-    config.attention_dropout = attention_dropout
-    config.drop_path_dropout = drop_path_dropout
+    config.dropout = drop_rate
+    config.attention_dropout = drop_rate #attention-dropout
+    config.drop_path_rate = drop_path_rate
     config.pretrained = pretrained
     config.input_channels = in_channels
     config.pool = 'cls'
@@ -703,9 +704,9 @@ def vit_b_16_384(
              in_channels: int = 3,
              image_size: int = 384,
              has_logits: bool = False,
-             drop_out: float = 0.0,
-             attention_dropout: float = 0.0,
-             drop_path_dropout: float = 0.0
+             drop_rate: float = 0.0,
+             #attention-dropout: float = 0.0,
+             drop_path_rate: float = 0.0
              ) -> ViT:
     '''construct and return a ViT network'''
     config = ConfigDict()
@@ -716,9 +717,9 @@ def vit_b_16_384(
     config.mlp_dim = 3072
     config.num_heads = 12
     config.num_layers = 12
-    config.dropout = drop_out
-    config.attention_dropout = attention_dropout
-    config.drop_path_dropout = drop_path_dropout
+    config.dropout = drop_rate
+    config.attention_dropout = drop_rate#attention-dropout
+    config.drop_path_rate = drop_path_rate
     config.pretrained = pretrained
     config.input_channels = in_channels
     config.pool = 'cls'
@@ -735,9 +736,9 @@ def vit_l_16_224(
              in_channels: int = 3,
              image_size: int = 224,
              has_logits: bool = False,
-             drop_out: float = 0.0,
-             attention_dropout: float = 0.0,
-             drop_path_dropout: float = 0.0
+             drop_rate: float = 0.0,
+             #attention-dropout: float = 0.0,
+             drop_path_rate: float = 0.0
              ) -> ViT:
     '''construct and return a ViT network'''
 
@@ -749,9 +750,9 @@ def vit_l_16_224(
     config.mlp_dim = 4096
     config.num_heads = 16
     config.num_layers = 24
-    config.dropout = drop_out
-    config.attention_dropout = attention_dropout
-    config.drop_path_dropout = drop_path_dropout
+    config.dropout = drop_rate
+    config.attention_dropout = drop_rate #attention-dropout
+    config.drop_path_rate = drop_path_rate
     config.input_channels = in_channels
     config.pool = 'cls'
     config.pretrained = pretrained
@@ -768,9 +769,9 @@ def vit_l_16_384(
              in_channels: int = 3,
              image_size: int = 384,
              has_logits: bool = False,
-             drop_out: float = 0.0,
-             attention_dropout: float = 0.0,
-             drop_path_dropout: float = 0.0
+             drop_rate: float = 0.0,
+             #attention-dropout: float = 0.0,
+             drop_path_rate: float = 0.0
              ) -> ViT:
     '''construct and return a ViT network'''
 
@@ -782,9 +783,9 @@ def vit_l_16_384(
     config.mlp_dim = 4096
     config.num_heads = 16
     config.num_layers = 24
-    config.dropout = drop_out
-    config.attention_dropout = attention_dropout
-    config.drop_path_dropout = drop_path_dropout
+    config.dropout = drop_rate
+    config.attention_dropout = drop_rate #attention-dropout
+    config.drop_path_rate = drop_path_rate
     config.input_channels = in_channels
     config.pool = 'cls'
     config.pretrained = pretrained
@@ -801,9 +802,9 @@ def vit_b_32_224(
              in_channels: int = 3,
              image_size: int = 224,
              has_logits: bool = False,
-             drop_out: float = 0.0,
-             attention_dropout: float = 0.0,
-             drop_path_dropout: float = 0.0
+             drop_rate: float = 0.0,
+             #attention-dropout: float = 0.0,
+             drop_path_rate: float = 0.0
              ) -> ViT:
     '''construct and return a ViT network'''
     config = ConfigDict()
@@ -814,9 +815,9 @@ def vit_b_32_224(
     config.mlp_dim = 3072
     config.num_heads = 12
     config.num_layers = 12
-    config.dropout = drop_out
-    config.attention_dropout = attention_dropout
-    config.drop_path_dropout = drop_path_dropout
+    config.dropout = drop_rate
+    config.attention_dropout = drop_rate #attention-dropout
+    config.drop_path_rate = drop_path_rate
     config.pretrained = pretrained
     config.input_channels = in_channels
     config.pool = 'cls'
@@ -833,9 +834,9 @@ def vit_b_32_384(
              in_channels: int = 3,
              image_size: int = 384,
              has_logits: bool = False,
-             drop_out: float = 0.0,
-             attention_dropout: float = 0.0,
-             drop_path_dropout: float = 0.0
+             drop_rate: float = 0.0,
+             #attention_dropout: float = 0.0,
+             drop_path_rate: float = 0.0
              ) -> ViT:
     '''construct and return a ViT network'''
     config = ConfigDict()
@@ -846,9 +847,9 @@ def vit_b_32_384(
     config.mlp_dim = 3072
     config.num_heads = 12
     config.num_layers = 12
-    config.dropout = drop_out
-    config.attention_dropout = attention_dropout
-    config.drop_path_dropout = drop_path_dropout
+    config.dropout = drop_rate
+    config.attention_dropout = drop_rate #attention_dropout
+    config.drop_path_rate = drop_path_rate
     config.pretrained = pretrained
     config.input_channels = in_channels
     config.pool = 'cls'
@@ -865,9 +866,9 @@ def vit_l_32_224(
              in_channels: int = 3,
              image_size: int = 224,
              has_logits: bool = False,
-             drop_out: float = 0.0,
-             attention_dropout: float = 0.0,
-             drop_path_dropout: float = 0.0
+             drop_rate: float = 0.0,
+             #attention-dropout: float = 0.0,
+             drop_path_rate: float = 0.0
              ) -> ViT:
     '''construct and return a ViT network'''
     config = ConfigDict()
@@ -878,9 +879,9 @@ def vit_l_32_224(
     config.mlp_dim = 4096
     config.num_heads = 16
     config.num_layers = 24
-    config.dropout = drop_out
-    config.attention_dropout = attention_dropout
-    config.drop_path_dropout = drop_path_dropout
+    config.dropout = drop_rate
+    config.attention_dropout = drop_rate #attention-dropout
+    config.drop_path_rate = drop_path_rate
     config.pretrained = pretrained
     config.input_channels = in_channels
     config.pool = 'cls'
