@@ -305,7 +305,7 @@ Please see [configs](./configs) for the details about model performance and pret
 
 We appreciate all contributions including issues and PRs to make MindCV better. 
 
-Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline. Please follow the [Model Template and Guideline](models/model-template.md) for contributing a model that fits the overall interface :)
+Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline. Please follow the [Model Template and Guideline](mindcv/models/model-template.md) for contributing a model that fits the overall interface :)
 
 ### License
 
