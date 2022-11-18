@@ -170,7 +170,7 @@ class StateMonitor(Callback):
                                                               save_path=ckpt_save_path)
                 if self.ckpt_save_policy == 'top_k':
                     print("Top K accuracy checkpoints:")
-                    print('\n'.join(ckpt for ckpt,_ in ckpoint_filelist))
+                    print('\n'.join(ckpt + '\t' + str(acc)  for ckpt, acc in ckpoint_filelist))
                 else:
                     print(f"Saving model to {ckpt_save_path}")
 

@@ -63,10 +63,10 @@ label_smoothing: 0.1 # Exp 1119, compared to 1118 part2
 
 # lr scheduler config
 scheduler: 'warmup_cosine_decay'
-lr: 0.0005 # # 0.000125 ~ 0.00025 for bs256x4 on imagentte # 0.0005-0.001 for imagenet on GPU.
+lr: 0.00075 # # 0.000125 ~ 0.00025 for bs256x4 on imagentte # 0.0005-0.001 for imagenet on GPU.
 min_lr: 0.00001
-warmup_epochs: 10
-decay_epochs: 290
+warmup_epochs: 38
+decay_epochs: 262
 lr_epoch_stair: True # exp 1118, compare to 1116, better.
 
 # optimizer config
