@@ -17,6 +17,7 @@ def create_scheduler(
         decay_rate: float = 0.9,
         milestones: list = None,
         num_epochs: int = 200,
+        stepwise_sched: bool=True
 ):
     r"""Creates learning rate scheduler by name.
 
@@ -33,6 +34,7 @@ def create_scheduler(
         decay_rate: LR decay rate (default: 0.9)
         milestones: list of epoch milestones for multi_step_decay scheduler. Must be increasing.
         num_epochs: number of total epochs.
+	stepwise_sched: if False, lr inside an epoch will be the same, the lr is only updated in the beginning of a new epoch. Otherwise, lr will be updated every step. (default: False)
 
     Returns:
         Cell object for computing LR with input of current global steps
@@ -46,7 +48,8 @@ def create_scheduler(
                                            max_lr=lr,
                                            warmup_epochs=warmup_epochs,
                                            decay_epochs=decay_epochs,
-                                           steps_per_epoch=steps_per_epoch
+                                           steps_per_epoch=steps_per_epoch,
+					   step_mode=stepwise_sched
                                            )
     elif scheduler == 'exponential_decay':
         decay_steps = decay_epochs * steps_per_epoch
@@ -77,7 +80,7 @@ def create_scheduler(
                                         decay_rate,
                                         milestones,
                                         steps_per_epoch,
-                                        num_epochs
+                                        num_epochs,
                                         )
 
     elif scheduler == 'constant':
