@@ -81,7 +81,7 @@ def create_parser():
     group.add_argument('--interpolation', type=str, default='bilinear',
                        help='Image interpolation mode for resize operator(default="bilinear")')
     group.add_argument('--auto_augment', type=str, default=None,
-            help='Use auto augment policy. Optional: "randaug" for RandAugment, "autoaug" for original AutoAugment, "autoaugr" for AutoAugment with increasing posterize, or None. If apply, recommend for imagenet: randaug-m7-mstd0.5 (defalt: None).'
+            help='Auto augment policy config. If "randaug",apply RandAugment, "autoaug" for original AutoAugment, "autoaugr" for AutoAugment with increasing posterize, or None. If apply, recommend for imagenet: randaug-m7-mstd0.5 (defalt: None).'
                             'Example: "randaug-m10-n2-w0-mstd0.5-mmax10-inc0", "autoaug-mstd0.5" or autoaugr-mstd0.5.')
     group.add_argument('--re_prob', type=float, default=0.,
                        help='Probability of performing erasing (default=0.)')
@@ -170,7 +170,7 @@ def create_parser():
                        help='LR decay rate if scheduler supports')
     group.add_argument('--multi_step_decay_milestones', type=list, default=[30, 60, 90],
                        help='list of epoch milestones for MultStepDecayLR, decay LR by decay_rate at the milestone epoch.')
-    group.add_argument('--lr_epoch_stair', type=str2bool, nargs='?', const=True, default=True, help='If Ture, LR will be updated in the begin of each new epoch. Otherwise, update learning rate in step. Recommend value for imagenet: True. (default=False)')
+    group.add_argument('--stepwise_lr_sched', type=str2bool, nargs='?', const=True, default=True, help='If False, LR will be updated in the begin of each new epoch. Otherwise, update learning rate in each step. (default=False)')
 
     # Loss parameters
     group = parser.add_argument_group('Loss parameters')

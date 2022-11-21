@@ -162,7 +162,7 @@ def train(args):
                                     decay_rate=args.decay_rate,
                                     milestones=args.multi_step_decay_milestones,
                                     num_epochs=args.epoch_size,
-                                    epoch_stair=args.lr_epoch_stair)
+                                    stepwise_sched=args.stepwise_lr_sched)
     
     # resume training if ckpt_path is given
     if args.ckpt_path != '' and args.resume_opt: 
