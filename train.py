@@ -183,13 +183,11 @@ def train(args):
                                  checkpoint_path=opt_ckpt_path)
 
     # Define eval metrics.
-
     if num_classes >= 5:
         eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy(),
                         'Top_5_Accuracy': nn.Top5CategoricalAccuracy()}
     else:
         eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy()}
-    eval_name = list(eval_metrics.keys())
 
     # init model
     if args.loss_scale > 1.0:
@@ -215,7 +213,8 @@ def train(args):
     state_cb = StateMonitor(model, summary_dir=summary_dir,
                             dataset_val=loader_eval,
                             val_interval=args.val_interval,
-                            metric_name=eval_name,
+                            metric_name=list(eval_metrics.keys())
+,
                             ckpt_dir=args.ckpt_save_dir,
                             ckpt_save_interval=args.ckpt_save_interval,
                             best_ckpt_name=args.model + '_best.ckpt',

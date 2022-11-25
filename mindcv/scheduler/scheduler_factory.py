@@ -14,13 +14,10 @@ def create_scheduler(
         min_lr: float = 1e-6,
         warmup_epochs: int = 3,
         decay_epochs: int = 10,
-	cooldown_epochs: int = 0,
         decay_rate: float = 0.9,
         milestones: list = None,
         num_epochs: int = 200,
-        lr_epoch_stair: bool=False,
-	cycle_mode: bool=False,
-	cycle_decay: float=1.0
+        lr_epoch_stair: bool=True
 ):
     r"""Creates learning rate scheduler by name.
 
@@ -37,27 +34,24 @@ def create_scheduler(
         decay_rate: LR decay rate (default: 0.9)
         milestones: list of epoch milestones for multi_step_decay scheduler. Must be increasing.
         num_epochs: number of total epochs.
-	lr_epoch_stair: if False, lr inside an epoch will be the same, the lr is only updated in the beginning of a new epoch. Otherwise, lr will be updated every step. (default: False)
-
+	lr_epoch_stair: If True, LR will be updated in the begin of each new epoch and the LR will be consisent for each batch in one epoch. Otherwise, learning rate will be updated dynamically in each step. (default=False)
     Returns:
         Cell object for computing LR with input of current global steps
     """
 
     if milestones is None:
         milestones = []
-    elif scheduler!='multi_step_decay':
-        print(f"WARNING: milestones is not effective for {scheduler}")
+
+    if warmup_epochs + decay_epochs > num_epochs:
+        print('====> WARNING: warmup_epochs + decay_epochs > num_epochs. Please check and reduce decay_epochs!')
 
     if scheduler == 'warmup_cosine_decay':
         lr_scheduler = WarmupCosineDecayLR(min_lr=min_lr,
                                            max_lr=lr,
                                            warmup_epochs=warmup_epochs,
                                            decay_epochs=decay_epochs,
-					   cooldown_epochs=cooldown_epochs,
                                            steps_per_epoch=steps_per_epoch,
-					   step_mode=not lr_epoch_stair,
-					   cycle_mode=cycle_mode,
-					   cycle_decay=cycle_decay
+					   step_mode=not lr_epoch_stair
                                            )
     elif scheduler == 'exponential_decay':
         decay_steps = decay_epochs * steps_per_epoch
@@ -97,3 +91,4 @@ def create_scheduler(
         raise ValueError(f'Invalid scheduler: {scheduler}')
 
     return lr_scheduler
+
