@@ -17,7 +17,7 @@ def create_scheduler(
         decay_rate: float = 0.9,
         milestones: list = None,
         num_epochs: int = 200,
-        lr_epoch_stair: bool=True
+        lr_epoch_stair: bool=False
 ):
     r"""Creates learning rate scheduler by name.
 
