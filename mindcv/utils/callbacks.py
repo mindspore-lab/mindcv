@@ -28,7 +28,7 @@ class StateMonitor(Callback):
                  ckpt_dir="./",
                  ckpt_save_interval=1,
                  best_ckpt_name="best.ckpt",
-                 metric_name="accuracy",
+                 metric_name=["accuracy"],
                  rank_id=None,
                  device_num=None,
                  log_interval=100,
@@ -64,9 +64,16 @@ class StateMonitor(Callback):
             if not os.path.isdir(ckpt_dir):
                 os.makedirs(ckpt_dir)
             self.log_txt_fp = os.path.join(ckpt_dir, 'result.log')
-
+            result_log = 'Epoch\tTrainLoss\t'
+            name_dict = {'Top_1_Accuracy': 'ValAcc@1', 'Top_5_Accuracy': 'ValAcc@5'}
+            for i in range(len(self.metric_name)):
+                if self.metric_name[i] in name_dict.keys():
+                    result_log += name_dict[self.metric_name[i]] + "\t"
+                else:
+                    result_log += self.metric_name[i] + "\t"
+            result_log += "Time\n"
             with open(self.log_txt_fp, 'w', encoding="utf-8") as fp:
-                fp.write('Epoch\tTrainLoss\tValAcc\tTime\n')
+                fp.write(result_log)
 
             self.best_ckpt_path = os.path.join(ckpt_dir, best_ckpt_name)
 
@@ -125,29 +132,35 @@ class StateMonitor(Callback):
         self.summary_record.add_value('scalar', f'train_loss_{self.rank_id}', loss)
 
         # val while training if validation loader is not None
-        val_acc_val = Tensor(-1.0)
+        res = Tensor(np.zeros(len(self.metric_name)), ms.float32)
         if self.dataset_val is not None:
             if cur_epoch >= self.val_start_epoch and (cur_epoch - self.val_start_epoch) % self.val_interval == 0:
                 val_time = time()
-                res = self.apply_eval()[self.metric_name]
+                for i in range(len(self.metric_name)):
+                    res[i] = self.apply_eval()[self.metric_name[i]] * 100
+
                 if self.device_num > 1:
-                    res = self.all_reduce(Tensor(res, ms.float32)).asnumpy()
+                    res = self.all_reduce(res)
                     res /= self.device_num
-                val_acc_val = 100 * res
                 # record val acc
                 if self.rank_id in [0, None]:
-                    print(f"Validation {self.metric_name}: {val_acc_val:.3f}, time:{time() - val_time:.6f}s")
+                    metric_str = "Validation "
+                    for i in range(len(self.metric_name)):
+                        metric_str += self.metric_name[i] + ": " + str(res[i]) + ", "
+                    metric_str += f"time:{time() -val_time:.6f}s"
+                    print(metric_str)
                     # Save the best ckpt file
-                    if val_acc_val > self.best_res:
-                        self.best_res = val_acc_val
+                    if res[0] > self.best_res:
+                        self.best_res = res[0]
                         self.best_epoch = cur_epoch
                         if self.save_best_ckpt and (self.rank_id == 0):
                             save_checkpoint(cb_params.train_network, self.best_ckpt_path, async_save=True)
-                            print(f"=> New best val acc: {val_acc_val:.3f}")
+                            print(f"=> New best val acc: {res[0].asnumpy():.3f}")
 
-                    if not isinstance(val_acc_val, Tensor):
-                        val_acc_val = Tensor(val_acc_val)
-                    self.summary_record.add_value('scalar', 'val_' + self.metric_name, val_acc_val)
+                    if not isinstance(res, Tensor):
+                        res = Tensor(res)
+                    for i in range(len(res)):
+                        self.summary_record.add_value('scalar', 'val_' + self.metric_name[i], res[i])
 
         # log
         if self.rank_id in [0, None]:
@@ -166,7 +179,7 @@ class StateMonitor(Callback):
                 ckpt_save_path = os.path.join(self.ckpt_dir, cur_ckpoint_file)
                 ckpoint_filelist = self._manager.save_ckpoint(cb_params.train_network,
                                                               num_ckpt=self.keep_checkpoint_max,
-                                                              metric=val_acc_val,
+                                                              metric=res[0],
                                                               save_path=ckpt_save_path)
                 if self.ckpt_save_policy == 'top_k':
                     print("Top K accuracy checkpoints:")
@@ -178,9 +191,12 @@ class StateMonitor(Callback):
             print(f'Total time since last epoch: {epoch_time:.3f}')
             print("-" * 80)
             self.epoch_start = time()
-
+            result_log = f'{cur_epoch}\t\t\t{loss.asnumpy():.7f}\t\t\t'
+            for i in range(len(res)):
+                result_log += f"{res[i].asnumpy():.3f}\t\t\t"
+            result_log += f"{epoch_time:.2f}\n"
             with open(self.log_txt_fp, 'a', encoding="utf-8") as fp:
-                fp.write(f'{cur_epoch}\t{loss.asnumpy():.7f}\t{val_acc_val.asnumpy():.3f}\t{epoch_time:.2f}\n')
+                fp.write(result_log)
 
         self.summary_record.record(int(global_step))
 
@@ -188,7 +204,7 @@ class StateMonitor(Callback):
     def on_train_end(self, run_context):
         if self.dataset_val is not None and self.rank_id == 0:
             print("Finish training!")
-            print(f"The best validation {self.metric_name} is: {self.best_res} at epoch {self.best_epoch}.")
+            print(f"The best validation {self.metric_name[0]} is: {self.best_res} at epoch {self.best_epoch}.")
         print("=" * 80)
 
     def _get_loss(self, cb_params):
