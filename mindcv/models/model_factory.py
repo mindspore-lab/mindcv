@@ -11,6 +11,7 @@ def create_model(
         pretrained=False,
         in_channels: int = 3,
         checkpoint_path: str = '',
+        use_ema=False,
         **kwargs):
     r"""Creates model by name.
 
@@ -35,7 +36,21 @@ def create_model(
     model = create_fn(**model_args, **kwargs)
 
     if os.path.exists(checkpoint_path):
-        param_dict = load_checkpoint(checkpoint_path)
-        load_param_into_net(model, param_dict)
+
+        checkpoint_param = load_checkpoint(checkpoint_path)
+        ema_param_dict = dict()
+        for param in checkpoint_param:
+            if param.startswith("ema"):
+                new_name = param.split("ema.")[1]
+                ema_data = checkpoint_param[param]
+                ema_data.name = new_name
+                ema_param_dict[new_name] = ema_data
+
+        if ema_param_dict and use_ema:
+            load_param_into_net(model, ema_param_dict)
+        elif bool(ema_param_dict) is False and use_ema:
+            raise ValueError('chekpoint_param does not contain ema_parameter, please set use_ema is False.')
+        else:
+            load_param_into_net(model, checkpoint_param)
 
     return model
