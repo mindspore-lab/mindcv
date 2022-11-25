@@ -291,6 +291,9 @@ Please see [configs](./configs) for the details about model performance and pret
 
 ## Notes
 ### What is New 
+- 2022/11/21
+1. Add visualization for loss and acc curves
+2. Support epochwise lr warmup cosine decay (previous is stepwise)
 - 2022/11/09
 1. Add 7 pretrained ViT models.
 2. Add RandAugment augmentation.

@@ -169,8 +169,8 @@ def create_parser():
     group.add_argument('--decay_rate', type=float, default=0.9,
                        help='LR decay rate if scheduler supports')
     group.add_argument('--multi_step_decay_milestones', type=list, default=[30, 60, 90],
-                       help='list of epoch milestones for MultStepDecayLR, decay LR by decay_rate at the milestone epoch.')
-    group.add_argument('--stepwise_lr_sched', type=str2bool, nargs='?', const=True, default=True, help='If False, LR will be updated in the begin of each new epoch. Otherwise, update learning rate in each step. (default=False)')
+                       help='list of epoch milestones for lr decay, which is ONLY effective for the multi_step_decay scheduler. LR will be decay by decay_rate at the milestone epoch.')
+    group.add_argument('--lr_epoch_stair', type=str2bool, nargs='?', const=True, default=False, help='If True, LR will be updated in the begin of each new epoch and the LR will be consisent for each batch in one epoch. Otherwise, learning rate will be updated dynamically in each step. (default=False)')
 
     # Loss parameters
     group = parser.add_argument_group('Loss parameters')
