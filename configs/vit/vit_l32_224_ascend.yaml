@@ -62,7 +62,7 @@ loss_scale: 1024.0
 label_smoothing: 0.1 # Exp 1119, compared to 1118 part2
 
 # lr scheduler config
-scheduler: 'warmup_cosine_decay'
+scheduler: 'cosine_decay'
 lr: 0.003 #  
 min_lr: 1e-6
 warmup_epochs: 32

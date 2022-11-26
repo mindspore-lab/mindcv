@@ -37,7 +37,7 @@ loss: 'CE'
 label_smoothing: 0.1
 
 # lr scheduler config
-scheduler: 'warmup_cosine_decay' # model_zoo中是polynomial
+scheduler: 'cosine_decay' # model_zoo中是polynomial
 min_lr: 0.0
 lr: 0.01
 warmup_epochs: 0
