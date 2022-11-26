@@ -146,6 +146,41 @@ def test_scheduler_dynamic():
     lrs_ms = dynamic_lr.linear_refined_lr(0.5, 1.0, 4, lr=0.05, steps_per_epoch=2, epochs=10)
     assert np.allclose(lrs_ms, lrs_manually)
 
+    # polynomial_lr
+    lrs_manually = [0.05, 0.05, 0.0375, 0.0375, 0.025, 0.025, 0.0125, 0.0125,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    lrs_ms = dynamic_lr.polynomial_lr(4, 1.0, lr=0.05, steps_per_epoch=2, epochs=10)
+    assert np.allclose(lrs_ms, lrs_manually)
+
+    # polynomial_refined_lr
+    lrs_manually = [0.05, 0.04375, 0.0375, 0.03125, 0.025, 0.01875, 0.0125, 0.00625,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    lrs_ms = dynamic_lr.polynomial_refined_lr(4, 1.0, lr=0.05, steps_per_epoch=2, epochs=10)
+    assert np.allclose(lrs_ms, lrs_manually)
+
+    # exponential_lr
+    lrs_manually = [0.05, 0.05, 0.045, 0.045, 0.0405, 0.0405,
+                    0.03645, 0.03645, 0.032805, 0.032805, 0.0295245, 0.0295245,
+                    0.02657205, 0.02657205, 0.023914845, 0.023914845,
+                    0.0215233605, 0.0215233605, 0.01937102445, 0.01937102445]
+    lrs_ms = dynamic_lr.exponential_lr(0.9, lr=0.05, steps_per_epoch=2, epochs=10)
+    assert np.allclose(lrs_ms, lrs_manually)
+
+    # exponential_refined_lr
+    lrs_manually = [0.05, 0.047434164902525694, 0.045, 0.042690748412273126, 0.0405, 0.03842167357104581,
+                    0.03645, 0.03457950621394123, 0.032805, 0.031121555592547107, 0.0295245, 0.0280094000332924,
+                    0.02657205, 0.02520846002996316, 0.023914845, 0.022687614026966844,
+                    0.0215233605, 0.02041885262427016, 0.01937102445, 0.018376967361843143]
+    lrs_ms = dynamic_lr.exponential_refined_lr(0.9, lr=0.05, steps_per_epoch=2, epochs=10)
+    assert np.allclose(lrs_ms, lrs_manually)
+
+    # step_lr
+    lrs_manually = [0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+                    0.025, 0.025, 0.025, 0.025, 0.025, 0.025,
+                    0.0125, 0.0125, 0.0125, 0.0125, 0.0125, 0.0125, 0.00625, 0.00625]
+    lrs_ms = dynamic_lr.step_lr(3, 0.5, lr=0.05, steps_per_epoch=2, epochs=10)
+    assert np.allclose(lrs_ms, lrs_manually)
+
     # multi_step_lr
     lrs_manually = [0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                     0.025, 0.025, 0.025, 0.025, 0.025, 0.025,
