@@ -155,8 +155,8 @@ def create_parser():
 
     # Scheduler parameters
     group = parser.add_argument_group('Scheduler parameters')
-    group.add_argument('--scheduler', type=str, default='warmup_cosine_decay',
-                       choices=['constant', 'warmup_cosine_decay', 'exponential_decay', 'step_decay', 'multi_step_decay'],
+    group.add_argument('--scheduler', type=str, default='cosine_decay',
+                       choices=['constant', 'cosine_decay', 'exponential_decay', 'step_decay', 'multi_step_decay'],
                        help='Type of scheduler (default="warmup_consine_decay")')
     group.add_argument('--lr', type=float, default=0.001,
                        help='learning rate (default=0.001)')
@@ -164,13 +164,16 @@ def create_parser():
                        help='The minimum value of learning rate if scheduler supports (default=None)')
     group.add_argument('--warmup_epochs', type=int, default=3,
                        help='Warmup epochs (default=None)')
+    group.add_argument('--warmup_factor', type=float, default=0.0,
+                       help='Warmup factor of learning rate (default=0.0)')
     group.add_argument('--decay_epochs', type=int, default=100,
                        help='Decay epochs (default=None)')
     group.add_argument('--decay_rate', type=float, default=0.9,
                        help='LR decay rate if scheduler supports')
     group.add_argument('--multi_step_decay_milestones', type=list, default=[30, 60, 90],
                        help='list of epoch milestones for lr decay, which is ONLY effective for the multi_step_decay scheduler. LR will be decay by decay_rate at the milestone epoch.')
-    group.add_argument('--lr_epoch_stair', type=str2bool, nargs='?', const=True, default=False, help='If True, LR will be updated in the begin of each new epoch and the LR will be consisent for each batch in one epoch. Otherwise, learning rate will be updated dynamically in each step. (default=False)')
+    group.add_argument('--lr_epoch_stair', type=str2bool, nargs='?', const=True, default=False,
+                       help='If True, LR will be updated in the begin of each new epoch and the LR will be consisent for each batch in one epoch. Otherwise, learning rate will be updated dynamically in each step. (default=False)')
 
     # Loss parameters
     group = parser.add_argument_group('Loss parameters')

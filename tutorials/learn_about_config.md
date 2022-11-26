@@ -300,7 +300,7 @@ def train(args):
 2. yaml文件样例
 
 ```text
-scheduler: 'warmup_cosine_decay'
+scheduler: 'cosine_decay'
 min_lr: 0.0
 lr: 0.01
 warmup_epochs: 0
@@ -311,7 +311,7 @@ decay_epochs: 200
 3. parse参数设置
 
 ```text
-python train.py ... --scheduler warmup_cosine_decay --min_lr 0.0 --lr 0.01 \
+python train.py ... --scheduler cosine_decay --min_lr 0.0 --lr 0.01 \
              --warmup_epochs 0 --decay_epochs 200 ...
 ```
 
@@ -325,8 +325,7 @@ def train(args):
                           lr=args.lr,
                           min_lr=args.min_lr,
                           warmup_epochs=args.warmup_epochs,
-                          decay_epochs=args.decay_epochs,
-                          decay_rate=args.decay_rate)
+                          decay_epochs=args.decay_epochs)
     ...
 ```
 
