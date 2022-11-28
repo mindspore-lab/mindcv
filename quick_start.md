@@ -161,7 +161,7 @@ from mindcv.loss import create_loss
 loss = create_loss(name='CE')
 ```
 
-使用`create_scheduler`接口设置学习率策略（warmup_consine_decay）。
+使用`create_scheduler`接口设置学习率策略。
 
 
 ```python

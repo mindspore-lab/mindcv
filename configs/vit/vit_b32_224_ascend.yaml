@@ -62,7 +62,7 @@ loss_scale: 1024.0
 label_smoothing: 0.1 
 
 # lr scheduler config
-scheduler: 'warmup_cosine_decay'
+scheduler: 'cosine_decay'
 lr: 0.003 #  diff from 4xGPU
 min_lr: 0.00001
 warmup_epochs: 38
