@@ -166,15 +166,6 @@ class ShuffleNetV2(nn.Cell):
         self.classifier = nn.Dense(self.stage_out_channels[-1], num_classes, has_bias=False)
         self._initialize_weights()
 
-    def construct(self, x):
-        x = self.first_conv(x)
-        x = self.max_pool(x)
-        x = self.features(x)
-        x = self.conv_last(x)
-        x = self.pool(x)
-        x = self.classifier(x)
-        return x
-
     def _initialize_weights(self):
         """Initialize weights for cells."""
         for name, cell in self.cells_and_names():
@@ -195,6 +186,23 @@ class ShuffleNetV2(nn.Cell):
                 if cell.bias is not None:
                     cell.bias.set_data(
                         init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+
+    def forward_features(self, x: Tensor) -> Tensor:
+        x = self.first_conv(x)
+        x = self.max_pool(x)
+        x = self.features(x)
+        return x
+
+    def forward_head(self, x: Tensor) -> Tensor:
+        x = self.conv_last(x)
+        x = self.pool(x)
+        x = self.classifier(x)
+        return x
+
+    def construct(self, x: Tensor) -> Tensor:
+        x = self.forward_features(x)
+        x = self.forward_head(x)
+        return x
 
 
 @register_model
