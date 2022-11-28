@@ -62,7 +62,7 @@ def create_scheduler(
 
     # lr decay phase
     main_epochs = num_epochs - warmup_epochs
-    if scheduler == 'cosine_decay':
+    if scheduler in ['cosine_decay', 'warmup_cosine_decay']:
         cosine_func = cosine_decay_lr if lr_epoch_stair else cosine_decay_refined_lr
         main_lr_scheduler = cosine_func(t_max=decay_epochs, eta_min=min_lr,
                                         eta_max=lr, steps_per_epoch=steps_per_epoch, epochs=main_epochs)
