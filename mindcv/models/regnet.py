@@ -1,3 +1,8 @@
+"""
+MindSpore implementation of `RegNet`.
+Refer to: Designing Network Design Spaces
+"""
+
 import math
 import numpy as np
 
@@ -401,11 +406,19 @@ class AnyNet(nn.Cell):
                 if cell.bias is not None:
                     cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
 
-    def construct(self, x):
+    def forward_features(self, x):
         x = self.stem(x)
         for module in self.stages:
             x = module(x)
+        return x
+
+    def forward_head(self, x):
         x = self.head(x)
+        return x
+
+    def construct(self, x):
+        x = self.forward_features(x)
+        x = self.forward_head(x)
         return x
 
 
@@ -452,7 +465,9 @@ def generate_regnet_full(w_a, w_0, w_m, d, stride, bot_mul, group_w):
 
 
 class RegNet(AnyNet):
-    """RegNet model."""
+    r"""RegNet model class, based on
+    `"Designing Network Design Spaces" <https://arxiv.org/abs/2003.13678>`_
+    """
 
     @staticmethod
     def regnet_get_params(w_a, w_0, w_m, d, stride, bot_mul, group_w, stem_type, stem_w, block_type, head_w,
