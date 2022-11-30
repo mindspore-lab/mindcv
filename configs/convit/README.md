@@ -26,7 +26,7 @@ ConViT combines e the strengths of convolutional architectures and Vision Transf
 |  GPU   | convit_tiny_plus  |           |           |                 |            |                |            |          |        |
 | Ascend | convit_tiny_plus  |    77.00  |  93.60    |                 |            |        247     |            |          |        |
 |  GPU   | convit_small      |           |           |                 |            |                |            |          |        |
-| Ascend | convit_small      |           |           |                 |            |                |            |          |        |
+| Ascend | convit_small      |   81.63   |    95.59  |                 |            |         490    |            |          |        |
 |  GPU   | convit_small_plus |           |           |                 |            |                |            |          |        |
 | Ascend | convit_small_plus |           |           |                 |            |                |            |          |        |
 |  GPU   | convit_base       |           |           |                 |            |                |            |          |        |
