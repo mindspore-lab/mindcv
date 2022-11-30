@@ -18,6 +18,7 @@ __all__ = [
     'mnasnet0_75',
     'mnasnet1_0',
     'mnasnet1_3',
+    'mnasnet1_4',
 ]
 
 
@@ -35,7 +36,7 @@ default_cfgs = {
     'mnasnet0.75': _cfg(url=''),
     'mnasnet1.0': _cfg(url=''),
     'mnasnet1.3': _cfg(url=''),
-
+    'mnasnet1.4': _cfg(url=''),
 }
 
 
@@ -57,16 +58,16 @@ class InvertedResidual(nn.Cell):
         self.layers = nn.SequentialCell([
             # pw
             nn.Conv2d(in_channels, hidden_dim, kernel_size=1, stride=1),
-            nn.BatchNorm2d(hidden_dim, momentum=0.9997),
+            nn.BatchNorm2d(hidden_dim, momentum=0.99, eps=1e-3),
             nn.ReLU(),
             # dw
             nn.Conv2d(hidden_dim, hidden_dim, kernel_size=kernel_size, stride=stride, pad_mode='pad',
                       padding=kernel_size // 2, group=hidden_dim),
-            nn.BatchNorm2d(hidden_dim, momentum=0.9997),
+            nn.BatchNorm2d(hidden_dim, momentum=0.99, eps=1e-3),
             nn.ReLU(),
             # pw-linear
             nn.Conv2d(hidden_dim, out_channels, kernel_size=1, stride=1),
-            nn.BatchNorm2d(out_channels, momentum=0.9997)
+            nn.BatchNorm2d(out_channels, momentum=0.99, eps=1e-3)
         ])
 
     def construct(self, x: Tensor) -> Tensor:
@@ -109,14 +110,14 @@ class Mnasnet(nn.Cell):
 
         features: List[nn.Cell] = [
             nn.Conv2d(in_channels, mid_channels, kernel_size=3, stride=2, pad_mode='pad', padding=1),
-            nn.BatchNorm2d(mid_channels, momentum=0.9997),
+            nn.BatchNorm2d(mid_channels, momentum=0.99, eps=1e-3),
             nn.ReLU(),
             nn.Conv2d(mid_channels, mid_channels, kernel_size=3, stride=1, pad_mode='pad', padding=1,
                       group=mid_channels),
-            nn.BatchNorm2d(mid_channels, momentum=0.9997),
+            nn.BatchNorm2d(mid_channels, momentum=0.99, eps=1e-3),
             nn.ReLU(),
             nn.Conv2d(mid_channels, input_channels, kernel_size=1, stride=1),
-            nn.BatchNorm2d(input_channels, momentum=0.9997)
+            nn.BatchNorm2d(input_channels, momentum=0.99, eps=1e-3)
         ]
 
         for t, c, n, s, k in inverted_residual_setting:
@@ -129,7 +130,7 @@ class Mnasnet(nn.Cell):
 
         features.extend([
             nn.Conv2d(input_channels, 1280, kernel_size=1, stride=1),
-            nn.BatchNorm2d(1280, momentum=0.9997),
+            nn.BatchNorm2d(1280, momentum=0.99, eps=1e-3),
             nn.ReLU()
         ])
         self.features = nn.SequentialCell(features)
@@ -219,6 +220,19 @@ def mnasnet1_3(pretrained: bool = False, num_classes: int = 1000, in_channels=3,
      Refer to the base class `models.Mnasnet` for more details."""
     default_cfg = default_cfgs['mnasnet1.3']
     model = Mnasnet(alpha=1.3, in_channels=in_channels, num_classes=num_classes, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
+    return model
+
+
+@register_model
+def mnasnet1_4(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
+    """Get MnasNet model with width scaled by 1.4.
+     Refer to the base class `models.Mnasnet` for more details."""
+    default_cfg = default_cfgs['mnasnet1.4']
+    model = Mnasnet(alpha=1.4, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
