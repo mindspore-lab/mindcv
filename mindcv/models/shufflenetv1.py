@@ -96,7 +96,7 @@ class ShuffleV1Block(nn.Cell):
         if self.stride == 1:
             out = self.relu(identify + x)
         else:
-            out = ops.concat((self.branch_proj(identify), self.relu(x)), axis=1)
+            out = self.relu(ops.concat((self.branch_proj(identify), x), axis=1))
 
         return out
 
