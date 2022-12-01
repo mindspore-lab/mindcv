@@ -1,7 +1,7 @@
 """models init"""
 from . import layers, convnext, densenet, dpn, efficientnet, ghostnet, googlenet, inception_v3, inception_v4, mnasnet,\
     mobilenet_v1, mobilenet_v2, mobilenet_v3, model_factory, nasnet, pnasnet, registry, regnet, repvgg, res2net, resnet,\
-    rexnet, shufflenetv1, shufflenetv2, sknet, squeezenet, swin_transformer, vgg, xception, convit, vit
+    rexnet, shufflenetv1, shufflenetv2, sknet, squeezenet, swin_transformer, vgg, xception, convit, vit, repmlp
 
 __all__ = []
 __all__.extend(layers.__all__)
@@ -35,6 +35,8 @@ __all__.extend(vgg.__all__)
 __all__.extend(xception.__all__)
 __all__.extend(convit.__all__)
 __all__.extend(vit.__all__)
+__all__.extend(repmlp.__all__)
+
 
 #fixme: since googlenet is used as both the file and function name, we need to import * after __all__ 
 
@@ -70,3 +72,4 @@ from .repvgg import *
 from .swin_transformer import *
 from .convit import *
 from .vit import *
+from .repmlp import *
