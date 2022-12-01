@@ -7,10 +7,11 @@ import numpy as np
 from collections import OrderedDict
 
 import mindspore as ms
-
 from mindspore import nn, ops, Tensor
 from mindspore.common.initializer import initializer, Uniform
+
 from .registry import register_model
+from .utils import load_pretrained
 
 
 __all__ = [
@@ -23,7 +24,26 @@ __all__ = [
     "RepMLPNet_L256"
 ]
 
+
+def _cfg(url='', **kwargs):
+    return {
+        'url': url,
+        'num_classes': 1000,
+        'first_conv': 'features.0', 'classifier': 'classifier',
+        **kwargs
+    }
+
+default_cfgs = {
+    'RepMLPNet_T224': _cfg(url=''),
+    'RepMLPNet_T256': _cfg(url=''),
+    'RepMLPNet_B224': _cfg(url=''),
+    'RepMLPNet_B256': _cfg(url=''),
+    'RepMLPNet_D256': _cfg(url=''),
+    'RepMLPNet_L256': _cfg(url=''),
+
+}
 class Convd(nn.Conv2d):
+    """Initialization of Conv2d"""
     def __init__(self, in_channels, out_channels, kernel_size=(1, 1), stride=1, pad_mode='same', padding=0, group=1, has_bias=False):
         super(Convd, self).__init__(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size,
                                      stride=stride, pad_mode="pad", padding=padding, group=group, has_bias=has_bias)
@@ -37,6 +57,7 @@ class Convd(nn.Conv2d):
 
 
 class Linear(nn.Dense):
+    """Initialization of Dense"""
     def __init__(self, in_channels, out_channels, has_bias=True):
         super(Linear, self).__init__(in_channels=in_channels, out_channels=out_channels, has_bias=has_bias)
 
@@ -82,6 +103,7 @@ def fuse_bn(conv_or_fc, bn):
 
 
 class GlobalPerceptron(nn.Cell):
+    """GlobalPerceptron Layers povides global informations(One of the three components of RepMLPBlock)"""
     def __init__(self, input_channels, internal_neurons):
         super(GlobalPerceptron, self).__init__()
         self.fc1 = Convd(in_channels=input_channels, out_channels=internal_neurons, kernel_size=(1, 1), stride=1, has_bias=True)
@@ -105,6 +127,7 @@ class GlobalPerceptron(nn.Cell):
 
 
 class RepMLPBlock(nn.Cell):
+    """Basic RepMLPBlock Layer(compose of Global Perceptron, Channel Perceptron and Local Perceptron)"""
     def __init__(self, in_channels, out_channels,
                  h, w,
                  reparam_conv_k=None,
@@ -168,23 +191,17 @@ class RepMLPBlock(nn.Cell):
         w_parts = origin_shape[3] // self.w
 
         partitions = self.partition(inputs, h_parts, w_parts)
-        # print(partitions)
-
         #   Channel Perceptron
         fc3_out = self.partition_affine(partitions, h_parts, w_parts)
-        # print(fc3_out)
 
         #   Local Perceptron
         if self.reparam_conv_k is not None and not self.deploy:
             conv_inputs = self.reshape(partitions, (-1, self.S, self.h, self.w))
             conv_out = 0
-            # print(y)
             for k in self.conv_branch_k:
                 conv_out += k(conv_inputs)
-                # print(conv_out)
             conv_out = self.reshape(conv_out, (-1, h_parts, w_parts, self.S, self.h, self.w))
             fc3_out += conv_out
-        # print(fc3_out)
 
         input_perm = (0, 3, 1, 4, 2, 5)
         fc3_out = self.transpose(fc3_out, input_perm) # N, O, h_parts, out_h, w_parts, out_w
@@ -192,51 +209,9 @@ class RepMLPBlock(nn.Cell):
         out = out * global_vec
         return out
 
-    def get_equivalent_fc3(self):
-        fc_weight, fc_bias = fuse_bn(self.fc3, self.fc3_bn)
-        if self.reparam_conv_k is not None:
-            largest_k = max(self.reparam_conv_k)
-            largest_branch = self.__getattr__('repconv{}'.format(largest_k))
-            total_kernel, total_bias = fuse_bn(largest_branch.conv, largest_branch.bn)
-            for k in self.reparam_conv_k:
-                if k != largest_k:
-                    k_branch = self.__getattr__('repconv{}'.format(k))
-                    kernel, bias = fuse_bn(k_branch.conv, k_branch.bn)
-                    total_kernel += nn.Pad(kernel, [(largest_k - k) // 2] * 4)
-                    total_bias += bias
-            rep_weight, rep_bias = self._convert_conv_to_fc(total_kernel, total_bias)
-            final_fc3_weight = rep_weight.reshape_as(fc_weight) + fc_weight
-            final_fc3_bias = rep_bias + fc_bias
-        else:
-            final_fc3_weight = fc_weight
-            final_fc3_bias = fc_bias
-        return final_fc3_weight, final_fc3_bias
-
-    def local_inject(self):
-        self.deploy = True
-        #   Locality Injection
-        fc3_weight, fc3_bias = self.get_equivalent_fc3()
-        #   Remove Local Perceptron
-        if self.reparam_conv_k is not None:
-            for k in self.reparam_conv_k:
-                self.__delattr__('repconv{}'.format(k))
-        self.__delattr__('fc3')
-        self.__delattr__('fc3_bn')
-        self.fc3 = Convd(self.S * self.h * self.w, self.S * self.h * self.w, 1, 1, 0, has_bias=True, group=self.S)
-        self.fc3_bn = ops.Identity()
-        self.fc3.weight.data = fc3_weight
-        self.fc3.bias.data = fc3_bias
-
-    def _convert_conv_to_fc(self, conv_kernel, conv_bias):
-        I = ops.eye(self.h * self.w).repeat(1, self.S).reshape(self.h * self.w, self.S, self.h, self.w).to(
-            conv_kernel.device)
-        fc_k = ops.Conv2D(I, conv_kernel, pad=(conv_kernel.size(2) // 2, conv_kernel.size(3) // 2), group=self.S)
-        fc_k = fc_k.reshape(self.h * self.w, self.S * self.h * self.w).t()
-        fc_bias = conv_bias.repeat_interleave(self.h * self.w)
-        return fc_k, fc_bias
-
 
 class FFNBlock(nn.Cell):
+    """Common FFN layer"""
     def __init__(self, in_channels, hidden_channels=None, out_channels=None, act_layer=nn.GELU):
         super().__init__()
         out_features = out_channels or in_channels
@@ -253,6 +228,7 @@ class FFNBlock(nn.Cell):
 
 
 class RepMLPNetUnit(nn.Cell):
+    """Basic unit of RepMLPNet"""
     def __init__(self, channels, h, w, reparam_conv_k, globalperceptron_reduce, ffn_expand=4,
                  num_sharesets=1, deploy=False):
         super().__init__()
@@ -271,6 +247,24 @@ class RepMLPNetUnit(nn.Cell):
 
 
 class RepMLPNet(nn.Cell):
+    r"""RepMLPNet model class, based on
+    `"RepMLPNet: Hierarchical Vision MLP with Re-parameterized Locality" <https://arxiv.org/pdf/2112.11081v2.pdf>`_
+
+    Args:
+        in_channels: number of input channels. Default: 3.
+        num_classes: number of classification classes. Default: 1000.
+        patch_size: size of a single image patch. Default: (4, 4)
+        num_blocks: number of blocks per stage. Default: (2,2,6,2)
+        channels: number of in_channels(channels[stage_idx]) and out_channels(channels[stage_idx + 1]) per stage. Default: (192,384,768,1536)
+        hs: height of picture per stage. Default: (64,32,16,8)
+        ws: width of picture per stage. Default: (64,32,16,8)
+        sharesets_nums: number of share sets per stage. Default: (4,8,16,32)
+        reparam_conv_k: convolution kernel size in local Perceptron. Default: (3,)
+        globalperceptron_reduce: Intermediate convolution output size(in_channal = inchannal, out_channel = in_channel/globalperceptron_reduce) 
+            in globalperceptron. Default: 4
+        use_checkpoint: whether to use checkpoint
+        deploy: whether to use bias
+    """
     def __init__(self,
                  in_channels=3, num_class=1000,
                  patch_size=(4, 4),
@@ -330,67 +324,82 @@ class RepMLPNet(nn.Cell):
         return x
 
 
-
-
-def locality_injection(self):
-    for m in self.modules():
-        if hasattr(m, 'local_inject'):
-            m.local_inject()
-
-
 @register_model
 def RepMLPNet_T224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
+    """Get RepMLPNet_T224 model.
+     Refer to the base class `models.RepMLPNet` for more details."""
+    default_cfg = default_cfgs['RepMLPNet_T224']
     model = RepMLPNet(in_channels=in_channels, num_class=num_classes, channels=(64, 128, 256, 512), hs=(56,28,14,7), ws=(56,28,14,7),
                       num_blocks=(2,2,6,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,16,128),
                      deploy=deploy)
+    
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
     return model
     
 @register_model
 def RepMLPNet_T256(pretrained: bool = False, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
+    """Get RepMLPNet_T256 model.
+     Refer to the base class `models.RepMLPNet` for more details."""
+    default_cfg = default_cfgs['RepMLPNet_T256']
     model = RepMLPNet(in_channels=in_channels, num_class=num_classes, channels=(64, 128, 256, 512), hs=(64,32,16,8), ws=(64,32,16,8),
                       num_blocks=(2,2,6,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,16,128),
                      deploy=deploy)
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
     return model
 
 @register_model
 def RepMLPNet_B224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
+    """Get RepMLPNet_B224 model.
+     Refer to the base class `models.RepMLPNet` for more details."""
+    default_cfg = default_cfgs['RepMLPNet_B224']
     model = RepMLPNet(in_channels=in_channels, num_class=num_classes, channels=(96, 192, 384, 768), hs=(56,28,14,7), ws=(56,28,14,7),
                       num_blocks=(2,2,12,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,32,128),
                      deploy=deploy)
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
 
 @register_model
 def RepMLPNet_B256(pretrained: bool = False, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
+    """Get RepMLPNet_B256 model.
+     Refer to the base class `models.RepMLPNet` for more details."""
+    default_cfg = default_cfgs['RepMLPNet_B256']
     model = RepMLPNet(in_channels=in_channels, num_class=num_classes, channels=(96, 192, 384, 768), hs=(64,32,16,8), ws=(64,32,16,8),
                       num_blocks=(2,2,12,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,32,128),
                      deploy=deploy)
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
 
 @register_model
 def RepMLPNet_D256(pretrained: bool = False, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
+    """Get RepMLPNet_D256 model.
+     Refer to the base class `models.RepMLPNet` for more details."""
+    default_cfg = default_cfgs['RepMLPNet_D256']
     model = RepMLPNet(in_channels=in_channels, num_class=num_classes, channels=(80, 160, 320, 640), hs=(64,32,16,8), ws=(64,32,16,8),
                       num_blocks=(2,2,18,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,16,128),
                      deploy=deploy)
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
 
 @register_model
 def RepMLPNet_L256(pretrained: bool = False, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
+    """Get RepMLPNet_L256 model.
+     Refer to the base class `models.RepMLPNet` for more details."""
+    default_cfg = default_cfgs['RepMLPNet_L256']
     model = RepMLPNet(in_channels=in_channels, num_class=num_classes, channels=(96, 192, 384, 768), hs=(64,32,16,8), ws=(64,32,16,8),
                       num_blocks=(2,2,18,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,32,256),
                      deploy=deploy)
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
 
-model_map = {
-    'RepMLPNet-T256': RepMLPNet_T256,
-    'RepMLPNet-T224': RepMLPNet_T224,
-    'RepMLPNet-B224': RepMLPNet_B224,
-    'RepMLPNet-B256': RepMLPNet_B256,
-    'RepMLPNet-D256': RepMLPNet_D256,
-    'RepMLPNet-L256': RepMLPNet_L256,
-}
-
-
-
+#   Verify the equivalency
 if __name__ == '__main__':
     # x = Tensor(np.ones([1, 3, 3, 3]).astype(np.float32))
     x = Tensor(np.ones([1, 3, 256, 256]).astype(np.float32))
