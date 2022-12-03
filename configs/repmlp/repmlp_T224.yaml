@@ -44,7 +44,6 @@ cutmix: 1.0
 cutmix_prob: 1.0
 auto_augment: 'randaug-m9-mstd0.5-inc1'
 re_prob: 0.25
-preset: 'raug15'
 
 
 # model config
@@ -57,8 +56,7 @@ keep_checkpoint_max: 10
 ckpt_save_dir: './'
 epoch_size: 300
 dataset_sink_mode: True
-amp_level: 'O3'
-
+amp_level: 'O2'
 
 # loss config
 loss: 'ce'
@@ -67,7 +65,7 @@ aux_factor: 0.0
 
 # lr scheduler config
 scheduler: 'warmup_cosine_decay'
-lr: 0.004
+lr: 0.005
 warmup_epochs: 10
 min_lr: 1e-5
 decay_epochs: 290
