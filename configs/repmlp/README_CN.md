@@ -16,7 +16,7 @@
 
 | Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
 |-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
-| repmlp_t224 | D910x8 | 76.46     |      | 38.3M       | 1011s/epoch | 15.8ms/step | [model]() | [cfg]() | [log]() |
+| repmlp_t224 | D910x8 | 76.649     |      | 38.3M       | 1011s/epoch | 15.8ms/step | [model]() | [cfg]() | [log]() |
 
 
 #### 备注
