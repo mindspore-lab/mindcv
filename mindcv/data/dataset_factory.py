@@ -5,10 +5,11 @@ Create dataset by name
 from typing import Optional
 import os
 
-from mindspore.dataset import MnistDataset, Cifar10Dataset, Cifar100Dataset, ImageFolderDataset
+from mindspore.dataset import MnistDataset, Cifar10Dataset, Cifar100Dataset, ImageFolderDataset, DistributedSampler
 import mindspore.dataset as ds
 
 from .dataset_download import MnistDownload, Cifar10Download, Cifar100Download
+from .distributed_sampler import RepAugDistributedSampler
 
 __all__ = ["create_dataset"]
 
@@ -72,21 +73,18 @@ def create_dataset(
     Returns:
         Dataset object
     """
+    name = name.lower()
 
-    if num_samples is None:
-        sampler = None
-    elif num_samples > 0:
-        if shuffle:
-            sampler = ds.RandomSampler(replacement=False, num_samples=num_samples)
-        else:
-            sampler = ds.SequentialSampler(num_samples=num_samples)
+    if num_samples is not None and num_samples > 0:
+        sampler = DistributedSampler(num_shards, shard_id, shuffle=shuffle, num_samples=num_samples)
         shuffle = None  # shuffle and sampler cannot be set at the same in mindspore datatset API
+        mindspore_kwargs = dict(shuffle=shuffle, sampler=sampler,
+                            num_parallel_workers=num_parallel_workers, **kwargs)
     else:
         sampler = None
-
-    name = name.lower()
-    mindspore_kwargs = dict(shuffle=shuffle, sampler=sampler, num_shards=num_shards, shard_id=shard_id,
+        mindspore_kwargs = dict(shuffle=shuffle, sampler=sampler, num_shards=num_shards, shard_id=shard_id,
                             num_parallel_workers=num_parallel_workers, **kwargs)
+
     if name in _MINDSPORE_BASIC_DATASET:
         dataset_class = _MINDSPORE_BASIC_DATASET[name][0]
         dataset_download = _MINDSPORE_BASIC_DATASET[name][1]
