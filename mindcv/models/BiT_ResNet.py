@@ -1,6 +1,6 @@
 """
-MindSpore implementation of `ResNet`.
-Refer to Deep Residual Learning for Image Recognition.
+MindSpore implementation of `BiT_ResNet`.
+Refer to Big Transfer (BiT): General Visual Representation Learning.
 """
 
 from typing import Optional, Type, List, Union
@@ -15,7 +15,7 @@ from .utils import load_pretrained
 from .registry import register_model
 
 __all__ = [
-    'ResNet',
+    'BiT_ResNet',
     'BiTresnet50',
 ]
 
@@ -30,7 +30,17 @@ def _cfg(url='', **kwargs):
 
 
 class StdConv2d(nn.Conv2d):
+    r"""Conv2d with Weight Standardization
 
+          Args:
+              in_channels: The channel number of the input tensor of the Conv2d layer.
+              out_channels: The channel number of the output tensor of the Conv2d layer.
+              kernel_size: Specifies the height and width of the 2D convolution kernel.
+              stride: The movement stride of the 2D convolution kernel. Default: 1.
+              pad_mode: Specifies padding mode. The optional values are "same", "valid", "pad". Default: "same".
+              padding: The number of padding on the height and width directions of the input. Default: 0.
+              group: Splits filter into groups. Default: 1.
+          """
     def construct(self, x):
         w = self.weight
         mean_op = ops.ReduceMean(keep_dims=True)
@@ -41,10 +51,7 @@ class StdConv2d(nn.Conv2d):
         return output
 
 class Bottleneck(nn.Cell):
-    """
-    Bottleneck here places the stride for downsampling at 3x3 convolution(self.conv2) as torchvision does,
-    while original implementation places the stride at the first 1x1 convolution(self.conv1)
-    """
+    """define the basic block of BiT"""
     expansion: int = 4
 
     def __init__(self,
@@ -100,13 +107,14 @@ class Bottleneck(nn.Cell):
         return out
 
 
-class ResNet(nn.Cell):
-    r"""ResNet model class, based on
-    `"Deep Residual Learning for Image Recognition" <https://arxiv.org/abs/1512.03385>`_
+class BiT_ResNet(nn.Cell):
+    r"""BiT_ResNet model class, based on
+    `"Big Transfer (BiT): General Visual Representation Learning" <https://arxiv.org/abs/1912.11370>`_
 
     Args:
-        block: block of resnet.
+        block: block of BiT_ResNetv2.
         layers: number of layers of each stage.
+        width: width of each layer.
         num_classes: number of classification classes. Default: 1000.
         in_channels: number the channels of the input. Default: 3.
         groups: number of groups for group conv in blocks. Default: 1.
@@ -134,19 +142,16 @@ class ResNet(nn.Cell):
         self.groups = groups
         self.base_with = base_width
 
-        #root
         self.conv1 = StdConv2d(in_channels, self.input_channels, kernel_size=7,
                                stride=2, pad_mode='pad', padding=3)
         self.pad = nn.ConstantPad2d(1,0)
         self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='valid')
 
-        #body
         self.layer1 = self._make_layer(block, 64*wf, layers[0])
         self.layer2 = self._make_layer(block, 128*wf, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256*wf, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512*wf, layers[3], stride=2)
 
-        #head
         self.gn = norm(32,2048*wf)
         self.relu = nn.ReLU()
         self.pool = GlobalAvgPooling(keep_dims=True)
@@ -223,13 +228,9 @@ class ResNet(nn.Cell):
 @register_model
 def BiTresnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 50 layers ResNet model.
-     Refer to the base class `models.ResNet` for more details.
+     Refer to the base class `models.BiT_Resnet` for more details.
      """
-    default_cfg = default_cfgs['resnet50']
-    model = ResNet(Bottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    model = BiT_ResNet(Bottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     return model
 
