@@ -287,6 +287,9 @@ Please see [configs](./configs) for the details about model performance and pret
 	* Label Smoothing
 	* Stochastic Depth (depends on networks)
 	* Dropout (depends on networks)
+* Loss
+	* Cross Entropy (w/ class weight and auxilary logit support)
+	* Binary Cross Entropy  (w/ class weight and auxilary logit support)
 </details>
 
 ## Notes
