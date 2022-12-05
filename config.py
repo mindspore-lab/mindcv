@@ -152,6 +152,8 @@ def create_parser():
                        help='Enables the Nesterov momentum (default=False)')
     group.add_argument('--filter_bias_and_bn', type=str2bool, nargs='?', const=True, default=True,
                        help='Filter Bias and BatchNorm (default=True)')
+    group.add_argument('--eps', type=float, default=1e-10,
+                       help='Term Added to the Denominator to Improve Numerical Stability (default=1e-10)')
 
     # Scheduler parameters
     group = parser.add_argument_group('Scheduler parameters')
