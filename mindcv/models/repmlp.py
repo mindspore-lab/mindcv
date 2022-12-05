@@ -33,11 +33,11 @@ def _cfg(url='', **kwargs):
 
 default_cfgs = {
     'RepMLPNet_T224': _cfg(url=''),
-    'RepMLPNet_T256': _cfg(url='',input_size=(1, 3, 256, 256)),
+    'RepMLPNet_T256': _cfg(url='',input_size=(3, 256, 256)),
     'RepMLPNet_B224': _cfg(url=''),
-    'RepMLPNet_B256': _cfg(url='',input_size=(1, 3, 256, 256)),
-    'RepMLPNet_D256': _cfg(url='',input_size=(1, 3, 256, 256)),
-    'RepMLPNet_L256': _cfg(url='',input_size=(1, 3, 256, 256)),
+    'RepMLPNet_B256': _cfg(url='',input_size=(3, 256, 256)),
+    'RepMLPNet_D256': _cfg(url='',input_size=(3, 256, 256)),
+    'RepMLPNet_L256': _cfg(url='',input_size=(3, 256, 256)),
 }
 
 def conv_bn(in_channels, out_channels, kernel_size, stride, padding, group=1, momentum=0.9, has_bias=False):
