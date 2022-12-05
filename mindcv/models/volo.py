@@ -196,7 +196,6 @@ class OutlookAttention(nn.Cell):
     --kernel_size: kernel size in each window for outlook attention
     return: token features after outlook attention
     """
-
     def __init__(self, dim, num_heads, kernel_size=3, padding=1, stride=1,
                  qkv_bias=False, qk_scale=None, attn_drop=0., proj_drop=0.):
         super().__init__()
@@ -221,6 +220,7 @@ class OutlookAttention(nn.Cell):
         self.reshape = ops.Reshape()
         self.transpose = ops.Transpose()
         self.batch_mat_mul = ops.BatchMatMul()
+
 
     def construct(self, x):
         B, H, W, C = x.shape
@@ -287,6 +287,11 @@ class Outlooker(nn.Cell):
                  qk_scale=None):
         super().__init__()
         self.norm1 = norm_layer([dim])
+        print(dim, num_heads, kernel_size, padding,stride,
+                                     qkv_bias, qk_scale,
+                                     attn_drop)
+
+
         self.attn = OutlookAttention(dim, num_heads, kernel_size=kernel_size,
                                      padding=padding, stride=stride,
                                      qkv_bias=qkv_bias, qk_scale=qk_scale,
@@ -304,7 +309,8 @@ class Outlooker(nn.Cell):
 
     def construct(self, x):
         # print("\nxx",x.shape)
-        # print("\nnorm", self.norm1(x).shape)
+        print("\nnorm", self.norm1(x).shape)
+        #print("\nnorm output: ", self.norm1(x))
         # print("\nattn", self.attn(self.norm1(x)).shape)
         x = x + self.drop_path(self.attn(self.norm1(x)))
         x = x + self.drop_path(self.mlp(self.norm2(x)))
@@ -945,3 +951,14 @@ def volo_d5(pretrained=False, **kwargs):
                  **kwargs)
     model.default_cfg = default_cfgs['volo_large']
     return model
+
+if __name__ == '__main__':
+    dummy_input = ms.Tensor(np.random.rand(2, 28, 28, 192), dtype=ms.float32)
+    attn = OutlookAttention(192, 6, kernel_size=3,
+                                     padding=1, stride=2,
+                                     qkv_bias=False, qk_scale=None,
+                                     attn_drop=0.0)
+    output = attn(dummy_input)
+    print(output.shape)
+
+    
