@@ -287,10 +287,16 @@ Please see [configs](./configs) for the details about model performance and pret
 	* Label Smoothing
 	* Stochastic Depth (depends on networks)
 	* Dropout (depends on networks)
+* Loss
+	* Cross Entropy (w/ class weight and auxilary logit support)
+	* Binary Cross Entropy  (w/ class weight and auxilary logit support)
 </details>
 
 ## Notes
 ### What is New 
+- 2022/12/05
+1. Support lr warmup for all lr scheduling algorithms besides cosine decay.
+
 - 2022/11/21
 1. Add visualization for loss and acc curves
 2. Support epochwise lr warmup cosine decay (previous is stepwise)

@@ -1,7 +1,7 @@
 """models init"""
 from . import layers, convnext, densenet, dpn, efficientnet, ghostnet, googlenet, inception_v3, inception_v4, mnasnet,\
-    mobilenet_v1, mobilenet_v2, mobilenet_v3, model_factory, nasnet, pnasnet, registry, repvgg, res2net, resnet,\
-    rexnet, shufflenetv1, shufflenetv2, sknet, squeezenet, swin_transformer, vgg, xception, convit, vit, volo
+    mobilenet_v1, mobilenet_v2, mobilenet_v3, model_factory, nasnet, pnasnet, registry, regnet, repvgg, res2net, resnet,\
+    rexnet, shufflenetv1, shufflenetv2, sknet, squeezenet, swin_transformer, vgg, xception, convit, vit
 
 __all__ = []
 __all__.extend(layers.__all__)
@@ -21,6 +21,7 @@ __all__.extend(model_factory.__all__)
 __all__.extend(nasnet.__all__)
 __all__.extend(pnasnet.__all__)
 __all__.extend(registry.__all__)
+__all__.extend(regnet.__all__)
 __all__.extend(repvgg.__all__)
 __all__.extend(res2net.__all__)
 __all__.extend(resnet.__all__)
@@ -47,6 +48,7 @@ from .mobilenet_v3 import *
 from .xception import *
 from .model_factory import *
 from .registry import *
+from .regnet import *
 from .resnet import *
 from .rexnet import *
 from .shufflenetv1 import *

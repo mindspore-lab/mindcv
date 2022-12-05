@@ -37,6 +37,7 @@ def create_optimizer(
         loss_scale: float = 1.0,
         schedule_decay: float = 4e-3,
         checkpoint_path: str = '',
+        eps: float = 1e-10,
         **kwargs):
     r"""Creates optimizer by name.
 
@@ -118,6 +119,7 @@ def create_optimizer(
                                momentum=momentum,
                                weight_decay=weight_decay,
                                loss_scale=loss_scale,
+                               epsilon=eps,
                                **opt_args
                                )
     elif opt == 'adagrad':
