@@ -63,8 +63,3 @@ momentum: 0.9
 weight_decay: 0.00003  # 改变
 loss_scale: 1024  # 改变
 use_nesterov: False
-
-
-
-
-
