@@ -40,28 +40,16 @@ mobilenet-v3提供了两个版本，分别为mobilenet-v3 large 以及mobilenet-
 > [configs文件夹](../../configs)中列出了mindcv套件所包含的模型的各个规格的yaml配置文件(在ImageNet数据集上训练和验证的配置)。
 
   ```shell
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
-pirun -n 8 python train.py -c configs/mobilenetv3/mobienet_v3_large.yaml --data_dir /path/to/imagenet
-  ```
-
-- 下面是使用在ImageNet上预训练的mobilenet_v3_large_100模型和Momentum优化器在CIFAR10数据集上进行微调的示例。	
-
-  ```shell
-  python train.py --model=mobilenet_v3_large_100 --pretrained --opt=momentum --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
+cd mindcv/scripts
+bash run_distribute_train_ascend.sh ./hccl_8p_01234567_123.60.231.9.json /tmp/dataset/imagenet ../configs/mobilenetv3/v3_large_Ascend.yaml
   ```
 
 详细的可调参数及其默认值可以在[config.py](../../config.py)中查看。
 
 ### 验证
 
-- 下面是使用`validate.py`文件验证densenet121的预训练模型的精度的示例。
-
-  ```shell
-  python validate.py --model=mobilenet_v3_large_100 --dataset=imagenet --val_split=val --pretrained
-  ```
-
 - 下面是使用`validate.py`文件验证densenet121的自定义参数文件的精度的示例。
 
   ```shell
-  python validate.py --model=mobilenet_v3_large_100 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/mobilenet_v3_large_100-best.ckpt'
+  python validate.py -c ../configs/mobilenetv3/v3_large_Ascend.yaml
   ```

@@ -38,33 +38,21 @@ Please download the [ImageNet-1K](https://www.image-net.org/download.php) datase
 - **Hyper-parameters.** The hyper-parameter configurations for producing the reported results are stored in the yaml files in `mindcv/configs/mobilenetv3` folder. For example, to train with one of these configurations, you can run:
 
   ```shell
-  # train mobilenetv3_large_100 on 8 GPUs
-  export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
-  pirun -n 8 python train.py -c configs/mobilenetv3/mobienet_v3_large.yaml --data_dir /path/to/imagenet
+  # train mobilenetv3_large_100 on Ascend
+  cd mindcv/scripts
+  bash run_distribute_train_ascend.sh ./hccl_8p_01234567_123.60.231.9.json /tmp/dataset/imagenet ../configs/mobilenetv3/v3_large_Ascend.yaml
   ```
 
   Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascneds** with the same batch size.
-
-- **Finetuning.** Here is an example for finetuning a pretrained mobilenetv3_large_100 on CIFAR10 dataset using Momentum optimizer.
-
-  ```shell
-  python train.py --model=mobilenetv3_large_100 --pretrained --opt=momentum --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
-  ```
 
 Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
 
 ### Validation
 
-- To validate the trained model, you can use `validate.py`. Here is an example for mobilenetv3_large_100 to verify the accuracy of pretrained weights.
-
-  ```shell
-  python validate.py --model=mobilenetv3_large_100 --dataset=imagenet --val_split=val --pretrained
-  ```
-
 - To validate the model, you can use `validate.py`. Here is an example for mobilenetv3_large_100 to verify the accuracy of your training.
 
   ```shell
-  python validate.py --model=mobilenetv3_large_100 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/mobilenetv3_large_100-best.ckpt'
+  python validate.py -c ../configs/mobilenetv3/v3_large_Ascend.yaml
   ```
 
 ### Deployment (optional)
