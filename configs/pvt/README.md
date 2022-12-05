@@ -12,7 +12,7 @@ PVT is a general backbone network for dense prediction without convolution opera
 ***
 
 | Model           |  Top-1 (%)  | Train T. | Infer T. |  Download | Config | Log |  
-|-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
+|-----------------|-------------|----------|----------|------------|-------|--------|
 | PVT_tiny     |74.92 |  433s/epoch  | 16ms/step | [model]() | [cfg]()    | [log]() |
 | PVT_small     | 79.66  |538s/epoch |30ms/step | [model]() | [cfg]()    | [log]() |
 | PVT_medium    |81.82  |766s/epoch |47ms/step | [model]() | [cfg]()    | [log]() |
