@@ -9,7 +9,6 @@ from mindspore.dataset import MnistDataset, Cifar10Dataset, Cifar100Dataset, Ima
 import mindspore.dataset as ds
 
 from .dataset_download import MnistDownload, Cifar10Download, Cifar100Download
-from .distributed_sampler import RepAugDistributedSampler
 
 __all__ = ["create_dataset"]
 
