@@ -6,11 +6,10 @@ from typing import Optional
 import os
 
 from mindspore.dataset import MnistDataset, Cifar10Dataset, Cifar100Dataset, ImageFolderDataset, DistributedSampler
+import mindspore.dataset as ds
 
 from .dataset_download import MnistDownload, Cifar10Download, Cifar100Download
 from .distributed_sampler import RepeatAugSampler
-
-#import mindspore.dataset as ds
 #from .dataset_reader import ImageNetDataset
 
 __all__ = ["create_dataset"]
@@ -84,12 +83,16 @@ def create_dataset(
     name = name.lower()
     # subset sampling
     if num_samples is not None and num_samples > 0:
-        num_shards = 1 if num_shards is None else num_shards
-        shard_id = 0 if shard_id is None else shard_id
-        sampler = DistributedSampler(num_shards, shard_id, shuffle=shuffle, num_samples=num_samples)
-
-        shuffle = None  # shuffle and sampler cannot be set at the same in mindspore datatset API
-        mindspore_kwargs = dict(shuffle=shuffle, sampler=sampler,
+        # TODO: rewrite ordered distributed sampler
+        if num_shards is not None and num_shards > 1: # distributed
+            print('ns', num_shards, 'num_samples', num_samples)
+            sampler = DistributedSampler(num_shards, shard_id, shuffle=shuffle, num_samples=num_samples)
+        else: # standalone
+            if shuffle:
+                sampler = ds.RandomSampler(replacement=False, num_samples=num_samples)
+            else:
+                sampler = ds.SequentialSampler(num_samples=num_samples)
+        mindspore_kwargs = dict(shuffle=None, sampler=sampler,
                             num_parallel_workers=num_parallel_workers, **kwargs)
     else:
         sampler = None
