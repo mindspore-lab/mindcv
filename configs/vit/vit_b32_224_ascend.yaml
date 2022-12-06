@@ -22,7 +22,7 @@ val_interval: 1
 
 # dataset config
 dataset: "imagenet"
-data_dir: "/data0/imagenet2012"
+data_dir: "/data/imagenet"
 shuffle: True
 dataset_download: False
 batch_size: 256
@@ -48,7 +48,7 @@ drop_rate: 0.1 # 1119 add
 drop_path_rate: 0.1 # 1119 add
 num_classes: 1000
 pretrained: False
-ckpt_path: "/home/mindspore/xmx/vit/vit_b_32_224_best.ckpt"
+ckpt_path: ""
 keep_checkpoint_max: 10
 ckpt_save_policy: "top_k"
 ckpt_save_dir: "./vit_b32_224"
@@ -66,7 +66,7 @@ scheduler: "warmup_cosine_decay"
 lr: 0.003 #  diff from 4xGPU
 min_lr: 1e-6
 warmup_epochs: 32
-decay_epochs: 562
+decay_epochs: 568
 lr_epoch_stair: False
 
 # optimizer config
