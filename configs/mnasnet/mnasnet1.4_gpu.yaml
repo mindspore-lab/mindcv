@@ -1,0 +1,51 @@
+# system config
+mode: 0
+distribute: True
+num_parallel_workers: 8
+
+# dataset config
+dataset: 'imagenet'
+data_dir: ''
+shuffle: True
+dataset_download: False
+batch_size: 64
+drop_remainder: True
+
+# Augmentation config
+image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+interpolation: 'bilinear'
+crop_pct: 0.875
+
+# model config
+model: 'mnasnet1_4'
+num_classes: 1000
+pretrained: False
+ckpt_path: ''
+keep_checkpoint_max: 10
+ckpt_save_dir: './mnasnet1.4_ckpt'
+epoch_size: 400
+dataset_sink_mode: True
+amp_level: 'O0'
+
+# loss config
+loss: 'CE'
+label_smoothing: 0.1
+
+# lr scheduler config
+scheduler: 'cosine_decay'
+min_lr: 1e-10
+lr: 0.008
+warmup_epochs: 5
+decay_epochs: 395
+
+# optimizer config
+opt: 'rmsprop'
+filter_bias_and_bn: True
+momentum: 0.9
+weight_decay: 1e-5
+loss_scale: 256
+use_nesterov: False
+eps: 1e-3

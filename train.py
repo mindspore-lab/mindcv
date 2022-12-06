@@ -182,7 +182,8 @@ def train(args):
                                  nesterov=args.use_nesterov,
                                  filter_bias_and_bn=args.filter_bias_and_bn,
                                  loss_scale=args.loss_scale,
-                                 checkpoint_path=opt_ckpt_path)
+                                 checkpoint_path=opt_ckpt_path,
+                                 eps=args.eps)
 
     # Define eval metrics.
     if num_classes >= 5:

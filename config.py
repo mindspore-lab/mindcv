@@ -154,6 +154,8 @@ def create_parser():
                        help='Enables the Nesterov momentum (default=False)')
     group.add_argument('--filter_bias_and_bn', type=str2bool, nargs='?', const=True, default=True,
                        help='Filter Bias and BatchNorm (default=True)')
+    group.add_argument('--eps', type=float, default=1e-10,
+                       help='Term Added to the Denominator to Improve Numerical Stability (default=1e-10)')
 
     # Scheduler parameters
     group = parser.add_argument_group('Scheduler parameters')
@@ -175,7 +177,7 @@ def create_parser():
     group.add_argument('--multi_step_decay_milestones', type=list, default=[30, 60, 90],
                        help='list of epoch milestones for lr decay, which is ONLY effective for the multi_step_decay scheduler. LR will be decay by decay_rate at the milestone epoch.')
     group.add_argument('--lr_epoch_stair', type=str2bool, nargs='?', const=True, default=False,
-                       help='If True, LR will be updated in the first step of an epoch and LRs are the same in the remaining steps in the epoch. Otherwise, learning rate is updated every  step dynamically. (default=False)')
+                       help='If True, LR will be updated in the first step of each epoch and LRs are the same in the remaining steps in the epoch. Otherwise, learning rate is updated every  step dynamically. (default=False)')
 
     # Loss parameters
     group = parser.add_argument_group('Loss parameters')
