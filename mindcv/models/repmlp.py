@@ -282,7 +282,7 @@ class RepMLPNet(nn.Cell):
         ws: width of picture per stage. Default: (64,32,16,8)
         sharesets_nums: number of share sets per stage. Default: (4,8,16,32)
         reparam_conv_k: convolution kernel size in local Perceptron. Default: (3,)
-        globalperceptron_reduce: Intermediate convolution output size(in_channal = inchannal, out_channel = in_channel/globalperceptron_reduce) 
+        globalperceptron_reduce: Intermediate convolution output size(in_channal = inchannal, out_channel = in_channel/globalperceptron_reduce)
             in globalperceptron. Default: 4
         use_checkpoint: whether to use checkpoint
         deploy: whether to use bias
@@ -377,21 +377,21 @@ def locality_injection(self):
             m.local_inject()
 
 @register_model
-def RepMLPNet_T224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
+def RepMLPNet_T224(pretrained: bool = False, image_size: int = 224, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
     """Get RepMLPNet_T224 model.
      Refer to the base class `models.RepMLPNet` for more details."""
     default_cfg = default_cfgs['RepMLPNet_T224']
     model = RepMLPNet(in_channels=in_channels, num_class=num_classes, channels=(64, 128, 256, 512), hs=(56,28,14,7), ws=(56,28,14,7),
                       num_blocks=(2,2,6,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,16,128),
                      deploy=deploy)
-    
+
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
+    model.image_size = image_size
     return model
-    
+
 @register_model
-def RepMLPNet_T256(pretrained: bool = False, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
+def RepMLPNet_T256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
     """Get RepMLPNet_T256 model.
      Refer to the base class `models.RepMLPNet` for more details."""
     default_cfg = default_cfgs['RepMLPNet_T256']
@@ -400,11 +400,11 @@ def RepMLPNet_T256(pretrained: bool = False, num_classes: int = 1000, in_channel
                      deploy=deploy)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
+    model.image_size = image_size
     return model
 
 @register_model
-def RepMLPNet_B224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
+def RepMLPNet_B224(pretrained: bool = False, image_size: int = 224, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
     """Get RepMLPNet_B224 model.
      Refer to the base class `models.RepMLPNet` for more details."""
     default_cfg = default_cfgs['RepMLPNet_B224']
@@ -413,10 +413,11 @@ def RepMLPNet_B224(pretrained: bool = False, num_classes: int = 1000, in_channel
                      deploy=deploy)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    model.image_size = image_size
     return model
 
 @register_model
-def RepMLPNet_B256(pretrained: bool = False, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
+def RepMLPNet_B256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
     """Get RepMLPNet_B256 model.
      Refer to the base class `models.RepMLPNet` for more details."""
     default_cfg = default_cfgs['RepMLPNet_B256']
@@ -425,10 +426,11 @@ def RepMLPNet_B256(pretrained: bool = False, num_classes: int = 1000, in_channel
                      deploy=deploy)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    model.image_size = image_size
     return model
 
 @register_model
-def RepMLPNet_D256(pretrained: bool = False, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
+def RepMLPNet_D256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
     """Get RepMLPNet_D256 model.
      Refer to the base class `models.RepMLPNet` for more details."""
     default_cfg = default_cfgs['RepMLPNet_D256']
@@ -437,10 +439,11 @@ def RepMLPNet_D256(pretrained: bool = False, num_classes: int = 1000, in_channel
                      deploy=deploy)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    model.image_size = image_size
     return model
 
 @register_model
-def RepMLPNet_L256(pretrained: bool = False, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
+def RepMLPNet_L256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3, deploy=False, **kwargs):
     """Get RepMLPNet_L256 model.
      Refer to the base class `models.RepMLPNet` for more details."""
     default_cfg = default_cfgs['RepMLPNet_L256']
@@ -449,7 +452,9 @@ def RepMLPNet_L256(pretrained: bool = False, num_classes: int = 1000, in_channel
                      deploy=deploy)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    model.image_size = image_size
     return model
+
 
 #   Verify the equivalency
 if __name__ == '__main__':
