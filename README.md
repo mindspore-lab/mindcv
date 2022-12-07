@@ -262,6 +262,7 @@ Please see [configs](./configs) for the details about model performance and pret
 * Augmentation
 	* [AutoAugment](https://arxiv.org/abs/1805.09501)
 	* [RandAugment](https://arxiv.org/abs/1909.13719) 
+	* [Repeated Augmentation](https://openaccess.thecvf.com/content_CVPR_2020/papers/Hoffer_Augment_Your_Batch_Improving_Generalization_Through_Instance_Repetition_CVPR_2020_paper.pdf)
 	* RandErasing (Cutout)
 	* CutMix
 	* Mixup
@@ -294,8 +295,9 @@ Please see [configs](./configs) for the details about model performance and pret
 
 ## Notes
 ### What is New 
-- 2022/12/05
+- 2022/12/07
 1. Support lr warmup for all lr scheduling algorithms besides cosine decay.
+2. Add repeated augmentation, which can be enabled by setting `--aug_repeats` to be a value larger than 1 (typically, 3 is a common choice).
 
 - 2022/11/21
 1. Add visualization for loss and acc curves
