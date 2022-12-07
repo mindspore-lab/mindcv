@@ -50,7 +50,8 @@ def train(args):
         num_shards=device_num,
         shard_id=rank_id,
         num_parallel_workers=args.num_parallel_workers,
-        download=args.dataset_download)
+        download=args.dataset_download,
+        num_aug_repeats=args.aug_repeats)
 
     if args.num_classes is None:
         num_classes = dataset_train.num_classes()

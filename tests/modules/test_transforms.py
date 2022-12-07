@@ -1,5 +1,6 @@
 import os
 import sys
+import collections
 sys.path.append('.')
 
 import pytest
@@ -143,3 +144,75 @@ def test_transforms_standalone_imagenet_is_training(mode, name, image_resize):
     assert type(transform_list_train) == list
     assert type(transform_list_val) == list
     assert transform_list_train != transform_list_val
+
+
+def test_repeated_aug():
+    
+    distribute = False
+    #ms.set_context(mode=ms.PYNATIVE_MODE)
+    if distribute:
+        from mindspore.communication import init, get_rank, get_group_size
+        ms.set_context(mode=ms.GRAPH_MODE)
+        init()
+        device_num = get_group_size()
+        rank_id = get_rank()
+        ms.set_auto_parallel_context(device_num=device_num,
+                                     parallel_mode='data_parallel',
+                                     gradients_mean=True)
+    else:
+        device_num = 1
+        rank_id = 0
+
+    name = 'imagenet'
+    '''
+    data_dir = '/data/imagenette2-320'
+    num_classes = 10
+    '''
+    dataset_url = "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/intermediate/Canidae_data.zip"
+    root_dir = "./"
+
+    if not os.path.exists(os.path.join(root_dir, 'data/Canidae')):
+        DownLoad().download_and_extract_archive(dataset_url, root_dir)
+    data_dir = "./data/Canidae/"
+    num_classes = 2
+
+    num_aug_repeats = 3
+
+    dataset = create_dataset(
+        name=name,
+        root=data_dir,
+        split='val',
+        shuffle=True,
+        num_samples=None,
+        num_parallel_workers=8,
+        num_shards=device_num,
+        shard_id=rank_id,
+        download=False,
+        num_aug_repeats=num_aug_repeats
+    )
+
+    # load dataset
+    loader = create_loader(
+        dataset=dataset,
+        batch_size=32,
+        drop_remainder=True,
+        is_training=False,
+        transform=None,
+        num_classes=num_classes,
+        num_parallel_workers=2,
+    )
+    for epoch in range(1):
+        #cnt = 1
+        for batch, (data, label) in enumerate(loader.create_tuple_iterator()):
+            mean_vals = data.mean(axis=[1,2,3])
+            #print(mean_vals, mean_vals.shape)
+            rounded = [int(val * 10e8) for val in mean_vals] 
+            rep_ele = [item for item, count in collections.Counter(rounded).items() if count > 1]
+            #print('repeated instance indices: ', len(rep_ele)) #, rep_ele)
+            assert len(rep_ele) > 0, 'Not replicated instances found in the batch'
+            if batch == 0:
+                print('Epoch: ', epoch, 'Batch: ', batch, 'Rank: ', rank_id, 'Label: ', label[:4])
+
+
+if __name__=='__main__':
+    test_repeated_aug()
