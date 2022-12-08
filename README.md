@@ -291,6 +291,8 @@ Please see [configs](./configs) for the details about model performance and pret
 * Loss
 	* Cross Entropy (w/ class weight and auxilary logit support)
 	* Binary Cross Entropy  (w/ class weight and auxilary logit support)
+	* Soft Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
+	* Soft Binary Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
 </details>
 
 ## Notes
