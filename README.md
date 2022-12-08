@@ -4,18 +4,18 @@
     <a href="https://mindcv-ai.readthedocs.io/en/latest">
         <img alt="docs" src="https://img.shields.io/badge/docs-latest-blue">
     </a>
-    <a href="https://github.com/mindspore-ecosystem/mindcv/blob/main/LICENSE">
-        <img alt="GitHub" src="https://img.shields.io/github/license/mindspore-ecosystem/mindcv.svg">
+    <a href="https://github.com/mindspore-lab/mindcv/blob/main/LICENSE">
+        <img alt="GitHub" src="https://img.shields.io/github/license/mindspore-lab/mindcv.svg">
     </a>
-    <a href="https://github.com/mindspore-ecosystem/mindcv/pulls">
+    <a href="https://github.com/mindspore-lab/mindcv/pulls">
         <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-pink.svg">
     </a>
-    <a href="https://github.com/mindspore-ecosystem/mindcv/issues">
-        <img alt="open issues" src="https://img.shields.io/github/issues/mindspore-ecosystem/mindcv">
+    <a href="https://github.com/mindspore-lab/mindcv/issues">
+        <img alt="open issues" src="https://img.shields.io/github/issues/mindspore-lab/mindcv">
     </a>
     <!---
-    <a href="https://github.com/mindspore-ecosystem/mindcv/tags">
-        <img alt="GitHub tags" src="https://img.shields.io/github/tags/mindspore-ecosystem/mindcv">
+    <a href="https://github.com/mindspore-lab/mindcv/tags">
+        <img alt="GitHub tags" src="https://img.shields.io/github/tags/mindspore-lab/mindcv">
     </a>
     -->
 </p>
@@ -23,7 +23,7 @@
 
 | **Build Type**   |`Linux`           |`MacOS`           |`Windows`         |
 | :---:            | :---:            | :---:            | :---:            |
-| **Build Status** | [![Status](https://github.com/mindspore-ecosystem/mindcv/actions/workflows/main.yml/badge.svg)](https://github.com/mindspore-ecosystem/mindcv/actions) | [![Status](https://github.com/mindspore-ecosystem/mindcv/actions/workflows/mac.yml/badge.svg)](https://github.com/mindspore-ecosystem/mindcv/actions) | Not tested|
+| **Build Status** | [![Status](https://github.com/mindspore-lab/mindcv/actions/workflows/main.yml/badge.svg)](https://github.com/mindspore-lab/mindcv/actions) | [![Status](https://github.com/mindspore-lab/mindcv/actions/workflows/mac.yml/badge.svg)](https://github.com/mindspore-lab/mindcv/actions) | Not tested|
 
 [Introduction](#introduction) |
 [Installation](#installation) |
@@ -90,14 +90,14 @@ The following instructions assume the desired dependency is fulfilled.
 ### Install with pip
 MindCV can be installed with pip. 
 ```shell
-pip install https://github.com/mindspore-ecosystem/mindcv/releases/download/v0.0.1-beta/mindcv-0.0.1b0-py3-none-any.whl
+pip install https://github.com/mindspore-lab/mindcv/releases/download/v0.0.1-beta/mindcv-0.0.1b0-py3-none-any.whl
 ```
 -->
 
 ### Install from source
 To install MindCV from source, please run:
 ```shell
-pip install git+https://github.com/mindspore-ecosystem/mindcv.git
+pip install git+https://github.com/mindspore-lab/mindcv.git
 ```
 
 #### Notes: 
