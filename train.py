@@ -12,7 +12,7 @@ from mindcv.data import create_dataset, create_transforms, create_loader
 from mindcv.loss import create_loss
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
-from mindcv.utils import StateMonitor, Allreduce
+from mindcv.utils import StateMonitor, Allreduce, TrainOneStepWithEMA
 from config import parse_args
 
 ms.set_seed(1)
@@ -28,7 +28,6 @@ h1.setFormatter(formatter1)
 def train(args):
     ''' main train function'''
     ms.set_context(mode=args.mode)
-
     if args.distribute:
         init()
         device_num = get_group_size()
@@ -143,7 +142,8 @@ def train(args):
                            drop_rate=args.drop_rate,
                            drop_path_rate=args.drop_path_rate,
                            pretrained=args.pretrained,
-                           checkpoint_path=args.ckpt_path)
+                           checkpoint_path=args.ckpt_path,
+                           use_ema=args.use_ema)
     
     num_params = sum([param.size for param in network.get_parameters()])
 
@@ -174,16 +174,27 @@ def train(args):
 
     # create optimizer
     #TODO: consistent naming opt, name, dataset_name
-    optimizer = create_optimizer(network.trainable_params(),
-                                 opt=args.opt,
-                                 lr=lr_scheduler,
-                                 weight_decay=args.weight_decay,
-                                 momentum=args.momentum,
-                                 nesterov=args.use_nesterov,
-                                 filter_bias_and_bn=args.filter_bias_and_bn,
-                                 loss_scale=args.loss_scale,
-                                 checkpoint_path=opt_ckpt_path,
-                                 eps=args.eps)
+    if args.use_ema:
+        optimizer = create_optimizer(network.trainable_params(),
+                                     opt=args.opt,
+                                     lr=lr_scheduler,
+                                     weight_decay=args.weight_decay,
+                                     momentum=args.momentum,
+                                     nesterov=args.use_nesterov,
+                                     filter_bias_and_bn=args.filter_bias_and_bn,
+                                     checkpoint_path=opt_ckpt_path,
+                                     eps=args.eps)
+    else:
+        optimizer = create_optimizer(network.trainable_params(),
+                                     opt=args.opt,
+                                     lr=lr_scheduler,
+                                     weight_decay=args.weight_decay,
+                                     momentum=args.momentum,
+                                     nesterov=args.use_nesterov,
+                                     filter_bias_and_bn=args.filter_bias_and_bn,
+                                     loss_scale=args.loss_scale,
+                                     checkpoint_path=opt_ckpt_path,
+                                     eps=args.eps)
 
     # Define eval metrics.
     if num_classes >= 5:
@@ -193,12 +204,27 @@ def train(args):
         eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy()}
 
     # init model
-    if args.loss_scale > 1.0:
-        loss_scale_manager = FixedLossScaleManager(loss_scale=args.loss_scale, drop_overflow_update=False)
+    if args.use_ema:
+        net_with_loss = nn.WithLossCell(network, loss)
+
+        if args.dynamic_loss_scale:
+            loss_scale_manager = nn.DynamicLossScaleUpdateCell(loss_scale_value=args.loss_scale, scale_factor=2,
+                                                               scale_window=1000)
+        else:
+            loss_scale_manager = nn.FixedLossScaleUpdateCell(loss_scale_value=args.loss_scale)
+        ms.amp.auto_mixed_precision(net_with_loss, amp_level=args.amp_level)
+        net_with_loss = TrainOneStepWithEMA(net_with_loss, optimizer, scale_sense=loss_scale_manager,
+                                            use_ema=args.use_ema, ema_decay=args.ema_decay)
+        eval_network = nn.WithEvalCell(network, loss, args.amp_level in ["O2", "O3", "auto"])
+        model = Model(net_with_loss, eval_network=eval_network, metrics=eval_metrics, eval_indexes=[0, 1, 2])
+    else:
+        if args.dynamic_loss_scale:
+            loss_scale_manager = ms.amp.DynamicLossScaleManager(init_loss_scale=args.loss_scale, scale_factor=2,
+                                                                scale_window=1000)
+        else:
+            loss_scale_manager = FixedLossScaleManager(loss_scale=args.loss_scale, drop_overflow_update=False)
         model = Model(network, loss_fn=loss, optimizer=optimizer, metrics=eval_metrics, amp_level=args.amp_level,
                       loss_scale_manager=loss_scale_manager)
-    else:
-        model = Model(network, loss_fn=loss, optimizer=optimizer, metrics=eval_metrics, amp_level=args.amp_level)
 
     # callback
     # save checkpoint, summary training loss
@@ -216,8 +242,7 @@ def train(args):
     state_cb = StateMonitor(model, summary_dir=summary_dir,
                             dataset_val=loader_eval,
                             val_interval=args.val_interval,
-                            metric_name=list(eval_metrics.keys())
-,
+                            metric_name=list(eval_metrics.keys()),
                             ckpt_dir=args.ckpt_save_dir,
                             ckpt_save_interval=args.ckpt_save_interval,
                             best_ckpt_name=args.model + '_best.ckpt',

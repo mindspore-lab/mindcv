@@ -110,6 +110,9 @@ def create_parser():
                        help='probability of applying cutmix and/or mixup (default=0.)')
     group.add_argument('--mixup', type=float, default=0.,
                        help='Hyperparameter of beta distribution of mixup. Recommended value is 0.2 for ImageNet. (default=0.)')
+    group.add_argument('--use_ema', type=str2bool, nargs='?', const=True, default=False,
+                       help='training with ema (default=False)')
+    group.add_argument('--ema_decay', type=float, default=0.9999, help='ema decay')
 
     # Model parameters
     group = parser.add_argument_group('Model parameters')
@@ -150,6 +153,8 @@ def create_parser():
     #group.add_argument('--loss_scaler', type=str, default='static', help='Loss scaler, static or dynamic (default=static)')
     group.add_argument('--loss_scale', type=float, default=1.0,
                        help='Loss scale (default=1.0)')
+    group.add_argument('--dynamic_loss_scale', type=str2bool, nargs='?', const=True, default=False,
+                       help='Whether to use dynamic loss scale  (default=False)')
     group.add_argument('--use_nesterov', type=str2bool, nargs='?', const=True, default=False,
                        help='Enables the Nesterov momentum (default=False)')
     group.add_argument('--filter_bias_and_bn', type=str2bool, nargs='?', const=True, default=True,
