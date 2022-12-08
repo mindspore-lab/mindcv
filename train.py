@@ -49,7 +49,8 @@ def train(args):
         num_shards=device_num,
         shard_id=rank_id,
         num_parallel_workers=args.num_parallel_workers,
-        download=args.dataset_download)
+        download=args.dataset_download,
+        num_aug_repeats=args.aug_repeats)
 
     if args.num_classes is None:
         num_classes = dataset_train.num_classes()
@@ -158,11 +159,12 @@ def train(args):
                                     lr=args.lr,
                                     min_lr=args.min_lr,
                                     warmup_epochs=args.warmup_epochs,
+                                    warmup_factor=args.warmup_factor,
                                     decay_epochs=args.decay_epochs,
                                     decay_rate=args.decay_rate,
                                     milestones=args.multi_step_decay_milestones,
                                     num_epochs=args.epoch_size,
-                                    stepwise_sched=args.stepwise_lr_sched)
+                                    lr_epoch_stair=args.lr_epoch_stair)
     
     # resume training if ckpt_path is given
     if args.ckpt_path != '' and args.resume_opt: 
@@ -195,7 +197,6 @@ def train(args):
                                      eps=args.eps)
 
     # Define eval metrics.
-
     if num_classes >= 5:
         eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy(),
                         'Top_5_Accuracy': nn.Top5CategoricalAccuracy()}

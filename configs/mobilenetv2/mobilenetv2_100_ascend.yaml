@@ -51,7 +51,7 @@ loss: 'CE'
 label_smoothing: 0.1
 
 # lr scheduler config
-scheduler: 'warmup_cosine_decay'
+scheduler: 'cosine_decay'
 min_lr: 0.0
 lr: 0.4
 warmup_epochs: 4

@@ -162,6 +162,7 @@ def train(args):
                                     lr=args.lr,
                                     min_lr=args.min_lr,
                                     warmup_epochs=args.warmup_epochs,
+                                    warmup_factor=args.warmup_factor,
                                     decay_epochs=args.decay_epochs,
                                     decay_rate=args.decay_rate,
                                     milestones=args.multi_step_decay_milestones,
