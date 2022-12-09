@@ -1,14 +1,14 @@
 # ConViT
 > [ConViT: Improving Vision Transformers with Soft Convolutional Inductive Biases](https://arxiv.org/pdf/2103.10697.pdf)
 
-## Introduction
+## 模型简介
 ***
 
-ConViT结合了卷积架构和ViT的优势。ConViT引入了门控位置自注意力（GPSA），这是一种位置自注意力的形式，可以配备“软”卷积归纳偏置。ConViT初始化GPSA层以模拟卷积层的局部性，然后通过调整调节对位置与内容信息的注意力的门控参数，让每个注意力头可以自由地逃离局部性。由此产生的类似卷积的ViT架构ConViT在ImageNet上优于DeiT(Touvron et al., 2020)，同时提供了大大提高的样本效率。
+ConViT combines e the strengths of convolutional architectures and Vision Transformers (ViTs). ConViT introduce gated positional self-attention (GPSA), a form of positional self-attention which can be equipped with a “soft” convolutional inductive bias. ConViT initialize the GPSA layers to mimic the locality of convolutional layers, then give each attention head the freedom to escape locality by adjusting a gating parameter regulating the attention paid to position versus content information. ConViT, outperforms the DeiT (Touvron et al., 2020) on ImageNet, while offering a much improved sample efficiency.
 
 ![ConViT](convit.png)
 
-## 性能指标
+## Results
 ***
 
 | Model            | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
@@ -20,7 +20,7 @@ ConViT结合了卷积架构和ViT的优势。ConViT引入了门控位置自注�
 | convit_base      | D910x8-G  | 82.10       | 95.52      | 86             | 880s/epoch | 32.8ms/step | [model]() | [cfg]() | [log]() |
 | convit_base_plus | D910x8-G  | 82.00       | 95.04      | 152            | 1028s/epoch | 36.6ms/step | [model]() | [cfg]() | [log]() |
 
-#### 备注
+#### Notes
 
 - All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
 - Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
