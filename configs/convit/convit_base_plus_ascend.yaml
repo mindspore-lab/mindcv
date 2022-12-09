@@ -1,0 +1,70 @@
+# Copyright 2022 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+# system config
+mode: 0
+distribute: True
+num_parallel_workers: 8
+
+# dataset config
+dataset: 'imagenet'
+data_dir: ''
+shuffle: True
+dataset_download: False
+batch_size: 128
+drop_remainder: True
+
+# Augmentation config
+image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+interpolation: 'bicubic'
+auto_augment: 'autoaug-mstd0.5'
+re_prob: 0.1
+mixup: 0.2
+cutmix: 1.0
+cutmix_prob: 1.0
+crop_pct: 0.925
+color_jitter: 0.4
+
+# model config
+model: 'convit_base_plus'
+num_classes: 1000
+pretrained: False
+ckpt_path: ''
+keep_checkpoint_max: 10
+ckpt_save_dir: './ckpt/'
+epoch_size: 300
+dataset_sink_mode: True
+amp_level: 'O2'
+
+# loss config
+loss: 'CE'
+label_smoothing: 0.1
+
+# lr scheduler config
+scheduler: 'warmup_cosine_decay'
+lr: 0.0007
+min_lr: 0.000001
+warmup_epochs: 40
+decay_epochs: 260
+
+# optimizer config
+opt: 'adamw'
+weight_decay: 0.1
+loss_scale: 1024
+filter_bias_and_bn: True
+use_nesterov: False
