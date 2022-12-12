@@ -14,6 +14,7 @@ from functools import partial
 
 from .layers.drop_path import DropPath
 from .layers.mlp import Mlp
+from .layers.identity import Identity
 from .utils import load_pretrained
 from .registry import register_model
 
@@ -118,7 +119,7 @@ class Block(nn.Cell):
             num_heads=num_heads, qkv_bias=qkv_bias, qk_scale=qk_scale,
             attn_drop=attn_drop, proj_drop=drop, sr_ratio=sr_ratio)
         # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
-        self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
+        self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
         self.norm2 = norm_layer([dim])
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
@@ -251,7 +252,7 @@ class PyramidVisionTransformer(nn.Cell):
         self.cls_token = mindspore.Parameter(ops.zeros((1, 1, embed_dims[3]), mindspore.float32))
 
         # classification head
-        self.head = nn.Dense(embed_dims[3], num_classes) if num_classes > 0 else nn.Identity()
+        self.head = nn.Dense(embed_dims[3], num_classes) if num_classes > 0 else Identity()
         self.reshape = ops.reshape
         self.transpose = ops.transpose
         self.broadcast_to = ops.broadcast_to
@@ -292,7 +293,7 @@ class PyramidVisionTransformer(nn.Cell):
 
     def reset_classifier(self, num_classes, global_pool=''):
         self.num_classes = num_classes
-        self.head = nn.Dense(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
+        self.head = nn.Dense(self.embed_dim, num_classes) if num_classes > 0 else Identity()
 
     def _get_pos_embed(self, pos_embed, ph, pw, H, W):
         if H * W == self.patch_embed1.num_patches:
