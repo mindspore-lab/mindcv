@@ -46,34 +46,20 @@ Please download the [ImageNet-1K](https://www.image-net.org/download.php) datase
 
   ```shell
   # train densenet121 on 8 GPUs
-  export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
-  mpirun -n 8 python train.py -c configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/imagenet
+  mpirun -n 8 python train.py --config configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/imagenet
   ```
-  
-  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascneds** with the same batch size.
 
-- **Finetuning.** Here is an example for finetuning a pretrained densenet121 on CIFAR10 dataset using Momentum optimizer.
-
-  ```shell
-  python train.py --model=densenet121 --pretrained --opt=momentum --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
-  ```
+  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascends** with the same batch size.
 
 Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
 
 ### Validation
 
-- To validate the trained model, you can use `validate.py`. Here is an example for densenet121 to verify the accuracy of
-  pretrained weights.
-
-  ```shell
-  python validate.py --model=densenet121 --dataset=imagenet --val_split=val --pretrained
-  ```
-
 - To validate the model, you can use `validate.py`. Here is an example for densenet121 to verify the accuracy of your
   training.
 
   ```shell
-  python validate.py --model=densenet121 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/densenet121-best.ckpt'
+  python validate.py --config configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/densenet121.ckpt
   ```
 
 ### Deployment (optional)

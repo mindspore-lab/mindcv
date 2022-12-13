@@ -1,4 +1,4 @@
-# DenseNet
+# MnasNet
 
 ***
 > [MnasNet: Platform-Aware Neural Architecture Search for Mobile](https://arxiv.org/abs/1807.11626)
@@ -38,12 +38,6 @@
   mpirun -n 8 python train.py -c configs/mnasnet/mnasnet0.75_gpu.yaml --data_dir /path/to/imagenet
   ```
 
-- 下面是使用在ImageNet上预训练的mnasnet0_75模型和Rmsprop优化器在CIFAR10数据集上进行微调的示例。
-
-  ```shell
-  python train.py --model=mnasnet0_75 --pretrained --opt=rmsprop --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
-  ```
-
 详细的可调参数及其默认值可以在[config.py](../../config.py)中查看。
 
 ### 验证
@@ -51,11 +45,17 @@
 - 下面是使用`validate.py`文件验证mnasnet0_75的预训练模型的精度的示例。
 
   ```shell
-  python validate.py --model=mnasnet0_75 --dataset=imagenet --val_split=val --pretrained
+  python validate.py 
+  -c configs/mnasnet/mnasnet0.75_ascend.yaml 
+  --data_dir=/path/to/imagenet 
+  --ckpt_path=/path/to/ckpt
   ```
 
 - 下面是使用`validate.py`文件验证mnasnet0_75的自定义参数文件的精度的示例。
 
   ```shell
-  python validate.py --model=mnasnet0_75 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/mnasnet0_75-best.ckpt'
+  python validate.py 
+  -c configs/mnasnet/mnasnet0.75_ascend.yaml 
+  --data_dir=/path/to/imagenet 
+  --ckpt_path=/path/to/ckpt
   ```

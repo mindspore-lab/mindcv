@@ -97,19 +97,21 @@ class StateMonitor(Callback):
     def on_train_step_end(self, run_context):
         cb_params = run_context.original_args()
         num_batches = cb_params.batch_num
-        #global_step = cb_params.optimizer.global_step.asnumpy()[0]
         cur_epoch = cb_params.cur_epoch_num + self.last_epoch -1 #(global_step-1) // num_batches
-        #cur_step_in_epoch = (global_step- 1) % cb_params.batch_num
         cur_step_in_epoch = int((cb_params.cur_step_num - 1) % cb_params.batch_num)
 
+        if cb_params.optimizer is not None:
+            optimizer = cb_params.optimizer
+        else:
+            optimizer = cb_params.train_network.network.optimizer
 
         if (cur_step_in_epoch  + 1) % self.log_interval == 0 or \
                 (cur_step_in_epoch  + 1) >= num_batches or cur_step_in_epoch == 0:
-            step = cb_params.optimizer.global_step
-            if cb_params.optimizer.dynamic_lr:
-                cur_lr = cb_params.optimizer.learning_rate(step-1)[0].asnumpy()
+            step = optimizer.global_step
+            if optimizer.dynamic_lr:
+                cur_lr = optimizer.learning_rate(step-1)[0].asnumpy()
             else:
-                cur_lr = cb_params.optimizer.learning_rate.asnumpy()
+                cur_lr = optimizer.learning_rate.asnumpy()
             loss = self._get_loss(cb_params)
 
             print(f"Epoch: {cur_epoch+1}, "
@@ -123,8 +125,13 @@ class StateMonitor(Callback):
         save the best ckpt file with highest validation accuracy.
         """
         cb_params = run_context.original_args()
+        if cb_params.optimizer is not None:
+            optimizer = cb_params.optimizer
+        else:
+            optimizer = cb_params.train_network.network.optimizer
+
         # the global step may larger than batch_size * epoch due to graph mode async
-        global_step = cb_params.optimizer.global_step.asnumpy()[0]
+        global_step = optimizer.global_step.asnumpy()[0]
         cur_epoch = cb_params.cur_epoch_num + self.last_epoch
         cur_step_in_epoch = cb_params.batch_num #(global_step - 1) % cb_params.batch_num
 
@@ -170,7 +177,7 @@ class StateMonitor(Callback):
 
                 # save optim for resume
                 optim_save_path = os.path.join(self.ckpt_dir, f'optim_{self.model_name}.ckpt')
-                ms.save_checkpoint(cb_params.optimizer, optim_save_path, async_save=True)
+                ms.save_checkpoint(optimizer, optim_save_path, async_save=True)
 
                 cur_ckpoint_file = self.model_name + "-" + str(cur_epoch) + "_" \
                                    + str(cur_step_in_epoch) + ".ckpt"

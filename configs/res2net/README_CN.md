@@ -39,27 +39,15 @@
 > [configs文件夹](../../configs)中列出了mindcv套件所包含的模型的各个规格的yaml配置文件(在ImageNet数据集上训练和验证的配置)。
 
   ```shell
-  mpirun --allow-run-as-root -n 8 python train.py -c configs/res2net/res2net_50_gpu.yaml --data_dir /path/to/imagenet
-  ```
-
-- 下面是使用在ImageNet上预训练的Res2Net50模型和Momentum优化器在CIFAR10数据集上进行微调的示例。
-
-  ```shell
-  python train.py --model=res2net50 --pretrained --opt=momentum --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
+  mpirun -n 8 python train.py --config configs/res2net/res2net_50_gpu.yaml --data_dir /path/to/imagenet
   ```
 
 详细的可调参数及其默认值可以在[config.py](../../config.py)中查看。
 
 ### 验证
 
-- 下面是使用`validate.py`文件验证Res2Net50的预训练模型的精度的示例。
-
-  ```shell
-  python validate.py --model=res2net50 --dataset=imagenet --val_split=val --pretrained
-  ```
-
 - 下面是使用`validate.py`文件验证Res2Net50的自定义参数文件的精度的示例。
 
   ```shell
-  python validate.py --model=res2net50 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/res2net50-best.ckpt'
+  python validate.py --config configs/res2net/res2net_50_gpu.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/res2net50.ckpt
   ```
