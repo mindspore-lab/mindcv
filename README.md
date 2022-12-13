@@ -223,6 +223,7 @@ Currently, MindCV supports the model families listed below. More models with pre
 <details open>
 <summary> Supported models </summary>
 
+* Big Transfer ResNetV2 (BiT) - https://arxiv.org/abs/1912.11370
 * ConvNeXt - https://arxiv.org/abs/2201.03545
 * ConViT (Soft Convolutional Inductive Biases Vision Transformers)- https://arxiv.org/abs/2103.10697
 * DenseNet - https://arxiv.org/abs/1608.06993
@@ -249,6 +250,8 @@ Currently, MindCV supports the model families listed below. More models with pre
 * SqueezeNet - https://arxiv.org/abs/1602.07360
 * Swin Transformer - https://arxiv.org/abs/2103.14030
 * VGG - https://arxiv.org/abs/1409.1556
+* Visformer - https://arxiv.org/abs/2104.12533
+* Vision Transformer (ViT) - https://arxiv.org/abs/2010.11929
 * Xception - https://arxiv.org/abs/1610.02357
 
 Please see [configs](./configs) for the details about model performance and pretrained weights.
