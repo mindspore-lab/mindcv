@@ -59,7 +59,7 @@ Detailed adjustable parameters and their default value can be seen in [config.py
 - To validate the trained model, you can use `validate.py`. Here is an example for shufflenet_v2_x2_0 to verify the accuracy of pretrained weights.
 
   ```shell
-  python validate.py -c ../configs/shufflenet_v2/shufflenet_v2_x2.0_ascend.yaml
+  python validate.py -c configs/shufflenet_v2/shufflenet_v2_x2.0_ascend.yaml
   ```
 
 ### Deployment (optional)

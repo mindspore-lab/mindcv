@@ -57,5 +57,5 @@ bash run_distribute_train_ascend.sh ./hccl_8p_01234567_123.60.231.9.json /tmp/da
 - 下面是使用`validate.py`文件验证shufflenet_v2_x2_0的预训练模型的精度的示例
 
   ```shell
-  python validate.py -c ../configs/shufflenet_v2/shufflenet_v2_x2.0_ascend.yaml
+  python validate.py -c configs/shufflenet_v2/shufflenet_v2_x2.0_ascend.yaml
   ```

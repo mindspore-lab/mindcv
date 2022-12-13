@@ -52,7 +52,7 @@ Detailed adjustable parameters and their default value can be seen in [config.py
 - To validate the model, you can use `validate.py`. Here is an example for mobilenetv3_large_100 to verify the accuracy of your training.
 
   ```shell
-  python validate.py -c ../configs/mobilenetv3/v3_large_Ascend.yaml
+  python validate.py -c configs/mobilenetv3/v3_large_Ascend.yaml
   ```
 
 ### Deployment (optional)

@@ -51,5 +51,5 @@ bash run_distribute_train_ascend.sh ./hccl_8p_01234567_123.60.231.9.json /tmp/da
 - 下面是使用`validate.py`文件验证densenet121的自定义参数文件的精度的示例。
 
   ```shell
-  python validate.py -c ../configs/mobilenetv3/v3_large_Ascend.yaml
+  python validate.py -c configs/mobilenetv3/v3_large_Ascend.yaml
   ```

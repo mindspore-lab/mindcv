@@ -50,7 +50,7 @@ bash run_distribute_train_ascend.sh ./hccl_8p_01234567_123.60.231.9.json /tmp/da
 - 下面是使用`validate.py`文件验证shufflenet_v1_g3_x2_0的自定义参数文件的精度的示例。
 
   ```shell
-  python validate.py -c ../configs/shufflenet_v1/shufflenet_v1_2.0_ascend.yaml
+  python validate.py -c configs/shufflenet_v1/shufflenet_v1_2.0_ascend.yaml
   ```
 
 
