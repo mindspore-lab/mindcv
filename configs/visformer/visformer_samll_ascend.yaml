@@ -1,0 +1,58 @@
+# system config
+mode: 0
+distribute: True
+num_parallel_workers: 8
+val_while_train: True
+
+
+# dataset config
+dataset: 'imagenet'
+data_dir: './imagenet'
+shuffle: True
+dataset_download: False
+batch_size: 64
+drop_remainder: True
+
+
+# Augmentation config
+interpolation: BICUBIC
+re_prob: 0.25
+mixup: 0.8
+cutmix: 1.0
+cutmix_prob: 1.0
+auto_augment: autoaug
+
+
+# model config
+model: 'visformer_small'
+num_classes: 1000
+pretrained: False
+ckpt_path: ''
+keep_checkpoint_max: 10
+ckpt_save_dir: './ckpt'
+epoch_size: 300
+dataset_sink_mode: True
+amp_level: 'O3'
+
+
+# loss config
+loss: 'CE'
+label_smoothing: 0.1
+
+
+# lr scheduler config
+scheduler: 'cosine_decay'
+lr_epoch_stair: True
+lr: 0.0005
+min_lr: 0.00001
+warmup_factor: 0.002
+warmup_epochs: 5
+decay_epochs: 295
+decay_rate: 0.1
+
+
+# optimizer config
+opt: 'adamw'
+momentum: 0.9
+weight_decay: 0.05
+loss_scale: 1024
