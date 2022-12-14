@@ -245,7 +245,6 @@ Currently, MindCV supports the model families listed below. More models with pre
 * RegNet - https://arxiv.org/abs/2003.13678
 * RepMLP https://arxiv.org/abs/2105.01883
 * RepVGG - https://arxiv.org/abs/2101.03697
-* ResMLP - https://arxiv.org/abs/2105.03404
 * ResNet (v1b/v1.5) - https://arxiv.org/abs/1512.03385
 * ResNeXt - https://arxiv.org/abs/1611.05431
 * Res2Net - https://arxiv.org/abs/1904.01169
