@@ -46,28 +46,16 @@ ShuffleNetV2中提出了一个关键点，之前的轻量级网络都是通过�
 > [configs文件夹](../../configs)中列出了mindcv套件所包含的模型的各个规格的yaml配置文件(在ImageNet数据集上训练和验证的配置)。
 
   ```shell
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
-mpirun -n 8 python train.py -c configs/shufflenetv2/shufflenet_v2_x2_0.yaml --data_dir /path/to/imagenet
-  ```
-
-- 下面是使用在ImageNet上预训练的shufflenet_v2_x2_0模型和Momentum优化器在CIFAR10数据集上进行微调的示例。
-
-  ```shell
-  python train.py --model=shufflenet_v2_x2_0 --pretrained --opt=momentum --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
+cd mindcv/scripts
+bash run_distribute_train_ascend.sh ./hccl_8p_01234567_123.60.231.9.json /tmp/dataset/imagenet ../configs/shufflenet_v2/shufflenet_v2_x2.0_ascend.yaml
   ```
 
 详细的可调参数及其默认值可以在[config.py](../../config.py)中查看。
 
 ### 验证
 
-- 下面是使用`validate.py`文件验证shufflenet_v2_x2_0的预训练模型的精度的示例。
+- 下面是使用`validate.py`文件验证shufflenet_v2_x2_0的预训练模型的精度的示例
 
   ```shell
-  python validate.py --model=shufflenet_v2_x2_0 --dataset=imagenet --val_split=val --pretrained
-  ```
-
-- 下面是使用`validate.py`文件验证shufflenet_v2_x2_0的自定义参数文件的精度的示例。
-
-  ```shell
-  python validate.py --model=shufflenet_v2_x2_0 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/shufflenet_v2_x2_0-best.ckpt'
+  python validate.py -c configs/shufflenet_v2/shufflenet_v2_x2.0_ascend.yaml
   ```
