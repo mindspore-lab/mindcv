@@ -6,6 +6,7 @@ import numpy as np
 from mindspore import nn, Tensor
 from mindspore import FixedLossScaleManager, Model
 from mindspore.communication import init, get_rank, get_group_size
+import mindspore.dataset.transforms as transforms
 
 from mindcv.models import create_model
 from mindcv.data import create_dataset, create_transforms, create_loader
@@ -77,6 +78,8 @@ def train(args):
         re_value=args.re_value,
         re_max_attempts=args.re_max_attempts
     )
+    
+    target_transform = transforms.OneHot(num_classes) if args.loss == 'BCE' else None
 
     # load dataset
     loader_train = create_loader(
@@ -89,6 +92,7 @@ def train(args):
         cutmix_prob=args.cutmix_prob,
         num_classes=num_classes,
         transform=transform_list,
+        target_transform=target_transform,
         num_parallel_workers=args.num_parallel_workers,
     )
 
@@ -118,6 +122,7 @@ def train(args):
             drop_remainder=False,
             is_training=False,
             transform=transform_list_eval,
+            target_transform=target_transform,
             num_parallel_workers=args.num_parallel_workers,
         )
         # validation dataset count
