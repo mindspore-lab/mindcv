@@ -63,6 +63,8 @@ def create_parser():
     group.add_argument('--drop_remainder', type=str2bool, nargs='?', const=True, default=True,
                        help='Determines whether or not to drop the last block whose data '
                             'row number is less than batch size (default=True)')
+    group.add_argument('--aug_repeats', type=int, default=0,
+                       help='Number of dataset repeatition for repeated augmentation. If 0 or 1, repeated augmentation is diabled. Otherwise, repeated augmentation is enabled and the common choice is 3. (Default: 0)')
 
     # Augmentation parameters
     group = parser.add_argument_group('Augmentation parameters')
@@ -108,6 +110,9 @@ def create_parser():
                        help='probability of applying cutmix and/or mixup (default=0.)')
     group.add_argument('--mixup', type=float, default=0.,
                        help='Hyperparameter of beta distribution of mixup. Recommended value is 0.2 for ImageNet. (default=0.)')
+    group.add_argument('--use_ema', type=str2bool, nargs='?', const=True, default=False,
+                       help='training with ema (default=False)')
+    group.add_argument('--ema_decay', type=float, default=0.9999, help='ema decay')
 
     # Model parameters
     group = parser.add_argument_group('Model parameters')
@@ -148,6 +153,8 @@ def create_parser():
     #group.add_argument('--loss_scaler', type=str, default='static', help='Loss scaler, static or dynamic (default=static)')
     group.add_argument('--loss_scale', type=float, default=1.0,
                        help='Loss scale (default=1.0)')
+    group.add_argument('--dynamic_loss_scale', type=str2bool, nargs='?', const=True, default=False,
+                       help='Whether to use dynamic loss scale  (default=False)')
     group.add_argument('--use_nesterov', type=str2bool, nargs='?', const=True, default=False,
                        help='Enables the Nesterov momentum (default=False)')
     group.add_argument('--filter_bias_and_bn', type=str2bool, nargs='?', const=True, default=True,
@@ -175,7 +182,7 @@ def create_parser():
     group.add_argument('--multi_step_decay_milestones', type=list, default=[30, 60, 90],
                        help='list of epoch milestones for lr decay, which is ONLY effective for the multi_step_decay scheduler. LR will be decay by decay_rate at the milestone epoch.')
     group.add_argument('--lr_epoch_stair', type=str2bool, nargs='?', const=True, default=False,
-                       help='If True, LR will be updated in the begin of each new epoch and the LR will be consisent for each batch in one epoch. Otherwise, learning rate will be updated dynamically in each step. (default=False)')
+                       help='If True, LR will be updated in the first step of each epoch and LRs are the same in the remaining steps in the epoch. Otherwise, learning rate is updated every  step dynamically. (default=False)')
 
     # Loss parameters
     group = parser.add_argument_group('Loss parameters')

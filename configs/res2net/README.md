@@ -40,29 +40,16 @@ and demonstrate consistent performance gains over baseline models.
   the `configs` folder. To trigger training using preset yaml config.
 
   ```shell
-  mpirun --allow-run-as-root -n 8 python train.py -c configs/res2net/res2net_50_gpu.yaml --data_dir /path/to/imagenet
-  ```
-
-- Here is the example for finetuning a pretrained InceptionV3 on CIFAR10 dataset using Adam optimizer.
-
-  ```shell
-  python train.py --model=res2net50 --pretrained --opt=momentum --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
+  mpirun -n 8 python train.py --config configs/res2net/res2net_50_gpu.yaml --data_dir /path/to/imagenet
   ```
 
 Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
 
 ### Eval
 
-- To validate the model, you can use `validate.py`. Here is an example for res2net50 to verify the accuracy of
-  pretrained weights.
-
-  ```shell
-  python validate.py --model=res2net50 --dataset=imagenet --val_split=val --pretrained
-  ```
-
 - To validate the model, you can use `validate.py`. Here is an example for res2net50 to verify the accuracy of your
   training.
 
   ```shell
-  python validate.py --model=res2net50 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/res2net50-best.ckpt'
+  python validate.py --config configs/res2net/res2net_50_gpu.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/res2net50.ckpt
   ```

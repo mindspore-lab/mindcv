@@ -37,6 +37,7 @@ interpolation: 'bilinear'
 crop_pct: 0.875
 color_jitter: 0.4
 re_prob: 0.5
+mixup: 0.2
 
 # model config
 model: 'res2net50'
@@ -46,7 +47,7 @@ ckpt_path: ''
 keep_checkpoint_max: 10
 val_interval: 5
 ckpt_save_dir: './ckpt'
-epoch_size: 200
+epoch_size: 300
 dataset_sink_mode: True
 amp_level: 'O2'
 
@@ -58,8 +59,8 @@ label_smoothing: 0.1
 scheduler: 'cosine_decay'
 min_lr: 0.0
 lr: 0.1
-warmup_epochs: 4
-decay_epochs: 196
+warmup_epochs: 5
+decay_epochs: 295
 
 # optimizer config
 opt: 'momentum'

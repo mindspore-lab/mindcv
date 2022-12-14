@@ -21,51 +21,43 @@ val_while_train: True
 
 # dataset config
 dataset: 'imagenet'
-data_dir: ''
+data_dir: '/data0/dataset/imagenet2012/imagenet_original/'
 shuffle: True
 dataset_download: False
 batch_size: 32
 drop_remainder: True
-val_split: val
 
 # Augmentation config
 image_resize: 224
-scale: [0.08, 1.0]
-ratio: [0.75, 1.333]
 hflip: 0.5
-interpolation: 'bilinear'
 crop_pct: 0.875
-color_jitter: 0.4
-re_prob: 0.5
-mixup: 0.2
 
 # model config
-model: 'res2net101'
+model: 'BiTresnet50'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''
 keep_checkpoint_max: 10
-val_interval: 5
+save_checkpoint: True
 ckpt_save_dir: './ckpt'
-epoch_size: 300
+epoch_size: 90
 dataset_sink_mode: True
-amp_level: 'O2'
+amp_level: 'O0'
 
 # loss config
 loss: 'CE'
 label_smoothing: 0.1
 
 # lr scheduler config
-scheduler: 'cosine_decay'
-min_lr: 0.0
-lr: 0.1
-warmup_epochs: 5
-decay_epochs: 295
+scheduler: 'multi_step_decay'
+lr: 0.06
+decay_rate: 0.5
+multi_step_decay_milestones: [30, 40, 50, 60, 70, 80, 85]
+
 
 # optimizer config
-opt: 'momentum'
-filter_bias_and_bn: True
+opt: 'sgd'
+filter_bias_and_bn: False
 momentum: 0.9
 weight_decay: 0.0001
 loss_scale: 1024
-use_nesterov: False
