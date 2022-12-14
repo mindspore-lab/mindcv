@@ -352,8 +352,8 @@ class RepMLPNet(nn.Cell):
                     cell.bias.set_data(
                         init.initializer(init.Uniform(k), cell.bias.shape, cell.bias.dtype))
 
-    def construct(self, inputs):
-        x = self.conv_embedding(inputs)
+    def forward_features(self, x: Tensor) -> Tensor:
+        x = self.conv_embedding(x)
 
         for i, stage in enumerate(self.stages):
             for block in stage:
@@ -366,9 +366,15 @@ class RepMLPNet(nn.Cell):
         shape = self.shape(x)
         pool = nn.AvgPool2d(kernel_size=(shape[2], shape[3]))
         x = pool(x)
-        x = x.view(shape[0], -1)
-        x = self.head(x)
-        return x
+        return x.view(shape[0], -1)
+    
+    def forward_head(self, x: Tensor)-> Tensor:
+    	return self.head(x)
+        
+
+    def construct(self, x: Tensor) -> Tensor:
+        x = self.forward_features(x)
+        return self.forward_head(x)
 
 
 def locality_injection(self):
