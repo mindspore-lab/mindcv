@@ -8,10 +8,10 @@ setup(
     name="mindcv",
     author="MindSpore Ecosystem",
     author_email='mindspore-ecosystem@example.com',
-    url="https://github.com/mindspore-ecosystem/mindcv",
+    url="https://github.com/mindspore-lab/mindcv",
     project_urls={
-        'Sources': 'https://github.com/mindspore-ecosystem/mindcv',
-        'Issue Tracker': 'https://github.com/mindspore-ecosystem/mindcv/issues',
+        'Sources': 'https://github.com/mindspore-lab/mindcv',
+        'Issue Tracker': 'https://github.com/mindspore-lab/mindcv/issues',
     },
     description="A toolbox of vision models and algorithms based on MindSpore.",
     license="Apache Software License 2.0",
