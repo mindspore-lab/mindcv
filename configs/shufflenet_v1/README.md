@@ -38,33 +38,21 @@ Please download the [ImageNet-1K](https://www.image-net.org/download.php) datase
 - **Hyper-parameters.** The hyper-parameter configurations for producing the reported results are stored in the yaml files in `mindcv/configs/shufflenetv1` folder. For example, to train with one of these configurations, you can run:
 
   ```shell
-  # train shufflenet_v1_g3_x2_0 on 8 GPUs
-  export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
-  mpirun -n 8 python train.py -c configs/shufflenetv1/shufflenet_v1_g3_x2_0.yaml --data_dir /path/to/imagenet
+  # train shufflenet_v1_g3_x2_0 on Ascend
+  cd mindcv/scripts
+  bash run_distribute_train_ascend.sh ./hccl_8p_01234567_123.60.231.9.json /tmp/dataset/imagenet ../configs/shufflenet_v1/shufflenet_v1_2.0_ascend.yaml
   ```
 
   Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascneds** with the same batch size.
-
-- **Finetuning.** Here is an example for finetuning a pretrained shufflenet_v1_g3_x2_0 on CIFAR10 dataset using Momentum optimizer.
-
-  ```shell
-  python train.py --model=shufflenet_v1_g3_x2_0 --pretrained --opt=momentum --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
-  ```
 
 Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
 
 ### Validation
 
-- To validate the trained model, you can use `validate.py`. Here is an example for shufflenet_v1_g3_x2_0 to verify the accuracy of pretrained weights.
-
-  ```shell
-  python validate.py --model=shufflenet_v1_g3_x2_0 --dataset=imagenet --val_split=val --pretrained
-  ```
-
 - To validate the model, you can use `validate.py`. Here is an example for shufflenet_v1_g3_x2_0 to verify the accuracy of your training.
 
   ```shell
-  python validate.py --model=shufflenet_v1_g3_x2_0 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/shufflenet_v1_g3_x2_0-best.ckpt'
+  python validate.py -c configs/shufflenet_v1/shufflenet_v1_2.0_ascend.yaml
   ```
 
 ### Deployment (optional)

@@ -38,12 +38,16 @@ def one_hot(x, num_classes, on_value=1., off_value=0.):
     return x
 
 
-def mixup_target(target, num_classes, lam=1., smoothing=0.0):
+def mixup_target(target, num_classes, lam=1., smoothing=0.0, is_onehot_label=False):
     """mixup_target"""
-    off_value = smoothing / num_classes
-    on_value = 1. - smoothing + off_value
-    y1 = one_hot(target, num_classes, on_value=on_value, off_value=off_value)
-    y2 = one_hot(np.flip(target, axis=0), num_classes, on_value=on_value, off_value=off_value)
+    if not is_onehot_label:
+        off_value = smoothing / num_classes
+        on_value = 1. - smoothing + off_value
+        y1 = one_hot(target, num_classes, on_value=on_value, off_value=off_value)
+        y2 = one_hot(np.flip(target, axis=0), num_classes, on_value=on_value, off_value=off_value)
+    else:
+        y1 = target
+        y2 = np.flip(target)
     return y1 * lam + y2 * (1. - lam)
 
 
@@ -120,10 +124,11 @@ class Mixup:
         correct_lam (bool): apply lambda correction when cutmix bbox clipped by image borders
         label_smoothing (float): apply label smoothing to the mixed target tensor
         num_classes (int): number of classes for target
+        is_onehot_label: indicate wheter the input label is onehot format. 
     """
 
     def __init__(self, mixup_alpha=1., cutmix_alpha=0., cutmix_minmax=None, prob=1.0, switch_prob=0.5,
-                 mode='batch', correct_lam=True, label_smoothing=0.1, num_classes=1000):
+                 mode='batch', correct_lam=True, label_smoothing=0.1, num_classes=1000, is_onehot_label=False):
         self.mixup_alpha = mixup_alpha
         self.cutmix_alpha = cutmix_alpha
         self.cutmix_minmax = cutmix_minmax
@@ -138,6 +143,7 @@ class Mixup:
         self.mode = mode
         self.correct_lam = correct_lam  # correct lambda based on clipped area for cutmix
         self.mixup_enabled = True  # set to false to disable mixing (intended tp be set by train loop)
+        self.is_onehot_label = is_onehot_label # 
 
     def _params_per_elem(self, batch_size):
         """_params_per_elem"""
@@ -243,5 +249,5 @@ class Mixup:
             lam = self._mix_pair(x)
         else:
             lam = self._mix_batch(x)
-        target = mixup_target(target, self.num_classes, lam, self.label_smoothing)
+        target = mixup_target(target, self.num_classes, lam, self.label_smoothing, is_onehot_label=self.is_onehot_label)
         return x.astype(np.float32), target.astype(np.float32)
