@@ -367,7 +367,7 @@ class Visformer(nn.Cell):
                 if cell.bias is not None:
                     cell.bias.set_data(initializer(Constant(0), cell.bias.shape, cell.bias.dtype))
 
-    def construct(self, x: Tensor) -> Tensor:
+    def forward_features(self, x: Tensor) -> Tensor:
         x = self.stem(x)
 
         # stage 0
@@ -402,14 +402,21 @@ class Visformer(nn.Cell):
             x = self.pos_drop(x)
         for b in self.stage3:
             x = b(x)
-
-        # head
         x = self.norm(x)
+        return x
+
+    def forward_head(self, x: Tensor) -> Tensor:
+        # head
         if self.pool:
             x = self.global_pooling(x)
         else:
             x = x[:, :, 0, 0]
         x = self.head(x.view(x.shape[0], -1))
+        return x
+
+    def construct(self, x: Tensor) -> Tensor:
+        x = self.forward_head(x)
+        x = self.forward_head(x)
         return x
 
 
