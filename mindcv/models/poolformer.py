@@ -292,22 +292,19 @@ class PoolFormer(nn.Cell):
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.patch_embed(x)
-        return x
-
-    def forward_head(self, x: Tensor) -> Tensor:
         x = self.network(x)
-
-        return x
-
-    def construct(self, x: Tensor) -> Tensor:
-        x = self.forward_features(x)
-        x = self.forward_head(x)
         if self.fork_feat:
             # otuput features of four stages for dense prediction
             return x
         x = self.norm(x)
-        cls_out = self.head(x.mean([-2, -1]))
-        return cls_out
+        return x
+
+    def forward_head(self, x: Tensor) -> Tensor:
+        return self.head(x.mean([-2, -1]))
+
+    def construct(self, x: Tensor) -> Tensor:
+        x = self.forward_features(x)
+        return self.forward_head(x)
 
 
 @register_model
