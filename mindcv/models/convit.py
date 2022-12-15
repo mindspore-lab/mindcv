@@ -223,6 +223,8 @@ class ConViT(nn.Cell):
         attn_drop_rate (float) : attention layers dropout rate. Default: 0.
         locality_strength (float) : determines how focused each head is around its attention center. Default: 1.
         local_up_to_layer (int) : number of GPSA layers. Default: 10.
+        use_pos_embed (bool): whether use the embeded position.  Default: True.
+        locality_strength（float）: the strength of locality. Default: 1.
     """
 
     def __init__(self, 
