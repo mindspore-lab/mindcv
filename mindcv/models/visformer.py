@@ -415,7 +415,7 @@ class Visformer(nn.Cell):
         return x
 
     def construct(self, x: Tensor) -> Tensor:
-        x = self.forward_head(x)
+        x = self.forward_features(x)
         x = self.forward_head(x)
         return x
 

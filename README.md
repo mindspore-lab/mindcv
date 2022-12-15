@@ -241,10 +241,10 @@ Currently, MindCV supports the model families listed below. More models with pre
 * NASNet - https://arxiv.org/abs/1707.07012
 * PNasNet - https://arxiv.org/abs/1712.00559
 * PVT (Pyramid Vision Transformer) - https://arxiv.org/abs/2102.12122
+* PoolFormer models w/ weights adapted from https://github.com/sail-sg/poolformer
 * RegNet - https://arxiv.org/abs/2003.13678
 * RepMLP https://arxiv.org/abs/2105.01883
 * RepVGG - https://arxiv.org/abs/2101.03697
-* ResMLP - https://arxiv.org/abs/2105.03404
 * ResNet (v1b/v1.5) - https://arxiv.org/abs/1512.03385
 * ResNeXt - https://arxiv.org/abs/1611.05431
 * Res2Net - https://arxiv.org/abs/1904.01169
