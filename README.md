@@ -234,16 +234,21 @@ Currently, MindCV supports the model families listed below. More models with pre
 * GoogleNet - https://arxiv.org/abs/1409.4842
 * Inception-V3 - https://arxiv.org/abs/1512.00567
 * Inception-ResNet-V2 and Inception-V4 - https://arxiv.org/abs/1602.07261
+* MNASNet - https://arxiv.org/abs/1807.11626
 * MobileNet-V1 - https://arxiv.org/abs/1704.04861
 * MobileNet-V2 - https://arxiv.org/abs/1801.04381
 * MobileNet-V3 (MBConvNet w/ Efficient Head) - https://arxiv.org/abs/1905.02244
 * NASNet - https://arxiv.org/abs/1707.07012
 * PNasNet - https://arxiv.org/abs/1712.00559
+* PVT (Pyramid Vision Transformer) - https://arxiv.org/abs/2102.12122
+* PoolFormer models w/ weights adapted from https://github.com/sail-sg/poolformer
+* RegNet - https://arxiv.org/abs/2003.13678
+* RepMLP https://arxiv.org/abs/2105.01883
 * RepVGG - https://arxiv.org/abs/2101.03697
-* ResMLP - https://arxiv.org/abs/2105.03404
 * ResNet (v1b/v1.5) - https://arxiv.org/abs/1512.03385
 * ResNeXt - https://arxiv.org/abs/1611.05431
 * Res2Net - https://arxiv.org/abs/1904.01169
+* ReXNet - https://arxiv.org/abs/2007.00992
 * ShuffleNet v1 - https://arxiv.org/abs/1707.01083
 * ShuffleNet v2 - https://arxiv.org/abs/1807.11164
 * SKNet - https://arxiv.org/abs/1903.06586
@@ -306,6 +311,7 @@ Please see [configs](./configs) for the details about model performance and pret
 1. Support lr warmup for all lr scheduling algorithms besides cosine decay.
 2. Add repeated augmentation, which can be enabled by setting `--aug_repeats` to be a value larger than 1 (typically, 3 or 4 is a common choice).
 3. Add EMA.
+4. Improve BCE loss to support mixup/cutmix. 
 
 - 2022/11/21
 1. Add visualization for loss and acc curves
