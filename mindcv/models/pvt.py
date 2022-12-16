@@ -184,7 +184,7 @@ class PyramidVisionTransformer(nn.Cell):
             drop_path_rate(float) : The drop rate for drop path. Default: 0.0.
             norm_layer(nn.Cell) : Norm layer that will be used in blocks. Default: nn.LayerNorm.
             depths (list) : number of Blocks.
-            sr_ratios(list) : stride and kernel size of each attention
+            sr_ratios(list) : stride and kernel size of each attention.
             num_stages(int) : number of stage. Default: 4.
         """
     def __init__(self, img_size=224, patch_size=4, in_chans=3, num_classes=1000, embed_dims=[64, 128, 320, 512],
