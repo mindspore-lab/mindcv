@@ -137,13 +137,13 @@ class DPN(nn.Cell):
     `"Dual Path Networks" <https://arxiv.org/pdf/1707.01629.pdf>`_
 
     Args:
-        num_init_channel: the output channel of first blocks. Default: 64.
-        k_r: the first channel of each stage. Default: 96.
-        g: number of group in the conv2d. Default: 32.
+        num_init_channel: int type, the output channel of first blocks. Default: 64.
+        k_r: int type, the first channel of each stage. Default: 96.
+        g: int type,number of group in the conv2d. Default: 32.
         k_sec Tuple[int]: multiplicative factor for number of bottleneck layers. Default: 4.
         inc_sec Tuple[int]: the first output channel in each stage. Default: (16, 32, 24, 128).
-        in_channels: number of input channels. Default: 3.
-        num_classes: number of classification classes. Default: 1000.
+        in_channels: int type, number of input channels. Default: 3.
+        num_classes: int type, number of classification classes. Default: 1000.
     """
     def __init__(self,
                  num_init_channel: int = 64,
