@@ -81,4 +81,4 @@ def test_checkpoint_manager(mode, ckpt_save_policy):
         save_path = os.path.join('./' + f'network_{t + 1}.ckpt')
         ckpoint_filelist = manager.save_ckpoint(network, num_ckpt=2, metric=acc, save_path=save_path)
 
-    assert len(ckpoint_filelist) == 2
+    assert len(ckpoint_filelist) == 2, "num of checkpoints is NOT correct"

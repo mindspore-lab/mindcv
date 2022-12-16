@@ -74,8 +74,14 @@ def create_loader(
                           input_columns='image',
                           num_parallel_workers=num_parallel_workers,
                           python_multiprocessing=python_multiprocessing)
+
     if target_transform is None:
         target_transform = transforms.TypeCast(ms.int32)
+        is_onehot_target = False
+    else:
+        is_onehot_target = True
+        
+        
     target_input_columns = 'label' if 'label' in dataset.get_col_names() else 'fine_label'
     dataset = dataset.map(operations=target_transform,
                           input_columns=target_input_columns,
@@ -98,11 +104,13 @@ def create_loader(
                 prob=cutmix_prob,
                 switch_prob=0.5,
                 label_smoothing=0.0,
-                num_classes=num_classes)
+                num_classes=num_classes,
+                is_onehot_label=is_onehot_target)
             trans_batch = mixup_fn
             #trans_batch = vision.MixUpBatch(alpha=mixup)
 
         if trans_batch != []:
+            # images in a batch are mixed. labels are converted soft onehot labels.
             dataset = dataset.map(input_columns=["image", target_input_columns],
                                   num_parallel_workers=num_parallel_workers, operations=trans_batch)
 

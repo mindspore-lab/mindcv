@@ -41,12 +41,6 @@ Please download the [ImageNet-1K](https://www.image-net.org/download.php) datase
   ```
   
   Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascends** with the same batch size.
-  
-- **Finetuning.** Here is an example for finetuning a pretrained mnasnet0_75 on CIFAR10 dataset using Rmsprop optimizer.
-
-  ```shell
-  python train.py --model=mnasnet0_75 --pretrained --opt=rmsprop --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
-  ```
 
 Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
 
@@ -55,13 +49,19 @@ Detailed adjustable parameters and their default value can be seen in [config.py
 - To validate the trained model, you can use `validate.py`. Here is an example for mnasnet0_75 to verify the accuracy of pretrained weights.
   
   ```shell
-  python validate.py --model=mnasnet0_75 --dataset=imagenet --val_split=val --pretrained
+  python validate.py 
+  -c configs/mnasnet/mnasnet0.75_ascend.yaml 
+  --data_dir=/path/to/imagenet 
+  --ckpt_path=/path/to/ckpt
   ```
   
 - To validate the model, you can use `validate.py`. Here is an example for mnasnet0_75 to verify the accuracy of your training.
   
   ```shell
-  python validate.py --model=mnasnet0_75 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/mnasnet0_75-best.ckpt'
+  python validate.py 
+  -c configs/mnasnet/mnasnet0.75_ascend.yaml 
+  --data_dir=/path/to/imagenet 
+  --ckpt_path=/path/to/ckpt
   ```
 
 ### Deployment (optional)

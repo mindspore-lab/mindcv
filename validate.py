@@ -55,7 +55,8 @@ def validate(args):
                            drop_rate=args.drop_rate,
                            drop_path_rate=args.drop_path_rate,
                            pretrained=args.pretrained,
-                           checkpoint_path=args.ckpt_path)
+                           checkpoint_path=args.ckpt_path,
+                           use_ema=args.use_ema)
     network.set_train(False)
 
     # create loss
