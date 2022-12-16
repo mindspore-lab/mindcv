@@ -15,7 +15,7 @@ PVT是一种无需卷积操作的用于密集预测的通用主干网络。PVT�
 
 | Model           |  Top-1 (%)  | Train T. | Infer T. |  Download | Config | Log |  
 |-----------------|-----------|-------|-------|------------|-------|--------|
-| PVT_tiny     |74.92 |  433s/epoch  | 16ms/step | [model]() | [cfg]()    | [log]() |
+| PVT_tiny     |74.81 |  387s/epoch  | 16ms/step | [model]() | [cfg]()    | [log]() |
 | PVT_small     | 79.66  |538s/epoch |30ms/step | [model]() | [cfg]()    | [log]() |
 | PVT_medium    |81.82  |766s/epoch |47ms/step | [model]() | [cfg]()    | [log]() |
 | PVT_large    |81.75  |1074s/epoch |67ms/step | [model]() | [cfg]()    | [log]() |
