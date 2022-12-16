@@ -38,10 +38,10 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'pvt_tiny': _cfg(url=''),
-    'pvt_small': _cfg(url=''),
-    'pvt_medium': _cfg(url=''),
-    'pvt_large': _cfg(url=''),
+    'pvt_tiny': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_tiny_224.ckpt'),
+    'pvt_small': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_small_224.ckpt'),
+    'pvt_medium': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_medium_224.ckpt'),
+    'pvt_large': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_large_224.ckpt'),
     'pvt_huge_v2': _cfg(url=''),
 }
 
@@ -249,7 +249,7 @@ class PyramidVisionTransformer(nn.Cell):
         self.norm = norm_layer([embed_dims[3]])
 
         # cls_token
-        self.cls_token = mindspore.Parameter(ops.zeros((1, 1, embed_dims[3]), mindspore.float32))
+        self.cls_token = mindspore.Parameter(ops.zeros((1, 1, embed_dims[3]), mindspore.float16))
 
         # classification head
         self.head = nn.Dense(embed_dims[3], num_classes) if num_classes > 0 else Identity()

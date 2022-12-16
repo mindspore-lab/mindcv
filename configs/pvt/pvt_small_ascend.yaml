@@ -61,7 +61,7 @@ scheduler: 'warmup_cosine_decay'
 lr: 0.0005
 min_lr: 0.000001
 warmup_epochs: 10
-decay_epochs: 490
+decay_epochs: 390
 
 # optimizer config
 opt: 'adamw'
