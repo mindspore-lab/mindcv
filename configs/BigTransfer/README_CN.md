@@ -19,15 +19,10 @@
 | :----------: | :------: | :-------: | :-------: | :-------: | :--------: | :---------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
 |    BiT50-S   | D910x8-G |   76.81   |   93.17   |    25     | 651s/step  |             | [model](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/BigTransfer/BiT50.yaml) | [log](https://github.com/mindspore-lab/mindcv/tree/main/configs/BigTransfer) |
 
-#### 备注
-
-- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
-- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.
-
-## 示例
+## 备注
 
 - 以上模型均在ImageNet-1K数据集上训练和验证。
-- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.
+- Context: D910 x 8 - G, D910 - 中文昇腾910, x8 - 8卡, G - 静态图模型.
 
 ***
 
