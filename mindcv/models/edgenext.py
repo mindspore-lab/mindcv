@@ -17,13 +17,7 @@ from .layers.identity import Identity
 from .utils import load_pretrained
 
 __all__ = [
-    'edgenext_xx_small',
-    'edgenext_x_small',
     'edgenext_small',
-    'edgenext_base',
-    'edgenext_xx_small_bn_hs',
-    'edgenext_x_small_bn_hs',
-    'edgenext_small_bn_hs'
 ]
 
 
@@ -138,7 +132,7 @@ class ConvEncoder(nn.Cell):
         self.act = nn.GELU(approximate=False)
         self.pwconv2 = nn.Dense(expan_ratio * dim, dim)
 
-        self.gamma_conv = Parameter(Tensor(layer_scale_init_value * np.ones(dim), ms.float32), requires_grad=True) if layer_scale_init_value > 0. else None
+        self.gamma1 = Parameter(Tensor(layer_scale_init_value * np.ones(dim), ms.float32), requires_grad=True) if layer_scale_init_value > 0. else None
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
 
     def construct(self, x: Tensor) -> Tensor:
@@ -150,8 +144,8 @@ class ConvEncoder(nn.Cell):
         x = self.pwconv1(x)
         x = self.act(x)
         x = self.pwconv2(x)
-        if self.gamma_conv is not None:
-            x = self.gamma_conv * x
+        if self.gamma1 is not None:
+            x = self.gamma1 * x
         x = ops.transpose(x, (0, 3, 1, 2))
         x = input + self.drop_path(x)
         return x
@@ -166,13 +160,13 @@ class ConvEncoderBNHS(nn.Cell):
                  kernel_size=7):
         super().__init__()
         self.dwconv = nn.Conv2d(dim, dim, kernel_size=kernel_size, pad_mode="pad", padding=kernel_size // 2, group=dim,
-                                has_bias=False)
+                                has_bias=True)
         self.norm = nn.BatchNorm2d(dim)
         self.pwconv1 = nn.Dense(dim, expan_ratio * dim)
         self.act = nn.HSwish()
         self.pwconv2 = nn.Dense(expan_ratio * dim, dim)
-        self.gamma_conv = Parameter(Tensor(layer_scale_init_value * np.ones(dim), ms.float32),
-                                    requires_grad=True) if layer_scale_init_value > 0. else None
+        self.gamma1 = Parameter(Tensor(layer_scale_init_value * np.ones(dim), ms.float32),
+                                requires_grad=True) if layer_scale_init_value > 0. else None
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
 
     def construct(self, x: Tensor) -> Tensor:
@@ -184,8 +178,8 @@ class ConvEncoderBNHS(nn.Cell):
 
         x = self.act(x)
         x = self.pwconv2(x)
-        if self.gamma_conv is not None:
-            x = self.gamma_conv * x
+        if self.gamma1 is not None:
+            x = self.gamma1 * x
         x = ops.transpose(x, (0, 3, 1, 2))
 
         x = input + self.drop_path(x)
@@ -251,7 +245,7 @@ class SDTAEncoder(nn.Cell):
         B, C, H, W = x.shape
         x = ops.reshape(x, (B, C, H * W))
         x = ops.transpose(x, (0, 2, 1))
-        if self.pos_embd:
+        if self.pos_embd is not None:
             pos_encoding = ops.transpose(ops.reshape(self.pos_embd(B, H, W), (B, -1, x.shape[1])), (0, 2, 1))
             x = x + pos_encoding
         x = x + self.drop_path(self.gamma_xca * self.xca(self.norm_xca(x)))
@@ -294,7 +288,7 @@ class SDTAEncoderBNHS(nn.Cell):
         self.convs = nn.CellList(convs)
 
         self.pos_embd = None
-        if use_pos_emb:
+        if use_pos_emb is not None:
             self.pos_embd = PositionalEncodingFourier(dim=dim)
         self.norm_xca = nn.BatchNorm2d(dim)
         self.gamma_xca = Parameter(Tensor(layer_scale_init_value * np.ones(dim), ms.float32),
@@ -394,6 +388,26 @@ class XCA(nn.Cell):
 
 
 class EdgeNeXt(nn.Cell):
+    r"""EdgeNeXt model class, based on
+    `"Efficiently Amalgamated CNN-Transformer Architecture for Mobile Vision" <https://arxiv.org/abs/2206.10589>`_
+
+    Args:
+        in_channels: number of input channels. Default: 3
+        num_classes: number of classification classes. Default: 1000
+        depths: the depths of each layer. Default: [0, 0, 0, 3]
+        dims: the middle dim of each layer. Default: [24, 48, 88, 168]
+        global_block: number of global block. Default: [0, 0, 0, 3]
+        global_block_type: type of global block. Default: ['None', 'None', 'None', 'SDTA']
+        drop_path_rate: Stochastic Depth. Default: 0.
+        layer_scale_init_value: value of layer scale initialization. Default: 1e-6
+        head_init_scale: scale of head initialization. Default: 1.
+        expan_ratio: ratio of expansion. Default: 4
+        kernel_sizes: kernel sizes of different stages. Default: [7, 7, 7, 7]
+        heads: number of attention heads. Default: [8, 8, 8, 8]
+        use_pos_embd_xca: use position embedding in xca or not. Default: [False, False, False, False]
+        use_pos_embd_global: use position embedding globally or not. Default: False
+        d2_scales: scales of splitting channels
+    """
     def __init__(self, in_chans=3, num_classes=1000,
                  depths=[3, 3, 9, 3], dims=[24, 48, 88, 168],
                  global_block=[0, 0, 0, 3], global_block_type=['None', 'None', 'None', 'SDTA'],
@@ -459,7 +473,7 @@ class EdgeNeXt(nn.Cell):
                     cell.bias.set_data(init.initializer(init.Zero(),
                                                         cell.bias.shape,
                                                         cell.bias.dtype))
-            elif isinstance(cell, (LayerNorm, nn.LayerNorm)):
+            elif isinstance(cell, (nn.LayerNorm)):
                 cell.gamma.set_data(init.initializer(init.One(),
                                                      cell.gamma.shape,
                                                      cell.gamma.dtype))
@@ -472,7 +486,7 @@ class EdgeNeXt(nn.Cell):
     def forward_features(self, x):
         x = self.downsample_layers[0](x)
         x = self.stages[0](x)
-        if self.pos_embd:
+        if self.pos_embd is not None:
             B, C, H, W = x.shape
             x = x + self.pos_embd(B, H, W)
         for i in range(1, 4):
@@ -502,14 +516,14 @@ class EdgeNeXtBNHS(nn.Cell):
             self.pos_embd = None
         self.downsample_layers = nn.CellList()  # stem and 3 intermediate downsampling conv layers
         stem = nn.SequentialCell(
-            nn.Conv2d(in_chans, dims[0], kernel_size=4, stride=4),
+            nn.Conv2d(in_chans, dims[0], kernel_size=4, stride=4, has_bias=True),
             nn.BatchNorm2d(dims[0])
         )
         self.downsample_layers.append(stem)
         for i in range(3):
             downsample_layer = nn.SequentialCell(
                 nn.BatchNorm2d(dims[i]),
-                nn.Conv2d(dims[i], dims[i + 1], kernel_size=2, stride=2, has_bias=False),
+                nn.Conv2d(dims[i], dims[i + 1], kernel_size=2, stride=2, has_bias=True),
             )
             self.downsample_layers.append(downsample_layer)
 
@@ -552,7 +566,7 @@ class EdgeNeXtBNHS(nn.Cell):
                     cell.bias.set_data(init.initializer(init.Zero(),
                                                         cell.bias.shape,
                                                         cell.bias.dtype))
-            elif isinstance(cell, (LayerNorm, nn.LayerNorm)):
+            elif isinstance(cell, (nn.LayerNorm)):
                 cell.gamma.set_data(init.initializer('ones', cell.gamma.shape, cell.gamma.dtype))
                 cell.beta.set_data(init.initializer('zeros', cell.beta.shape, cell.beta.dtype))
 
@@ -562,7 +576,7 @@ class EdgeNeXtBNHS(nn.Cell):
     def forward_features(self, x):
         x = self.downsample_layers[0](x)
         x = self.stages[0](x)
-        if self.pos_embd:
+        if self.pos_embd is not None:
             B, C, H, W = x.shape
             x = x + self.pos_embd(B, H, W)
         for i in range(1, 4):
@@ -582,6 +596,7 @@ def edgenext_xx_small(pretrained: bool = False, num_classes: int = 1000, in_chan
         Refer to the base class `models.EdgeNeXt` for more details."""
     default_cfg = default_cfgs['edgenext_xx_small']
     model = EdgeNeXt(depths=[2, 2, 6, 2], dims=[24, 48, 88, 168], expan_ratio=4,
+                     num_classes=num_classes,
                      global_block=[0, 1, 1, 1],
                      global_block_type=['None', 'SDTA', 'SDTA', 'SDTA'],
                      use_pos_embd_xca=[False, True, False, False],
@@ -606,6 +621,7 @@ def edgenext_x_small(pretrained: bool = False,
         Refer to the base class `models.EdgeNeXt` for more details."""
     default_cfg = default_cfgs['edgenext_x_small']
     model = EdgeNeXt(depths=[3, 3, 9, 3], dims=[32, 64, 100, 192], expan_ratio=4,
+                     num_classes=num_classes,
                      global_block=[0, 1, 1, 1],
                      global_block_type=['None', 'SDTA', 'SDTA', 'SDTA'],
                      use_pos_embd_xca=[False, True, False, False],
@@ -630,6 +646,7 @@ def edgenext_small(pretrained: bool = False,
         Refer to the base class `models.EdgeNeXt` for more details."""
     default_cfg = default_cfgs['edgenext_small']
     model = EdgeNeXt(depths=[3, 3, 9, 3], dims=[48, 96, 160, 304], expan_ratio=4,
+                     num_classes=num_classes,
                      global_block=[0, 1, 1, 1],
                      global_block_type=['None', 'SDTA', 'SDTA', 'SDTA'],
                      use_pos_embd_xca=[False, True, False, False],
@@ -653,6 +670,7 @@ def edgenext_base(pretrained: bool = False,
         Refer to the base class `models.EdgeNeXt` for more details."""
     default_cfg = default_cfgs['edgenext_base']
     model = EdgeNeXt(depths=[3, 3, 9, 3], dims=[80, 160, 288, 584], expan_ratio=4,
+                     num_classes=num_classes,
                      global_block=[0, 1, 1, 1],
                      global_block_type=['None', 'SDTA', 'SDTA', 'SDTA'],
                      use_pos_embd_xca=[False, True, False, False],
@@ -677,6 +695,7 @@ def edgenext_xx_small_bn_hs(pretrained: bool = False,
         Refer to the base class `models.EdgeNeXtBNHS` for more details."""
     default_cfg = default_cfgs['edgenext_xx_small_bn_hs']
     model = EdgeNeXtBNHS(depths=[2, 2, 6, 2], dims=[24, 48, 88, 168], expan_ratio=4,
+                         num_classes=num_classes,
                          global_block=[0, 1, 1, 1],
                          global_block_type=['None', 'SDTA_BN_HS', 'SDTA_BN_HS', 'SDTA_BN_HS'],
                          use_pos_embd_xca=[False, True, False, False],
@@ -701,6 +720,7 @@ def edgenext_x_small_bn_hs(pretrained: bool = False,
         Refer to the base class `models.EdgeNeXtBNHS` for more details."""
     default_cfg = default_cfgs['edgenext_x_small_bn_hs']
     model = EdgeNeXtBNHS(depths=[3, 3, 9, 3], dims=[32, 64, 100, 192], expan_ratio=4,
+                         num_classes=num_classes,
                          global_block=[0, 1, 1, 1],
                          global_block_type=['None', 'SDTA_BN_HS', 'SDTA_BN_HS', 'SDTA_BN_HS'],
                          use_pos_embd_xca=[False, True, False, False],
@@ -725,6 +745,7 @@ def edgenext_small_bn_hs(pretrained: bool = False,
         Refer to the base class `models.EdgeNeXtBNHS` for more details."""
     default_cfg = default_cfgs['edgenext_small_bn_hs']
     model = EdgeNeXtBNHS(depths=[3, 3, 9, 3], dims=[48, 96, 160, 304], expan_ratio=4,
+                         num_classes=num_classes,
                          global_block=[0, 1, 1, 1],
                          global_block_type=['None', 'SDTA_BN_HS', 'SDTA_BN_HS', 'SDTA_BN_HS'],
                          use_pos_embd_xca=[False, True, False, False],
