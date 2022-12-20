@@ -6,10 +6,6 @@ class NoLossScaler(LossScaler):
     """
     No LossScaler
     """
-
-    def __init__(self):
-        super().__init__(1)
-
     def scale(self, inputs):
         return inputs
 
