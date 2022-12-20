@@ -650,12 +650,12 @@ def vit_b_16_224(
     `An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale <https://arxiv.org/abs/2010.11929>`_.
 
     Args:
-        image_size (int): The input image size. Default: 224 for ImageNet.
-        num_classes (int): The number of classification. Default: 1000.
-        has_logits (bool): Whether has logits or not. Default: False.
         pretrained (bool): Whether to download and load the pre-trained model. Default: False.
-        drop_rate (float): The drop out rate. Default: 0.0.
-        attention_dropout (float): The attention dropout rate. Default: 0.0.
+        num_classes (int): The number of classification. Default: 1000.
+        in_channels (int): The number of input channels. Default: 3.
+        image_size (int): The input image size. Default: 224 for ImageNet.
+        has_logits (bool): Whether has logits or not. Default: False.
+        drop_rate (float): The drop out rate. Default: 0.0.s
         drop_path_rate (float): The stochastic depth rate. Default: 0.0.
 
     Returns:
