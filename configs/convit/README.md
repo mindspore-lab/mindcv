@@ -13,12 +13,12 @@ ConViT combines the strengths of convolutional architectures and Vision Transfor
 
 | Model            | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
 |------------------|-----------|-------------|------------|----------------|----------|----------|-----------|--------|-----|
-| convit_tiny      | D910x8-G  | 73.66       | 91.72      | 6              | 240s/epoch | 50.7ms/step | [model]() | [cfg]() | [log]() |
-| convit_tiny_plus | D910x8-G  | 77.00       | 93.60      | 10             | 247s/epoch | 40.9ms/step | [model]() | [cfg]() | [log]() |
-| convit_small     | D910x8-G  | 81.63       | 95.59      | 27             | 490s/epoch | 36.4ms/step | [model]() | [cfg]() | [log]() |
-| convit_small_plus| D910x8-G  | 81.82       | 95.41      | 48             | 556s/epoch | 32.7ms/step | [model]() | [cfg]() | [log]() |
-| convit_base      | D910x8-G  | 82.10       | 95.52      | 86             | 880s/epoch | 32.8ms/step | [model]() | [cfg]() | [log]() |
-| convit_base_plus | D910x8-G  | 82.00       | 95.04      | 152            | 1028s/epoch | 36.6ms/step | [model]() | [cfg]() | [log]() |
+| convit_tiny      | D910x8-G  | 73.66       | 91.72      | 6              | 243s/epoch | 50.7ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/) | [cfg]() | [log]() |
+| convit_tiny_plus | D910x8-G  | 77.00       | 93.60      | 10             | 246s/epoch | 40.9ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/) | [cfg]() | [log]() |
+| convit_small     | D910x8-G  | 81.63       | 95.59      | 27             | 491s/epoch | 36.4ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/) | [cfg]() | [log]() |
+| convit_small_plus| D910x8-G  | 81.8        | 95.42      | 48             | 557s/epoch | 32.7ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/) | [cfg]() | [log]() |
+| convit_base      | D910x8-G  | 82.10       | 95.52      | 86             | 880s/epoch | 32.8ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/) | [cfg]() | [log]() |
+| convit_base_plus | D910x8-G  | 81.96       | 95.04      | 152            | 1031s/epoch | 36.6ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/) | [cfg]() | [log]() |
 
 #### Notes
 
