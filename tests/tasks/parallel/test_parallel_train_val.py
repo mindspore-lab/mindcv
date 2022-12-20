@@ -63,7 +63,8 @@ def test_train(mode,  model='resnet18', opt='adamw', scheduler='polynomial'):
 
     if check_acc: 
         res = out.decode()
-        acc = res.split(',')[0].split(':')[1]
+        last_line = res.strip().split('\n')[-1]
+        acc = last_line.split(',')[0].split(':')[1]
         print('Val acc: ', acc)
         assert float(acc) > 0.5, 'Acc is too low'
 
