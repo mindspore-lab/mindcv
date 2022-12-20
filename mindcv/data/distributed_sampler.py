@@ -11,12 +11,12 @@ class RepeatAugSampler():
     This sampler was adapted from https://github.com/facebookresearch/deit/blob/0c4b8f60/samplers.py
 
     Args:
-        dataset_size: dataset size
-        num_shards: num devices
-        rank_id: device id
-        shuffle: shuffle
-        num_repeats: num of repeated instances in repeated augmentation, default:3
-        selected_round: round the total num of samples by this factor
+        dataset_size: dataset size.
+        num_shards: num devices.
+        rank_id: device id.
+        shuffle(bool): True for using shuffle, False for not using.
+        num_repeats(int): num of repeated instances in repeated augmentation, Default:3.
+        selected_round(int): round the total num of samples by this factor, Defailt:256.
     """
     def __init__(
             self,

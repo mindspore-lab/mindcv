@@ -137,7 +137,7 @@ Infer the input image with a pretrained SoTA model,
 ```
 The top-1 prediction result is labrador retriever (拉布拉多犬), which is the breed of this cut dog.
 
-### Useful Script Guidelines
+### Training and Validation
 It is easy to train your model on standard datasets or your own dataset with MindCV. Model training, transfer learning, or evaluaiton can be done using one or a few line of code with flexible configuration. 
 
 - Standalone Training
@@ -183,7 +183,7 @@ You can configure your model and other components either by specifying external 
 mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
 
-More [yaml config files](configs) used to yield competitive results on ImageNet training can be found in the `configs` folder. 
+**Well-defined config files for training SoTA models are placed in the [`configs`](configs) folder, along with their performance reported on ImageNet dataset.**
 
 
 - Validation
