@@ -10,29 +10,33 @@ data_url: '/cache/data'
 data_dir: '/cache/data/imagenet'
 shuffle: True
 dataset_download: False
-batch_size: 64
+batch_size: 128
 drop_remainder: True
-
+auto_augment: True
 
 # Augmentation config
-interpolation: 'bicubic'
+image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+interpolation: 'bilinear'
+crop_pct: 0.875
+color_jitter: [0.4, 0.4, 0.4]
 re_prob: 0.2
 drop_rate: 0.2
-auto_augment: 'randaug-m9-mstd0.5'
-re_value: 'random'
 
 # model config
-model: 'rexnet_x10'
+model: 'rexnet_x13'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''
-keep_checkpoint_max: 5
+keep_checkpoint_max: 10
 ckpt_save_dir: '/cache/output'
 ckpt_save_policy: 'top_k'
 val_split: 'val'
 val_while_train: True
 val_interval: 1
-epoch_size: 410
+epoch_size: 400
 dataset_sink_mode: True
 amp_level: 'O3'
 
@@ -41,10 +45,10 @@ loss: 'CE'
 label_smoothing: 0.1
 
 # lr scheduler config
-scheduler: 'warmup_cosine_decay'
-min_lr: 1.0e-3
+scheduler: 'warmup_cosine_decay' # model_zoo中是polynomial
+min_lr: 0.00001
 lr: 0.5
-warmup_epochs: 3
+warmup_epochs: 0
 decay_epochs: 400
 
 # optimizer config
@@ -53,7 +57,7 @@ filter_bias_and_bn: True
 momentum: 0.9
 weight_decay: 0.00001
 loss_scale: 1024
-use_nesterov: True
+use_nesterov: False
 
 
 
