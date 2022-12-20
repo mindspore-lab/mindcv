@@ -83,7 +83,7 @@ def create_dataset(
     name = name.lower()
     # subset sampling
     if num_samples is not None and num_samples > 0:
-        # TODO: rewrite ordered distributed sampler
+        # TODO: rewrite ordered distributed sampler (subset sampling in distributed mode is not tested)
         if num_shards is not None and num_shards > 1: # distributed
             print('ns', num_shards, 'num_samples', num_samples)
             sampler = DistributedSampler(num_shards, shard_id, shuffle=shuffle, num_samples=num_samples)
@@ -132,14 +132,13 @@ def create_dataset(
 
     else:
         if name == "imagenet" and download:
-            raise ValueError("Imagenet dataset download is not supported.")
+            raise ValueError("Imagenet dataset download is not supported. Please download imagenet from https://www.image-net.org/download.php, and parse the path of dateset directory via args.data_dir")
 
         if os.path.isdir(root):
             root = os.path.join(root, split)
         dataset = ImageFolderDataset(dataset_dir=root, **mindspore_kwargs)
         ''' Another implementation which a bit slower than ImageFolderDataset
             imagenet_dataset = ImageNetDataset(dataset_dir=root)
-            # TODO: why round by 256?
             sampler = RepeatAugSampler(len(imagenet_dataset), num_shards=num_shards, rank_id=shard_id, num_repeats=repeated_aug, selected_round=1, shuffle=shuffle)
             dataset = ds.GeneratorDataset(imagenet_dataset, column_names=imagenet_dataset.column_names, sampler=sampler)
         '''
