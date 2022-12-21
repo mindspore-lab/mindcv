@@ -31,7 +31,7 @@ analysis of the main components that lead to high transfer performance.
 #### Notes
 
 - All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
-- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.
+- Context: D910 x 8 - G, D910 - Ascend 910, x8 - 8 devices, G - graph mode.
 
 ## Quick Start
 
@@ -52,11 +52,12 @@ Please download the [ImageNet-1K](https://www.image-net.org/download.php) datase
 - **Hyper-parameters.** The hyper-parameter configurations for producing the reported results are stored in the yaml files in `mindcv/configs/BigTransfer` folder. For example, to train with one of these configurations, you can run:
 
   ```
-  # train BiT on 8 NPUs
+  # train BiT on 8 GPUs
+  export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7  # suppose there are 8 GPUs
   mpirun -n 8 python train.py -c configs/BigTransfer/BiT50.yaml --data_dir /path/to/imagenet
   ```
 
-  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascneds** with the same batch size.
+  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascends** with the same batch size.
 
 Detailed adjustable parameters and their default value can be seen in [config.py](https://github.com/mindspore-lab/mindcv/tree/main/configs/BigTransfer)
 
