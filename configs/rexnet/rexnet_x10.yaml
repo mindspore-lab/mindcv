@@ -17,7 +17,6 @@ drop_remainder: True
 # Augmentation config
 interpolation: 'bicubic'
 re_prob: 0.2
-drop_rate: 0.2
 auto_augment: 'randaug-m9-mstd0.5'
 re_value: 'random'
 
@@ -26,15 +25,16 @@ model: 'rexnet_x10'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''
-keep_checkpoint_max: 5
+keep_checkpoint_max: 10
 ckpt_save_dir: '/cache/output'
 ckpt_save_policy: 'top_k'
 val_split: 'val'
 val_while_train: True
 val_interval: 1
-epoch_size: 410
+epoch_size: 400
 dataset_sink_mode: True
-amp_level: 'O3'
+amp_level: 'O2'
+drop_rate: 0.2
 
 # loss config
 loss: 'CE'
@@ -42,18 +42,15 @@ label_smoothing: 0.1
 
 # lr scheduler config
 scheduler: 'warmup_cosine_decay'
-min_lr: 1.0e-3
+min_lr: 1.0e-6
 lr: 0.5
-warmup_epochs: 3
-decay_epochs: 400
+warmup_epochs: 5
+decay_epochs: 395
 
 # optimizer config
 opt: 'sgd'
 filter_bias_and_bn: True
 momentum: 0.9
-weight_decay: 0.00001
+weight_decay: 1.0e-5
 loss_scale: 1024
 use_nesterov: True
-
-
-
