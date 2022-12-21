@@ -15,7 +15,7 @@ import glob
 check_acc = True
 
 @pytest.mark.parametrize('mode', ['GRAPH', 'PYNATIVE_FUNC'])
-def test_train(mode,  model='resnet18', opt='adamw', scheduler='polynomial'):
+def test_train(mode,  model='resnet18', opt='adam', scheduler='polynomial_decay'):
     ''' train on a imagenet subset dataset '''
     # prepare data 
     data_dir = 'data/Canidae'
@@ -69,4 +69,5 @@ def test_train(mode,  model='resnet18', opt='adamw', scheduler='polynomial'):
         assert float(acc) > 0.5, 'Acc is too low'
 
 if __name__=="__main__":
-    test_train('GRAPH', 'resnet18', 'adam', 'polynomial_decay')
+    test_train('GRAPH')#, 'resnet18', 'adam', 'polynomial_decay')
+    #test_train('PYNATIVE_FUNC')
