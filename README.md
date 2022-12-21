@@ -1,7 +1,7 @@
 # MindCV
 
 <p align="left">
-    <a href="https://mindcv-ai.readthedocs.io/en/latest">
+    <a href="https://mindcv.readthedocs.io/en/latest">
         <img alt="docs" src="https://img.shields.io/badge/docs-latest-blue">
     </a>
     <a href="https://github.com/mindspore-lab/mindcv/blob/main/LICENSE">

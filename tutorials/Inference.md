@@ -69,7 +69,7 @@ data_dir = "./data/"
 dataset = create_dataset(root=data_dir, split='test', num_parallel_workers=num_workers)
 # 图像可视
 from PIL import Image
-display(Image.open("./data/test/dog/dog.jpg"))
+Image.open("./data/test/dog/dog.jpg")
 ```
 
 
