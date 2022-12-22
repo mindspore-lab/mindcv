@@ -34,11 +34,11 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'rexnet_x09': _cfg(url=''),
-    'rexnet_x10': _cfg(url=''),
-    'rexnet_x13': _cfg(url=''),
-    'rexnet_x15': _cfg(url=''),
-    'rexnet_x20': _cfg(url='')
+    'rexnet_x09': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet0.9_acc77.07_bs64_8p.ckpt'),
+    'rexnet_x10': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet1.0_acc77.4_bs64_8p.ckpt'),
+    'rexnet_x13': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet1.3_acc79.06_bs64_8p.ckpt'),
+    'rexnet_x15': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet1.5_acc79.94_bs64_8p.ckpt'),
+    'rexnet_x20': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet2.0_acc80.6_bs64_8p.ckpt')
 }
 
 

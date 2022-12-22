@@ -38,10 +38,10 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'pvt_tiny': _cfg(url=''),
-    'pvt_small': _cfg(url=''),
-    'pvt_medium': _cfg(url=''),
-    'pvt_large': _cfg(url=''),
+    'pvt_tiny': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_tiny_224.ckpt'),
+    'pvt_small': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_small_224.ckpt'),
+    'pvt_medium': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_medium_224.ckpt'),
+    'pvt_large': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_large_224.ckpt'),
     'pvt_huge_v2': _cfg(url=''),
 }
 
