@@ -21,8 +21,8 @@ Middle: SqueezeNet with simple bypass; Right: SqueezeNet with complex bypass .
 ***
 | Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
 |-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
-| squeezenet_1.0 | D910x8-G | 59.49   | 81.22 |   |   |   | [model]() | [cfg]() | [log]() |
-| squeezenet_1.1 | D910x8-G | 58.99 |   80.99 |   |   |   | [model]() | [cfg]() | [log]() |
+| squeezenet_1.0 | GPU | 59.49   | 81.22 |   |   |   | [model]() | [cfg]() | [log]() |
+| squeezenet_1.1 | GPU | 58.99 |   80.99 |   |   |   | [model]() | [cfg]() | [log]() |
 
 #### Notes
 
