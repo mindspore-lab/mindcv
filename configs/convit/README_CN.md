@@ -8,7 +8,7 @@
 
 结合了卷积架构和ViTs的优势。 ConViT：用柔性卷积归纳偏差改进视觉Transformer。研究了初始化和归纳偏差在视觉Transformer学习中的重要性。展示了以柔性方式利用卷积约束，融合了架构先验和表达能力的优点。结果是在不增加模型大小、不需要任何调优的情况下，提高训练性和样本有效性的简单方法。引入了门控位置自注意力(GPSA)，一种位置自注意力的形式，可以配备一个"软"卷积归纳偏差。初始化GPSA层以模仿卷积层的位置性，通过调整门控参数来调节对位置信息与内容信息的关注度，给每个关注头以摆脱位置性的自由。由此产生的类似卷积的视觉Transformer架构ConViT在ImageNet上的表现优于DeiT。
 
-![ConViT](C:/Users/12985/Downloads/mindcv-main/configs/convit/convit.png)
+![ConViT](convit.png)
 
 ## 性能指标
 
