@@ -42,12 +42,12 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'convit_tiny': _cfg(url=''),
-    'convit_tiny_plus': _cfg(url=''),
-    'convit_small': _cfg(url=''),
-    'convit_small_plus': _cfg(url=''),
-    'convit_base': _cfg(url=''),
-    'convit_base_plus': _cfg(url='')
+    'convit_tiny': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny.ckpt'),
+    'convit_tiny_plus': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny_plus.ckpt'),
+    'convit_small': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/convit/convit_small.ckpt'),
+    'convit_small_plus': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/convit/convit_small_plus.ckpt'),
+    'convit_base': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/convit/convit_base.ckpt'),
+    'convit_base_plus': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/convit/convit_base_plus.ckpt')
 }
 
 

@@ -33,10 +33,10 @@ def _cfg(url='', **kwargs):
 
 default_cfgs = {
     'mnasnet0.5': _cfg(url=''),
-    'mnasnet0.75': _cfg(url=''),
-    'mnasnet1.0': _cfg(url=''),
+    'mnasnet0.75': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet0_75_ascend.ckpt'),
+    'mnasnet1.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet1_0_ascend.ckpt'),
     'mnasnet1.3': _cfg(url=''),
-    'mnasnet1.4': _cfg(url=''),
+    'mnasnet1.4': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet1_4_ascend.ckpt'),
 }
 
 

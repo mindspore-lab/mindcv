@@ -33,10 +33,10 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'shufflenet_v1_g3_0.5': _cfg(url=''),
-    'shufflenet_v1_g3_1.0': _cfg(url=''),
-    'shufflenet_v1_g3_1.5': _cfg(url=''),
-    'shufflenet_v1_g3_2.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenet_v1_g3_2.0_224.ckpt'),
+    'shufflenet_v1_g3_0.5': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x0_5-Ascend.ckpt'),
+    'shufflenet_v1_g3_1.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x1_0-Ascend.ckpt'),
+    'shufflenet_v1_g3_1.5': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x1_5-Ascend.ckpt'),
+    'shufflenet_v1_g3_2.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x2_0-Ascend.ckpt'),
     'shufflenet_v1_g8_0.5': _cfg(url=''),
     'shufflenet_v1_g8_1.0': _cfg(url=''),
     'shufflenet_v1_g8_1.5': _cfg(url=''),
