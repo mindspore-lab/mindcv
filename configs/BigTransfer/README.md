@@ -54,7 +54,7 @@ Please download the [ImageNet-1K](https://www.image-net.org/download.php) datase
   ```
   # train BiT on 8 GPUs
   export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7  # suppose there are 8 GPUs
-  mpirun -n 8 python train.py -c configs/BigTransfer/BiT50.yaml --data_dir /path/to/imagenet
+  mpirun -n 8 python train.py -c configs/BigTransfer/BiT50_ascend.yaml --data_dir /path/to/imagenet
   ```
 
   Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascends** with the same batch size.
@@ -66,7 +66,7 @@ Detailed adjustable parameters and their default value can be seen in [config.py
 - To validate the trained model, you can use `validate.py`. Here is an example for BiT-50 to verify the accuracy of pretrained weights.
 
   ```
-  python validate.py -c configs/BigTransfer/BiT50.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+  python validate.py -c configs/BigTransfer/BiT50_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
   ```
 
 ### Deployment (optional)
