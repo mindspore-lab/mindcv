@@ -1,14 +1,13 @@
-# 快速入门
+# Quick Start
 
-本教程中我们将提供一个快速上手[mindcv](https://github.com/mindspore-lab/mindcv)的指南。
+In this tutorial, we will provide a quick start guideline for [mindcv](https://github.com/mindspore-lab/mindcv).
 
-本教程将以DenseNet分类模型为例，实现对Cifar10数据集的迁移学习，并在此流程中对MindCV各模块的用法作讲解。
+This tutorial will take DenseNet classification model as an example to implement migration training for Cifar10 dataset, and explain the usage of MindCV modules in this process.
 
 
+## Environment Setting
 
-## 环境准备
-
-### 安装MindCV
+### Installing MindCV
 
 
 ```python
@@ -37,77 +36,81 @@
     [1m[[0m[34;49mnotice[0m[1;39;49m][0m[39;49m To update, run: [0m[32;49mpip install --upgrade pip[0m
     
 
-> 以下教程假设依赖包均已安装，若遇到依赖问题，请按照Git repo上的[安装指南](https://github.com/mindlab-ai/mindcv#dependency)进行安装
+>The following tutorials assume that all dependent packages have been installed. If you encounter dependency problems, please follow the [installation guide](https://github.com/mindspore-lab/mindcv#dependency) on Git repo. 
 
-## 数据集读取
 
-通过[mindcv.data](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html)中的[create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset)模块，我们可快速地读取标准数据集或自定义的数据集。
+## Dataset Load
+
+Through the [create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset)  module in [mindcv.data](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html), we can quickly load standard datasets or customized datasets.
 
 
 ```python
 from mindcv.data import create_dataset, create_transforms, create_loader
 import os
 
-# 数据集路径
-cifar10_dir = './datasets/cifar/cifar-10-batches-bin' # 你的数据存放路径
-num_classes = 10 # 类别数
-num_workers = 8 # 数据读取及加载的工作线程数 
+# dataset path
+cifar10_dir = './datasets/cifar/cifar-10-batches-bin' # your dataset path
+num_classes = 10 # num of classes
+num_workers = 8 # Number of parallel workers
 download = not os.path.exists(cifar10_dir)
 
-# 创建数据集
+# create dataset
 dataset_train = create_dataset(name='cifar10', root=cifar10_dir, split='train', shuffle=True, num_parallel_workers=num_workers, download=download)
 ```
 
     170052608B [01:13, 2328662.39B/s]                                
     
 
-[create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset)参数说明:
+[create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset) parameters:
 
-- name: 数据集名称，如MNIST、CIFAR10、ImageNeT、“ ”表示自定义数据集。默认值：“ ”。
+- name: dataset name like MNIST, CIFAR10, ImageNeT, ‘’. ‘’ means a customized dataset. Default: ‘’.
 
-- dataset_dir: 包含数据集文件的根目录路径。默认：‘./’。
+- dataset_dir: dataset root dir. Default: ‘./’.
 
-- split: “ ”或拆分名称字符串（train/val/test），如果是“ ”，则不使用拆分。否则，它是根目录的子文件夹，例如train、val、test。默认值：“train”。
+- split: data split, ‘’ or split name string (train/val/test), if it is ‘’, no split is used. Otherwise, it is a subfolder of root dir, e.g., train, val, test. Default: ‘train’.
 
-- shuffle: 是否混洗数据集。默认值：True。
+- shuffle: whether to shuffle the dataset. Default: True.
 
-- num_sample：获取的样本数。默认值：None，获取采样到的所有样本。
+- num_sample: Number of elements to sample (default=None, which means sample all elements).
 
-- num_shards：数据集分片数量。默认：None。如果指定此参数，num_samples将反映每个碎片的最大样本数。
+- num_shards: Number of shards that the dataset will be divided into (default=None). When this argument is specified, num_samples reflects the maximum sample number of per shard.
 
-- shard_id:当前分片的分片ID，默认：None。仅当同时指定num_shards时，才能指定此参数。
+- shard_id: The shard ID within num_shards (default=None). This argument can only be specified when num_shards is also specified.
 
-- num_parallel_workers: 指定读取数据的工作线程数。默认值：None。
+- num_parallel_workers: Number of workers to read the data (default=None, set in the config).
 
-- download: 是否下载数据集。默认值：False。
+- download: whether to download the dataset. Default: False.
 
-- num_aug_repeats: 重复增强数据集的重复次数。如果为0或1，则禁用重复增强。否则，将启用重复增强，常用选项为3。默认值：0。
+- num_aug_repeats: Number of dataset repeatition for repeated augmentation. If 0 or 1, repeated augmentation is diabled. Otherwise, repeated augmentation is enabled and the common choice is 3. (Default: 0)
 
 
-## 数据处理及加载
-1. 通过[create_transforms](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_transforms)函数, 可直接得到标准数据集合适的数据处理增强策略(transform list)，包括Cifar10, imagenet上常用的数据处理策略。
+## Data Processing and Loading
+
+1. Through the [create_transforms](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_transforms) function, you can directly obtain the appropriate data processing augmentation strategies (transform list) for standard datasets, including common data processing strategies on Cifar10 and Imagenet.
+
 
 
 ```python
-# 创建所需的数据增强操作的列表
+# create transforms
 trans = create_transforms(dataset_name='cifar10', image_resize=224)
 ```
 
-[create_transforms](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_transforms)参数说明:
+[create_transforms](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_transforms) parameters:
 
-- dataset_name: 数据集名称。如果为“ ”，则为自定义数据集。当前应用与ImageNet相同的数据转换。如果给定标准数据集名称，包括imagenet、cifar10、mnist，则将返回预设转换。默认值：“ ”。
+- dataset_name: if ‘ ’, customized dataset. Currently, apply the same transform pipeline as ImageNet. if standard dataset name is given including imagenet, cifar10, mnist, preset transforms will be returned. Default: ‘ ’.
 
-- image_resize：调整适应网络的图像大小。默认值：224。
+- image_resize: the image size after resize for adapting to network. Default: 224.
 
-- is_training：如果为True，则将在支持时应用增强。默认值：False。
+- is_training:  if True, augmentation will be applied if support. Default: False.
 
-- **kwargs： 额外其他参数。
+- **kwargs: additional args parsed to transforms_imagenet_train and transforms_imagenet_eval.
 
-2. 通过[mindcv.data.create_loader](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_loader)函数，进行数据转换和batch切分加载，我们需要将[create_transforms](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_transforms)返回的transform_list传入。
+2. The [mindcv.data.create_loader](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_loader) function is used for data conversion and batch split loading. We need to pass in the transform_list returned by [create_transforms](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_transforms).
+
 
 
 ```python
-# 执行数据增强操作，生成所需数据集。
+# Perform data augmentation operations to generate the required dataset.
 loader_train = create_loader(dataset=dataset_train,
                              batch_size=64,
                              is_training=True,
@@ -118,46 +121,44 @@ loader_train = create_loader(dataset=dataset_train,
 num_batches = loader_train.get_dataset_size()
 ```
 
-[create_loader](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_loader)参数说明:
+[create_loader](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_loader) parameters:
 
-- dataset: 通过标准数据集接口（mindspore.dataset.Cifar10Dataset，mindspore.dataset.CocoDataset）或者自定义数据集接口（mindspore.dataset.GeneratorDataset）加载过的数据集。
+- dataset: dataset object created by create_dataset.
 
-- batch_size: 指定每个批处理数据包含的数据条目。
+- batch_size: The number of rows each batch is created with. An int or callable object which takes exactly 1 parameter, BatchInfo.
 
-- drop_remainder：确定是否删除小于批大小的数据最后一个块（默认值=False）。如果为True，并且如果有少于batch_size的数据可用于生成最后一个批处理，则这些数据将被删除，不会传播到子节点。
+- drop_remainder: Determines whether to drop the last block whose data row number is less than batch size (default=False). If True, and if there are less than batch_size rows available to make the last batch, then those rows will be dropped and not propagated to the child node.
 
-- is_training: 读取数据集的训练集（True）或验证集（False）。默认值：False。
+- is_training: whether it is in train mode. Default: False.
 
-- mixup：如果大于0，mixup将被启用（默认值：0.0）。
+- mixup: mixup alpha, mixup will be enbled if > 0. (default=0.0).
 
-- cutmix：如果大于0，将启用cutmix（默认值：0.0）。此操作是实验性的。
+- cutmix: cutmix alpha, cutmix will be enabled if > 0. (default=0.0). This operation is experimental.
 
-- cutmix_prob: 为图像执行cutmix的概率（默认值：0.0）。
+- cutmix_prob: prob of doing cutmix for an image (default=0.0)
 
-- num_classes: 分类的类别数。默认值：1000。
+- num_classes: the number of classes. Default: 1000.
     
-- transform: 将应用于图像的转换列表，由create_transform获得。如果为None，则将应用评估的默认imagenet转换。默认值：None。
+- transform: the list of transformations that wil be applied on the image, which is obtained by create_transform. If None, the default imagenet transformation for evaluation will be applied. Default: None.
 
-- target_transform: 将应用于标签的转换列表。如果为None，则标签将转换为ms.int32类型。默认值：None。
+- target_transform: the list of transformations that will be applied on the label. If None, the label will be converted to the type of ms.int32. Default: None.
 
-- num_parallel_workers: 指定读取数据的工作线程数。默认值：None。
+- num_parallel_workers: Number of workers(threads) to process the dataset in parallel (default=None).
 
-- python_multiprocessing；使用多个工作进程并行化Python操作。如果Python操作计算量很大（默认值为False），则此选项可能会很有用。
-
-
-> 在notebook中避免重复执行[create_loader](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_loader)单个Cell，或在执行[create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset)之后再次执行。
-
-## 模型创建和加载
-
-使用[create_model](https://mindcv.readthedocs.io/en/latest/api/mindcv.models.html#mindcv.models.create_model)接口获得实例化的DenseNet，并加载预训练权重densenet_121_224.ckpt（ImageNet数据集训练得到）。
+- python_multiprocessing: Parallelize Python operations with multiple worker processes. This option could be beneficial if the Python operation is computational heavy (default=False).
 
 
+>Avoid repeatedly executing a single cell of [create_loader](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_loader) in notebook, or execute again after executing [create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset). 
+
+## Model Creation and Loading
+
+Use the [create_model](https://mindcv.readthedocs.io/en/latest/api/mindcv.models.html#mindcv.models.create_model) interface to obtain the instantiated DenseNet and load the pretraining weight densenet_121_224.ckpt (obtained from ImageNet dataset training).
 
 
 ```python
 from mindcv.models import create_model
 
-# 实例化 DenseNet-121 模型并加载预训练权重。
+# nstantiate the DenseNet121 model and load the pretraining weights.
 network = create_model(model_name='densenet121', num_classes=num_classes, pretrained=True)
 ```
 
@@ -167,27 +168,27 @@ network = create_model(model_name='densenet121', num_classes=num_classes, pretra
     [WARNING] ME(1769:281472959711936,MainProcess):2022-12-21-16:03:22.692.908 [mindspore/train/serialization.py:714] classifier.bias is not loaded.
     
 
-> 由于Cifar10和ImageNet数据集所需类别数量不同，分类器参数无法共享，出现分类器参数无法加载的告警不影响微调。
+> Because the number of classes required by Cifar10 and ImageNet datasets is different, the classifier parameters cannot be shared, and the warning that the classifier parameters cannot be loaded does not affect the fine tuning.
 
-[create_model](https://mindcv.readthedocs.io/en/latest/api/mindcv.models.html#mindcv.models.create_model)参数说明:
+[create_model](https://mindcv.readthedocs.io/en/latest/api/mindcv.models.html#mindcv.models.create_model) parameters:
 
-- model_name: 需要加载的模型的规格的名称。
+- model_name: The name of model.
 
-- num_classes: 分类的类别数。默认值：1000。
+- num_classes: The number of classes. Default: 1000.
 
-- pretrained: 是否加载与训练权重。默认值：False。
+- pretrained: Whether to load the pretrained model. Default: False.
 
-- in_channels：输入通道。默认值：3。
+- in_channels: The input channels. Default: 3.
 
-- checkpoint_path：checkpoint的路径。默认值：“ ”。
+- checkpoint_path: The path of checkpoint files. Default: “”.
 
-- use_ema：是否使用ema方法 默认值: False。
+- use_ema: Whether use ema method. Default: False.
 
-使用[mindcv.loss.create_loss](https://mindcv.readthedocs.io/en/latest/api/mindcv.loss.html#mindcv.loss.create_loss)接口创建损失函数（cross_entropy loss）。
+Use the [mindcv.loss.create_loss](https://mindcv.readthedocs.io/en/latest/api/mindcv.loss.html#mindcv.loss.create_loss) interface to create a loss function (cross_entropy loss).
 
-## 模型训练
+## Model Training
 
-通过[create_loss](https://mindcv.readthedocs.io/en/latest/api/mindcv.loss.html#mindcv.loss.create_loss)接口获得损失函数
+By [create_loss](https://mindcv.readthedocs.io/en/latest/api/mindcv.loss.html#mindcv.loss.create_loss) interface obtains loss function.
 
 
 ```python
@@ -196,104 +197,104 @@ from mindcv.loss import create_loss
 loss = create_loss(name='CE')
 ```
 
-[create_loss](https://mindcv.readthedocs.io/en/latest/api/mindcv.loss.html#mindcv.loss.create_loss)参数说明：
+[create_loss](https://mindcv.readthedocs.io/en/latest/api/mindcv.loss.html#mindcv.loss.create_loss) parameters:
 
-- name: 损失函数名称：'CE'用于交叉熵损失。'BCE'：二进制交叉熵。默认值：“CE”。
+- name: loss name, ‘CE’ for cross_entropy. ‘BCE’: binary cross entropy. Default: ‘CE’.
 
-- weight: 指定各类别的权重。数据类型仅支持float32或float16。默认值: None。
+- weight: Class weight. A rescaling weight given to the loss of each batch element. If given, has to be a Tensor of size ‘nbatch’. Data type must be float16 or float32.
 
-- reduction：指定应用于输出结果的计算方式，比如’none’、’mean’、’sum’，默认值：’mean’。
+- reduction: Apply specific reduction method to the output: ‘mean’ or ‘sum’. By default, the sum of the output will be divided by the number of elements in the output. ‘sum’: the output will be summed. Default:’mean’.
 
-- label_smoothing：标签平滑值，用于计算Loss时防止模型过拟合的正则化手段。取值范围为[0.0, 1.0]。默认值：0.0。
+- label_smoothing: Label smoothing factor, a regularization tool used to prevent the model from overfitting when calculating Loss. The value range is [0.0, 1.0]. Default: 0.0.
 
-- aux_factor：辅助损耗因数。如果模型具有辅助逻辑输出（即深度监控），如inception_v3模型，则设置aux_fuactor>0.0。默认值：0.0。
+- aux_factor: Auxiliary loss factor. Set aux_fuactor > 0.0 if the model has auxilary logit outputs (i.e., deep supervision), like inception_v3. Default: 0.0.
 
-使用[create_scheduler](https://mindcv.readthedocs.io/en/latest/api/mindcv.scheduler.html#mindcv.scheduler.create_scheduler)接口设置学习率策略。
+Use [create_scheduler](https://mindcv.readthedocs.io/en/latest/api/mindcv.scheduler.html#mindcv.scheduler.create_scheduler) interface sets the learning rate scheduler.
 
 
 ```python
 from mindcv.scheduler import create_scheduler
 
-# 设置学习率策略
+# learning rate scheduler
 lr_scheduler = create_scheduler(steps_per_epoch=num_batches,
                                 scheduler='constant',
                                 lr=0.0001)
 ```
 
-[create_scheduler](https://mindcv.readthedocs.io/en/latest/api/mindcv.scheduler.html#mindcv.scheduler.create_scheduler)参数说明:
+[create_scheduler](https://mindcv.readthedocs.io/en/latest/api/mindcv.scheduler.html#mindcv.scheduler.create_scheduler) parameters:
 
-- steps_pre_epoch: 完成一轮训练所需要的步数。
+- steps_pre_epoch: number of steps per epoch.
 
-- scheduler: 学习率策略的名称。默认值：‘constant’。
+- scheduler: scheduler name like ‘constant’, ‘cosine_decay’, ‘step_decay’, ‘exponential_decay’, ‘polynomial_decay’, ‘multi_step_decay’. Default: ‘constant’.
 
-- lr: 学习率。默认值：0.01。
+- lr: learning rate value. Default: 0.01.
 
-- min_lr: decay时学习率的最小值。默认值：1e-6。
+- min_lr: lower lr bound for ‘cosine_decay’ schedulers. Default: 1e-6.
 
-- warmup_epochs：如果学习率策略支持，用来预热学习率。默认值：3。
+- warmup_epochs: epochs to warmup LR, if scheduler supports. Default: 3.
 
-- warmup_factor：学习率策略的预热阶段是一个线性增加的学习率，开始因子是warmup_factor，即第一个step/epoch的学习率是lr * warmup_actor，而预热阶段的结束学习率为lr。默认值：0.0。
+- warmup_factor: the warmup phase of scheduler is a linearly increasing lr, the beginning factor is warmup_factor, i.e., the lr of the first step/epoch is lr*warmup_factor, and the ending lr in the warmup phase is lr. Default: 0.0.
 
-- decay_epochs：对于“cosine_decay”学习率策略，在decay_epochs中将学习率衰减到min_lr。对于“step_decay”学习率策略，每decay_epochs将学习率衰减一个decay_rate因子。默认值：10。
+- decay_epochs: for ‘cosine_decay’ schedulers, decay LR to min_lr in decay_epochs. For ‘step_decay’ scheduler, decay LR by a factor of decay_rate every decay_epochs. Default: 10.
 
-- decay_rate：学习率衰减因子。默认值：0.9。
+- decay_rate: LR decay rate (default: 0.9).
 
-- milestones：“multi_step_decay”学习率策略的列表。
+- milestones: list of epoch milestones for ‘multi_step_decay’ scheduler. Must be increasing.
 
-- num_epochs：训练epoch的数量。
+- num_epochs: number of total epochs.
 
-- lr_epoch_stair：如果为True，则学习率将在每个epoch的开始时更新，并且学习率将在一个epoch中对每个批次保持一致。否则，学习率将在每个步骤中动态更新。（默认值=False）
+- lr_epoch_stair: If True, LR will be updated in the beginning of each new epoch and the LR will be consistent for each batch in one epoch. Otherwise, learning rate will be updated dynamically in each step. (default=False).
 
 
-使用[create_optimizer](https://mindcv.readthedocs.io/en/latest/api/mindcv.optim.html#mindcv.optim.create_optimizer)接口创建优化器。
+Use [create_optimizer](https://mindcv.readthedocs.io/en/latest/api/mindcv.optim.html#mindcv.optim.create_optimizer) interface creates an optimizer.
 
 
 ```python
 from mindcv.optim import create_optimizer
 
-# 设置优化器
+# create optimizer
 opt = create_optimizer(network.trainable_params(), opt='adam', lr=lr_scheduler) 
 ```
 
-[create_optimizer](https://mindcv.readthedocs.io/en/latest/api/mindcv.optim.html#mindcv.optim.create_optimizer)参数说明:
+[create_optimizer](https://mindcv.readthedocs.io/en/latest/api/mindcv.optim.html#mindcv.optim.create_optimizer) parameters:
 
-- params: 需要优化的参数的列表。
+- params: network parameters. Union[list[Parameter],list[dict]], which must be the list of parameters or list of dicts. When the list element is a dictionary, the key of the dictionary can be “params”, “lr”, “weight_decay”,”grad_centralization” and “order_params”.
 
-- opt：优化器。默认值：'adam'。
+- opt: Wrapped optimizer. You could choose like ‘sgd’, ‘nesterov’, ‘momentum’, ‘adam’, ‘adamw’, ‘rmsprop’, ‘adagrad’, ‘lamb’. ‘adam’ is the default choise for convolution-based networks. ‘adamw’ is recommended for ViT-based networks. Default: ‘adam’.
 
-- lr: 学习率的最大值。
+- lr: learning rate, float or lr scheduler. Fixed and dynamic learning rate are supported. Default: 1e-3.
 
-- weight_decay：权重衰减系数。默认值：0。
+- weight_decay: weight decay factor. It should be noted that weight decay can be a constant value or a Cell. It is a Cell only when dynamic weight decay is applied. Dynamic weight decay is similar to dynamic learning rate, users need to customize a weight decay schedule only with global step as input, and during training, the optimizer calls the instance of WeightDecaySchedule to get the weight decay value of current step. Default: 0.
 
-- momentum：如果优化器支持，则会产生动量。默认值：0.9。
+- momentum: momentum if the optimizer supports. Default: 0.9.
 
-- nesterov：是否使用Nesterov加速梯度（NAG）算法更新梯度。默认值：False。
+- nesterov: whether to use Nesterov Accelerated Gradient (NAG) algorithm to update the gradients. Default: False.
 
-- filter_bias_and_bn：是否过滤批次规范参数和权重衰减的偏差。如果为True，权重衰减将不适用于Conv层或Dense层中的BN参数和bias。默认值：True。
+- filter_bias_and_bn: whether to filter batch norm paramters and bias from weight decay. If True, weight decay will not apply on BN parameters and bias in Conv or Dense layers. Default: True.
 
-- loss_scale：损失函数值缩放比例。默认值：1.0。
+- loss_scale: A floating point value for the loss scale, which must be larger than 0.0. Default: 1.0.
 
-- checkpoint_path：优化器checkpoint路径。
+- checkpoint_path: optimizer checkpoint path.
 
-- eps：添加到分母以提高数值稳定性的项。默认值：1e-10。         
+- eps: Term Added to the Denominator to Improve Numerical Stability. default: 1e-10.
 
-使用[mindspore.Model](https://mindspore.cn/docs/zh-CN/r1.8/api_python/mindspore/mindspore.Model.html)接口根据用户传入的参数封装可训练的实例。
+Use the [mindspore.Model](https://mindspore.cn/docs/zh-CN/r1.8/api_python/mindspore/mindspore.Model.html) interface to encapsulate trainable instances according to the parameters passed in by the user.
 
 
 ```python
 from mindspore import Model
 
-# 封装可训练或推理的实例
+# Encapsulates examples that can be trained or inferred
 model = Model(network, loss_fn=loss, optimizer=opt, metrics={'accuracy'})
 ```
 
-使用[`mindspore.Model.train`](https://mindspore.cn/docs/zh-CN/r1.8/api_python/mindspore/mindspore.Model.html#mindspore.Model.train)接口进行模型训练。
+Use the [`mindspore.Model.train`](https://mindspore.cn/docs/zh-CN/r1.8/api_python/mindspore/mindspore.Model.html#mindspore.Model.train) interface for model training.
 
 
 ```python
 from mindspore import LossMonitor, TimeMonitor, CheckpointConfig, ModelCheckpoint
 
-# 设置在训练过程中保存网络参数的回调函数
+# Set the callback function for saving network parameters during training.
 ckpt_save_dir = './ckpt' 
 ckpt_config = CheckpointConfig(save_checkpoint_steps=num_batches)
 ckpt_cb = ModelCheckpoint(prefix='densenet121-cifar10',
@@ -345,10 +346,10 @@ model.train(5, loader_train, callbacks=[LossMonitor(num_batches//5), TimeMonitor
 
 
 ```python
-# 加载验证数据集
+# Load validation dataset
 dataset_val = create_dataset(name='cifar10', root=cifar10_dir, split='test', shuffle=True, num_parallel_workers=num_workers, download=download)
 
-# 执行数据增强操作，生成所需数据集。
+# Perform data enhancement operations to generate the required dataset.
 loader_val = create_loader(dataset=dataset_val,
                            batch_size=64,
                            is_training=False,
@@ -357,13 +358,13 @@ loader_val = create_loader(dataset=dataset_val,
                            num_parallel_workers=num_workers)
 ```
 
-加载微调后的参数文件（densenet121-cifar10-5_782.ckpt）到模型。
+Load the fine-tuning parameter file (densenet121-cifar10-5_782.ckpt) to the model.
 
-根据用户传入的参数封装可推理的实例，加载验证数据集，验证微调的 DenseNet121模型精度。
+Encapsulate inferable instances according to the parameters passed in by the user, load the validation data set, and verify the precision of the fine tuned DenseNet121 model.
 
 
 ```python
-# 验证微调后的DenseNet121的精度
+# Verify the accuracy of DenseNet121 after fine-tune
 acc = model.eval(loader_val, dataset_sink_mode=False)
 print(acc)
 ```
@@ -377,11 +378,12 @@ print(acc)
     [WARNING] DEVICE(1769,ffff87c70ac0,python):2022-12-21-16:25:01.871.273 [mindspore/ccsrc/plugin/device/ascend/hal/device/kernel_select_ascend.cc:330] FilterRaisedOrReducePrecisionMatchedKernelInfo] Operator:[Default/network-WithLossCell/_loss_fn-CrossEntropySmooth/GatherD-op27139] don't support int64, reduce precision from int64 to int32.
     
 
-## 使用YAML文件进行模型训练和验证
+## Use YAML files for model training and validation
 
-我们还可以直接使用设置好模型参数的yaml文件，通过`train.py`和`validate.py`脚本来快速来对模型进行训练和验证。以下是在ImageNet上训练SqueezenetV1的示例 （需要将imagenet提前下载到目录下）
+We can also use the yaml file with the model parameters set directly to quickly train and verify the model through `train.py` and `validate.py` scripts. The following is an example of training SqueezenetV1 on ImageNet (you need to download imagenet to the directory in advance)
 
-> 详细教程请参考 [使用yaml文件的教程](https://mindcv.readthedocs.io/en/latest/tutorials/learn_about_config.html)
+
+> For detailed tutorials, please refer to the [tutorial](https://mindcv.readthedocs.io/en/latest/tutorials/learn_about_config.html).
 
 
 
