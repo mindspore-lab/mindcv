@@ -18,11 +18,15 @@ RepVGG是一种类似VGG架构的网络，但是其性能优于许多复杂的�
 
 ***
 
-|        |           |           |           |    Pynative     |  Pynative  |     Graph      |   Graph    |           |            |
-| :----: | --------- | :-------: | :-------: | :-------------: | :--------: | :------------: | :--------: | :-------: | :--------: |
-|        | Model     | Top-1 (%) | Top-5 (%) | train (s/epoch) | Infer (ms) | train(s/epoch) | Infer (ms) | Download  |   Config   |
-|  GPU   | RepVGG_A0 | 71.98     | 90.36     |                 |            |                |            | [model]() | [config]() |
-| Ascend | RepVGG_A0 | 71.87     | 90.43     |                 |            |                |            |           |            |
+| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
+|-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
+| RepVGG_A0 | GPU | 71.98     | 90.36     |       |  |   | [model]() | [cfg]() | [log]() |
+| RepVGG_A0 | D910x8-G | 71.87 | 90.43     |        |   |   | [model]() | [cfg]() | [log]() |
+
+#### Notes
+
+- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
+- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function. 
 
 ## 示例
 
