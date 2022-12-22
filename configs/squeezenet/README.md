@@ -19,14 +19,15 @@ Middle: SqueezeNet with simple bypass; Right: SqueezeNet with complex bypass .
 ## Benchmark
 
 ***
+| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
+|-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
+| squeezenet_1.0 | D910x8-G | 59.49   | 81.22 |   |   |   | [model]() | [cfg]() | [log]() |
+| squeezenet_1.1 | D910x8-G | 58.99 |   80.99 |   |   |   | [model]() | [cfg]() | [log]() |
 
-|        |              |           |           |    Pynative     |  Pynative  |     Graph      |   Graph    |           |            |
-| :----: | ------------ | :-------: | :-------: | :-------------: | :--------: | :------------: | :--------: | :-------: | :--------: |
-|        | Model        | Top-1 (%) | Top-5 (%) | train (s/epoch) | Infer (ms) | train(s/epoch) | Infer (ms) | Download  |   Config   |
-| GPU | squeezenet_1.0 | 59.48 | 81.22 |  |  |  |  | [model]() | [config]() |
-| Ascend | squeezenet_1.0 |   59.49   | 81.22 |  |  |  |  |  |  |
-|  GPU   | squeezenet_1.1 | 58.99 | 80.98 |                 |            |                |            | [model]() | [config]() |
-| Ascend | squeezenet_1.1 | 58.99 |   80.99   |                 |            |                |            |           |            |
+#### Notes
+
+- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
+- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
 
 ## Examples
 
