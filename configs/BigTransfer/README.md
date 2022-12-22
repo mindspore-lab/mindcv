@@ -52,8 +52,7 @@ Please download the [ImageNet-1K](https://www.image-net.org/download.php) datase
 - **Hyper-parameters.** The hyper-parameter configurations for producing the reported results are stored in the yaml files in `mindcv/configs/BigTransfer` folder. For example, to train with one of these configurations, you can run:
 
   ```
-  # train BiT on 8 GPUs
-  export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7  # suppose there are 8 GPUs
+  # train BiT on 8 NPUs
   mpirun -n 8 python train.py -c configs/BigTransfer/BiT50_ascend.yaml --data_dir /path/to/imagenet
   ```
 
