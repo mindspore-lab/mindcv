@@ -33,7 +33,7 @@
 > [configs文件夹](../../configs)中列出了mindcv套件所包含的模型的各个规格的yaml配置文件(在ImageNet数据集上训练和验证的配置)。
 
   ```shell
-mpirun -n 8 python train.py -c configs/BigTransfer/BiT50.yaml --data_dir /path/to/imagenet
+mpirun -n 8 python train.py -c configs/BigTransfer/BiT50_ascend.yaml --data_dir /path/to/imagenet
   ```
 
 详细的可调参数及其默认值可以在[config.py](../../config.py)中查看。
@@ -43,5 +43,5 @@ mpirun -n 8 python train.py -c configs/BigTransfer/BiT50.yaml --data_dir /path/t
 - 下面是使用`validate.py`文件验证BiT-50的自定义参数文件的精度的示例。
 
   ```shell
-  python validate.py -c configs/BigTransfer/BiT50.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+  python validate.py -c configs/BigTransfer/BiT50_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
   ```
