@@ -21,7 +21,7 @@ auto_augment: 'randaug-m9-mstd0.5'
 re_value: 'random'
 
 # model config
-model: 'rexnet_x10'
+model: 'rexnet_x20'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''
@@ -35,6 +35,7 @@ epoch_size: 400
 dataset_sink_mode: True
 amp_level: 'O2'
 drop_rate: 0.2
+drop_path_rate: 0.1
 
 # loss config
 loss: 'CE'
@@ -44,8 +45,8 @@ label_smoothing: 0.1
 scheduler: 'warmup_cosine_decay'
 min_lr: 1.0e-6
 lr: 0.5
-warmup_epochs: 5
-decay_epochs: 395
+warmup_epochs: 30
+decay_epochs: 370
 
 # optimizer config
 opt: 'sgd'

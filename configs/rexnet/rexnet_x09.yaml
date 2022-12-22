@@ -21,7 +21,7 @@ auto_augment: 'randaug-m9-mstd0.5'
 re_value: 'random'
 
 # model config
-model: 'rexnet_x10'
+model: 'rexnet_x09'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''

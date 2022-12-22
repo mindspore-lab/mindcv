@@ -4,28 +4,25 @@
 
 ##  Introduction
 ***
-Rank Expansion Networks (ReXNets) follow a set of new design principles for designing bottlenecks in image classification models. Authors refine each layer by 1) expanding the input channel size of the convolution layer and 2) replacing the ReLU6s.
+This is a new paradigm for network architecture design. ReXNet proposes a set of design principles to solve the Representational Bottleneck problem in the existing network. Rexnet combines these design principles with the existing network units to obtain a new network, RexNet, which achieves a great performance improvement.
 
-## Benchmark
+
+
+## Results
 ***
 
 |        |           |           |           |    Pynative     |  Pynative  |     Graph      |   Graph    |           |            |
 | :----: | --------- | :-------: | :-------: | :-------------: | :--------: | :------------: | :--------: | :-------: | :--------: |
 |        | Model     | Top-1 (%) | Top-5 (%) | train (s/epoch) | Infer (ms) | train(s/epoch) | Infer (ms) | Download  |   Config   |
-|  GPU   | rexnet_x09 |           |           |          |            |         |            | [model]() | [config]() |
-| Ascend | rexnet_x09 |           |           |          |            |         |            |           |            |
-|  GPU   | rexnet_x10 |           |           |          |            |         |            | [model]() | [config]() |
-| Ascend | rexnet_x10 |           |           |          |            |         |            |           |            |
-|  GPU   | rexnet_x13 |           |           |          |            |         |            | [model]() | [config]() |
-| Ascend | rexnet_x13 |           |           |          |            |         |            |           |            |
-|  GPU   | rexnet_x15 |           |           |          |            |         |            | [model]() | [config]() |
-| Ascend | rexnet_x15 |           |           |          |            |         |            |           |            |
-|  GPU   | rexnet_x20 |           |           |          |            |         |            | [model]() | [config]() |
-| Ascend | rexnet_x20 |           |           |          |            |         |            |           |            |
+| Ascend | rexnet_x09 | 77.07 | 93.41 |          |            |         |            | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/) | [cfg](https://github.com/mindspore-lab/mindcv/tree/main/configs/rexnet) |
+| Ascend | rexnet_x10 | 77.38 | 93.60 |          |            |         |            | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/) | [cfg](https://github.com/mindspore-lab/mindcv/tree/main/configs/rexnet) |
+| Ascend | rexnet_x13 | 79.06 | 94.28 |          |            |         |            | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/) | [cfg](https://github.com/mindspore-lab/mindcv/tree/main/configs/rexnet) |
+| Ascend | rexnet_x15 | 79.94 | 94.74 |          |            |         |            | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/) | [cfg](https://github.com/mindspore-lab/mindcv/tree/main/configs/rexnet) |
+| Ascend | rexnet_x20 | 80.6 | 94.99 |          |            |         |            | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/) | [cfg](https://github.com/mindspore-lab/mindcv/tree/main/configs/rexnet) |
 
 
 
-## Examples
+## Quick Start
 
 ***
 
@@ -59,3 +56,7 @@ Detailed adjustable parameters and their default value can be seen in [config.py
   ```shell
   python validate.py --model=rexnet_x10 --dataset=imagenet --val_split=val --ckpt_path='./rexnetx10_ckpt/rexnet-best.ckpt'
   ```
+
+### Deployment (optional)
+
+Please refer to the deployment tutorial in MindCV.
