@@ -26,7 +26,7 @@ analysis of the main components that lead to high transfer performance.
 
 |    Model     | Context  | Top-1 (%) | Top-5 (%) | Params(M) |  Train T.  |  Infer T.   |                           Download                           |                            Config                            |                             Log                              |
 | :----------: | :------: | :-------: | :-------: | :-------: | :--------: | :---------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
-|    BiT50-S   | D910x8-G |   76.81   |   93.17   |    25     | 651s/step  |             | [model](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/BigTransfer/BiT50.yaml) | [log](https://github.com/mindspore-lab/mindcv/tree/main/configs/BigTransfer) |
+|    BiT50-S   | D910x8-G |   76.81   |   93.17   |    25     | 651s/step  |             | [model](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/BigTransfer/BiT50_ascend.yaml) | [log](https://github.com/mindspore-lab/mindcv/tree/main/configs/BigTransfer) |
 
 #### Notes
 
@@ -41,7 +41,7 @@ analysis of the main components that lead to high transfer performance.
 
 #### Installation
 
-Please refer to the [installation instruction](https://github.com/mindspore-ecosystem/mindcv#installation) in MindCV.
+Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
 
 #### Dataset Preparation
 
@@ -59,7 +59,7 @@ Please download the [ImageNet-1K](https://www.image-net.org/download.php) datase
 
   Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascends** with the same batch size.
 
-Detailed adjustable parameters and their default value can be seen in [config.py](https://github.com/mindspore-lab/mindcv/tree/main/configs/BigTransfer)
+Detailed adjustable parameters and their default value can be seen in [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py)
 
 ### Validation
 
