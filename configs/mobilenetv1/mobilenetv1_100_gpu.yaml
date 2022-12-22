@@ -1,3 +1,5 @@
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -15,47 +17,50 @@
 mode: 0
 distribute: True
 num_parallel_workers: 8
-val_while_train: True
 
 # dataset config
 dataset: 'imagenet'
-data_dir: '/data0/dataset/imagenet2012/imagenet_original/'
+data_dir: ''
 shuffle: True
 dataset_download: False
-batch_size: 32
+batch_size: 64
 drop_remainder: True
+train_split: 'train'
 
 # Augmentation config
 image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
 hflip: 0.5
+interpolation: 'bilinear'
 crop_pct: 0.875
 
 # model config
-model: 'BiTresnet50'
-num_classes: 1000
+model: 'mobilenet_v1_100_224'
+num_classes: 1001
 pretrained: False
 ckpt_path: ''
-keep_checkpoint_max: 10
-save_checkpoint: True
-ckpt_save_dir: './ckpt'
-epoch_size: 90
+keep_checkpoint_max: 80
+ckpt_save_dir: './v1_100_ckpt'
+epoch_size: 200
 dataset_sink_mode: True
-amp_level: 'O0'
+amp_level: 'O2'
 
 # loss config
 loss: 'CE'
 label_smoothing: 0.1
 
 # lr scheduler config
-scheduler: 'multi_step_decay'
-lr: 0.06
-decay_rate: 0.5
-multi_step_decay_milestones: [30, 40, 50, 60, 70, 80, 85]
-
+scheduler: 'cosine_decay'
+min_lr: 0.0
+lr: 0.4
+warmup_epochs: 2
+decay_epochs: 198
 
 # optimizer config
-opt: 'sgd'
-filter_bias_and_bn: False
+opt: 'momentum'
+filter_bias_and_bn: True
 momentum: 0.9
-weight_decay: 0.0001
+weight_decay: 0.00003
 loss_scale: 1024
+use_nesterov: False

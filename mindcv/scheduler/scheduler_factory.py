@@ -18,6 +18,8 @@ def create_scheduler(
         decay_rate: float = 0.9,
         milestones: list = None,
         num_epochs: int = 200,
+	num_cycles: int = 1,
+	cycle_decay: float = 1.0,
         lr_epoch_stair: bool = False
 ):
     r"""Creates learning rate scheduler by name.
@@ -64,8 +66,9 @@ def create_scheduler(
     main_epochs = num_epochs - warmup_epochs
     if scheduler in ['cosine_decay', 'warmup_cosine_decay']:
         cosine_func = cosine_decay_lr if lr_epoch_stair else cosine_decay_refined_lr
-        main_lr_scheduler = cosine_func(t_max=decay_epochs, eta_min=min_lr,
-                                        eta_max=lr, steps_per_epoch=steps_per_epoch, epochs=main_epochs)
+        main_lr_scheduler = cosine_func(decay_epochs=decay_epochs, eta_min=min_lr,
+                                        eta_max=lr, steps_per_epoch=steps_per_epoch, epochs=main_epochs,
+                                        num_cycles=num_cycles, cycle_decay=cycle_decay)
     elif scheduler == 'exponential_decay':
         exponential_func = exponential_lr if lr_epoch_stair else exponential_refined_lr
         main_lr_scheduler = exponential_func(gamma=decay_rate,

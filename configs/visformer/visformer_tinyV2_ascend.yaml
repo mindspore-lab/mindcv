@@ -17,34 +17,34 @@
 mode: 0
 distribute: True
 num_parallel_workers: 8
+val_while_train: True
 
 # dataset config
 dataset: 'imagenet'
-data_dir: ''
+data_dir: './imagenet'
 shuffle: True
 dataset_download: False
-batch_size: 64
+batch_size: 256
 drop_remainder: True
-train_split: 'train'
 
 # Augmentation config
-image_resize: 224
-scale: [0.08, 1.0]
-ratio: [0.75, 1.333]
-hflip: 0.5
-interpolation: 'bilinear'
-crop_pct: 0.875
+interpolation: BICUBIC
+re_prob: 0.25
+mixup: 0.8
+cutmix: 1.0
+cutmix_prob: 1.0
+auto_augment: autoaug
 
 # model config
-model: 'mobilenet_v1_100_224'
-num_classes: 1001
+model: 'visformer_tiny_v2'
+num_classes: 1000
 pretrained: False
 ckpt_path: ''
-keep_checkpoint_max: 80
-ckpt_save_dir: './v1_100_ckpt'
-epoch_size: 200
+keep_checkpoint_max: 10
+ckpt_save_dir: './ckpt'
+epoch_size: 300
 dataset_sink_mode: True
-amp_level: 'O2'
+amp_level: 'O3'
 
 # loss config
 loss: 'CE'
@@ -52,20 +52,15 @@ label_smoothing: 0.1
 
 # lr scheduler config
 scheduler: 'cosine_decay'
-min_lr: 0.0
-lr: 0.4
-warmup_epochs: 2
-decay_epochs: 198
+lr_epoch_stair: True
+lr: 0.001
+min_lr: 0.00002
+warmup_factor: 0.02
+warmup_epochs: 5
+decay_epochs: 295
 
 # optimizer config
-opt: 'momentum'
-filter_bias_and_bn: True
+opt: 'adamw'
 momentum: 0.9
-weight_decay: 0.00003
+weight_decay: 0.05
 loss_scale: 1024
-use_nesterov: False
-
-
-
-
-

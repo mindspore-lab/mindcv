@@ -175,7 +175,7 @@ class GhostNet(nn.Cell):
         num_classes: number of classification classes. Default: 1000.
         in_channels: number of input channels. Default: 3.
         width: base width of hidden channel in blocks. Default: 1.0
-        droupout: the prob of the features before classification. Default: 0.2
+        droupout: the probability of the features before classification. Default: 0.2
     """
 
     def __init__(self,

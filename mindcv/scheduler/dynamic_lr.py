@@ -114,25 +114,51 @@ def multi_step_lr(milestones, gamma, *, lr, steps_per_epoch, epochs):
     return lrs
 
 
-def cosine_decay_lr(t_max, eta_min, *, eta_max, steps_per_epoch, epochs):
-    steps = steps_per_epoch * epochs
-    delta = 0.5 * (eta_max - eta_min)
+def cosine_decay_lr(decay_epochs, eta_min, *, eta_max, steps_per_epoch, epochs, num_cycles=1, cycle_decay=1.0):
+    ''' update every epoch'''
+    tot_steps = steps_per_epoch * epochs
     lrs = []
-    for i in range(steps):
-        t_cur = math.floor(i / steps_per_epoch)
-        t_cur = min(t_cur, t_max)
-        lrs.append(eta_min + delta * (1.0 + math.cos(math.pi * t_cur / t_max)))
+    
+    for c in range(num_cycles):
+        lr_max = eta_max * (cycle_decay ** c)
+        delta = 0.5 * (lr_max - eta_min)
+        for i in range(steps_per_epoch * decay_epochs):
+            t_cur = math.floor(i / steps_per_epoch)
+            t_cur = min(t_cur, decay_epochs)
+            lr_cur = eta_min + delta * (1.0 + math.cos(math.pi * t_cur / decay_epochs))
+            if len(lrs) < tot_steps:
+                lrs.append(lr_cur)
+            else:
+                break
+
+    if epochs > num_cycles * decay_epochs:
+        for i in range((epochs - (num_cycles * decay_epochs)) * steps_per_epoch):
+            lrs.append(eta_min)
+
     return lrs
 
 
-def cosine_decay_refined_lr(t_max, eta_min, *, eta_max, steps_per_epoch, epochs):
-    steps = steps_per_epoch * epochs
-    delta = 0.5 * (eta_max - eta_min)
+def cosine_decay_refined_lr(decay_epochs, eta_min, *, eta_max, steps_per_epoch, epochs, num_cycles=1, cycle_decay=1.0):
+    ''' update every step '''
+    tot_steps = steps_per_epoch * epochs
     lrs = []
-    for i in range(steps):
-        t_cur = i / steps_per_epoch
-        t_cur = min(t_cur, t_max)
-        lrs.append(eta_min + delta * (1.0 + math.cos(math.pi * t_cur / t_max)))
+
+    for c in range(num_cycles):
+        lr_max = eta_max * (cycle_decay ** c)
+        delta = 0.5 * (lr_max - eta_min)
+        for i in range(steps_per_epoch * decay_epochs):
+            t_cur = i / steps_per_epoch
+            t_cur = min(t_cur, decay_epochs)
+            lr_cur = eta_min + delta * (1.0 + math.cos(math.pi * t_cur / decay_epochs))
+            if len(lrs) < tot_steps:
+                lrs.append(lr_cur)
+            else:
+                break
+
+    if epochs > num_cycles * decay_epochs:
+        for i in range((epochs - (num_cycles * decay_epochs)) * steps_per_epoch):
+            lrs.append(eta_min)
+
     return lrs
 
 

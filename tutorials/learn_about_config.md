@@ -66,6 +66,7 @@ def train(args):
 
 - num_parallel_workers: 读取数据的工作线程数。
 
+
 2. yaml文件样例
 
 ```text
@@ -101,9 +102,11 @@ def train(args):
         num_shards=device_num,
         shard_id=rank_id,
         num_parallel_workers=args.num_parallel_workers,
-        download=args.dataset_download)
+        download=args.dataset_download,
+        num_aug_repeats=args.aug_repeats)
     
     ...
+    target_transform = transforms.OneHot(num_classes) if args.loss == 'BCE' else None
     
     loader_train = create_loader(
         dataset=dataset_train,
@@ -111,8 +114,11 @@ def train(args):
         drop_remainder=args.drop_remainder,
         is_training=True,
         mixup=args.mixup,
+        cutmix=args.cutmix,
+        cutmix_prob=args.cutmix_prob,
         num_classes=args.num_classes,
         transform=transform_list,
+        target_transform=target_transform,
         num_parallel_workers=args.num_parallel_workers,
     )
     
@@ -245,7 +251,8 @@ def train(args):
                     drop_rate=args.drop_rate,
                     drop_path_rate=args.drop_path_rate,
                     pretrained=args.pretrained,
-                    checkpoint_path=args.ckpt_path)
+                    checkpoint_path=args.ckpt_path,
+                    use_ema=args.use_ema)
     ...
 ```
 
@@ -320,12 +327,17 @@ python train.py ... --scheduler cosine_decay --min_lr 0.0 --lr 0.01 \
 ```python
 def train(args):
     ...
-    lr_scheduler = create_scheduler(steps_per_epoch,
+    lr_scheduler = create_scheduler(num_batches,
                           scheduler=args.scheduler,
                           lr=args.lr,
                           min_lr=args.min_lr,
                           warmup_epochs=args.warmup_epochs,
-                          decay_epochs=args.decay_epochs)
+                          warmup_factor=args.warmup_factor,
+                          decay_epochs=args.decay_epochs,
+                          decay_rate=args.decay_rate,
+                          milestones=args.multi_step_decay_milestones,
+                          num_epochs=args.epoch_size,
+                          lr_epoch_stair=args.lr_epoch_stair)
     ...
 ```
 
@@ -370,14 +382,27 @@ python train.py ... --opt momentum --filter_bias_and_bn True --weight_decay 0.00
 ```python
 def train(args):
     ...
-    optimizer = create_optimizer(network.trainable_params(),
-                        opt=args.opt,
-                        lr=lr_scheduler,
-                        weight_decay=args.weight_decay,
-                        momentum=args.momentum,
-                        nesterov=args.use_nesterov,
-                        filter_bias_and_bn=args.filter_bias_and_bn,
-                        loss_scale=args.loss_scale)
+    if args.use_ema:
+        optimizer = create_optimizer(network.trainable_params(),
+                            opt=args.opt,
+                            lr=lr_scheduler,
+                            weight_decay=args.weight_decay,
+                            momentum=args.momentum,
+                            nesterov=args.use_nesterov,
+                            filter_bias_and_bn=args.filter_bias_and_bn,
+                            loss_scale=args.loss_scale,
+                            checkpoint_path=opt_ckpt_path,
+                            eps=args.eps)
+     else:
+        optimizer = create_optimizer(network.trainable_params(),
+                            opt=args.opt,
+                            lr=lr_scheduler,
+                            weight_decay=args.weight_decay,
+                            momentum=args.momentum,
+                            nesterov=args.use_nesterov,
+                            filter_bias_and_bn=args.filter_bias_and_bn,
+                            checkpoint_path=opt_ckpt_path,
+                            eps=args.eps)
     ...
 ```
 

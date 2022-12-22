@@ -2,12 +2,15 @@
 MindSpore implementation of `ReXNet`.
 Refer to ReXNet: Rethinking Channel Dimensions for Efficient Model Design.
 """
+import math
 from math import ceil
 from typing import Any
 
+import mindspore.common.initializer as init
 import mindspore.nn as nn
+import numpy as np
 
-from .layers import Conv2dNormActivation, GlobalAvgPooling, SqueezeExcite
+from .layers import Conv2dNormActivation, DropPath, GlobalAvgPooling, SqueezeExcite
 from .registry import register_model
 from .utils import load_pretrained, make_divisible
 
@@ -51,6 +54,7 @@ class LinearBottleneck(nn.Cell):
                  ch_div=1,
                  act_layer=nn.SiLU,
                  dw_act_layer=nn.ReLU6,
+                 drop_path=None,
                  **kwargs):
         super(LinearBottleneck, self).__init__(**kwargs)
         self.use_shortcut = stride == 1 and in_channels <= out_channels
@@ -76,6 +80,7 @@ class LinearBottleneck(nn.Cell):
         self.act_dw = dw_act_layer()
 
         self.conv_pwl = Conv2dNormActivation(dw_channels, out_channels, 1, padding=0, activation=None)
+        self.drop_path = drop_path
 
     def construct(self, x):
         shortcut = x
@@ -87,6 +92,8 @@ class LinearBottleneck(nn.Cell):
         x = self.act_dw(x)
         x = self.conv_pwl(x)
         if self.use_shortcut:
+            if self.drop_path is not None:
+                x = self.drop_path(x)
             x[:, 0:self.in_channels] += shortcut
         return x
 
@@ -121,6 +128,7 @@ class ReXNetV1(nn.Cell):
                  use_se=True,
                  se_ratio=1/12,
                  drop_rate=0.2,
+                 drop_path_rate=0.,
                  ch_div=1,
                  act_layer=nn.SiLU,
                  dw_act_layer=nn.ReLU6,
@@ -160,11 +168,22 @@ class ReXNetV1(nn.Cell):
         stem_chs = make_divisible(round(stem_channel * width_mult), divisor=ch_div)
         self.stem = Conv2dNormActivation(in_channels, stem_chs, stride=2, padding=1, activation=act_layer)
 
-        for _, (in_c, out_c, exp_ratio, stride, use_se) in enumerate(zip(in_channels_group, 
-                                                                         out_channels_group, 
-                                                                         exp_ratios, 
-                                                                         strides, 
+        feat_chs = [stem_chs]
+        feature_info = []
+        curr_stride = 2
+        features = []
+        num_blocks = len(in_channels_group)
+        for block_idx, (in_c, out_c, exp_ratio, stride, use_se) in enumerate(zip(in_channels_group,
+                                                                         out_channels_group,
+                                                                         exp_ratios,
+                                                                         strides,
                                                                          use_ses)):
+            if stride > 1:
+                fname = 'stem' if block_idx == 0 else f'features.{block_idx - 1}'
+                feature_info += [dict(num_chs=feat_chs[-1], reduction=curr_stride, module=fname)]
+                curr_stride *= stride
+            block_dpr = drop_path_rate * block_idx / (num_blocks - 1)  # stochastic depth linear decay rule
+            drop_path = DropPath(block_dpr) if block_dpr > 0. else None
             features.append(LinearBottleneck(in_channels=in_c,
                                              out_channels=out_c,
                                              exp_ratio=exp_ratio,
@@ -172,7 +191,8 @@ class ReXNetV1(nn.Cell):
                                              use_se=use_se, 
                                              se_ratio=se_ratio,
                                              act_layer=act_layer,
-                                             dw_act_layer=dw_act_layer))
+                                             dw_act_layer=dw_act_layer,
+                                             drop_path=drop_path))
 
         pen_channels = make_divisible(int(1280 * width_mult), divisor=ch_div)
         features.append(Conv2dNormActivation(out_channels_group[-1],
@@ -180,26 +200,47 @@ class ReXNetV1(nn.Cell):
                                              kernel_size=1,
                                              activation=act_layer))
 
-        features.append(GlobalAvgPooling())
+        features.append(GlobalAvgPooling(keep_dims=True))
         self.useconv = cls_useconv
         self.features = nn.SequentialCell(*features)
         if self.useconv:
             self.cls = nn.SequentialCell(
-                nn.Dropout(drop_rate),
+                nn.Dropout(1.0 - drop_rate),
                 nn.Conv2d(pen_channels, num_classes, 1, has_bias=True))
         else:
             self.cls = nn.SequentialCell(
-                nn.Dropout(drop_rate),
+                nn.Dropout(1.0 - drop_rate),
                 nn.Dense(pen_channels, num_classes))
+        self._initialize_weights()
 
-    def construct(self, x):
+    def _initialize_weights(self) -> None:
+        """Initialize weights for cells."""
+        for _, cell in self.cells_and_names():
+            if isinstance(cell, (nn.Conv2d, nn.Dense)):
+                cell.weight.set_data(
+                    init.initializer(init.HeUniform(math.sqrt(5), mode='fan_in', nonlinearity='relu'),
+                                     cell.weight.shape, cell.weight.dtype))
+                if cell.bias is not None:
+                    cell.bias.set_data(
+                        init.initializer(init.HeUniform(math.sqrt(5), mode='fan_in', nonlinearity='leaky_relu'),
+                                         [1, cell.bias.shape[0]], cell.bias.dtype).reshape((-1)))
+
+    def forward_features(self, x):
         x = self.stem(x)
         x = self.features(x)
+        return x
+
+    def forward_head(self, x):
         if not self.useconv:
-            x = x.reshape((-1, x.shape[1]))
+            x = x.reshape((x.shape[0], -1))
             x = self.cls(x)
         else:
-            x = self.cls(x).reshape((-1, x.shape[1]))
+            x = self.cls(x).reshape((x.shape[0], -1))
+        return x
+
+    def construct(self, x):
+        x = self.forward_features(x)
+        x = self.forward_head(x)
         return x
 
 

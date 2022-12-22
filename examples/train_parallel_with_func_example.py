@@ -75,12 +75,13 @@ def main():
     epochs = 10
     for t in range(epochs):
         print(f"Epoch {t + 1}\n-------------------------------")
-        save_path = f'./ckpt/resnet18-{t + 1}_{num_batches}.ckpt'
+        save_path = f'./resnet18-{t + 1}_{num_batches}.ckpt'
         b = time()
         train_epoch(network, loader_train, loss, opt)
         print('Epoch time cost: ', time() - b)
         test_epoch(network, loader_test)
-        ms.save_checkpoint(network, save_path, async_save=True)
+        if rank_id in [None, 0]:
+            ms.save_checkpoint(network, save_path, async_save=True)
     print("Done!")
 
 
