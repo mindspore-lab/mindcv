@@ -1,12 +1,11 @@
-# Image Classification Prediction
+# 图像分类预测
 
-This tutorial introduces how to call the pretraining model in MindCV to make classification prediction on the test image.
+本教程介绍如何在MindCV中调用预训练模型，在测试图像上进行分类预测。
 
-## Model loading
+## 模型加载
 
-### View all available network models
-
-By calling the `registry.list_models` function in `mindcv.models`, the names of all network models can be printed. The models of a network in different parameter configurations will also be printed, such as resnet18 / resnet34 / resnet50 / resnet101 / resnet152.
+### 查看全部可用的网络模型
+通过调用`mindcv.models`中的`registry.list_models`函数，可以打印出全部网络模型的名字，一个网络在不同参数配置下的模型也会分别打印出来，例如resnet18 / resnet34 / resnet50 / resnet101 / resnet152。
 
 
 ```python
@@ -192,15 +191,15 @@ registry.list_models()
 
 
 
-### Load pretraining model
-
-Taking the resnet50 model as an example, we introduce two methods to load the model checkpoint using the `create_model` function in `mindcv.models`. 1). When the `pretrained` parameter in the interface is set to True, network weights can be automatically downloaded.
+### 加载预训练模型
+我们以resnet50模型为例，介绍两种使用`mindcv.models`中`create_model`函数进行模型checkpoint加载的方法。
+1). 当接口中的`pretrained`参数设置为True时，可以自动下载网络权重。
 
 
 ```python
 from mindcv.models import create_model
 model = create_model(model_name='resnet50', num_classes=1000, pretrained=True)
-# Switch the execution logic of the network to the inference scenario
+# 切换网络的执行逻辑为推理场景
 model.set_train(False)
 ```
 
@@ -581,20 +580,19 @@ model.set_train(False)
 
 
 
-## Data Preparation
+## 数据准备
 
-### Create Dataset
-
-Here, we download a Wikipedia image as a test image, and use the `create_dataset` function in `mindcv.data` to construct a custom dataset for a single image.
+### 构造数据集
+这里，我们下载一张Wikipedia的图片作为测试图片，使用`mindcv.data`中的`create_dataset`函数，为单张图片构造自定义数据集。
 
 
 ```python
 from mindcv.data import create_dataset
 num_workers = 1
-# path of dataset
+# 数据集目录路径
 data_dir = "./data/"
 dataset = create_dataset(root=data_dir, split='test', num_parallel_workers=num_workers)
-# Image visualization
+# 图像可视
 from PIL import Image
 Image.open("./data/test/dog/dog.jpg")
 ```
@@ -606,7 +604,7 @@ Image.open("./data/test/dog/dog.jpg")
 
 
 
-The directory structure of the dataset is as follows:
+数据集的目录结构如下：
 
 ```Text
 data/
@@ -617,11 +615,10 @@ data/
     └─ ……
 ```
 
-### Data Preprocessing
+### 数据预处理
+通过调用`create_transforms`函数，获得预训练模型使用的ImageNet数据集的数据处理策略(transform list)。
 
-Call the `create_transforms` function to obtain the data processing strategy (transform list) of the ImageNet dataset used by the pre training model.
-
-We pass the obtained transform list into the `create_loader` function, specify `batch_size=1` and other parameters, and then complete the preparation of test data. The `Dataset` object is returned as the input of the model.
+我们将得到的transform list传入`create_loader`函数，指定`batch_size=1`和其他参数，即可完成测试数据的准备，返回`Dataset` Object，作为模型的输入。
 
 
 ```python
@@ -637,9 +634,8 @@ data_loader = create_loader(
     )
 ```
 
-## Model Inference
-The picture of the user-defined dataset is transferred to the model to obtain the inference result. Here, use the `Squeeze` function of `mindspore.ops` to remove the batch dimension.
-
+## 模型推理
+将自定义数据集的图片传入模型，获得推理的结果。这里使用`mindspore.ops`的`Squeeze`函数去除batch维度。
 
 
 ```python

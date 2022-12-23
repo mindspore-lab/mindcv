@@ -1,18 +1,18 @@
-# Understanding Model Configuration
+# 了解模型配置
 
-`mindcv` can parse the yaml file of the model through the `argparse` library and `pyyaml` library to configure parameters. Let's use squeezenet_1.0 model as an example to explain how to configure the corresponding parameters.
-
-
-## Basic Environment
-
-1. Parameter description
-
-- mode: Use graph mode (0) or pynative mode (1).
-
-- distribute: Whether to use distributed.
+`mindcv`套件可以通过python的`argparse`库和`pyyaml`库解析模型的yaml文件来进行参数的配置，下面我们以squeezenet_1.0模型为例，解释如何配置相应的参数。
 
 
-2. Sample yaml file
+## 基础环境
+
+1. 参数说明
+
+- mode：使用静态图模式（0）或动态图模式（1）。
+
+- distribute：是否使用分布式。
+
+
+2. yaml文件样例
 
 ```text
 mode: 0 
@@ -20,15 +20,15 @@ distribute: True
 ...
 ```
 
-3. Parse parameter setting
+3. parse参数设置
 
 ```text 
 python train.py --mode 0 --distribute False ...
 ```
 
-4. Corresponding code example
+4. 对应的代码示例
 
-> `args.model` represents the parameter `mode`, `args.distribute` represents the parameter `distribute`。
+> `args.model`代表参数`mode`, `args.distribute`代表参数`distribute`。
 
 ```python
 def train(args):
@@ -48,26 +48,26 @@ def train(args):
 ```
 
 
-## Dataset
+## 数据集
 
-1. Parameter description
+1. 参数说明
 
-- dataset: dataset name.
+- dataset：数据集名称。
 
-- data_dir: Path of dataset file.
+- data_dir：数据集文件所在路径。
 
-- shuffle: whether to shuffle the dataset.
+- shuffle：是否进行数据混洗。
 
-- dataset_download: whether to download the dataset.
+- dataset_download：是否下载数据集。
 
-- batch_size: The number of rows each batch.
+- batch_size：每个批处理数据包含的数据条目。
 
-- drop_remainder: Determines whether to drop the last block whose data row number is less than batch size.
+- drop_remainder：当最后一个批处理数据包含的数据条目小于 batch_size 时，是否将该批处理丢弃。
 
-- num_parallel_workers: Number of workers(threads) to process the dataset in parallel.
+- num_parallel_workers：读取数据的工作线程数。
 
 
-2. Sample yaml file
+2. yaml文件样例
 
 ```text
 dataset: 'imagenet'
@@ -80,7 +80,7 @@ num_parallel_workers: 8
 ...
 ```
 
-3. Parse parameter setting
+3. parse参数设置
 
 ```text 
 python train.py ... --dataset imagenet --data_dir ./imagenet2012 --shuffle True \
@@ -88,7 +88,7 @@ python train.py ... --dataset imagenet --data_dir ./imagenet2012 --shuffle True 
             --num_parallel_workers 8 ...
 ```
 
-4. Corresponding code example
+4. 对应的代码示例
 
 ```python
 def train(args):
@@ -125,27 +125,27 @@ def train(args):
     ...
 ```
 
-## Data Augmentation
+## 数据增强
 
-1. Parameter description
+1. 参数说明
 
-- image_resize: the image size after resize for adapting to network.
+- image_resize：图像的输出尺寸大小。
 
-- scale: random resize scale.
+- scale：要裁剪的原始尺寸大小的各个尺寸的范围。
 
-- ratio: random resize aspect ratio.
+- ratio：裁剪宽高比的范围。
 
-- hfilp: horizontal flip training aug probability.
+- hfilp：图像被翻转的概率。
 
-- interpolation: image interpolation mode for resize operator.
+- interpolation：图像插值方式。
 
-- crop_pct: input image center crop percent.
+- crop_pct：输入图像中心裁剪百分比。
 
-- color_jitter: color jitter factor.
+- color_jitter：颜色抖动因子（亮度调整因子，对比度调整因子，饱和度调整因子）。
 
-- re_prob: probability of performing erasing.
+- re_prob：执行随机擦除的概率。
 
-2. Sample yaml file
+2. yaml文件样例
 
 ```text
 image_resize: 224
@@ -159,7 +159,7 @@ re_prob: 0.5
 ...
 ```
 
-3. Parse parameter setting
+3. parse参数设置
 
 ```text
 python train.py ... --image_resize 224 --scale [0.08, 1.0] --ratio [0.75, 1.333] \
@@ -167,7 +167,7 @@ python train.py ... --image_resize 224 --scale [0.08, 1.0] --ratio [0.75, 1.333]
             --color_jitter [0.4, 0.4, 0.4] --re_prob 0.5 ...
 ```
 
-4. Corresponding code example
+4. 对应的代码示例
 
 ```python
 def train(args):
@@ -194,29 +194,29 @@ def train(args):
     ...
 ```
 
-## Model
+## 模型
 
-1. Parameter description
+1. 参数说明
 
-- model: model name。
+- model：模型名称。
 
-- num_classes: number of label classes.。
+- num_classes：分类的类别数。
 
-- pretrained: whether load pretrained model。
+- pretrained：是否加载预训练模型。
 
-- ckpt_path: initialize model from this checkpoint.。
+- ckpt_path：参数文件所在的路径。
 
-- keep_checkpoint_max: max number of checkpoint files。
+- keep_checkpoint_max：最多保存多少个checkpoint文件。
 
-- ckpt_save_dir: path of checkpoint.
+- ckpt_save_dir：保存参数文件的路径。
 
-- epoch_size: train epoch size.
+- epoch_size：训练执行轮次。
 
-- dataset_sink_mode: the dataset sink mode。
+- dataset_sink_mode：数据是否直接下沉至处理器进行处理。
 
-- amp_level: auto mixed precision level for saving memory and acceleration.
+- amp_level：混合精度等级。
 
-2. Sample yaml file
+2. yaml文件样例
 
 ```text
 model: 'squeezenet1_0'
@@ -231,7 +231,7 @@ amp_level: 'O0'
 ...
 ```
 
-3. Parse parameter setting
+3. parse参数设置
 
 ```text
 python train.py ... --model squeezenet1_0 --num_classes 1000 --pretrained False \
@@ -240,7 +240,7 @@ python train.py ... --model squeezenet1_0 --num_classes 1000 --pretrained False 
             --amp_level O0 ...
 ```
 
-4. Corresponding code example
+4. 对应的代码示例
 
 ```python
 def train(args):
@@ -256,15 +256,15 @@ def train(args):
     ...
 ```
 
-## Loss Function
+## 损失函数
 
-1. Parameter description
+1. 参数说明
 
-- loss: name of loss function, BCE (BinaryCrossEntropy) or CE (CrossEntropy).
+- loss：损失函数的简称。
 
-- label_smoothing: use label smoothing.
+- label_smoothing：标签平滑值，用于计算Loss时防止模型过拟合的正则化手段。
 
-2. Sample yaml file
+2. yaml文件样例
 
 ```text
 loss: 'CE'
@@ -272,13 +272,13 @@ label_smoothing: 0.1
 ...
 ```
 
-3. Parse parameter setting
+3. parse参数设置
 
 ```text
 python train.py ... --loss CE --label_smoothing 0.1 ...
 ```
 
-4. Corresponding code example
+4. 对应的代码示例
 
 ```python
 def train(args):
@@ -290,21 +290,21 @@ def train(args):
     ...
 ```
 
-## Learning Rate Scheduler
+## 学习率策略
 
-1. Parameter description
+1. 参数说明
 
-- scheduler: name of scheduler.
+- scheduler：学习率策略的名称。
 
-- min_lr: the minimum value of learning rate if scheduler supports.
+- min_lr：学习率的最小值。
 
-- lr: learning rate.
+- lr：学习率的最大值。
 
-- warmup_epochs: warmup epochs.
+- warmup_epochs：学习率warmup的轮次。
 
-- decay_epochs: decay epochs.
+- decay_epochs：进行衰减的step数。
 
-2. Sample yaml file
+2. yaml文件样例
 
 ```text
 scheduler: 'cosine_decay'
@@ -315,14 +315,14 @@ decay_epochs: 200
 ...
 ```
 
-3. Parse parameter setting
+3. parse参数设置
 
 ```text
 python train.py ... --scheduler cosine_decay --min_lr 0.0 --lr 0.01 \
              --warmup_epochs 0 --decay_epochs 200 ...
 ```
 
-4. Corresponding code example
+4. 对应的代码示例
 
 ```python
 def train(args):
@@ -342,23 +342,23 @@ def train(args):
 ```
 
 
-## optimizer
+## 优化器
 
-1. Parameter description
+1. 参数说明
 
-- opt: name of optimizer。
+- opt：优化器名称。
 
-- filter_bias_and_bn: filter Bias and BatchNorm.
+- filter_bias_and_bn：参数中是否包含bias，gamma或者beta。
 
-- momentum: Hyperparameter of type float, means momentum for the moving average.
+- momentum：移动平均的动量。
 
-- weight_decay: weight decay（L2 penalty）。
+- weight_decay：权重衰减（L2 penalty）。
 
-- loss_scale: gradient scaling factor
+- loss_scale：梯度缩放系数
 
-- use_nesterov: whether enables the Nesterov momentum
+- use_nesterov：是否使用Nesterov Accelerated Gradient (NAG)算法更新梯度。
 
-2. Sample yaml file
+2. yaml文件样例
 
 ```text
 opt: 'momentum'
@@ -370,14 +370,14 @@ use_nesterov: False
 ...
 ```
 
-3. Parse parameter setting
+3. parse参数设置
 
 ```text
 python train.py ... --opt momentum --filter_bias_and_bn True --weight_decay 0.00007 \
               --loss_scale 1024 --use_nesterov False ...
 ```
 
-4. Corresponding code example
+4. 对应的代码示例
 
 ```python
 def train(args):
@@ -407,15 +407,14 @@ def train(args):
 ```
 
 
-## Combination of Yaml and Parse
+## Yaml和Parse组合使用
 
-You can override the parameter settings in the yaml file by using parse to set parameters. Take the following shell command as an example,
+使用parse设置参数可以覆盖yaml文件中的参数设置。以下面的shell命令为例，
 
 ```shell
 python train.py -c ./configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir ./data
 ```
-The above command overwrites the value of `args.data_dir` parameter from "./imaget2012" in yaml file to "./data".
-
+上面的命令将`args.data_dir`参数的值由yaml文件中的"./imagenet2012"覆盖为"./data"。
 
 
 
