@@ -34,7 +34,6 @@
 | shufflenet_v1_g3_x1_0 | D910x8-G     | 67.77     | 87.73     | 1.89       | 192s/epoch |          |  |  |  |
 | shufflenet_v1_g3_x1_5 | D910x8-G     | 71.53     | 90.17     | 3.48       | 303s/epoch |          |  |  |  |
 | shufflenet_v1_g3_x2_0 | D910x8-G     | 74.02     | 91.74     | 5.50       | 232s/epoch |          |  |  |  |
-|  | - |  |  | - | - | - |  |  |  |
 | shufflenet_v2_x0_5 | D910x8-G | 60.68     | 82.44     | 1.37       | 99s/epoch  |          |  |  |  |
 | shufflenet_v2_x1_0 | D910x8-G | 69.51     | 88.67     | 2.29       | 101s/epoch |          |  |  |  |
 | shufflenet_v2_x1_5 | D910x8-G | 72.59     | 90.79     | 3.53       | 125s/epoch |          |  |  |  |
