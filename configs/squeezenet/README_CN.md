@@ -16,13 +16,16 @@ SqueezeNet主要由Fire模块组成，是一种体量较小的卷积神经网路
 
 ***
 
-|        |              |           |           |    Pynative     |  Pynative  |     Graph      |   Graph    |           |            |
-| :----: | ------------ | :-------: | :-------: | :-------------: | :--------: | :------------: | :--------: | :-------: | :--------: |
-|        | Model        | Top-1 (%) | Top-5 (%) | train (s/epoch) | Infer (ms) | train(s/epoch) | Infer (ms) | Download  |   Config   |
-| GPU | squeezenet_1.0 | 59.48 | 81.22 |  |  |  |  | [model]() | [config]() |
-| Ascend | squeezenet_1.0 |   59.49   | 81.22 |  |  |  |  |  |  |
-|  GPU   | squeezenet_1.1 | 58.99 | 80.98 |                 |            |                |            | [model]() | [config]() |
-| Ascend | squeezenet_1.1 | 58.99 |   80.99   |                 |            |                |            |           |            |
+| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
+|-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
+| squeezenet_1.0 | GPU | 59.49   | 81.22 |   |   |   | [model]() | [cfg]() | [log]() |
+| squeezenet_1.1 | GPU | 58.99 |   80.99 |   |   |   | [model]() | [cfg]() | [log]() |
+
+#### Notes
+
+- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
+- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
+
 
 ## 示例
 

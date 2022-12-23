@@ -11,16 +11,21 @@ PVT is a general backbone network for dense prediction without convolution opera
 ## Results
 ***
 
-| Model           |  Top-1 (%)  | Top-5 (%)|Params (M)|Train T. | Infer T. |  Download | Config | Log |  
-|-----------------|-------------|----------|----------|------|----------|------------|-------|--------|
-| PVT_tiny     |74.81 | 92.18| 13.23| 387s/epoch  | 16ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_tiny_224.ckpt) | [cfg](configs/pvt/pvt_tiny_ascend.yaml)    | [log]() |
-| PVT_small     | 79.66  |94.71| 24.49| 538s/epoch |30ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_small_224.ckpt) | [cfg](configs/pvt/pvt_small_ascend.yaml)    | [log]() |
-| PVT_medium    |81.82  |95.81|44.21| 766s/epoch |47ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_medium_224.ckpt) | [cfg](configs/pvt/pvt_medium_ascend.yaml)    | [log]() |
-| PVT_large    |81.75  |95.70|61.36| 1074s/epoch |67ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_large_224.ckpt) | [cfg](configs/pvt/pvt_large_ascend.yaml)    | [log]() |
+| Model     | Context         |  Top-1 (%)  | Top-5 (%)|Params (M)|Train T. | Infer T. |  Download | Config | Log |  
+|-----------|-----------------|-------------|----------|----------|------|----------|------------|-------|--------|
+| PVT_tiny  | D910x8-G    |74.81 | 92.18| 13.23| 387s/epoch  | 16ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_tiny_224.ckpt) | [cfg](configs/pvt/pvt_tiny_ascend.yaml)    | [log]() |
+| PVT_small | D910x8-G     | 79.66  |94.71| 24.49| 538s/epoch |30ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_small_224.ckpt) | [cfg](configs/pvt/pvt_small_ascend.yaml)    | [log]() |
+| PVT_medium | D910x8-G    |81.82  |95.81|44.21| 766s/epoch |47ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_medium_224.ckpt) | [cfg](configs/pvt/pvt_medium_ascend.yaml)    | [log]() |
+| PVT_large | D910x8-G    |81.75  |95.70|61.36| 1074s/epoch |67ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_large_224.ckpt) | [cfg](configs/pvt/pvt_large_ascend.yaml)    | [log]() |
+
 
 #### Notes
+
 - All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
-- All models are trained with Ascend910*8 in graph mode and infered with an Ascend310.  
+- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
+
+
+
 
 ## Quick Start
 ***

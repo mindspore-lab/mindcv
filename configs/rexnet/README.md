@@ -11,15 +11,18 @@ This is a new paradigm for network architecture design. ReXNet proposes a set of
 ## Results
 ***
 
-|        |           |           |           |    Pynative     |  Pynative  |     Graph      |   Graph    |           |            |
-| :----: | --------- | :-------: | :-------: | :-------------: | :--------: | :------------: | :--------: | :-------: | :--------: |
-|        | Model     | Top-1 (%) | Top-5 (%) | train (s/epoch) | Infer (ms) | train(s/epoch) | Infer (ms) | Download  |   Config   |
-| Ascend | rexnet_x09 | 77.07 | 93.41 |          |            |         |            | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/) | [cfg](https://github.com/mindspore-lab/mindcv/tree/main/configs/rexnet) |
-| Ascend | rexnet_x10 | 77.38 | 93.60 |          |            |         |            | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/) | [cfg](https://github.com/mindspore-lab/mindcv/tree/main/configs/rexnet) |
-| Ascend | rexnet_x13 | 79.06 | 94.28 |          |            |         |            | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/) | [cfg](https://github.com/mindspore-lab/mindcv/tree/main/configs/rexnet) |
-| Ascend | rexnet_x15 | 79.94 | 94.74 |          |            |         |            | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/) | [cfg](https://github.com/mindspore-lab/mindcv/tree/main/configs/rexnet) |
-| Ascend | rexnet_x20 | 80.6 | 94.99 |          |            |         |            | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/) | [cfg](https://github.com/mindspore-lab/mindcv/tree/main/configs/rexnet) |
+| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
+|-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
+| rexnet_x09 | D910x8-G | 77.07 | 93.41    |      |   |   | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/)  | [cfg]() | [log]() |
+| rexnet_x10 | D910x8-G | 77.38 | 93.60    |       |   |   | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/)  | [cfg]() | [log]() |
+| rexnet_x13 | D910x8-G | 79.06 | 94.28 |  |   |   | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/)  | [cfg]() | [log]() |
+| rexnet_x15 | D910x8-G | 79.94 | 94.74  |   |   |   | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/)  | [cfg]() | [log]() |
+| rexnet_x20 | D910x8-G | 80.6 | 94.99  |   |   |   | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/)  | [cfg]() | [log]() |
 
+#### Notes
+
+- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
+- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
 
 
 ## Quick Start

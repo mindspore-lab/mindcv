@@ -35,11 +35,11 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'res2net50': _cfg(url=''),
-    'res2net101': _cfg(url=''),
+    'res2net50': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/res2net/res2net50-200_5004.ckpt'),
+    'res2net101': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/res2net/res2net101-140_5004.ckpt'),
     'res2net152': _cfg(url=''),
-    'res2net50_v1b': _cfg(url=''),
-    'res2net101_v1b': _cfg(url=''),
+    'res2net50_v1b': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/res2net/res2net50_v1b-300_5004.ckpt'),
+    'res2net101_v1b': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/res2net/res2net101_v1b-200_5004.ckpt'),
     'res2net152_v1b': _cfg(url='')
 }
 

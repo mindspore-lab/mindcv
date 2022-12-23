@@ -32,8 +32,8 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'mobilenet_v3_small_1.0': _cfg(url=''),
-    'mobilenet_v3_large_1.0': _cfg(url=''),
+    'mobilenet_v3_small_1.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-Ascend.ckpt'),
+    'mobilenet_v3_large_1.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-Ascend.ckpt'),
     'mobilenet_v3_small_0.75': _cfg(url=''),
     'mobilenet_v3_large_0.75': _cfg(url='')
 }

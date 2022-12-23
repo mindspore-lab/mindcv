@@ -41,6 +41,7 @@ default_cfgs = {
     'pvt_small': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_small_224.ckpt'),
     'pvt_medium': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_medium_224.ckpt'),
     'pvt_large': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_large_224.ckpt'),
+
 }
 
 
