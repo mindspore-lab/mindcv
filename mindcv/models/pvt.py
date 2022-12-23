@@ -24,7 +24,6 @@ __all__ = [
     'pvt_small',
     'pvt_medium',
     'pvt_large',
-    'pvt_huge_v2'
 ]
 
 
@@ -42,7 +41,6 @@ default_cfgs = {
     'pvt_small': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_small_224.ckpt'),
     'pvt_medium': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_medium_224.ckpt'),
     'pvt_large': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_large_224.ckpt'),
-    'pvt_huge_v2': _cfg(url=''),
 }
 
 
@@ -249,7 +247,7 @@ class PyramidVisionTransformer(nn.Cell):
         self.norm = norm_layer([embed_dims[3]])
 
         # cls_token
-        self.cls_token = mindspore.Parameter(ops.zeros((1, 1, embed_dims[3]), mindspore.float16))
+        self.cls_token = mindspore.Parameter(ops.zeros((1, 1, embed_dims[3]), mindspore.float32))
 
         # classification head
         self.head = nn.Dense(embed_dims[3], num_classes) if num_classes > 0 else Identity()
@@ -434,21 +432,6 @@ def pvt_large(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     return model
 
 
-@register_model
-def pvt_huge_v2(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PyramidVisionTransformer:
-    """Get PVT huge model
-    Refer to the base class "models.PVT" for more details.
-    """
-    default_cfg = default_cfgs['pvt_huge_v2']
-    model = PyramidVisionTransformer(in_chans=in_channels, num_classes=num_classes,
-                                     patch_size=4, embed_dims=[128, 256, 512, 768], num_heads=[2, 4, 8, 12],
-                                     mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-                                     norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 10, 60, 3],
-                                     sr_ratios=[8, 4, 2, 1], **kwargs)
 
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
 
 
