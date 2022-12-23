@@ -7,10 +7,6 @@ assignees: ''
 
 ---
 
-| name       | about	                             | labels   |
-| ---------- | ------------------------------------- | -------- |
-| Bug Report | Use this template for reporting a bug | bug |
-
 If this is your first time, please read our contributor guidelines: 
 https://github.com/mindspore-lab/mindcv/blob/main/CONTRIBUTING.md
 
