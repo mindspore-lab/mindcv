@@ -5,6 +5,7 @@ Refer to PVTv2: PVTv2: Improved Baselines with Pyramid Vision Transformer
 import math
 from functools import partial
 
+import mindspore
 import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore import Tensor
@@ -479,14 +480,3 @@ def pvt_v2_b2_li(pretrained: bool = False, num_classes: int = 1000, in_channels:
 
     return model
 
-
-if __name__ == '__main__':
-    import numpy as np
-    import mindspore
-    from mindspore import Tensor
-
-    model = pvt_v2_b0()
-    print(model)
-    dummy_input = Tensor(np.random.rand(8, 3, 224, 224), dtype=mindspore.float32)
-    y = model(dummy_input)
-    print(y.shape)
