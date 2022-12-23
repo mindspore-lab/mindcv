@@ -13,12 +13,12 @@ ConViT combines the strengths of convolutional architectures and Vision Transfor
 
 | Model            | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
 |------------------|-----------|-------------|------------|----------------|----------|----------|-----------|--------|-----|
-| convit_tiny      | D910x8-G  | 73.66       | 91.72      | 6              | 243s/epoch | 50.7ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/) | [cfg]() | [log]() |
-| convit_tiny_plus | D910x8-G  | 77.00       | 93.60      | 10             | 246s/epoch | 40.9ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/) | [cfg]() | [log]() |
-| convit_small     | D910x8-G  | 81.63       | 95.59      | 27             | 491s/epoch | 36.4ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/) | [cfg]() | [log]() |
-| convit_small_plus| D910x8-G  | 81.8        | 95.42      | 48             | 557s/epoch | 32.7ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/) | [cfg]() | [log]() |
-| convit_base      | D910x8-G  | 82.10       | 95.52      | 86             | 880s/epoch | 32.8ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/) | [cfg]() | [log]() |
-| convit_base_plus | D910x8-G  | 81.96       | 95.04      | 152            | 1031s/epoch | 36.6ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/) | [cfg]() | [log]() |
+| convit_tiny      | D910x8-G  | 73.66       | 91.72      | 6              | 243s/epoch | 50.7ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny.ckpt) | [cfg](configs/convit/convit_tiny_ascend.yaml) | [log]() |
+| convit_tiny_plus | D910x8-G  | 77.00       | 93.60      | 10             | 246s/epoch | 40.9ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny_plus.ckpt) | [cfg](configs/convit/convit_tiny_plus_ascend.yaml) | [log]() |
+| convit_small     | D910x8-G  | 81.63       | 95.59      | 27             | 491s/epoch | 36.4ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_small.ckpt) | [cfg](configs/convit/convit_small.yaml) | [log]() |
+| convit_small_plus| D910x8-G  | 81.8        | 95.42      | 48             | 557s/epoch | 32.7ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_small_plus.ckpt) | [cfg](configs/convit/convit_small_plus_ascend.yaml) | [log]() |
+| convit_base      | D910x8-G  | 82.10       | 95.52      | 86             | 880s/epoch | 32.8ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_base.ckpt) | [cfg](configs/convit/convit_base_ascend.yaml) | [log]() |
+| convit_base_plus | D910x8-G  | 81.96       | 95.04      | 152            | 1031s/epoch | 36.6ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_base_plus.ckpt) | [cfg](configs/convit/convit_base_plus_ascend.yaml) | [log]() |
 
 #### Notes
 

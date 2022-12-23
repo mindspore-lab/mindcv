@@ -16,9 +16,9 @@
 
 |    Model     | Context  | Top-1 (%) | Top-5 (%) | Params(M) |  Train T.  |  Infer T.   |                           Download                           |                            Config                            |                             Log                              |
 | :----------: | :------: | :-------: | :-------: | :-------: | :--------: | :---------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
-| vit_b_32_224 | D910x8-G |   75.86   |   92.08   |    86     | 619ms/step | 11.6ms/step | [model](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit) | [log](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit) |
-| vit_l_16_224 | D910x8-G |   76.34   |   92.79   |    307    | 632ms/step | 5.37ms/step | [model](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit) | [log](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit) |
-| vit_l_32_224 | D910x8-G |   73.71   |   90.92   |    307    | 534ms/step | 6.22ms/step | [model](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit) | [log](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit) |
+| vit_b_32_224 | D910x8-G |   75.86   |   92.08   |    86     | 619ms/step | 11.6ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [log]() |
+| vit_l_16_224 | D910x8-G |   76.34   |   92.79   |    307    | 632ms/step | 5.37ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l16_224_ascend.yaml) | [log]() |
+| vit_l_32_224 | D910x8-G |   73.71   |   90.92   |    307    | 534ms/step | 6.22ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l32_224_ascend.yaml) | [log]() |
 
 #### 备注
 
