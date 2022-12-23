@@ -29,10 +29,10 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'mobilenet_v1_0.25_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenet_v1_0.25_224.ckpt'),
-    'mobilenet_v1_0.5_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenet_v1_0.5_224.ckpt'),
-    'mobilenet_v1_0.75_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenet_v1_0.75_224.ckpt'),
-    'mobilenet_v1_1.0_224': _cfg(url=''),
+    'mobilenet_v1_0.25_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025_224-200_2502.ckpt'),
+    'mobilenet_v1_0.5_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_050_224-200_2502.ckpt'),
+    'mobilenet_v1_0.75_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_075_224-200_2502.ckpt'),
+    'mobilenet_v1_1.0_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_100_224-200_2502.ckpt'),
 
 }
 

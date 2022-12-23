@@ -2,7 +2,6 @@
 > [MetaFormer Is Actually What You Need for Vision](https://arxiv.org/pdf/2111.11418v3.pdf)
 
 ## Introduction
-***
 
 Instead of designing complicated token mixer to achieve SOTA performance, the target of this work is to demonstrate the competence of Transformer models largely stem from the general architecture MetaFormer. Pooling/PoolFormer are just the tools to support our claim.
 ![](metaformer.png)
@@ -14,11 +13,10 @@ Figure 2: (a) The overall framework of PoolFormer. (b) The architecture of PoolF
 
 
 ## Results
-***
 
 | Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
-|-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
-| poolformer_s12 | D910x8 | 77.094     |   93.394   |  12M       | 396.24s/epoch | 19.9ms/step | [model]() | [cfg]() | [log]() |
+|-----------------|-----------|-------------|------------|----------------|----------|----------|-----------|--------|-----|
+| poolformer_s12  | D910x8    | 77.094      |   93.394   |  12M           | 396.24s/epoch | 19.9ms/step | [model]() | [cfg]() | [log]() |
 
 
 #### Notes
@@ -27,7 +25,7 @@ Figure 2: (a) The overall framework of PoolFormer. (b) The architecture of PoolF
 - Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
 
 ## Quick Start
-***
+
 ### Preparation
 
 #### Installation
@@ -42,7 +40,7 @@ Please download the [ImageNet-1K](https://www.image-net.org/download.php) datase
 
   ```shell
   # train poolformer_s12 on 8 Ascends
-  bash ./scripts/run_distribution_ascend.sh ./scripts/rank_table_8pcs.json [DATASET_PATH] ./config/poolformer/poolformer_s12.yaml
+  mpirun -n 8 python train.py -c ./configs/poolformer/poolformer_s12.yaml --data_dir=/path/to/data
   ```
   
   Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascneds** with the same batch size.
@@ -63,6 +61,3 @@ Detailed adjustable parameters and their default value can be seen in [config.py
 ### Deployment (optional)
 
 Please refer to the deployment tutorial in MindCV.
-
-
-
