@@ -25,7 +25,7 @@ print('\n==> Models with training recipes: ', len(models_with_train_rec))
 print(models_with_train_rec)
 
 # get readme file list
-config_dirs = [d for d in os.listdir('./configs') if os.path.isdir('configs/'+d)]
+config_dirs = sorted([d for d in os.listdir('./configs') if os.path.isdir('configs/'+d)])
 print('\nTotal number of config folders: ', len(config_dirs))
 print('==> Configs w/o training rec: ', set(config_dirs)- set(models_with_train_rec))
 readmes = [f'configs/{d}/README.md' for d in config_dirs]
@@ -48,7 +48,7 @@ kw = ['Model', 'Top', 'Download', 'Config']
 head = '| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |'
 fout.write(head + '\n')
 
-fout.write("|-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|" + '\n')
+fout.write("|----------------|------------|-------|-------|----------|-------|--------|---|-----|-----|" + '\n')
 
 attrs = head.replace(' ','')[1:-1].split('|')
 print('table attrs: ', attrs)
@@ -111,6 +111,7 @@ for r in readmes:
 print('Parsed models in benchmark: ', len(parsed_models))
 print('Parsed model specs in benchmark: ', len(parsed_model_specs))
 print('Readme using inconsistent result table format: \r\n', set(config_dirs) - set(parsed_models))
+
 
 # write notes
 
