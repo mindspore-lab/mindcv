@@ -5,6 +5,7 @@ Example:
 """
 
 import ast
+import time
 import argparse
 import numpy as np
 from PIL import Image
@@ -19,12 +20,14 @@ parser = argparse.ArgumentParser(description='MindSpore Inference Demo')
 parser.add_argument('--image_path', type=str, help='path to image')
 parser.add_argument('--model', type=str, help='name of model')
 parser.add_argument('--ckpt_path', type=str, help='checkpoint path')
+group.add_argument('--est_time', type=str, nargs='?', const=True, default=False,
+                       help='Time statistics')
 
 
 def main():
     args = parser.parse_args()
     ms.set_seed(1)
-    ms.set_context(mode=ms.PYNATIVE_MODE)
+    ms.set_context(mode=ms.GRAPH_MODE)
 
     img = Image.open(args.image_path).convert("RGB")
     # create transform
@@ -43,9 +46,18 @@ def main():
         pretrained=True
     )
     network.set_train(False)
-    logits = nn.Softmax()(network(ms.Tensor(img)))[0].asnumpy()
-    preds = np.argsort(logits)[::-1][:5]
-    probs = logits[preds]
+    if args.est_time:
+        for i in range(1003):
+            if i == 3:
+                start = time.time()
+            logits = nn.Softmax()(network(ms.Tensor(img)))[0].asnumpy()
+            preds = np.argsort(logits)[::-1][:5]
+            probs = logits[preds]
+        print(f'Average time of 1000 inferences: {time.time()-start} ms')
+    else:
+        logits = nn.Softmax()(network(ms.Tensor(img)))[0].asnumpy()
+        preds = np.argsort(logits)[::-1][:5]
+        probs = logits[preds]
     with open("./tutorials/imagenet1000_clsidx_to_labels.txt", encoding='utf-8') as f:
         idx2label = ast.literal_eval(f.read())
     #print(f"Predict result of {args.image_path}:")
