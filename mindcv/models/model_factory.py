@@ -21,6 +21,7 @@ def create_model(
         pretrained (bool): Whether to load the pretrained model. Default: False.
         in_channels (int): The input channels. Default: 3.
         checkpoint_path (str): The path of checkpoint files. Default: "".
+        use_ema (bool): Whether use ema method. Default: False.
     """
 
     if checkpoint_path != '' and pretrained:

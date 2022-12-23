@@ -110,9 +110,6 @@ def create_parser():
                        help='probability of applying cutmix and/or mixup (default=0.)')
     group.add_argument('--mixup', type=float, default=0.,
                        help='Hyperparameter of beta distribution of mixup. Recommended value is 0.2 for ImageNet. (default=0.)')
-    group.add_argument('--use_ema', type=str2bool, nargs='?', const=True, default=False,
-                       help='training with ema (default=False)')
-    group.add_argument('--ema_decay', type=float, default=0.9999, help='ema decay')
 
     # Model parameters
     group = parser.add_argument_group('Model parameters')
@@ -139,6 +136,10 @@ def create_parser():
                        help='Input channels (default=3)')
     group.add_argument('--ckpt_save_policy', type=str, default='latest_k',
                        help='Checkpoint saving strategy. The optional values is None, "top_k" or "latest_k".')
+    group.add_argument('--use_ema', type=str2bool, nargs='?', const=True, default=False,
+                       help='training with ema (default=False)')
+    group.add_argument('--ema_decay', type=float, default=0.9999, help='ema decay')
+
 
     # Optimize parameters
     group = parser.add_argument_group('Optimizer parameters')
@@ -176,13 +177,17 @@ def create_parser():
     group.add_argument('--warmup_factor', type=float, default=0.0,
                        help='Warmup factor of learning rate (default=0.0)')
     group.add_argument('--decay_epochs', type=int, default=100,
-                       help='Decay epochs (default=None)')
+                       help='Decay epochs (default=100)')
     group.add_argument('--decay_rate', type=float, default=0.9,
                        help='LR decay rate if scheduler supports')
     group.add_argument('--multi_step_decay_milestones', type=list, default=[30, 60, 90],
                        help='list of epoch milestones for lr decay, which is ONLY effective for the multi_step_decay scheduler. LR will be decay by decay_rate at the milestone epoch.')
     group.add_argument('--lr_epoch_stair', type=str2bool, nargs='?', const=True, default=False,
                        help='If True, LR will be updated in the first step of each epoch and LRs are the same in the remaining steps in the epoch. Otherwise, learning rate is updated every  step dynamically. (default=False)')
+    group.add_argument('--num_cycles', type=int, default=1,
+                       help='Num of cylces for cosine decay (default=1)')
+    group.add_argument('--cycle_decay', type=float, default=1.0,
+                       help='Decay rate of lr max in each cosine cycle')
 
     # Loss parameters
     group = parser.add_argument_group('Loss parameters')

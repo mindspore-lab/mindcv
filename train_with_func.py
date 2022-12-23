@@ -9,15 +9,15 @@ import mindspore as ms
 from mindspore import nn, Tensor, ops, SummaryRecord
 from mindspore.communication import init, get_rank, get_group_size
 from mindspore.parallel._utils import _get_device_num, _get_gradients_mean
+from mindspore.amp import LossScaler, DynamicLossScaler, StaticLossScaler
 
 from mindcv.models import create_model
 from mindcv.data import create_dataset, create_transforms, create_loader
 from mindcv.loss import create_loss
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
-from mindcv.utils import CheckpointManager, Allreduce
+from mindcv.utils import CheckpointManager, Allreduce, NoLossScaler
 from config import parse_args
-
 
 logger = logging.getLogger('train')
 logger.setLevel(logging.INFO)
@@ -25,7 +25,6 @@ h1 = logging.StreamHandler()
 formatter1 = logging.Formatter('%(message)s',)
 logger.addHandler(h1)
 h1.setFormatter(formatter1)
-
 
 def train(args):
     """Train network."""
@@ -56,7 +55,8 @@ def train(args):
         num_shards=device_num,
         shard_id=rank_id,
         num_parallel_workers=args.num_parallel_workers,
-        download=args.dataset_download)
+        download=args.dataset_download,
+        num_aug_repeats=args.aug_repeats)
     
     if args.num_classes is None:
         num_classes = dataset_train.num_classes()
@@ -151,6 +151,7 @@ def train(args):
     num_params = sum([param.size for param in network.get_parameters()])
 
     # create loss
+    ms.amp.auto_mixed_precision(network, amp_level=args.amp_level) 
     loss = create_loss(name=args.loss,
                        reduction=args.reduction,
                        label_smoothing=args.label_smoothing,
@@ -184,6 +185,15 @@ def train(args):
                                  filter_bias_and_bn=args.filter_bias_and_bn,
                                  loss_scale=args.loss_scale,
                                  checkpoint_path=opt_ckpt_path)
+    
+    # set loss scale for mixed precision training
+    if args.amp_level != 'O0':
+        if args.dynamic_loss_scale:
+            loss_scaler = DynamicLossScaler(args.loss_scale, 2, 1000)
+        else:
+            loss_scaler = StaticLossScaler(args.loss_scale)
+    else:
+        loss_scaler = NoLossScaler()
 
     # resume
     begin_step = 0
@@ -214,10 +224,6 @@ def train(args):
                     f"LR Scheduler: {args.scheduler}")
         logger.info(f"-" * 40)
 
-
-        assert args.loss_scale == 1.0, 'loss_scale > 1.0 is not supported in train_with_func currently.'
-
-
         if args.ckpt_path != '':
             logger.info(f"Resume training from {args.ckpt_path}, last step: {begin_step}, last epoch: {begin_epoch}")
         else:
@@ -234,8 +240,8 @@ def train(args):
     best_acc = 0
     summary_dir = f"./{args.ckpt_save_dir}/summary_01"
 
+
     # Training
-    # TODO: args.loss_scale is not making effect.
     need_flush_from_cache = True
     assert (args.ckpt_save_policy != 'top_k' or args.val_while_train == True), \
         "ckpt_save_policy is top_k, val_while_train must be True."
@@ -250,6 +256,7 @@ def train(args):
                                      optimizer,
                                      epoch=t,
                                      n_epochs=args.epoch_size,
+                                     loss_scaler=loss_scaler,
                                      summary_record=summary_record,
                                      rank_id=rank_id,
                                      log_interval=args.log_interval)
@@ -307,12 +314,13 @@ def train(args):
 
     logger.info("Done!")
 
-def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, summary_record=None, rank_id=None, log_interval=100):
+def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, loss_scaler, summary_record=None, rank_id=None, log_interval=100):
     """Training an epoch network"""
     # Define forward function
     def forward_fn(data, label):
         logits = network(data)
         loss = loss_fn(logits, label)
+        loss = loss_scaler.scale(loss)
         return loss, logits
 
     # Get gradient function
@@ -327,13 +335,26 @@ def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, summary_r
     def train_step_parallel(data, label):
         (loss, logits), grads = grad_fn(data, label)
         grads = grad_reducer(grads)
-        loss = ops.depend(loss, optimizer(grads))
+        status = ms.amp.all_finite(grads)
+        if status:
+            loss = loss_scaler.unscale(loss)
+            grads = loss_scaler.unscale(grads)
+            loss = ops.depend(loss, optimizer(grads))
+        loss = ops.depend(loss, loss_scaler.adjust(status))
+
         return loss, logits
 
     @ms.ms_function
     def train_step(data, label):
         (loss, logits), grads = grad_fn(data, label)
         loss = ops.depend(loss, optimizer(grads))
+        status = ms.amp.all_finite(grads)
+        if status:
+            loss = loss_scaler.unscale(loss)
+            grads = loss_scaler.unscale(grads)
+            loss = ops.depend(loss, optimizer(grads))
+        loss = ops.depend(loss, loss_scaler.adjust(status))
+
         return loss, logits
 
     network.set_train()
@@ -422,7 +443,6 @@ def test_epoch(network, dataset, rank_id=None):
         correct /= total
 
     return correct
-
 
 def flush_from_cache(network):
     """Flush cache data to host if tensor is cache enable."""
