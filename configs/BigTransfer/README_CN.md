@@ -17,7 +17,7 @@
 
 |    Model     | Context  | Top-1 (%) | Top-5 (%) | Params(M) |  Train T.  |  Infer T.   |                           Download                           |                            Config                            |                             Log                              |
 | :----------: | :------: | :-------: | :-------: | :-------: | :--------: | :---------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
-|    BiT50-S   | D910x8-G |   76.81   |   93.17   |    25     | 651s/step  |             | [model](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/BigTransfer/BiT50_ascend.yaml) | [log](https://github.com/mindspore-lab/mindcv/tree/main/configs/BigTransfer) |
+|    BiT50-S   | D910x8-G |   76.81   |   93.17   |    25     | 652s/epoch | 189.8ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/BigTransfer/BiT50_ascend.yaml) | [log](https://github.com/mindspore-lab/mindcv/tree/main/configs/BigTransfer) |
 
 ## 备注
 

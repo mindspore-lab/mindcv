@@ -16,12 +16,12 @@
 
 | Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
 |-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
-| edgenext_small | D910x8-G | 79.146     | 94.394     | 5.59M       | 518s/epoch |  | [model]() | [cfg]() | [log]() |
+| edgenext_small | D910x8-G | 79.146     | 94.394     | 5.59M       | 518s/epoch | 238.6ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_small_ascend.yaml) | [log]() |
 
 #### 备注
 
 - 以上模型均在ImageNet-1K数据集上训练和验证。
-- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
+- Context: D910 x 8 - G, D910 - 昇腾910, x8 - 8卡, G - 静态图模式.
 
 ## 示例
 
