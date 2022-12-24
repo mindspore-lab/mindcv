@@ -1,70 +1,69 @@
-| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
-|----------------|------------|-------|-------|----------|-------|--------|---|-----|-----|
-|    BiT50-S   | D910x8-G |   76.81   |   93.17   |    25     | 651s/step  |             | [model](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/BigTransfer/BiT50_ascend.yaml) |  |
-| convit_tiny      | D910x8-G  | 73.66       | 91.72      | 6              | 243s/epoch | 50.7ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny.ckpt) | [cfg](configs/convit/convit_tiny_ascend.yaml) |  |
-| convit_tiny_plus | D910x8-G  | 77.00       | 93.60      | 10             | 246s/epoch | 40.9ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny_plus.ckpt) | [cfg](configs/convit/convit_tiny_plus_ascend.yaml) |  |
-| convit_small     | D910x8-G  | 81.63       | 95.59      | 27             | 491s/epoch | 36.4ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_small.ckpt) | [cfg](configs/convit/convit_small.yaml) |  |
-| convit_small_plus| D910x8-G  | 81.8        | 95.42      | 48             | 557s/epoch | 32.7ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_small_plus.ckpt) | [cfg](configs/convit/convit_small_plus_ascend.yaml) |  |
-| convit_base      | D910x8-G  | 82.10       | 95.52      | 86             | 880s/epoch | 32.8ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_base.ckpt) | [cfg](configs/convit/convit_base_ascend.yaml) |  |
-| convit_base_plus | D910x8-G  | 81.96       | 95.04      | 152            | 1031s/epoch | 36.6ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_base_plus.ckpt) | [cfg](configs/convit/convit_base_plus_ascend.yaml) |  |
-| DenseNet121 | D910x8-G | 75.64     | 92.84     | 8.06       | 238s/epoch | 6.7ms/step |  |  |  |
-| DenseNet161 | D910x8-G | 79.09     | 94.66     | 28.90      | 472s/epoch | 8.7ms/step |  |  |  |
-| DenseNet169 | D910x8-G | 77.26 | 93.71 | 14.30 | 313s/epoch | 7.4ms/step |  |  |  |
-| DenseNet201 | D910x8-G | 78.14 | 94.08 | 20.24 | 394s/epoch | 7.9ms/step |  |  |  |
-| edgenext_small | D910x8-G | 79.146     | 94.394     | 5.59M       | 518s/epoch |  |  |  |  |
-| MnasNet-B1-0_75 |  D910x8-G  | 71.81 | 90.53 | 3.20 |  96s/epoch  |  |  |     |  |
-| MnasNet-B1-1_0 |  D910x8-G  | 74.28 | 91.70 | 4.42 | 96s/epoch | |  |     |  |
-| MnasNet-B1-1_4 | D910x8-G | 76.01 | 92.83 | 7.16 | 121s/epoch | |  |  |  |
-| MobileNet_v1_025 | D910x8-G | 54.64       | 78.29      | 0.47           | 113s/epoch |        |  |  |  |
-| MobileNet_v1_050 | D910x8-G | 66.39       | 86.71      | 1.34           | 120s/epoch |        |  |  |  |
-| MobileNet_v1_075 | D910x8-G | 70.66       | 89.49      | 2.60           | 128s/epoch |        |  |  |  |
-| MobileNet_v1_100 | D910x8-G | 71.83       | 90.26      | 4.25           | 130s/epoch |        |  |  |  |
-| MobileNet_v2_075 | D910x8-G | 69.76       | 89.28      | 2.66           | 106s/epoch |        |  |  |  |
-| MobileNet_v2_100 | D910x8-G | 72.02       | 90.92      | 3.54           | 98s/epoch |        |  |  |  |
-| MobileNet_v2_140 | D910x8-G | 74.97       | 92.32      | 6.15           | 157s/epoch |        |  |  |  |
-| MobileNetV3_large_100 | D910x8-G | 75.14     | 92.33     | 5.51       | 225s/epoch |          |  |  |  |
-| MobileNetV3_small_100 | D910x8-G | 67.34     | 87.49     | 2.55       | 118s/epoch |          |  |  |  |
-| poolformer_s12  | D910x8    | 77.094      |   93.394   |  12M           | 396.24s/epoch | 19.9ms/step |  |  |  |
-| PVT_tiny | D910x8-G | 74.92     |       |        | 433s/epoch | 16ms/step |  |  |  |
-| PVT_small | D910x8-G | 79.66   |      |       | 538s/epoch | 30ms/step |  |  |  |
-| PVT_medium | D910x8-G | 81.82      |       |         | 766s/epoch |47ms/step  |  |  |  |
-| PVT_large | D910x8-G | 81.75     |       |        | 1074s/epoch | 67ms/step|  |  |  |
-| RegNetX-800MF   | D910x8-G  | 76.09       | 92.968        | 7.3         | 115s/epoch | 1.8ms/step |  |  |  |
-| repmlp_t224 | D910x8 | 76.649     |      | 38.3M       | 1011s/epoch | 15.8ms/step |  |  |  |
-| RepVGG_A0 | GPU | 71.98     | 90.36     |       |  |   |  |  |  |
-| RepVGG_A0 | D910x8-G | 71.87 | 90.43     |        |   |   |  |  |  |
-| Res2Net50      | D910x8-G | 79.35     | 94.64     | 25.76      | 246s/epoch | 28.5ms/step |  |  |  |
-| Res2Net101     | D910x8-G | 79.56     | 94.70     | 45.33      | 467s/epoch | 46.0ms/step |  |  |  |
-| Res2Net50      | D910x8-G | 80.32     | 95.09     | 25.77      | 250s/epoch | 29.6ms/step |  |  |  |
-| Res2Net101-v1b | D910x8-G | 81.26     | 95.41     | 45.35      | 435s/epoch | 42.4ms/step |  |  |  |
-| ResNet18 | D910x8-G | 70.10 | 89.58 | 11.70 | 118s/epoch |  |  |  |  |
-| ResNet34 | D910x8-G | 74.19 | 91.76 | 21.81 | 122s/epoch |  |  |  |  |
-| ResNet50 | D910x8-G | 76.78 | 93.42 | 25.61 | 213s/epoch |  |  |  |  |
-| ResNet101 | D910x8-G | 78.06 | 94.15 | 44.65 | 327s/epoch |  |  |  |  |
-| ResNet152 | D910x8-G | 78.37 | 94.09 | 60.34 | 456s/epoch |  |  |  |  |
-| rexnet_x09 | D910x8-G | 77.07 | 93.41    |      |   |   |   |  |  |
-| rexnet_x10 | D910x8-G | 77.38 | 93.60    |       |   |   |   |  |  |
-| rexnet_x13 | D910x8-G | 79.06 | 94.28 |  |   |   |   |  |  |
-| rexnet_x15 | D910x8-G | 79.94 | 94.74  |   |   |   |   |  |  |
-| rexnet_x20 | D910x8-G | 80.6 | 94.99  |   |   |   |   |  |  |
-| shufflenet_v1_g3_x0_5 | D910x8-G     | 57.05     | 79.73     | 0.73       | 169s/epoch |          |  |  |  |
-| shufflenet_v1_g3_x1_0 | D910x8-G     | 67.77     | 87.73     | 1.89       | 192s/epoch |          |  |  |  |
-| shufflenet_v1_g3_x1_5 | D910x8-G     | 71.53     | 90.17     | 3.48       | 303s/epoch |          |  |  |  |
-| shufflenet_v1_g3_x2_0 | D910x8-G     | 74.02     | 91.74     | 5.50       | 232s/epoch |          |  |  |  |
-| shufflenet_v2_x0_5 | D910x8-G | 60.68     | 82.44     | 1.37       | 99s/epoch  |          |  |  |  |
-| shufflenet_v2_x1_0 | D910x8-G | 69.51     | 88.67     | 2.29       | 101s/epoch |          |  |  |  |
-| shufflenet_v2_x1_5 | D910x8-G | 72.59     | 90.79     | 3.53       | 125s/epoch |          |  |  |  |
-| shufflenet_v2_x2_0 | D910x8-G | 75.14     | 92.13     | 7.44       | 149s/epoch |          |  |  |  |
-| squeezenet_1.0 | GPU | 59.49   | 81.22 |   |   |   |  |  |  |
-| squeezenet_1.1 | GPU | 58.99 |   80.99 |   |   |   |  |  |  |
-| visformer_tiny   | D910x8-G  | 78.61       | 94.33      | 10             | 353s/epoch | 10.9ms/step |  |  |  |
-| visformer_tiny2  | D910x8-G  | 78.62       | 94.36      | 9              | 390s/epoch | 11.5ms/step |  |  |  |
-| visformer_small  | D910x8-G  | 81.77       | 95.72      | 40             | 440s/epoch | 15.3ms/step |  |  |  |
-| visformer_small2 | D910x8-G  | 82.17       | 95.90      | 23             | 450s/epoch | 19.2ms/step |  |  |  |
-| vit_b_32_224 | D910x8-G |   75.86   |   92.08   |    86     | 619ms/step | 11.6ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) |  |
-| vit_l_16_224 | D910x8-G |   76.34   |   92.79   |    307    | 632ms/step | 5.37ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l16_224_ascend.yaml) |  |
-| vit_l_32_224 | D910x8-G |   73.71   |   90.92   |    307    | 534ms/step | 6.22ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l32_224_ascend.yaml) |  |
-
+| Model                 | Context   |   Top-1 (%) | Top-5 (%)   | Params (M)   | Train T.      | Download                                                                             | Config                                                                                         |
+|:----------------------|:----------|------------:|:------------|:-------------|:--------------|:-------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------|
+| BiT50-S               | D910x8-G  |      76.81  | 93.17       | 25           | 651s/step     | [model](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt)          | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/BigTransfer/BiT50_ascend.yaml) |
+| convit_tiny           | D910x8-G  |      73.66  | 91.72       | 6            | 243s/epoch    | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny.ckpt)       | [cfg](configs/convit/convit_tiny_ascend.yaml)                                                  |
+| convit_tiny_plus      | D910x8-G  |      77     | 93.60       | 10           | 246s/epoch    | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny_plus.ckpt)  | [cfg](configs/convit/convit_tiny_plus_ascend.yaml)                                             |
+| convit_small          | D910x8-G  |      81.63  | 95.59       | 27           | 491s/epoch    | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_small.ckpt)      | [cfg](configs/convit/convit_small.yaml)                                                        |
+| convit_small_plus     | D910x8-G  |      81.8   | 95.42       | 48           | 557s/epoch    | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_small_plus.ckpt) | [cfg](configs/convit/convit_small_plus_ascend.yaml)                                            |
+| convit_base           | D910x8-G  |      82.1   | 95.52       | 86           | 880s/epoch    | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_base.ckpt)       | [cfg](configs/convit/convit_base_ascend.yaml)                                                  |
+| convit_base_plus      | D910x8-G  |      81.96  | 95.04       | 152          | 1031s/epoch   | [model](https://download.mindspore.cn/toolkits/mindcv/convit/convit_base_plus.ckpt)  | [cfg](configs/convit/convit_base_plus_ascend.yaml)                                             |
+| DenseNet121           | D910x8-G  |      75.64  | 92.84       | 8.06         | 238s/epoch    |                                                                                      |                                                                                                |
+| DenseNet161           | D910x8-G  |      79.09  | 94.66       | 28.90        | 472s/epoch    |                                                                                      |                                                                                                |
+| DenseNet169           | D910x8-G  |      77.26  | 93.71       | 14.30        | 313s/epoch    |                                                                                      |                                                                                                |
+| DenseNet201           | D910x8-G  |      78.14  | 94.08       | 20.24        | 394s/epoch    |                                                                                      |                                                                                                |
+| edgenext_small        | D910x8-G  |      79.146 | 94.394      | 5.59M        | 518s/epoch    |                                                                                      |                                                                                                |
+| MnasNet-B1-0_75       | D910x8-G  |      71.81  | 90.53       | 3.20         | 96s/epoch     |                                                                                      |                                                                                                |
+| MnasNet-B1-1_0        | D910x8-G  |      74.28  | 91.70       | 4.42         | 96s/epoch     |                                                                                      |                                                                                                |
+| MnasNet-B1-1_4        | D910x8-G  |      76.01  | 92.83       | 7.16         | 121s/epoch    |                                                                                      |                                                                                                |
+| MobileNet_v1_025      | D910x8-G  |      54.64  | 78.29       | 0.47         | 113s/epoch    |                                                                                      |                                                                                                |
+| MobileNet_v1_050      | D910x8-G  |      66.39  | 86.71       | 1.34         | 120s/epoch    |                                                                                      |                                                                                                |
+| MobileNet_v1_075      | D910x8-G  |      70.66  | 89.49       | 2.60         | 128s/epoch    |                                                                                      |                                                                                                |
+| MobileNet_v1_100      | D910x8-G  |      71.83  | 90.26       | 4.25         | 130s/epoch    |                                                                                      |                                                                                                |
+| MobileNet_v2_075      | D910x8-G  |      69.76  | 89.28       | 2.66         | 106s/epoch    |                                                                                      |                                                                                                |
+| MobileNet_v2_100      | D910x8-G  |      72.02  | 90.92       | 3.54         | 98s/epoch     |                                                                                      |                                                                                                |
+| MobileNet_v2_140      | D910x8-G  |      74.97  | 92.32       | 6.15         | 157s/epoch    |                                                                                      |                                                                                                |
+| MobileNetV3_large_100 | D910x8-G  |      75.14  | 92.33       | 5.51         | 225s/epoch    |                                                                                      |                                                                                                |
+| MobileNetV3_small_100 | D910x8-G  |      67.34  | 87.49       | 2.55         | 118s/epoch    |                                                                                      |                                                                                                |
+| poolformer_s12        | D910x8    |      77.094 | 93.394      | 12M          | 396.24s/epoch |                                                                                      |                                                                                                |
+| PVT_tiny              | D910x8-G  |      74.92  |             |              | 433s/epoch    |                                                                                      |                                                                                                |
+| PVT_small             | D910x8-G  |      79.66  |             |              | 538s/epoch    |                                                                                      |                                                                                                |
+| PVT_medium            | D910x8-G  |      81.82  |             |              | 766s/epoch    |                                                                                      |                                                                                                |
+| PVT_large             | D910x8-G  |      81.75  |             |              | 1074s/epoch   |                                                                                      |                                                                                                |
+| RegNetX-800MF         | D910x8-G  |      76.09  | 92.968      | 7.3          | 115s/epoch    |                                                                                      |                                                                                                |
+| repmlp_t224           | D910x8    |      76.649 |             | 38.3M        | 1011s/epoch   |                                                                                      |                                                                                                |
+| RepVGG_A0             | GPU       |      71.98  | 90.36       |              |               |                                                                                      |                                                                                                |
+| RepVGG_A0             | D910x8-G  |      71.87  | 90.43       |              |               |                                                                                      |                                                                                                |
+| Res2Net50             | D910x8-G  |      79.35  | 94.64       | 25.76        | 246s/epoch    |                                                                                      |                                                                                                |
+| Res2Net101            | D910x8-G  |      79.56  | 94.70       | 45.33        | 467s/epoch    |                                                                                      |                                                                                                |
+| Res2Net50             | D910x8-G  |      80.32  | 95.09       | 25.77        | 250s/epoch    |                                                                                      |                                                                                                |
+| Res2Net101-v1b        | D910x8-G  |      81.26  | 95.41       | 45.35        | 435s/epoch    |                                                                                      |                                                                                                |
+| ResNet18              | D910x8-G  |      70.1   | 89.58       | 11.70        | 118s/epoch    |                                                                                      |                                                                                                |
+| ResNet34              | D910x8-G  |      74.19  | 91.76       | 21.81        | 122s/epoch    |                                                                                      |                                                                                                |
+| ResNet50              | D910x8-G  |      76.78  | 93.42       | 25.61        | 213s/epoch    |                                                                                      |                                                                                                |
+| ResNet101             | D910x8-G  |      78.06  | 94.15       | 44.65        | 327s/epoch    |                                                                                      |                                                                                                |
+| ResNet152             | D910x8-G  |      78.37  | 94.09       | 60.34        | 456s/epoch    |                                                                                      |                                                                                                |
+| rexnet_x09            | D910x8-G  |      77.07  | 93.41       |              |               |                                                                                      |                                                                                                |
+| rexnet_x10            | D910x8-G  |      77.38  | 93.60       |              |               |                                                                                      |                                                                                                |
+| rexnet_x13            | D910x8-G  |      79.06  | 94.28       |              |               |                                                                                      |                                                                                                |
+| rexnet_x15            | D910x8-G  |      79.94  | 94.74       |              |               |                                                                                      |                                                                                                |
+| rexnet_x20            | D910x8-G  |      80.6   | 94.99       |              |               |                                                                                      |                                                                                                |
+| shufflenet_v1_g3_x0_5 | D910x8-G  |      57.05  | 79.73       | 0.73         | 169s/epoch    |                                                                                      |                                                                                                |
+| shufflenet_v1_g3_x1_0 | D910x8-G  |      67.77  | 87.73       | 1.89         | 192s/epoch    |                                                                                      |                                                                                                |
+| shufflenet_v1_g3_x1_5 | D910x8-G  |      71.53  | 90.17       | 3.48         | 303s/epoch    |                                                                                      |                                                                                                |
+| shufflenet_v1_g3_x2_0 | D910x8-G  |      74.02  | 91.74       | 5.50         | 232s/epoch    |                                                                                      |                                                                                                |
+| shufflenet_v2_x0_5    | D910x8-G  |      60.68  | 82.44       | 1.37         | 99s/epoch     |                                                                                      |                                                                                                |
+| shufflenet_v2_x1_0    | D910x8-G  |      69.51  | 88.67       | 2.29         | 101s/epoch    |                                                                                      |                                                                                                |
+| shufflenet_v2_x1_5    | D910x8-G  |      72.59  | 90.79       | 3.53         | 125s/epoch    |                                                                                      |                                                                                                |
+| shufflenet_v2_x2_0    | D910x8-G  |      75.14  | 92.13       | 7.44         | 149s/epoch    |                                                                                      |                                                                                                |
+| squeezenet_1.0        | GPU       |      59.49  | 81.22       |              |               |                                                                                      |                                                                                                |
+| squeezenet_1.1        | GPU       |      58.99  | 80.99       |              |               |                                                                                      |                                                                                                |
+| visformer_tiny        | D910x8-G  |      78.61  | 94.33       | 10           | 353s/epoch    |                                                                                      |                                                                                                |
+| visformer_tiny2       | D910x8-G  |      78.62  | 94.36       | 9            | 390s/epoch    |                                                                                      |                                                                                                |
+| visformer_small       | D910x8-G  |      81.77  | 95.72       | 40           | 440s/epoch    |                                                                                      |                                                                                                |
+| visformer_small2      | D910x8-G  |      82.17  | 95.90       | 23           | 450s/epoch    |                                                                                      |                                                                                                |
+| vit_b_32_224          | D910x8-G  |      75.86  | 92.08       | 86           | 619ms/step    | [model](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt)         | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml)   |
+| vit_l_16_224          | D910x8-G  |      76.34  | 92.79       | 307          | 632ms/step    | [model](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224.ckpt)         | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l16_224_ascend.yaml)   |
+| vit_l_32_224          | D910x8-G  |      73.71  | 90.92       | 307          | 534ms/step    | [model](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224.ckpt)         | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l32_224_ascend.yaml)   |
 #### Notes
 - All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
-- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.
+- Context: device x pieces - G/F, G - graph mode, F - pynative mode with ms function, where D910 is Ascend 910 NPU.

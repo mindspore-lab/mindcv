@@ -1,8 +1,10 @@
 import glob
 import os
 import re
+import pandas as pd
 
 clear_empty_urls = True
+rm_columns = ['Infer T.', 'Log']
 
 # get all training recips
 recipes = sorted(glob.glob('configs/*/*.yaml'))
@@ -34,8 +36,7 @@ for readme in readmes:
     if not os.path.exists(readme):
         print('Missing readme: ', readme)
 
-# check yaml and reported performance 
-
+# check yaml and reported performance
 
 # merge readme reported results
 print('\r\n ')
@@ -70,14 +71,14 @@ for r in readmes:
                     if f"##{kw}" in line.strip().replace(' ', ''):
                         state = 1
             # detect head
-            elif state==1: 
+            elif state==1:
                 if '|Model|Context' in line.replace(' ', ''):
                     if len(line.split('|')) == len(head.split('|')):
                         state =2
                     else:
                         print('Detect head, but format is incorrect:')
                         print(line)
-            
+
             # get table values
             elif state==2:
                 if len(line.split('|')) == len(head.split('|')):
@@ -100,7 +101,7 @@ for r in readmes:
                 else:
                     state = 3
                     parsed_models.append(r.split('/')[1])
-        
+
     if state==0:
         print('Fail to get Results')
     elif state==1:
@@ -112,15 +113,51 @@ print('Parsed models in benchmark: ', len(parsed_models))
 print('Parsed model specs in benchmark: ', len(parsed_model_specs))
 print('Readme using inconsistent result table format: \r\n', set(config_dirs) - set(parsed_models))
 
-
-# write notes
-
-fout.write('\n#### Notes\n')
-fout.write('- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.\n- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.')
-
 fout.close()
 
-## check completeness: training recipes, recorded results, model py url
-# 1) url check
-#import mindcv
+def md_to_pd(md_fp, md_has_col_name=True, save_csv=False):
+    '''assume the first row is the header '''
+    # Convert the Markdown table to a list of lists
+    with open(md_fp) as f:
+        rows = []
+        for row in f.readlines():
+            if len(row.split('|')) >= 2:
+                # Get rid of leading and trailing '|'
+                tmp = row[1:-2]
 
+                # Split line and ignore column whitespace
+                clean_line = [col.strip() for col in tmp.split('|')]
+
+                # Append clean row data to rows variable
+                rows.append(clean_line)
+
+        # Get rid of syntactical sugar to indicate header (2nd row)
+        rows = rows[:1] + rows[2:]
+    print(rows)
+    if md_has_col_name:
+        df = pd.DataFrame(data=rows[1:], columns=rows[0])
+    else:
+        df = pd.DataFrame(rows)
+
+    if save_csv:
+        df.to_csv(md_fp.replace('.md', '.csv'), index=False, header=False)
+    return df
+
+df = md_to_pd(output_path, save_csv=True)
+print(df)
+
+for cn in rm_columns:
+    df = df.drop(cn, axis=1)
+
+print(df)
+
+md_doc = df.to_markdown(mode='w', index=False, tablefmt='pipe')
+
+fout = open(output_path, 'w')
+fout.write(md_doc)
+
+# write notes
+fout.write('\n#### Notes\n')
+fout.write('- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.\n- Context: device x pieces - G/F, G - graph mode, F - pynative mode with ms function, where D910 is Ascend 910 NPU.')
+
+fout.close()
