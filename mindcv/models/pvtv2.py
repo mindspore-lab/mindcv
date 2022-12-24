@@ -368,7 +368,7 @@ def pvt_v2_b0(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     Refer to the base class "models.PVTv2" for more details.
     """
     default_cfg = default_cfgs['pvt_v2_b0']
-    model = PyramidVisionTransformerV2(
+    model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
         patch_size=4, embed_dims=[32, 64, 160, 256], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[2, 2, 2, 2], sr_ratios=[8, 4, 2, 1],
         **kwargs)
@@ -386,7 +386,7 @@ def pvt_v2_b1(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     Refer to the base class "models.PVTv2" for more details.
     """
     default_cfg = default_cfgs['pvt_v2_b1']
-    model = PyramidVisionTransformerV2(
+    model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
         patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[2, 2, 2, 2], sr_ratios=[8, 4, 2, 1],
         **kwargs)
@@ -404,7 +404,7 @@ def pvt_v2_b2(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     Refer to the base class "models.PVTv2" for more details.
     """
     default_cfg = default_cfgs['pvt_v2_b2']
-    model = PyramidVisionTransformerV2(
+    model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
         patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 4, 6, 3], sr_ratios=[8, 4, 2, 1], **kwargs)
 
@@ -421,7 +421,7 @@ def pvt_v2_b3(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     Refer to the base class "models.PVTv2" for more details.
     """
     default_cfg = default_cfgs['pvt_v2_b3']
-    model = PyramidVisionTransformerV2(
+    model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
         patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 4, 18, 3], sr_ratios=[8, 4, 2, 1], **kwargs)
     if pretrained:
@@ -437,7 +437,7 @@ def pvt_v2_b4(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     Refer to the base class "models.PVTv2" for more details.
     """
     default_cfg = default_cfgs['pvt_v2_b4']
-    model = PyramidVisionTransformerV2(
+    model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
         patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 8, 27, 3], sr_ratios=[8, 4, 2, 1],
         **kwargs)
@@ -454,7 +454,7 @@ def pvt_v2_b5(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     Refer to the base class "models.PVTv2" for more details.
     """
     default_cfg = default_cfgs['pvt_v2_b5']
-    model = PyramidVisionTransformerV2(
+    model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
         patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[4, 4, 4, 4], qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 6, 40, 3], sr_ratios=[8, 4, 2, 1],
         **kwargs)
@@ -471,7 +471,7 @@ def pvt_v2_b2_li(pretrained: bool = False, num_classes: int = 1000, in_channels:
     Refer to the base class "models.PVTv2" for more details.
     """
     default_cfg = default_cfgs['pvt_v2_b2_li']
-    model = PyramidVisionTransformerV2(
+    model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
         patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 4, 6, 3], sr_ratios=[8, 4, 2, 1], linear=True,
         **kwargs)
