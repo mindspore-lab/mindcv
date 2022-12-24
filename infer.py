@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description='MindSpore Inference Demo')
 parser.add_argument('--image_path', type=str, help='path to image')
 parser.add_argument('--model', type=str, help='name of model')
 parser.add_argument('--ckpt_path', type=str, help='checkpoint path')
-group.add_argument('--est_time', type=str, nargs='?', const=True, default=False,
+parser.add_argument('--est_time', type=str, nargs='?', const=True, default=False,
                        help='Time statistics')
 
 
