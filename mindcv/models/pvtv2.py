@@ -23,8 +23,7 @@ __all__ = [
     'pvt_v2_b2',
     'pvt_v2_b3',
     'pvt_v2_b4',
-    'pvt_v2_b5',
-    'pvt_v2_b2_li'
+    'pvt_v2_b5'
 ]
 
 
@@ -43,8 +42,7 @@ default_cfgs = {
     'pvt_v2_b2': _cfg(url=''),
     'pvt_v2_b3': _cfg(url=''),
     'pvt_v2_b4': _cfg(url=''),
-    'pvt_v2_b5': _cfg(url=''),
-    'pvt_v2_b2_li': _cfg(url='')
+    'pvt_v2_b5': _cfg(url='')
 }
 
 
@@ -464,19 +462,5 @@ def pvt_v2_b5(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     return model
 
 
-@register_model
-def pvt_v2_b2_li(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3,
-                 **kwargs) -> PyramidVisionTransformerV2:
-    """Get PVTV2-b2_li model
-    Refer to the base class "models.PVTv2" for more details.
-    """
-    default_cfg = default_cfgs['pvt_v2_b2_li']
-    model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
-        patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 4, 6, 3], sr_ratios=[8, 4, 2, 1], linear=True,
-        **kwargs)
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
-    return model
 
