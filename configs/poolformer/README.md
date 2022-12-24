@@ -16,7 +16,7 @@ Figure 2: (a) The overall framework of PoolFormer. (b) The architecture of PoolF
 
 | Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
 |-----------------|-----------|-------------|------------|----------------|----------|----------|-----------|--------|-----|
-| poolformer_s12  | D910x8    | 77.094      |   93.394   |  12M           | 396.24s/epoch | 19.9ms/step | [model]() | [cfg]() | [log]() |
+| poolformer_s12  | D910x8    | 77.094      |   93.394   |  12           | 396.24s/epoch | 19.9ms/step | [model]() | [cfg]() | [log]() |
 
 
 #### Notes
