@@ -85,7 +85,7 @@ def main():
     # validate
     print("Testing...")
     test_acc1, test_acc5, test_loss = validate(network, loader_eval, loss)
-    print(f"Acc@1: {(100 * test_acc1):>0.1f}%, Acc@5: {(100 * test_acc5):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+    print(f"Acc@1: {test_acc1:.4%}, Acc@5: {test_acc5:.4%}, Avg loss: {test_loss:.4f}")
 
 
 if __name__ == '__main__':
