@@ -16,7 +16,7 @@
 
 | Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
 |-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
-| edgenext_small | D910x8-G | 79.146     | 94.394     | 5.59M       | 518s/epoch | 238.6ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_small_ascend.yaml) | [log]() |
+| edgenext_small | D910x8-G | 79.146     | 94.394     | 5.59       | 518s/epoch | 238.6ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_small_ascend.yaml) | [log]() |
 
 #### 备注
 
