@@ -16,12 +16,12 @@ In the pursuit of achieving ever-increasing accuracy, large and complex neural n
 
 | Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
 |-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
-| edgenext_small | D910x8-G | 79.146     | 94.394     | 5.59M       | 518s/epoch |  | [model]() | [cfg]() | [log]() |
+| edgenext_small | D910x8-G | 79.146     | 94.394     | 5.59M       | 518s/epoch | 238.6ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_small_ascend.yaml) | [log]() |
 
 #### Notes
 
 - All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
-- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
+- Context: D910 x 8 - G, D910 - Ascend 910, x8 - 8 devices, G - graph mode.
 
 ## Quick Start
 
@@ -31,7 +31,7 @@ In the pursuit of achieving ever-increasing accuracy, large and complex neural n
 
 #### Installation
 
-Please refer to the [installation instruction](https://github.com/mindspore-ecosystem/mindcv#installation) in MindCV.
+Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
 
 #### Dataset Preparation
 
@@ -43,11 +43,10 @@ Please download the [ImageNet-1K](https://www.image-net.org/download.php) datase
 
   ```shell
   # train edgenext_small on 8 Ascends
-  export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
   mpirun -n 8 python train.py -c configs/edgenext/edgenext_small_ascend.yaml --data_dir /path/to/imagenet_dir
   ```
   
-  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascneds** with the same batch size.
+  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascends** with the same batch size.
 
 Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
 
