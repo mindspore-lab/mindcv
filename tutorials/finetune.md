@@ -1,4 +1,4 @@
-# Model Fine-tuning Training on Custom Datasets
+# Model Fine-Tuning Training
 
 
 In this tutorial, you will learn how to use MindCV for transfer Learning to solve the problem of image classification on custom datasets. In the deep learning task, we often encounter the problem of insufficient training data. At this time, it is difficult to train the entire network directly to achieve the desired accuracy. A better approach is to use a pretrained model on a large dataset (close to the task data), and then use the model to initialize the network's weight parameters or apply it to specific tasks as a fixed feature extractor.

@@ -2,9 +2,9 @@
 
 This tutorial introduces how to call the pretraining model in MindCV to make classification prediction on the test image.
 
-## Model loading
+## Model Loading
 
-### View all available network models
+### View All Available Models
 
 By calling the `registry.list_models` function in `mindcv.models`, the names of all network models can be printed. The models of a network in different parameter configurations will also be printed, such as resnet18 / resnet34 / resnet50 / resnet101 / resnet152.
 
@@ -192,7 +192,7 @@ registry.list_models()
 
 
 
-### Load pretraining model
+### Load Pretraining Model
 
 Taking the resnet50 model as an example, we introduce two methods to load the model checkpoint using the `create_model` function in `mindcv.models`. 1). When the `pretrained` parameter in the interface is set to True, network weights can be automatically downloaded.
 
@@ -389,13 +389,13 @@ model.set_train(False)
 
 
 
-2). 当接口中的`checkpoint_path`参数设置为文件路径时，可以从本地加载后缀为`.ckpt`的模型参数文件。
+2). When the `checkpoint_path` parameter in the interface is set to the file path, the model parameter file with the `.ckpt` can be loaded.
 
 
 ```python
 from mindcv.models import create_model
 model = create_model(model_name='resnet50', num_classes=1000, checkpoint_path='./resnet50_224.ckpt')
-# 切换网络的执行逻辑为推理场景
+# Switch the execution logic of the network to the inference scenario
 model.set_train(False)
 ```
 
@@ -659,8 +659,3 @@ print('predict: {}'.format(idx2label[pred]))
 
     predict: Labrador retriever
     
-
-
-```python
-
-```
