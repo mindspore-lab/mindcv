@@ -19,10 +19,10 @@ the ‘Vision-friendly Transformer’.
 
 | Model            | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T.   | Infer T. |  Download | Config | Log |
 |------------------|-----------|-------------|------------|----------------|------------|----------|-----------|--------|-----|
-| visformer_tiny   | D910x8-G  | 78.61       | 94.33      | 10             | 353s/epoch | 10.9ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/visformer/) | [cfg]() | [log]() |
-| visformer_tiny2  | D910x8-G  | 78.62       | 94.36      | 9              | 390s/epoch | 11.5ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/visformer/) | [cfg]() | [log]() |
-| visformer_small  | D910x8-G  | 81.77       | 95.72      | 40             | 440s/epoch | 15.3ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/visformer/) | [cfg]() | [log]() |
-| visformer_small2 | D910x8-G  | 82.17       | 95.90      | 23             | 450s/epoch | 19.2ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/visformer/) | [cfg]() | [log]() |
+| visformer_tiny   | D910x8-G  | 78.28       | 94.15      | 10             | 496/epoch  | 300.7ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/visformer/) | [cfg]() | [log]() |
+| visformer_tiny2  | D910x8-G  | 78.82       | 94.41      | 9              | 390s/epoch | 602.5ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/visformer/) | [cfg]() | [log]() |
+| visformer_small  | D910x8-G  | 81.73       | 95.88      | 40             | 445s/epoch | 155.9ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/visformer/) | [cfg]() | [log]() |
+| visformer_small2 | D910x8-G  | 82.17       | 95.90      | 23             | 440s/epoch | 153.1ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/visformer/) | [cfg]() | [log]() |
 
 #### Notes
 
