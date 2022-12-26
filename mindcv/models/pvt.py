@@ -24,7 +24,6 @@ __all__ = [
     'pvt_small',
     'pvt_medium',
     'pvt_large',
-    'pvt_huge_v2'
 ]
 
 
@@ -42,7 +41,7 @@ default_cfgs = {
     'pvt_small': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_small_224.ckpt'),
     'pvt_medium': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_medium_224.ckpt'),
     'pvt_large': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_large_224.ckpt'),
-    'pvt_huge_v2': _cfg(url=''),
+
 }
 
 
@@ -184,7 +183,7 @@ class PyramidVisionTransformer(nn.Cell):
             drop_path_rate(float) : The drop rate for drop path. Default: 0.0.
             norm_layer(nn.Cell) : Norm layer that will be used in blocks. Default: nn.LayerNorm.
             depths (list) : number of Blocks.
-            sr_ratios(list) : stride and kernel size of each attention
+            sr_ratios(list) : stride and kernel size of each attention.
             num_stages(int) : number of stage. Default: 4.
         """
     def __init__(self, img_size=224, patch_size=4, in_chans=3, num_classes=1000, embed_dims=[64, 128, 320, 512],
@@ -434,21 +433,6 @@ def pvt_large(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     return model
 
 
-@register_model
-def pvt_huge_v2(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PyramidVisionTransformer:
-    """Get PVT huge model
-    Refer to the base class "models.PVT" for more details.
-    """
-    default_cfg = default_cfgs['pvt_huge_v2']
-    model = PyramidVisionTransformer(in_chans=in_channels, num_classes=num_classes,
-                                     patch_size=4, embed_dims=[128, 256, 512, 768], num_heads=[2, 4, 8, 12],
-                                     mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-                                     norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 10, 60, 3],
-                                     sr_ratios=[8, 4, 2, 1], **kwargs)
 
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
 
 

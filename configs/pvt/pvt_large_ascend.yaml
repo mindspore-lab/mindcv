@@ -23,7 +23,7 @@ dataset: 'imagenet'
 data_dir: './imagenet/'
 shuffle: True
 dataset_download: False
-batch_size: 64
+batch_size: 128
 drop_remainder: True
 
 # Augmentation config

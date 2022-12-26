@@ -49,7 +49,7 @@ keep_checkpoint_max: 10
 ckpt_save_dir: './ckpt/'
 epoch_size: 450
 dataset_sink_mode: True
-amp_level: 'O0'
+amp_level: 'O2'
 drop_path_rate: 0.1
 
 # loss config

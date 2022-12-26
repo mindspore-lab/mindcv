@@ -13,17 +13,20 @@ PVT是一种无需卷积操作的用于密集预测的通用主干网络。PVT�
 
 ***
 
-| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
-|-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
-| PVT_tiny | D910x8-G | 74.92     |       |        | 433s/epoch | 16ms/step | [model]() | [cfg]() | [log]() |
-| PVT_small | D910x8-G | 79.66   |      |       | 538s/epoch | 30ms/step | [model]() | [cfg]() | [log]() |
-| PVT_medium | D910x8-G | 81.82      |       |         | 766s/epoch |47ms/step  | [model]() | [cfg]() | [log]() |
-| PVT_large | D910x8-G | 81.75     |       |        | 1074s/epoch | 67ms/step| [model]() | [cfg]() | [log]() |
+
+| Model     | Context         |  Top-1 (%)  | Top-5 (%)|Params (M)|Train T. | Infer T. |  Download | Config | Log |  
+|-----------|-----------------|-------------|----------|----------|------|----------|------------|-------|--------|
+| PVT_tiny  | D910x8-G    |74.81 | 92.18| 13.23| 387s/epoch  | 13.3s | [model](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_tiny_224.ckpt) | [cfg](configs/pvt/pvt_tiny_ascend.yaml)    | [log]() |
+| PVT_small | D910x8-G     | 79.66  |94.71| 24.49| 538s/epoch |14.6s | [model](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_small_224.ckpt) | [cfg](configs/pvt/pvt_small_ascend.yaml)    | [log]() |
+| PVT_medium | D910x8-G    |81.82  |95.81|44.21| 766s/epoch |14.9s | [model](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_medium_224.ckpt) | [cfg](configs/pvt/pvt_medium_ascend.yaml)    | [log]() |
+| PVT_large | D910x8-G    |81.75  |95.70|61.36| 1074s/epoch |16.5s | [model](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_large_224.ckpt) | [cfg](configs/pvt/pvt_large_ascend.yaml)    | [log]() |
+
 
 #### Notes
 
 - All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
 - Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
+
 
 ## 示例
 
