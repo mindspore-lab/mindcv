@@ -16,52 +16,47 @@ Middle: SqueezeNet with simple bypass; Right: SqueezeNet with complex bypass .
 
 ![](squeezenet.png)
 
-## Benchmark
-
+## Results
 ***
-| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
-|-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
-| squeezenet_1.0 | GPU | 59.49   | 81.22 |   |   |   | [model]() | [cfg]() | [log]() |
-| squeezenet_1.1 | GPU | 58.99 |   80.99 |   |   |   | [model]() | [cfg]() | [log]() |
+|Model|Context| Top1/Top5 | Params(M) |Ckpt|Config|
+| :------:| :------: | :-------: | :-------: |:-----: |:-----: |
+|squeezenet_1.0| GPUx8-G |59.49/81.22| |[ckpt](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.0_224.ckpt)|[yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.0_gpu.yaml)|
+squeezenet_1.1 | D910x8-G |58.99/80.99 |  | [ckpt](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.1_224.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.1_gpu.yaml) | 
+
 
 #### Notes
+- Context: D910 -> HUAWEI Ascend 910 |  x 8 ->  using 8 NPUs | G -> MindSpore graph model ; F -> MindSpore pynative mode.
 
-- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
-- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
+## Quick Start
 
-## Examples
+---
 
-***
+### Preparation
 
-### Train
+#### Installation
 
-- The [yaml config files](../../configs) that yield competitive results on ImageNet for different models are listed in
-  the `configs` folder. To trigger training using preset yaml config.
+Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
 
-  ```shell
-  coming soon
+#### Dataset Preparation
+
+Please download the [ImageNet-1K](https://www.image-net.org/download.php) dataset for model training and validation.
+
+### Training
+
+- **Hyper-parameters.** The hyper-parameter configurations for producing the reported results are stored in the yaml files in `mindcv/configs/vit` folder. For example, to train with one of these configurations, you can run:
+
+  ```
+  # train squeezenet on 8 GPU
+  mpirun -n 8 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /path/to/imagenet
   ```
 
-- Here is the example for finetuning a pretrained squeezenet_1.0 on CIFAR10 dataset using Adam optimizer.
+  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/NPUs** with the same batch size.
 
-  ```shell
-  python train.py --model=squeezenet1_0 --pretrained --opt=momentum --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
+Detailed adjustable parameters and their default value can be seen in [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py)
+
+### Validation
+
+- To validate the trained model, you can use `validate.py`. Here is an example for vit_b_32 to verify the accuracy of pretrained weights.
+
   ```
-
-Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
-
-### Eval
-
-- To validate the model, you can use `validate.py`. Here is an example for squeezenet_1.0 to verify the accuracy of
-  pretrained weights.
-
-  ```shell
-  python validate.py --model=squeezenet1_0 --dataset=imagenet --val_split=val --pretrained
-  ```
-
-- To validate the model, you can use `validate.py`. Here is an example for squeezenet_1.0 to verify the accuracy of your
-  training.
-
-  ```shell
-  python validate.py --model=squeezenet1_0 --dataset=imagenet --val_split=val --ckpt_path='./ckpt/squeezenet1_0-best.ckpt'
-  ```
+  python validate.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt

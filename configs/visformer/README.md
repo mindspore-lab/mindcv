@@ -18,12 +18,11 @@ the ‘Vision-friendly Transformer’.
 ***
 ## ImageNet-1k
 
-|    Model     | Context  | Top1/Top5 | Params(M) |                           Ckpt                           |                            Config                            |
-| :----------: | :------: | :-------: | :-------: |:----------------------------------------------------------: | :----------------------------------------------------------: 
-| visformer_tiny | D910x8-G |   78.28/94.15   | 10 | [ckpt](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml) | 
-
-| visformer_tiny_v2 | D910x8-G |   78.82/94.41   |9    | coming | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_v2_ascend.yaml) | 
-| visformer_small | D910x8-G |   81.73/95.88   | 40    | [ckpt](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_ascend.yaml) | 
+|Model|Context| Top1/Top5 | Params(M) |Ckpt|Config|
+| :------:| :------: | :-------: | :-------: |:-----: |:-----: |
+|visformer_tiny| D910x8-G |78.28/94.15|10|[ckpt](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny.ckpt)|[yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml)|
+visformer_tiny_v2 | D910x8-G |78.82/94.41 |9| coming | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_v2_ascend.yaml) | 
+visformer_small | D910x8-G |   81.73/95.88   | 40    | [ckpt](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_ascend.yaml) | 
 | visformer_small_v2 | D910x8-G |   82.17/95.90   | 23    | [ckpt](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small_v2.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_v2_ascend.yaml) | 
 
 #### Notes
@@ -34,7 +33,7 @@ the ‘Vision-friendly Transformer’.
 ### Preparation
 
 #### Installation
-Please refer to the [installation instruction](https://github.com/mindspore-ecosystem/mindcv#installation) in MindCV.
+Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
 
 #### Dataset Preparation
 Please download the [ImageNet-1K](https://www.image-net.org/download.php) dataset for model training and validation.
@@ -45,7 +44,7 @@ Please download the [ImageNet-1K](https://www.image-net.org/download.php) datase
   files in `mindcv/configs/visformer` folder. For example, to train with one of these configurations, you can run:
 
   ```shell
-  # train densenet121 on 8 GPUs
+  # train visformer on 8 GPUs
   mpirun -n 8 python train.py -c configs/visformer/visformer_tiny_ascend.yaml --data_dir /path/to/imagenet
   ```
 
