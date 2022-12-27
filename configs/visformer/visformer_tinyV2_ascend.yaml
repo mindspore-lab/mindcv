@@ -42,7 +42,7 @@ pretrained: False
 ckpt_path: ''
 keep_checkpoint_max: 10
 ckpt_save_dir: './ckpt'
-epoch_size: 300
+epoch_size: 400
 dataset_sink_mode: True
 amp_level: 'O3'
 
@@ -55,7 +55,7 @@ scheduler: 'cosine_decay'
 lr_epoch_stair: True
 lr: 0.001
 min_lr: 0.00002
-warmup_factor: 0.02
+warmup_factor: 0.002
 warmup_epochs: 5
 decay_epochs: 295
 
