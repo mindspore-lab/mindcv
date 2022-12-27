@@ -1,0 +1,71 @@
+# Copyright 2022 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+# system config
+mode: 0
+distribute: True
+num_parallel_workers: 8
+
+# dataset config
+dataset: 'imagenet'
+data_dir: '/tmp/dataset/imagenet'
+shuffle: True
+dataset_download: False
+batch_size: 75
+drop_remainder: True
+train_split: 'train'
+
+# Augmentation config
+image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+interpolation: 'bilinear'
+crop_pct: 0.875
+
+# model config
+model: 'mobilenet_v3_large_100'
+num_classes: 1000
+pretrained: False
+ckpt_path: ''
+keep_checkpoint_max: 30
+ckpt_save_dir: './v3_large'
+epoch_size: 420
+dataset_sink_mode: True
+amp_level: 'O0'
+
+# loss config
+loss: 'CE'
+label_smoothing: 0.1
+
+# lr scheduler config
+scheduler: 'cosine_decay'
+min_lr: 0.0
+lr: 1.08
+warmup_epochs: 4
+decay_epochs: 416
+
+# optimizer config
+opt: 'momentum'
+filter_bias_and_bn: False
+momentum: 0.9
+weight_decay: 0.00004
+loss_scale: 1024
+use_nesterov: False
+
+
+
+
+
