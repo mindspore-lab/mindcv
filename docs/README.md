@@ -3,7 +3,7 @@
 1. Clone mindcv
 
    ```bash
-   git clone https://github.com/mindlab-ai/mindcv.git
+   git clone https://github.com/mindspore-lab/mindcv.git
    cd mindcv
    ```
 
