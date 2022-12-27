@@ -353,12 +353,12 @@ class DenseHead(nn.Cell):
         super().__init__()
 
         self.dropout = nn.Dropout(keep_prob)
-        self.dense = nn.Dense(input_channel, num_classes, has_bias=has_bias, activation=activation)
+        self.classifier = nn.Dense(input_channel, num_classes, has_bias=has_bias, activation=activation)
 
     def construct(self, x):
         if self.training:
             x = self.dropout(x)
-        x = self.dense(x)
+        x = self.classifier(x)
         return x
 
 class MultilayerDenseHead(nn.Cell):

@@ -5,7 +5,7 @@ import os
 import logging
 import collections.abc
 from itertools import repeat
-from typing import Optional
+from typing import Optional, List
 
 from mindspore import load_checkpoint, load_param_into_net
 
@@ -44,8 +44,9 @@ def load_pretrained(model, default_cfg, path='./', num_classes=1000, in_channels
         classifier_bias = param_dict[classifier_name + '.bias']
         classifier_bias.set_data(classifier_bias[:1000], slice_shape=True)
     elif num_classes != default_cfg['num_classes']:
-        del param_dict[classifier_name + '.weight']
-        del param_dict[classifier_name + '.bias']
+        params_names = list(param_dict.keys())
+        param_dict.pop(_search_param_name(params_names, classifier_name+'.weight'), "No Parameter {} in ParamDict".format(classifier_name+'.weight'))
+        param_dict.pop(_search_param_name(params_names, classifier_name+'.bias'), "No Parameter {} in ParamDict".format(classifier_name+'.bias'))
 
     if filter_fn is not None:
         param_dict = filter_fn(param_dict)
@@ -74,3 +75,12 @@ def _ntuple(n):
         return tuple(repeat(x, n))
 
     return parse
+
+def _search_param_name(params_names: List,
+                        param_name: str
+                        ) -> str:
+    for pi in params_names:
+        if param_name in pi:
+            return pi
+    return ""
+    
