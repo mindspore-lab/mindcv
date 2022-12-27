@@ -62,17 +62,17 @@ source_suffix = {
 # copy markdown files from outer directory
 if not os.path.exists('./tutorials'):
     os.makedirs('./tutorials')
-shutil.copy('../../tutorials/deployment.md', './tutorials/deployment.md')
-shutil.copy('../../tutorials/finetune.md', './tutorials/finetune.md')
-shutil.copy('../../tutorials/inference.md', './tutorials/inference.md')
-shutil.copy('../../tutorials/learn_about_config.md', './tutorials/learn_about_config.md')
+shutil.copy('../../tutorials/deployment_CN.md', './tutorials/deployment_CN.md')
+shutil.copy('../../tutorials/finetune_cn.md', './tutorials/finetune_cn.md')
+shutil.copy('../../tutorials/inference_cn.md', './tutorials/inference_cn.md')
+shutil.copy('../../tutorials/learn_about_config_cn.md', './tutorials/learn_about_config_cn.md')
 shutil.copy('../../tutorials/output_8_0.png', './tutorials/output_8_0.png')
 shutil.copy('../../tutorials/output_11_0.png', './tutorials/output_11_0.png')
 shutil.copy('../../tutorials/output_23_0.png', './tutorials/output_23_0.png')
 shutil.copy('../../tutorials/output_30_0.png', './tutorials/output_30_0.png')
 if not os.path.exists('./quick_start'):
     os.makedirs('./quick_start')
-shutil.copy('../../quick_start.md', './quick_start/quick_start.md')
+shutil.copy('../../quick_start_cn.md', './quick_start/quick_start_cn.md')
 
 os.system('cp -R %s %s'% ('../../configs', './'))
 

@@ -1,0 +1,3 @@
+# 定义和定位
+
+MindSpore分类套件是一个开源工具包，用于基于MindSpore计算视觉方向。它主要用于开发图像分类任务。它包含大量经典和前沿的深度学习分类模型，如ResNet、ViT和SwinTransformer。
