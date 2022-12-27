@@ -10,48 +10,5 @@ Xception是除了InceptionV4之外InceptionV3的另一个改进版本，该网�
 
 ![](./Xception.jpg)
 
-## 性能指标
-
-***
-
-|        |          |           |           |    Pynative     |  Pynative  |     Graph      |   Graph    |           |            |
-| :----: | -------- | :-------: | :-------: | :-------------: | :--------: | :------------: | :--------: | :-------: | :--------: |
-|        | Model    | Top-1 (%) | Top-5 (%) | train (s/epoch) | Infer (ms) | train(s/epoch) | Infer (ms) | Download  |   Config   |
-|  GPU   | xception |           |           |                 |            |                |            | [model]() | [config]() |
-| Ascend | xception |           |           |                 |            |                |            |           |            |
-
-## 示例
-
-***
-
-### 训练
-
-- 下面是使用预设的yaml配置文件启动训练的示例.
-
-> [configs文件夹](../../configs)中列出了mindcv套件所包含的模型的各个规格的yaml配置文件(在ImageNet数据集上训练和验证的配置)。
-
-  ```shell
-  comming soon
-  ```
-
-- 下面是使用在ImageNet上预训练的Xception模型和Momentum优化器在CIFAR10数据集上进行微调的示例。
-
-  ```shell
-  python train.py --model=xception --pretrained --opt=momentum --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
-  ```
-
-详细的可调参数及其默认值可以在[config.py](../../config.py)中查看。
-
-### 验证
-
-- 下面是使用`validate.py`文件验证Xception的预训练模型的精度的示例。
-
-  ```shell
-  python validate.py --model=xception --dataset=imagenet --val_split=val --pretrained
-  ```
-
-- 下面是使用`validate.py`文件验证Xception的自定义参数文件的精度的示例。
-
-  ```shell
-  python validate.py --model=xception --dataset=imagenet --val_split=val --ckpt_path='./ckpt/xception-best.ckpt'
-  ```
+## 状态
+模型训练中，comming soon
