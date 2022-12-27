@@ -21,7 +21,7 @@ You can switch between Chinese and English documents in the lower-left corner of
    :caption: Tutorials
 
    tutorials/learn_about_config.md
-   tutorials/Inference.md
+   tutorials/inference.md
    tutorials/finetune.md
    tutorials/deployment.md
 
@@ -48,16 +48,31 @@ You can switch between Chinese and English documents in the lower-left corner of
    :maxdepth: 1
    :caption: Examples
 
+   configs/BigTransfer/README.md
+   configs/convit/README.md
    configs/densenet/README.md
+   configs/edgenext/README.md
    configs/googlenet/README.md
    configs/inception_v3/README.md
    configs/inception_v4/README.md
+   configs/mnasnet/README.md
    configs/mobilenetv1/README.md
+   configs/mobilenetv2/README.md
    configs/mobilenetv3/README.md
+   configs/poolformer/README.md
+   configs/pvt/README.md
+   configs/regnet/README.md
+   configs/repmlp/README.md
    configs/repvgg/README.md
    configs/res2net/README.md
+   configs/resnet/README.md
+   configs/rexnet/README.md
+   configs/shufflenet_v1/README.md
+   configs/shufflenet_v2/README.md
    configs/sknet/README.md
    configs/squeezenet/README.md
+   configs/visformer/README.md
+   configs/vit/README.md
    configs/xception/README.md
 
 .. toctree::

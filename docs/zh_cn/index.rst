@@ -6,24 +6,24 @@
    :maxdepth: 1
    :caption: MindSpore分类
 
-   classification/definition.md
-   classification/feature.md
-   classification/display.md
+   classification/definition_CN.md
+   classification/feature_CN.md
+   classification/display_CN.md
 
 .. toctree::
    :maxdepth: 1
    :caption: 快速开始
 
-   quick_start/quick_start.md
+   quick_start/quick_start_CN.md
 
 .. toctree::
    :maxdepth: 1
    :caption: 教程
 
-   tutorials/learn_about_config.md
-   tutorials/Inference.md
-   tutorials/finetune.md
-   tutorials/deployment.md
+   tutorials/learn_about_config_CN.md
+   tutorials/inference_CN.md
+   tutorials/finetune_CN.md
+   tutorials/deployment_CN.md
 
 .. toctree::
    :maxdepth: 1
@@ -40,34 +40,49 @@
    :maxdepth: 1
    :caption: 记录
 
-   notes/changelog.md
-   notes/contribute.md
-   notes/faq.md
+   notes/changelog_CN.md
+   notes/contribute_CN.md
+   notes/faq_CN.md
 
 .. toctree::
    :maxdepth: 1
-   :caption: Examples
+   :caption: 示例
 
-   configs/densenet/README.md
-   configs/googlenet/README.md
-   configs/inception_v3/README.md
-   configs/inception_v4/README.md
-   configs/mobilenetv1/README.md
-   configs/mobilenetv3/README.md
-   configs/repvgg/README.md
-   configs/res2net/README.md
-   configs/sknet/README.md
-   configs/squeezenet/README.md
-   configs/xception/README.md
+   configs/BigTransfer/README_CN.md
+   configs/convit/README_CN.md
+   configs/densenet/README_CN.md
+   configs/edgenext/README_CN.md
+   configs/googlenet/README_CN.md
+   configs/inception_v3/README_CN.md
+   configs/inception_v4/README_CN.md
+   configs/mnasnet/README_CN.md
+   configs/mobilenetv1/README_CN.md
+   configs/mobilenetv2/README_CN.md
+   configs/mobilenetv3/README_CN.md
+   configs/poolformer/README_CN.md
+   configs/pvt/README_CN.md
+   configs/regnet/README_CN.md
+   configs/repmlp/README_CN.md
+   configs/repvgg/README_CN.md
+   configs/res2net/README_CN.md
+   configs/resnet/README_CN.md
+   configs/rexnet/README_CN.md
+   configs/shufflenet_v1/README_CN.md
+   configs/shufflenet_v2/README_CN.md
+   configs/sknet/README_CN.md
+   configs/squeezenet/README_CN.md
+   configs/visformer/README_CN.md
+   configs/vit/README_CN.md
+   configs/xception/README_CN.md
 
 .. toctree::
-   :caption: Switch Language
+   :caption: 切换语言
 
    switch_language.md
 
-Indices and tables
+索引和表格
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+* :ref:`索引`
+* :ref:`模块索引`
+* :ref:`搜索页面`

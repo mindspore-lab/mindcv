@@ -63,16 +63,16 @@ source_suffix = {
 if not os.path.exists('./tutorials'):
     os.makedirs('./tutorials')
 shutil.copy('../../tutorials/deployment_CN.md', './tutorials/deployment_CN.md')
-shutil.copy('../../tutorials/finetune_cn.md', './tutorials/finetune_cn.md')
-shutil.copy('../../tutorials/inference_cn.md', './tutorials/inference_cn.md')
-shutil.copy('../../tutorials/learn_about_config_cn.md', './tutorials/learn_about_config_cn.md')
+shutil.copy('../../tutorials/finetune_CN.md', './tutorials/finetune_CN.md')
+shutil.copy('../../tutorials/inference_CN.md', './tutorials/inference_CN.md')
+shutil.copy('../../tutorials/learn_about_config_CN.md', './tutorials/learn_about_config_CN.md')
 shutil.copy('../../tutorials/output_8_0.png', './tutorials/output_8_0.png')
 shutil.copy('../../tutorials/output_11_0.png', './tutorials/output_11_0.png')
 shutil.copy('../../tutorials/output_23_0.png', './tutorials/output_23_0.png')
 shutil.copy('../../tutorials/output_30_0.png', './tutorials/output_30_0.png')
 if not os.path.exists('./quick_start'):
     os.makedirs('./quick_start')
-shutil.copy('../../quick_start_cn.md', './quick_start/quick_start_cn.md')
+shutil.copy('../../quick_start_CN.md', './quick_start/quick_start_CN.md')
 
 os.system('cp -R %s %s'% ('../../configs', './'))
 
