@@ -16,18 +16,18 @@ the ‘Vision-friendly Transformer’.
 
 ## Results
 ***
+## ImageNet-1k
 
-| Model            | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T.   | Infer T. |  Download | Config | Log |
-|------------------|-----------|-------------|------------|----------------|------------|----------|-----------|--------|-----|
-| visformer_tiny   | D910x8-G  | 78.28       | 94.15      | 10             | 496/epoch  | 300.7ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/visformer/) | [cfg]() | [log]() |
-| visformer_tiny2  | D910x8-G  | 78.82       | 94.41      | 9              | 390s/epoch | 602.5ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/visformer/) | [cfg]() | [log]() |
-| visformer_small  | D910x8-G  | 81.73       | 95.88      | 40             | 445s/epoch | 155.9ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/visformer/) | [cfg]() | [log]() |
-| visformer_small2 | D910x8-G  | 82.17       | 95.90      | 23             | 440s/epoch | 153.1ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/visformer/) | [cfg]() | [log]() |
+|    Model     | Context  | Top1/Top5 | Params(M) |                           Ckpt                           |                            Config                            |
+| :----------: | :------: | :-------: | :-------: |:----------------------------------------------------------: | :----------------------------------------------------------: 
+| visformer_tiny | D910x8-G |   78.28/94.15   | 10 | [ckpt](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml) | 
+
+| visformer_tiny_v2 | D910x8-G |   78.82/94.41   |9    | coming | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_v2_ascend.yaml) | 
+| visformer_small | D910x8-G |   81.73/95.88   | 40    | [ckpt](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_ascend.yaml) | 
+| visformer_small_v2 | D910x8-G |   82.17/95.90   | 23    | [ckpt](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small_v2.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_v2_ascend.yaml) | 
 
 #### Notes
-
-- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
-- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
+- Context: D910 -> HUAWEI Ascend 910 |  x 8 ->  using 8 NPUs | G -> MindSpore graph model ; F -> MindSpore pynative mode.
 
 ## Quick Start
 ***
@@ -46,10 +46,10 @@ Please download the [ImageNet-1K](https://www.image-net.org/download.php) datase
 
   ```shell
   # train densenet121 on 8 GPUs
-  mpirun -n 8 python train.py --config configs/visformer/visformer_tiny_ascend.yaml --data_dir /path/to/imagenet
+  mpirun -n 8 python train.py -c configs/visformer/visformer_tiny_ascend.yaml --data_dir /path/to/imagenet
   ```
 
-  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascends** with the same batch size.
+  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/NPUs** with the same batch size.
 
 Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
 
@@ -59,12 +59,9 @@ Detailed adjustable parameters and their default value can be seen in [config.py
   training.
 
   ```shell
-  python validate.py --config configs/visformer/visformer_tiny_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/visformer_tiny.ckpt
+  python validate.py -c configs/visformer/visformer_tiny_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/visformer_tiny.ckpt
   ```
 
-### Deployment (optional)
-
-Please refer to the deployment tutorial in MindCV.
 
 
 
