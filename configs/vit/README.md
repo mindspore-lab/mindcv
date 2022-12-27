@@ -15,11 +15,11 @@ While the Transformer architecture has become the de-facto standard for natural 
 ---
 ## ImageNet-1k
 
-|    Model     | Context  | Top1/Top5 | Params(M) |                           Ckpt                           |                            Config                            |                             Log                              |
-| :----------: | :------: | :-------: | :-------: |:----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
-| vit_b_32_224 | D910x8-G |   75.86/92.08   | 86 | [ckpt](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [log]() |
-| vit_l_16_224 | D910x8-G |   76.34/92.79   |307    | [ckpt](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l16_224_ascend.yaml) | [log]() |
-| vit_l_32_224 | D910x8-G |   73.71/90.92   | 307    | [ckpt](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l32_224_ascend.yaml) | [log]() |
+|    Model     | Context  | Top1/Top5 | Params(M) |                           Ckpt                           |                            Config                            |
+| :----------: | :------: | :-------: | :-------: |:----------------------------------------------------------: | :----------------------------------------------------------: 
+| vit_b_32_224 | D910x8-G |   75.86/92.08   | 86 | [ckpt](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | 
+| vit_l_16_224 | D910x8-G |   76.34/92.79   |307    | [ckpt](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l16_224_ascend.yaml) | 
+| vit_l_32_224 | D910x8-G |   73.71/90.92   | 307    | [ckpt](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l32_224_ascend.yaml) | 
 
 #### Notes
 - Context: D910 -> HUAWEI Ascend 910 |  x 8 ->  using 8 NPUs | G -> MindSpore graph model ; F -> MindSpore pynative mode.
@@ -32,7 +32,7 @@ While the Transformer architecture has become the de-facto standard for natural 
 
 #### Installation
 
-Please refer to the [installation instruction](https://github.com/mindspore-ecosystem/mindcv#installation) in MindCV.
+Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
 
 #### Dataset Preparation
 

@@ -26,7 +26,7 @@ analysis of the main components that lead to high transfer performance.
 
 |    Model     | Context  | Top-1 (%) | Top-5 (%) | Params(M) |  Train T.  |  Infer T.   |                           Download                           |                            Config                            |                             Log                              |
 | :----------: | :------: | :-------: | :-------: | :-------: | :--------: | :---------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
-|    BiT50-S   | D910x8-G |   76.81   |   93.17   |    25     | 652s/epoch  | 189.8ms/step| [model](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/BigTransfer/BiT50_ascend.yaml) | [log](https://github.com/mindspore-lab/mindcv/tree/main/configs/BigTransfer) |
+|    BiT_resnet50-S   | D910x8-G |   76.81   |   93.17   |    25     | 652s/epoch  | 189.8ms/step| [model](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/BigTransfer/bit_resnet50_ascend.yaml) | [log](https://github.com/mindspore-lab/mindcv/tree/main/configs/BigTransfer) |
 
 #### Notes
 
@@ -53,10 +53,10 @@ Please download the [ImageNet-1K](https://www.image-net.org/download.php) datase
 
   ```
   # train BiT on 8 NPUs
-  mpirun -n 8 python train.py -c configs/BigTransfer/BiT50_ascend.yaml --data_dir /path/to/imagenet
+  mpirun -n 8 python train.py -c configs/BigTransfer/bit_resnet50_ascend.yaml --data_dir /path/to/imagenet
   ```
 
-  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascends** with the same batch size.
+  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/NPUs** with the same batch size.
 
 Detailed adjustable parameters and their default value can be seen in [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py)
 
@@ -65,9 +65,5 @@ Detailed adjustable parameters and their default value can be seen in [config.py
 - To validate the trained model, you can use `validate.py`. Here is an example for BiT-50 to verify the accuracy of pretrained weights.
 
   ```
-  python validate.py -c configs/BigTransfer/BiT50_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+  python validate.py -c configs/BigTransfer/bit_resnet50_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
   ```
-
-### Deployment (optional)
-
-Please refer to the deployment tutorial in MindCV.

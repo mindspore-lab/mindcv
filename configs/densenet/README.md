@@ -35,7 +35,7 @@ propagation, encourage feature reuse, and substantially reduce the number of par
 ### Preparation
 
 #### Installation
-Please refer to the [installation instruction](https://github.com/mindspore-ecosystem/mindcv#installation) in MindCV.
+Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
 
 #### Dataset Preparation
 Please download the [ImageNet-1K](https://www.image-net.org/download.php) dataset for model training and validation.
