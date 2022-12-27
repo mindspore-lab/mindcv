@@ -35,21 +35,11 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = dict(
-    poolformer_s12=_cfg(
-        url='https://github.com/sail-sg/poolformer/releases/download/v1.0/poolformer_s12.pth.tar',
-        crop_pct=0.9),
-    poolformer_s24=_cfg(
-        url='https://github.com/sail-sg/poolformer/releases/download/v1.0/poolformer_s24.pth.tar',
-        crop_pct=0.9),
-    poolformer_s36=_cfg(
-        url='https://github.com/sail-sg/poolformer/releases/download/v1.0/poolformer_s36.pth.tar',
-        crop_pct=0.9),
-    poolformer_m36=_cfg(
-        url='https://github.com/sail-sg/poolformer/releases/download/v1.0/poolformer_m36.pth.tar',
-        crop_pct=0.95),
-    poolformer_m48=_cfg(
-        url='https://github.com/sail-sg/poolformer/releases/download/v1.0/poolformer_m48.pth.tar',
-        crop_pct=0.95),
+    poolformer_s12=_cfg(url='https://download.mindspore.cn/toolkits/mindcv/poolformer/poolformer_s12-5be5c4e4.ckpt', crop_pct=0.9),
+    poolformer_s24=_cfg(url='', crop_pct=0.9),
+    poolformer_s36=_cfg(url='', crop_pct=0.9),
+    poolformer_m36=_cfg(url='', crop_pct=0.95),
+    poolformer_m48=_cfg(url='', crop_pct=0.95),
 )
 
 
@@ -348,7 +338,7 @@ def poolformer_m36(pretrained: bool = False, num_classes: int = 1000, in_channel
     default_cfg = default_cfgs['poolformer_m36']
     layers = (6, 6, 18, 6)
     embed_dims = (96, 192, 384, 768)
-    model = PoolFormer(in_chans=in_channels, num_classes=num_classes, \
+    model = PoolFormer(in_chans=in_channels, num_classes=num_classes,
                        layers=layers, layer_scale_init_value=1e-6, embed_dims=embed_dims, **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -362,7 +352,7 @@ def poolformer_m48(pretrained: bool = False, num_classes: int = 1000, in_channel
     default_cfg = default_cfgs['poolformer_m48']
     layers = (8, 8, 24, 8)
     embed_dims = (96, 192, 384, 768)
-    model = PoolFormer(in_chans=in_channels, num_classes=num_classes, \
+    model = PoolFormer(in_chans=in_channels, num_classes=num_classes,
                        layers=layers, layer_scale_init_value=1e-6, embed_dims=embed_dims, **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)

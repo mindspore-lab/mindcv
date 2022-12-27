@@ -35,7 +35,7 @@
 
   ```shell
   # train poolformer_s12 on 8 Ascends
-  bash ./scripts/run_distribution_ascend.sh ./scripts/rank_table_8pcs.json [DATASET_PATH] ./config/poolformer/poolformer_s12.yaml
+  mpirun -n 8 python train.py -c ./configs/poolformer/poolformer_s12.yaml --data_dir=/path/to/data
   ```
 
 
