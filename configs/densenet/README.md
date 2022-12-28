@@ -1,70 +1,107 @@
 # DenseNet
-> [Densely Connected Convolutional Networks](https://arxiv.org/pdf/1608.06993.pdf)
+<!--- Guideline: please use url linked to the paper abstract in ArXiv instead of PDF for fast loading.  -->
+> [Densely Connected Convolutional Networks](https://arxiv.org/abs/1608.06993)
 
 ## Introduction
-***
+<!--- Guideline: Introduce the model and architectures. Please cite if you use/adopt paper explanation from others. -->
+<!--- Guideline: If an architecture table/figure is available in the paper, please put one here and cite for intuitive illustration. -->
 
-Recent work has shown that convolutional networks can be substantially deeper, more accurate, and efficient to train if
+Recent work has shown that convolutional networks can be substantially deeper, more accurate, and more efficient to train if
 they contain shorter connections between layers close to the input and those close to the output. Dense Convolutional
 Network (DenseNet) is introduced based on this observation, which connects each layer to every other layer in a
 feed-forward fashion. Whereas traditional convolutional networks with $L$ layers have $L$ connections-one between each
-layer and its subsequent layer, our network has $\frac{L(L+1)}{2}$ direct connections. For each layer, the feature-maps
-of all preceding layers are used as inputs, and its own feature-maps are used as inputs into all subsequent layers.
+layer and its subsequent layer, DenseNet has $\frac{L(L+1)}{2}$ direct connections. For each layer, the feature maps
+of all preceding layers are used as inputs, and their feature maps are used as inputs into all subsequent layers.
 DenseNets have several compelling advantages: they alleviate the vanishing-gradient problem, strengthen feature
-propagation, encourage feature reuse, and substantially reduce the number of parameters.
+propagation, encourage feature reuse, and substantially reduce the number of parameters.[[1](#references)]
 
-![](densenet.png)
+<p align="center">
+  <img src="https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet.png" width=800 />  
+</p>
+<p align="center">
+  <em>Figure 1. Architecture of DenseNet [<a href="#references">1</a>] </em>
+</p>
 
 ## Results
-***
+<!--- Guideline:
+Table Format: 
+- Model: model name in lower case with _ seperator.
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
+- Top-1 and Top-5: Keep 2 digits after the decimal point.
+- Params (M): # of model parameters in millions (10^6). Keep 2 digits after the decimal point
+- Recipe: Training recipe/configuration linked to a yaml config file. Use absolute url path.  
+- Download: url of the pretrained model weights. Use absolute url path.
+-->
 
-| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
-|-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
-| DenseNet121 | D910x8-G | 75.64     | 92.84     | 8.06       | 238s/epoch | 6.7ms/step | [model]() | [cfg]() | [log]() |
-| DenseNet161 | D910x8-G | 79.09     | 94.66     | 28.90      | 472s/epoch | 8.7ms/step | [model]() | [cfg]() | [log]() |
-| DenseNet169 | D910x8-G | 77.26 | 93.71 | 14.30 | 313s/epoch | 7.4ms/step | [model]() | [cfg]() | [log]() |
-| DenseNet201 | D910x8-G | 78.14 | 94.08 | 20.24 | 394s/epoch | 7.9ms/step | [model]() | [cfg]() | [log]() |
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+<div align="center">
+
+|    Model     | Context  | Top-1 (%) | Top-5 (%) | Params (M) |                                              Recipe                                                 |                                              Download                                            | 
+|--------------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+| densenet_121 | D910x8-G | 75.64     | 92.84     | 8.06       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/densenet/densenet121-120_5004_Ascend.ckpt) |
+| densenet_161 | D910x8-G | 79.09     | 94.66     | 28.90      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_161_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/densenet/densenet161-120_5004_Ascend.ckpt) |
+| densenet_169 | D910x8-G | 77.26     | 93.71     | 14.31      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_169_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/densenet/densenet169-120_5004_Ascend.ckpt) |
+| densenet_201 | D910x8-G | 78.14     | 94.08     | 20.24      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_201_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/densenet/densenet201-120_5004_Ascend.ckpt) |
+
+</div>
 
 #### Notes
 
-- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
-- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K. 
 
 ## Quick Start
-***
+
 ### Preparation
 
 #### Installation
 Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
 
 #### Dataset Preparation
-Please download the [ImageNet-1K](https://www.image-net.org/download.php) dataset for model training and validation.
+Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/2012/index.php) dataset for model training and validation.
 
 ### Training
+<!--- Guideline: Please avoid using shell scripts in the command line. Python scripts preferred. -->
 
-- **Hyper-parameters.** The hyper-parameter configurations for producing the reported results are stored in the yaml files in `mindcv/configs/densenet` folder. For example, to train with one of these configurations, you can run:
+* Distributed Training
 
-  ```shell
-  # train densenet121 on 8 GPUs
-  mpirun -n 8 python train.py --config configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/imagenet
-  ```
+It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
-  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascends** with the same batch size.
+```shell
+# distrubted training on multiple GPU/Ascend devices
+mpirun -n 8 python train.py --config configs/densenet/densenet_121_ascend.yaml --data_dir /path/to/imagenet
+```
+> If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
 
-Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
+Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
+
+For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
+
+**Note:**  As the global batch size  (batch_size x num_devices) is an important hyper-parameter, it is recommended to keep the global batch size unchanged for reproduction or adjust the learning rate linearly to a new global batch size.
+
+* Standalone Training
+
+If you want to train or finetune the model on a smaller dataset without distributed training, please run:
+
+```shell
+# standalone training on a CPU/GPU/Ascend device
+python train.py --config configs/densenet/densenet_121_ascend.yaml --data_dir /path/to/dataset --distribute False
+```
 
 ### Validation
 
-- To validate the model, you can use `validate.py`. Here is an example for densenet121 to verify the accuracy of your
-  training.
+To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
-  ```shell
-  python validate.py --config configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/densenet121.ckpt
-  ```
+```
+python validate.py -c configs/densenet/densenet_121_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+```
 
-### Deployment (optional)
+### Deployment
 
-Please refer to the deployment tutorial in MindCV.
+Please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md) in MindCV.
 
+## References
+<!--- Guideline: Citation format GB/T 7714 is suggested. -->
 
-
+[1] Huang G, Liu Z, Van Der Maaten L, et al. Densely connected convolutional networks[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2017: 4700-4708.

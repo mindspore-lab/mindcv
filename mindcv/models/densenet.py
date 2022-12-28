@@ -33,10 +33,10 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'densenet121': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/densenet/densenet121_224.ckpt'),
-    'densenet169': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/densenet/densenet169_224.ckpt'),
-    'densenet201': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/densenet/densenet201_224.ckpt'),
-    'densenet161': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/densenet/densenet161_224.ckpt'),
+    'densenet121': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/densenet/densenet121-120_5004_Ascend.ckpt'),
+    'densenet169': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/densenet/densenet169-120_5004_Ascend.ckpt'),
+    'densenet201': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/densenet/densenet201-120_5004_Ascend.ckpt'),
+    'densenet161': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/densenet/densenet161-120_5004_Ascend.ckpt'),
 }
 
 
