@@ -12,6 +12,9 @@ The ViT is a visual model based on the architecture of a transformer originally 
 ![vit](./vit.png)
 
 ## Results
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
 ***
 
 | Model           | Context   |  Top-1 (%) | Top-5 (%)  |  Params (M) | Recipe  | Download |
