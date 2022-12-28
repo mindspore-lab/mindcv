@@ -4,28 +4,32 @@
 
 ## Introduction
 
-***
 
-In the pursuit of achieving ever-increasing accuracy, large and complex neural networks are usually developed. Such models demand high computational resources and therefore cannot be deployed on edge devices. It is of great interest to build resource-efficient general purpose networks due to their usefulness in several application areas. In this work, we strive to effectively combine the strengths of both CNN and Transformer models and propose a new efficient hybrid architecture EdgeNeXt. Specifically in EdgeNeXt, we introduce split depth-wise transpose attention (SDTA) encoder that splits input tensors into multiple channel groups and utilizes depth-wise convolution along with self-attention across channel dimensions to implicitly increase the receptive field and encode multi-scale features.
+In the pursuit of achieving ever-increasing accuracy, large and complex neural networks are usually developed. Such models demand high computational resources and therefore cannot be deployed on edge devices. It is of great interest to build resource-efficient general-purpose networks due to their usefulness in several application areas. This paper strives to effectively combine the strengths of both CNN and Transformer models and propose a new efficient hybrid architecture EdgeNeXt. EdgeNeXt introduces split depth-wise transpose attention (SDTA) encoder that splits input tensors into multiple channel groups and utilizes depth-wise convolution along with self-attention across channel dimensions to implicitly increase the receptive field and encode multi-scale features.
 
-![](edgenext.png)
+<p align="center">
+  <img src="https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext.png" width=800 />  
+</p>
+<p align="center">
+  <em>Figure 1. Architecture of EdgeNeXt</em>
+</p>
 
 ## Results
 
-***
+<div align="center">
 
-| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
-|-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
-| edgenext_small | D910x8-G | 79.146     | 94.394     | 5.59       | 518s/epoch | 238.6ms/step | [model](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt) | [cfg](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_small_ascend.yaml) | [log]() |
+| Model          | Context  |  Top-1 (%) | Top-5 (%) |  Params (M) |                                                 Recipe                                                |                                      Download                                       | 
+|----------------|----------|------------|-----------|-------------|-------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+| edgenext_small | D910x8-G | 79.15      |  94.39    | 5.59        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt) |
+
+</div>
 
 #### Notes
 
-- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
-- Context: D910 x 8 - G, D910 - Ascend 910, x8 - 8 devices, G - graph mode.
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K. 
 
 ## Quick Start
-
-***
 
 ### Preparation
 
@@ -35,29 +39,42 @@ Please refer to the [installation instruction](https://github.com/mindspore-lab/
 
 #### Dataset Preparation
 
-Please download the [ImageNet-1K](https://www.image-net.org/download.php) dataset for model training and validation.
+Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/2012/index.php) dataset for model training and validation.
 
 ### Training
 
-- **Hyper-parameters.** The hyper-parameter configurations for producing the reported results are stored in the yaml files in `mindcv/configs/edgenext  ` folder. For example, to train with one of these configurations, you can run:
+* Distributed Training
 
-  ```shell
-  # train edgenext_small on 8 Ascends
-  mpirun -n 8 python train.py -c configs/edgenext/edgenext_small_ascend.yaml --data_dir /path/to/imagenet_dir
-  ```
+It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
+
+```shell
+# distrubted training on multiple GPU/Ascend devices
+mpirun -n 8 python train.py --config configs/edgenext/edgenext_small_ascend.yaml --data_dir /path/to/imagenet
+```
   
-  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/Ascends** with the same batch size.
+Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
-Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
+For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
+
+**Note:**  As the global batch size  (batch_size x num_devices) is an important hyper-parameter, it is recommended to keep the global batch size unchanged for reproduction or adjust the learning rate linearly to a new global batch size.
+
+* Standalone Training
+
+If you want to train or finetune the model on a smaller dataset without distributed training, please run:
+
+```shell
+# standalone training on a CPU/GPU/Ascend device
+python train.py --config configs/edgenext/edgenext_small_ascend.yaml --data_dir /path/to/dataset --distribute False
+```
 
 ### Validation
 
-- To validate the trained model, you can use `validate.py`. Here is an example for edgenext_small to verify the accuracy of pretrained weights.
+To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
-  ```shell
-  python validate.py --model=edgenext_small --data_dir=imagenet_dir --val_split=val --ckpt_path
-  ```
+```
+python validate.py -c configs/edgenext/edgenext_small_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+```
 
-### Deployment (optional)
+### Deployment
 
-Please refer to the deployment tutorial in MindCV.
+Please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md) in MindCV.
