@@ -27,7 +27,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 |-----------------|-----------|------------|------------|-------------|---------|----------|
 | vit_b_32_224 | D910x8-G | 75.86  | 92.08    | 87.46    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt)  |
 | vit_l_16_224 | D910x8-G | 76.34  | 92.79    | 303.32    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l16_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224.ckpt)  |
-| vit_l_32_224 | D910x8-G | 73.71  | 90.92    | 303.326    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224.ckpt)  |
+| vit_l_32_224 | D910x8-G | 73.71  | 90.92    | 303.33    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224.ckpt)  |
 
 </div>
 
