@@ -34,7 +34,7 @@ For consistency, it is recommended to provide distributed training commands base
 
   ```shell
   # standalone training
-  python train.py --config configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/dataset
+  python train.py --config configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/dataset --distribute False
   
   # distributed training
   mpirun -n 8 python train.py --config configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/imagenet
