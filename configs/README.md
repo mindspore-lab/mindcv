@@ -20,7 +20,7 @@ This folder contains training recipes and model readme files for each model. The
 ### Model Readme Writing Guideline
 The model readme file in each sub-folder provides the introduction, reproduced results, and running guideline for each model. 
 
-Please follow the outline structure and **table format** shown in [densenet/README.md](densenet/README.md) when contributing your models :) 
+Please follow the outline structure and **table format** shown in [densenet/README.md](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/README.md) when contributing your models :) 
 
 #### Table Format
 
