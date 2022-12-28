@@ -5,7 +5,7 @@
 ## Introduction
 ***
 
-Vision Transformer (ViT) achieves remarkable results compared to convolutional neural networks (CNN) while obtaining fewer computational resources for pre-training. In comparison to convolutional neural networks (CNN), Vision Transformer (ViT) show a generally weaker inductive bias resulting in increased reliance on model regularization or data augmentation (AugReg) when training on smaller datasets. 
+Vision Transformer (ViT) achieves remarkable results compared to convolutional neural networks (CNN) while obtaining fewer computational resources for pre-training. In comparison to convolutional neural networks (CNN), Vision Transformer (ViT) shows a generally weaker inductive bias resulting in increased reliance on model regularization or data augmentation (AugReg) when training on smaller datasets. 
 
 The ViT is a visual model based on the architecture of a transformer originally designed for text-based tasks, as shown in the below figure. The ViT model represents an input image as a series of image patches, like the series of word embeddings used when using transformers to text, and directly predicts class labels for the image. ViT exhibits an extraordinary performance when trained on enough data, breaking the performance of a similar state-of-art CNN with 4x fewer computational resources.
 
@@ -26,7 +26,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 #### Notes
 - Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
-- Top-1 and Top-5: Accuracy reported on the validatoin set of ImageNet-1K. 
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K. 
 
 
 ## Quick Start
@@ -41,7 +41,8 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 
 ### Training
 
-* Disitrubuted Training
+* Distributed Training
+
 It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
 ```shell
@@ -49,14 +50,14 @@ It is easy to reproduce the reported results with the pre-defined training recip
 mpirun -n 8 python train.py --config configs/vit/vit_b32_224_ascend.yaml --data_dir /path/to/imagenet
 ```
   
-Similary, you can run the above command to train your model on GPU devices.
+Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
-Note: As global batch size is an important hyper-parameter in model training. it is recommended to use the same global batch size (batch_size x num_devices) for reproduction or adjust the learning rate linearly for a different global batch size.
+For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
 
-Detailed adjustable parameters and their default value can be seen in [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
-
+**Note:**  As the global batch size  (batch_size x num_devices) is an important hyper-parameter, it is recommended to keep the global batch size unchanged for reproduction or adjust the learning rate linearly to a new global batch size.
 
 * Standalone Training
+
 If you want to train or finetune the model on a smaller dataset without distributed training, please run:
 
 ```shell
