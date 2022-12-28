@@ -48,7 +48,7 @@ For consistency, it is recommended to provide distributed training commands base
   
   ```
   
-#### Url/link format
-Please use global path instead of relative path in the readme file 
+#### Url and Hyperlink Format
+Please use **absolute path** in the hyperlink or url for linking the target resource in the readme file and table.
 
 
