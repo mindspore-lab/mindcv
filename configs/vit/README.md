@@ -9,20 +9,27 @@ Vision Transformer (ViT) achieves remarkable results compared to convolutional n
 
 The ViT is a visual model based on the architecture of a transformer originally designed for text-based tasks, as shown in the below figure. The ViT model represents an input image as a series of image patches, like the series of word embeddings used when using transformers to text, and directly predicts class labels for the image. ViT exhibits an extraordinary performance when trained on enough data, breaking the performance of a similar state-of-art CNN with 4x fewer computational resources.
 
-![vit](./vit.png)
+<p align="center">
+  <img src="https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit.png" width=800 />  
+</p>
+<p align="center">
+  <em>Figure 1. Architecture of ViT</em>
+</p>
 
 ## Results
 ***
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-
+<div align="center">
+  
 | Model           | Context   |  Top-1 (%) | Top-5 (%)  |  Params (M) | Recipe  | Download |
 |-----------------|-----------|------------|------------|-------------|---------|----------|
 | vit_b_32_224 | D910x8-G | 75.86  | 92.08    | 87.46    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt)  |
 | vit_l_16_224 | D910x8-G | 76.34  | 92.79    | 303.32    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l16_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224.ckpt)  |
 | vit_l_32_224 | D910x8-G | 73.71  | 90.92    | 303.326    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224.ckpt)  |
 
+</div>
 
 #### Notes
 - Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
@@ -67,7 +74,7 @@ python train.py --config configs/vit/vit_b32_224_ascend.yaml --data_dir /path/to
 
 ### Validation
 
-- To validate the trained model, you can use `validate.py` and specify the path of the trained model in `--ckpt_path`.
+To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```
 python validate.py -c configs/vit/vit_b32_224_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
