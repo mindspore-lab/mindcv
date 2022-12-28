@@ -26,13 +26,13 @@ Please follow the outline structure and **table format** shown in [densenet/READ
 
 | Model           | Context   |  Top-1 (%) | Top-5 (%)  |  Params (M) | Recipe  | Download |
 |-----------------|-----------|------------|------------|-------------|---------|----------|
-| DenseNet121 | D910x8-G | 75.64     | 92.84     | 8.06       | [YAML]() | [weights]()  |
+| DenseNet121 | D910x8-G | 75.64  | 92.84    | 8.06    | [YAML](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/densenet/densenet121-120_5004_Ascend.ckpt)  |
 
 Illustration:
 - Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
 - Top-1 and Top-5: Accuracy reported on the validatoin set of ImageNet-1K. Keep 2 digits after the decimal point.
 - Params (M): # of model parameters. Keep **2 digits** after the decimal point
-- Recipe: Training recipe/configuration linked to a yaml config file
+- Recipe: Training recipe/configuration linked to a yaml config file. 
 - Download: url of the pretrained model weights
 
 #### Training Script Format
@@ -40,14 +40,15 @@ Illustration:
 For consistency, it is recommended to provide distributed training commands based on `mpirun -n {num_devices} python train.py`, instead of using shell script such as `distrubuted_train.sh`. 
 
   ```shell
-  # standalone training
+  # standalone training on gpu or ascend platform
   python train.py --config configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/dataset --distribute False
   
-  # distributed training
-  mpirun -n 8 python train.py --config configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/imagenet
+  # distributed training on gpu or ascend platform
+  mpirun -n 8 python train.py --config configs/densenet/densenet_121_ascend.yaml --data_dir /path/to/imagenet
   
   ```
   
-  
+#### Url/link format
+Please use global path instead of relative path in the readme file 
 
 
