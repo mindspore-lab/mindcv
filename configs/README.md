@@ -32,7 +32,7 @@ Illustration:
 - Model: model name in lower case with _ seperator.
 - Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
 - Top-1 and Top-5: Accuracy reported on the validatoin set of ImageNet-1K. Keep 2 digits after the decimal point.
-- Params (M): # of model parameters. Keep **2 digits** after the decimal point
+- Params (M): # of model parameters in millions (10^6). Keep **2 digits** after the decimal point
 - Recipe: Training recipe/configuration linked to a yaml config file. 
 - Download: url of the pretrained model weights
 
