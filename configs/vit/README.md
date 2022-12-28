@@ -12,16 +12,17 @@ The ViT is a visual model based on the architecture of a transformer originally 
 ![vit](./vit.png)
 
 ## Results
+***
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-***
 
 | Model           | Context   |  Top-1 (%) | Top-5 (%)  |  Params (M) | Recipe  | Download |
 |-----------------|-----------|------------|------------|-------------|---------|----------|
 | vit_b_32_224 | D910x8-G | 75.86  | 92.08    | 87.46    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt)  |
 | vit_l_16_224 | D910x8-G | 76.34  | 92.79    | 303.32    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l16_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224.ckpt)  |
 | vit_l_32_224 | D910x8-G | 73.71  | 90.92    | 303.326    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224.ckpt)  |
+
 
 #### Notes
 - Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
