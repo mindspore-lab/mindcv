@@ -5,7 +5,7 @@ This folder contains training recipes and model readme files for each model. The
 ```
     ├── configs
         ├── model_a                         // model name in lowcase with _ seperator
-        │   ├─ model_a_small_ascend.yaml    // training recipe denated as {model_name}_{specifiation}_{hardware}.yaml
+        │   ├─ model_a_small_ascend.yaml    // training recipe denated as {model_name}_{specification}_{hardware}.yaml
         |   ├─ model_a_large_gpu.yaml
         │   ├─ README.md                    //readme file containing performance results and pretrained weight urls
         │   └─ README_CN.md                 //readme file in Chinese
