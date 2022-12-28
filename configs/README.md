@@ -26,9 +26,10 @@ Please follow the outline structure and **table format** shown in [densenet/READ
 
 | Model           | Context   |  Top-1 (%) | Top-5 (%)  |  Params (M) | Recipe  | Download |
 |-----------------|-----------|------------|------------|-------------|---------|----------|
-| DenseNet121 | D910x8-G | 75.64  | 92.84    | 8.06    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/densenet/densenet121-120_5004_Ascend.ckpt)  |
+| densenet_121 | D910x8-G | 75.64  | 92.84    | 8.06    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/densenet/densenet121-120_5004_Ascend.ckpt)  |
 
 Illustration:
+- Model: model name in lower case with _ seperator.
 - Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
 - Top-1 and Top-5: Accuracy reported on the validatoin set of ImageNet-1K. Keep 2 digits after the decimal point.
 - Params (M): # of model parameters. Keep **2 digits** after the decimal point
