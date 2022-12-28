@@ -33,7 +33,7 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'edgenext_small': _cfg(url=''),
+    'edgenext_small': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt'),
 }
 
 
