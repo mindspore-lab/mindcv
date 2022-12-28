@@ -40,10 +40,10 @@ Illustration:
 For consistency, it is recommended to provide distributed training commands based on `mpirun -n {num_devices} python train.py`, instead of using shell script such as `distrubuted_train.sh`. 
 
   ```shell
-  # standalone training on gpu or ascend platform
+  # standalone training on a gpu or ascend device
   python train.py --config configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/dataset --distribute False
   
-  # distributed training on gpu or ascend platform
+  # distributed training on gpu or ascend divices
   mpirun -n 8 python train.py --config configs/densenet/densenet_121_ascend.yaml --data_dir /path/to/imagenet
   
   ```
