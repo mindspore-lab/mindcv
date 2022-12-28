@@ -3,7 +3,6 @@
 > [ An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale](https://arxiv.org/abs/2010.11929)
 
 ## Introduction
-***
 
 Vision Transformer (ViT) achieves remarkable results compared to convolutional neural networks (CNN) while obtaining fewer computational resources for pre-training. In comparison to convolutional neural networks (CNN), Vision Transformer (ViT) shows a generally weaker inductive bias resulting in increased reliance on model regularization or data augmentation (AugReg) when training on smaller datasets. 
 
@@ -17,7 +16,6 @@ The ViT is a visual model based on the architecture of a transformer originally 
 </p>
 
 ## Results
-***
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
@@ -37,7 +35,6 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 
 ## Quick Start
-***
 ### Preparation
 
 #### Installation
