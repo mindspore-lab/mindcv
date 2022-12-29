@@ -1,66 +1,86 @@
 # Visformer
-> [Visformer: The Vision-friendly Transformer](https://arxiv.org/pdf/2104.12533.pdf)
+>  [Visformer: The Vision-friendly Transformer](https://arxiv.org/abs/2104.12533)
 
 ## Introduction
-***
 
-The past few years have witnessed the rapid development of applying the Transformer module to vision problems. While some
-researchers have demonstrated that Transformer based models enjoy a favorable ability of fitting data, there are still 
-growing number of evidences showing that these models suffer over-fitting especially when the training data is limited. 
-This paper offers an empirical study by performing step-bystep operations to gradually transit a Transformer-based model
-to a convolution-based model. The results we obtain during the transition process deliver useful messages for improving 
-visual recognition. Based on these observations, we propose a new architecture named Visformer, which is abbreviated from
-the ‘Vision-friendly Transformer’.
+Visformer, or Vision-friendly Transformer, is an architecture that combines Transformer-based architectural features with those from convolutional neural network architectures. Visformer adopts the stage-wise design for higher base performance. But self-attentions are only utilized in the last two stages, considering that self-attention in the high-resolution stage is relatively inefficient even when the FLOPs are balanced. Visformer employs bottleneck blocks in the first stage and utilizes group 3 × 3 convolutions in bottleneck blocks inspired by ResNeXt. It also introduces BatchNorm to patch embedding modules as in CNNs. [[2](#references)]
 
-![](visformer.png)
+<p align="center">
+  <img src="https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer.png" width=800 />  
+</p>
+<p align="center">
+  <em>Figure 1. Network Configuration of Visformer  [<a href="https://arxiv.org/abs/2104.12533">1</a>] </em>
+</p>
 
 ## Results
-***
+
 ## ImageNet-1k
 
-|Model|Context| Top1/Top5 | Params(M) |Ckpt|Config|
-| :------:| :------: | :-------: | :-------: |:-----: |:-----: |
-|visformer_tiny| D910x8-G |78.28/94.15|10|[ckpt](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny.ckpt)|[yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml)|
-visformer_tiny_v2 | D910x8-G |78.82/94.41 |9| coming | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_v2_ascend.yaml) | 
-visformer_small | D910x8-G |   81.73/95.88   | 40    | [ckpt](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_ascend.yaml) | 
-| visformer_small_v2 | D910x8-G |   82.17/95.90   | 23    | [ckpt](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small_v2.ckpt) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_v2_ascend.yaml) | 
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+<div align="center">
+  
+| Model           | Context   |  Top-1 (%) | Top-5 (%)  |  Params (M) | Recipe  | Download |
+|-----------------|-----------|------------|------------|-------------|---------|----------|
+| visformer_tiny | D910x8-G | 78.28  | 94.15    | 10.33    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny.ckpt)  |
+| visformer_tiny_v2 | D910x8-G | 78.82  | 94.41    | 9.38    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_v2_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny_v2.ckpt)  |
+| visformer_small | D910x8-G | 81.73  | 95.88    |  40.25    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small.ckpt)  |
+| visformer_small_v2 | D910x8-G | 82.17  | 95.90    | 23.52    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_v2_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small_v2.ckpt)  |
+
+</div>
 
 #### Notes
-- Context: D910 -> HUAWEI Ascend 910 |  x 8 ->  using 8 NPUs | G -> MindSpore graph model ; F -> MindSpore pynative mode.
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K. 
 
 ## Quick Start
-***
 ### Preparation
 
 #### Installation
 Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
 
 #### Dataset Preparation
-Please download the [ImageNet-1K](https://www.image-net.org/download.php) dataset for model training and validation.
+Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/2012/index.php) dataset for model training and validation.
 
 ### Training
 
-- **Hyper-parameters.** The hyper-parameter configurations for producing the reported results are stored in the yaml 
-  files in `mindcv/configs/visformer` folder. For example, to train with one of these configurations, you can run:
+* Distributed Training
 
-  ```shell
-  # train visformer on 8 GPUs
-  mpirun -n 8 python train.py -c configs/visformer/visformer_tiny_ascend.yaml --data_dir /path/to/imagenet
-  ```
+It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
-  Note that the number of GPUs/Ascends and batch size will influence the training results. To reproduce the training result at most, it is recommended to use the **same number of GPUs/NPUs** with the same batch size.
+```shell
+# distrubted training on multiple GPU/Ascend devices
+mpirun -n 8 python train.py --config configs/visformer/visformer_tiny_ascend.yaml --data_dir /path/to/imagenet
+```
+  
+Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
-Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
+For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
+
+**Note:**  As the global batch size  (batch_size x num_devices) is an important hyper-parameter, it is recommended to keep the global batch size unchanged for reproduction or adjust the learning rate linearly to a new global batch size.
+
+* Standalone Training
+
+If you want to train or finetune the model on a smaller dataset without distributed training, please run:
+
+```shell
+# standalone training on a CPU/GPU/Ascend device
+python train.py --config configs/visformer/visformer_tiny_ascend.yaml --data_dir /path/to/dataset --distribute False
+```
 
 ### Validation
 
-- To validate the model, you can use `validate.py`. Here is an example for visformer_tiny to verify the accuracy of your
-  training.
+To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
-  ```shell
-  python validate.py -c configs/visformer/visformer_tiny_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/visformer_tiny.ckpt
-  ```
+```
+python validate.py -c configs/visformer/visformer_tiny_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+```
 
+### Deployment
 
+To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md).
 
+### References
+[1] Dosovitskiy, Alexey, et al. “An image is worth 16x16 words: Transformers for image recognition at scale.” arXiv preprint arXiv:2010.11929 (2020).
 
+[2] Visformer, https://paperswithcode.com/method/visformer
