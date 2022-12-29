@@ -254,7 +254,7 @@ class PyramidVisionTransformer(nn.Cell):
         self.head = nn.Dense(embed_dims[3], num_classes) if num_classes > 0 else Identity()
         self.reshape = ops.reshape
         self.transpose = ops.transpose
-        self.broadcast_to = ops.broadcast_to
+        self.tile = ops.Tile()
         self.Concat = ops.Concat(axis=1)
         self._initialize_weights()
 
@@ -334,10 +334,7 @@ class PyramidVisionTransformer(nn.Cell):
         x = self.transpose(self.reshape(x, (B, H, W, -1)), (0, 3, 1, 2))
 
         x, (H, W) = self.patch_embed4(x)
-        expand_shape = list(self.cls_token.shape)
-        expand_shape[0] = B
-        expand_shape = tuple(expand_shape)
-        cls_tokens = self.broadcast_to(self.cls_token, expand_shape)
+        cls_tokens = self.tile(self.cls_token, (B, 1, 1))
 
         x = self.Concat((cls_tokens, x))
         ph, pw = self.patch_embed4.H, self.patch_embed4.W

@@ -1,4 +1,4 @@
-# MindSpore Model.py Template
+# 模型编写指南
 
 本文档提供了编写MindSpore套件中的模型定义文件`model.py`的参考模板，旨在提供一种统一的代码风格。
 
