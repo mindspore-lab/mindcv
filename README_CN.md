@@ -4,7 +4,7 @@
     <a href="https://mindcv.readthedocs.io/en/latest">
         <img alt="docs" src="https://img.shields.io/badge/docs-latest-blue">
     </a>
-    <a href="https://github.com/mindspore-lab/mindcv/blob/main/LICENSE">
+    <a href="https://github.com/mindspore-lab/mindcv/blob/main/LICENSE.md">
         <img alt="GitHub" src="https://img.shields.io/github/license/mindspore-lab/mindcv.svg">
     </a>
     <a href="https://github.com/mindspore-lab/mindcv/pulls">

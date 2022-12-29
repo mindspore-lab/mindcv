@@ -4,7 +4,7 @@
     <a href="https://mindcv.readthedocs.io/en/latest">
         <img alt="docs" src="https://img.shields.io/badge/docs-latest-blue">
     </a>
-    <a href="https://github.com/mindspore-lab/mindcv/blob/main/LICENSE">
+    <a href="https://github.com/mindspore-lab/mindcv/blob/main/LICENSE.md">
         <img alt="GitHub" src="https://img.shields.io/github/license/mindspore-lab/mindcv.svg">
     </a>
     <a href="https://github.com/mindspore-lab/mindcv/pulls">
@@ -60,7 +60,7 @@ Users can customize and launch their transfer learning or training task in one c
 ```
 
 - **State-of-The-Art.** MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model: 
-
+__
 - **Flexibility and efficiency.** MindCV is bulit on MindSpore which is an efficent DL framework that can run on different hardward platforms (GPU/CPU/Ascend). It supports both graph mode for high efficiency and pynative mode for flexibity.
 	
 </details>
