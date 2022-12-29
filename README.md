@@ -67,8 +67,10 @@ Users can customize and launch their transfer learning or training task in one c
 	
 ### Benchmark Results
 
-The performance of the models trained using MindCV is summarized in [benchmark_results.md](./benchmark_results.md), which is reported on the standard ImageNet benchmark. 
+<!--- The performance of the models trained using MindCV is summarized in [benchmark_results.md](./benchmark_results.md), which is reported on the standard ImageNet benchmark. 
+-->
 
+Coming soon.
 
 ## Installation
 
