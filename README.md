@@ -25,6 +25,8 @@
 | :---:            | :---:            | :---:            | :---:            |
 | **Build Status** | [![Status](https://github.com/mindspore-lab/mindcv/actions/workflows/main.yml/badge.svg)](https://github.com/mindspore-lab/mindcv/actions) | [![Status](https://github.com/mindspore-lab/mindcv/actions/workflows/mac.yml/badge.svg)](https://github.com/mindspore-lab/mindcv/actions) | Not tested|
 
+English | [中文](README_CN.md)
+
 [Introduction](#introduction) |
 [Installation](#installation) |
 [Get Started](#get-started) |
@@ -107,7 +109,7 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 
 ### Hands-on Tutorial
 
-To get started with MindCV, please see the [transfer learning tutorial](tutorials/finetune.ipynb), which will give a quick tour on each key component and the train/validate/predict pipelines in MindCV. 
+To get started with MindCV, please see the [transfer learning tutorial](tutorials/finetune.md), which will give a quick tour on each key component and the train/validate/predict pipelines in MindCV. 
 
 Below is a few code snippets for your taste. 
 
@@ -194,7 +196,7 @@ It is easy to validate a trained model with `validate.py`.
 python validate.py --model=resnet50 --dataset=imagenet --val_split=validation --ckpt_path='./ckpt/densenet121-best.ckpt' 
 ``` 
 
-- Pynative mode with ms_function (Advanced)
+- Pynative mode with ms_function (Experiental)
 
 By default, the training pipeline (`train.py`) is run in [graph mode](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html), which is optimized for efficienty and speed but may not be flexible enough for debugging. You may alter the parameter `--mode` to switch to pure pynative mode for debugging purpose.
 
@@ -209,9 +211,9 @@ For more examples, see [examples/scripts](examples/scripts).
 ## Tutorials
 We provide [jupyter notebook tutorials](tutorials) for  
 
-- [Learn about configs](tutorials/learn_about_config.ipynb)  
-- [Inference with a pretrained model](tutorials/inference.ipynb) 
-- [Finetune a pretrained model on custom datasets](tutorials/finetune.ipynb) 
+- [Learn about configs](tutorials/learn_about_config.md)  
+- [Inference with a pretrained model](tutorials/inference.md) 
+- [Finetune a pretrained model on custom datasets](tutorials/finetune.md) 
 - [Customize models] //coming soon
 - [Optimizing performance for vision transformer] //coming soon
 - [Deployment demo](tutorials/deployment.md) 
@@ -334,11 +336,13 @@ Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guidelin
 
 ### License
 
-This project is released under the [Apache License 2.0](LICENSE.md).
+This project follows the [Apache License 2.0](LICENSE.md) open-source license.
 
 ### Acknowledgement
 
-MindCV is an open source project that welcome any contribution and feedback. We wish that the toolbox and benchmark could serve the growing research community by providing a flexible as well as standardized toolkit to reimplement existing methods and develop their own new computer vision methods.
+MindCV is an open-source project jointly developed by the MindSpore team, Xidian University, and Xi'an Jiaotong University. 
+Sincere thanks to all participating researchers and developers for their hard work on this project.
+We also acknowledge the computing resources provided by [OpenI](https://openi.pcl.ac.cn/).
 
 ### Citation
 

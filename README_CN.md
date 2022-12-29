@@ -24,6 +24,8 @@
 | :---:            | :---:            | :---:            | :---:            |
 | **Build Status** | [![Status](https://github.com/mindspore-lab/mindcv/actions/workflows/main.yml/badge.svg)](https://github.com/mindspore-lab/mindcv/actions) | [![Status](https://github.com/mindspore-lab/mindcv/actions/workflows/mac.yml/badge.svg)](https://github.com/mindspore-lab/mindcv/actions) | Not tested|
 
+[English](README.md) | 中文
+
 [简介](#简介) |
 [安装](#安装) |
 [快速入门](#快速入门) |
@@ -111,7 +113,7 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 
 ### 动手教程
 
-在开始上手MindCV前，可以阅读MindCV的[迁移学习教程](tutorials/finetune_CN.ipynb)，该教程可以帮助用户快速了解MindCV的各个重要组件以及训练、验证、测试流程。
+在开始上手MindCV前，可以阅读MindCV的[迁移学习教程](tutorials/finetune_CN.md)，该教程可以帮助用户快速了解MindCV的各个重要组件以及训练、验证、测试流程。
 
 以下是一些供您练习的代码片段。
 
@@ -201,7 +203,7 @@ mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet
 python validate.py --model resnet50 --dataset imagenet --val_split validation --ckpt_path './ckpt/densenet121-best.ckpt' 
 ``` 
 
-- 使用ms_function的调试模式 (高级)
+- 使用ms_function的调试模式 (试验性)
 
 在默认情况下，训练管道（`train.py`）在[图模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html) 下运行，虽然在该模型下运行的性能极佳，但是该模式不方便进行调试。为了方便调试，用户可以使用参数`--mode`将运行模式设置为调试模式。
 
@@ -218,9 +220,9 @@ python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download 
 
 我们提供了[jupyter notebook格式的教程](tutorials)
 
-- [了解模型配置](tutorials/learn_about_config_CN.ipynb)
-- [模型推理](tutorials/inference_CN.ipynb)
-- [自定义数据集上的模型微调训练](tutorials/finetune_CN.ipynb)
+- [了解模型配置](tutorials/learn_about_config_CN.md)
+- [模型推理](tutorials/inference_CN.md)
+- [自定义数据集上的模型微调训练](tutorials/finetune_CN.md)
 - [定制化模型] //coming soon
 - [vision transformer性能优化] //coming soon
 - [部署推理服务](tutorials/deployment_CN.md)
@@ -349,27 +351,29 @@ python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download 
 
 ### 贡献方式
 
-我们感谢包括提出问题和代码提交等在内的所有形式的贡献，来让MindCV变得更好。
+欢迎开发者用户提issue或提交代码PR，或贡献更多的算法和模型，一起让MindCV变得更好。
 
 有关贡献指南，请参阅[CONTRIBUTING.md](CONTRIBUTING.md)。请遵循[模型编写指南](mindcv/models/model_template_CN.md)所规定的规则来贡献模型接口：)
 
 ### 许可证
 
-本项目在[Apache License 2.0](License.md)下发布。
+本项目遵循[Apache License 2.0](License.md)开源协议。
 
-### 声明
+### 致谢
 
-MindCV是一个开源项目，欢迎任何形式的贡献和反馈。我们希望MindCV可以通过提供灵活和标准化的工具包来服务于相关的研究群体，帮助他们快速复现已有的方法并开发自己的新的计算机视觉方法。
+MindCV是由MindSpore团队、西安电子科技大学、西安交通大学联合开发的开源项目。
+衷心感谢所有参与的研究人员和开发人员为这个项目所付出的努力。
+十分感谢 [OpenI](https://openi.pcl.ac.cn/) 所提供的计算资源。
 
 ### 引用
 
-如果你觉得该项目对你的项目有帮助，请考虑引用我们的项目：
+如果你觉得MindCV对你的项目有帮助，请考虑引用：
 
 ```latex
 @misc{MindSpore Computer Vision 2022,
     title={{MindSpore Computer  Vision}:MindSpore Computer Vision Toolbox and Benchmark},
     author={MindSpore Vision Contributors},
-    howpublished = {\url{https://github.com/mindlab-ecosystem/mindcv/}},
+    howpublished = {\url{https://github.com/mindspore-lab/mindcv/}},
     year={2022}
 }
 ```
