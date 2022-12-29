@@ -1,18 +1,18 @@
-# system config
+# system
 mode: 0
 distribute: True
 num_parallel_workers: 8
 val_while_train: True
 
-# dataset config
+# dataset
 dataset: 'imagenet'
-data_dir: '/data/imagenet'
+data_dir: '/path/to/imagenet'
 shuffle: True
 dataset_download: False
 batch_size: 256
 drop_remainder: True
 
-# Augmentation config
+# augmentation
 interpolation: BICUBIC
 re_prob: 0.25
 mixup: 0.8
@@ -20,7 +20,7 @@ cutmix: 1.0
 cutmix_prob: 1.0
 auto_augment: autoaug
 
-# model config
+# model
 model: 'visformer_tiny_v2'
 num_classes: 1000
 pretrained: False
@@ -31,11 +31,11 @@ epoch_size: 400
 dataset_sink_mode: True
 amp_level: 'O3'
 
-# loss config
+# loss
 loss: 'CE'
 label_smoothing: 0.1
 
-# lr scheduler config
+# lr scheduler
 scheduler: 'cosine_decay'
 lr_epoch_stair: True
 lr: 0.001
@@ -44,7 +44,7 @@ warmup_factor: 0.002
 warmup_epochs: 5
 decay_epochs: 295
 
-# optimizer config
+# optimizer
 opt: 'adamw'
 momentum: 0.9
 weight_decay: 0.05
