@@ -209,13 +209,13 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
 For more examples, see [examples/scripts](examples/scripts). 
 
 ## Tutorials
-We provide [jupyter notebook tutorials](tutorials) for  
+We provide the following jupyter notebook tutorials to help users learn to use MindCV. 
 
 - [Learn about configs](tutorials/learn_about_config.md)  
 - [Inference with a pretrained model](tutorials/inference.md) 
 - [Finetune a pretrained model on custom datasets](tutorials/finetune.md) 
-- [Customize models] //coming soon
-- [Optimizing performance for vision transformer] //coming soon
+- [Customize your model]() //coming soon
+- [Optimizing performance for vision transformer]() //coming soon
 - [Deployment demo](tutorials/deployment.md) 
 
 ## Model List
@@ -330,7 +330,7 @@ Please see [configs](./configs) for the details about model performance and pret
 
 ### How to Contribute
 
-We appreciate all contributions including issues and PRs to make MindCV better. 
+We appreciate all kind of contributions including issues and PRs to make MindCV better. 
 
 Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline. Please follow the [Model Template and Guideline](mindcv/models/model_template.md) for contributing a model that fits the overall interface :)
 

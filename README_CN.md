@@ -214,17 +214,17 @@ python validate.py --model resnet50 --dataset imagenet --val_split validation --
 python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download --epoch_size 10  
 ```
 
-更多教程请参见[examples/scripts](examples/scripts)。
+更多样例请参见[examples/scripts](examples/scripts)。
 
 ## 教程
 
-我们提供了[jupyter notebook格式的教程](tutorials)
+我们提供了系列教程，帮助用户学习如何使用MindCV.
 
 - [了解模型配置](tutorials/learn_about_config_CN.md)
 - [模型推理](tutorials/inference_CN.md)
 - [自定义数据集上的模型微调训练](tutorials/finetune_CN.md)
-- [定制化模型] //coming soon
-- [vision transformer性能优化] //coming soon
+- [如何自定义模型]() //coming soon
+- [视觉ransformer性能优化]() //coming soon
 - [部署推理服务](tutorials/deployment_CN.md)
 
 ## 模型列表
@@ -363,7 +363,7 @@ python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download 
 
 MindCV是由MindSpore团队、西安电子科技大学、西安交通大学联合开发的开源项目。
 衷心感谢所有参与的研究人员和开发人员为这个项目所付出的努力。
-十分感谢 [OpenI](https://openi.pcl.ac.cn/) 所提供的计算资源。
+十分感谢 [OpenI](https://openi.pcl.ac.cn/) 平台所提供的算力资源。
 
 ### 引用
 
