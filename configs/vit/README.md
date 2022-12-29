@@ -20,9 +20,6 @@ The ViT is a visual model based on the architecture of a transformer originally 
 </p>
 
 ## Results
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
 <!--- Guideline:
 Table Format: 
 - Model: model name in lower case with _ seperator.
@@ -32,6 +29,8 @@ Table Format:
 - Recipe: Training recipe/configuration linked to a yaml config file. Use global url.  
 - Download: url of the pretrained model weights. Use global url.
 -->
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
   
@@ -97,7 +96,7 @@ python validate.py -c configs/vit/vit_b32_224_ascend.yaml --data_dir /path/to/im
 To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md).
 
 ### References
-<!--- Guideline: Citation format should follow GB/T 7714. -->
-[1] Chen, Zhengsu, et al. "Visformer: The vision-friendly transformer." Proceedings of the IEEE/CVF International Conference on Computer Vision. 2021.
+<!--- Guideline: Citation format GB/T 7714 is suggested. -->
+[1] Dosovitskiy A, Beyer L, Kolesnikov A, et al. An image is worth 16x16 words: Transformers for image recognition at scale[J]. arXiv preprint arXiv:2010.11929, 2020.
 
 [2] "Vision Transformers (ViT) in Image Recognition – 2022 Guide", https://viso.ai/deep-learning/vision-transformer-vit/
