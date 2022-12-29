@@ -348,7 +348,7 @@ If you find this project useful in your research, please consider citing:
 @misc{MindSpore Computer Vision 2022,
     title={{MindSpore Computer  Vision}:MindSpore Computer Vision Toolbox and Benchmark},
     author={MindSpore Vision Contributors},
-    howpublished = {\url{https://github.com/mindlab-ecosystem/mindcv/}},
+    howpublished = {\url{https://github.com/mindspore-lab/mindcv/}},
     year={2022}
 }
 ```
