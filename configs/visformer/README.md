@@ -80,7 +80,7 @@ python validate.py -c configs/visformer/visformer_tiny_ascend.yaml --data_dir /p
 
 To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md).
 
-### References
-[1] Dosovitskiy, Alexey, et al. “An image is worth 16x16 words: Transformers for image recognition at scale.” arXiv preprint arXiv:2010.11929 (2020).
+## References
+[1] Chen Z, Xie L, Niu J, et al. Visformer: The vision-friendly transformer. Proceedings of the IEEE/CVF International Conference on Computer Vision. 2021: 589-598.
 
 [2] Visformer, https://paperswithcode.com/method/visformer
