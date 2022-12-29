@@ -34,7 +34,7 @@ def _cfg(url='', **kwargs):
 default_cfgs = {
     'visformer_small': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small.ckpt'),
     'visformer_tiny': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny.ckpt'),
-    'visformer_tiny_v2': _cfg(url=''),
+    'visformer_tiny_v2': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny_v2.ckpt'),
     'visformer_small_v2': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small_v2.ckpt')
 }
 
