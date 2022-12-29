@@ -223,7 +223,7 @@ python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download 
 - [自定义数据集上的模型微调训练](tutorials/finetune_CN.ipynb)
 - [定制化模型] //coming soon
 - [vision transformer性能优化] //coming soon
-- [部署推理服务](tutorials/deployment_CN.ipynb)
+- [部署推理服务](tutorials/deployment_CN.md)
 
 ## 模型列表
 
