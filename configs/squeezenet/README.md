@@ -84,7 +84,7 @@ python validate.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /pat
 To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md).
 
 
-### References
+## References
 <!--- Guideline: Citation format GB/T 7714 is suggested. -->
 [1] Iandola F N, Han S, Moskewicz M W, et al. SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and< 0.5 MB model size[J]. arXiv preprint arXiv:1602.07360, 2016.
 
