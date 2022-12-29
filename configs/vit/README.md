@@ -6,13 +6,13 @@
 
 Vision Transformer (ViT) achieves remarkable results compared to convolutional neural networks (CNN) while obtaining fewer computational resources for pre-training. In comparison to convolutional neural networks (CNN), Vision Transformer (ViT) shows a generally weaker inductive bias resulting in increased reliance on model regularization or data augmentation (AugReg) when training on smaller datasets. 
 
-The ViT is a visual model based on the architecture of a transformer originally designed for text-based tasks, as shown in the below figure. The ViT model represents an input image as a series of image patches, like the series of word embeddings used when using transformers to text, and directly predicts class labels for the image. ViT exhibits an extraordinary performance when trained on enough data, breaking the performance of a similar state-of-art CNN with 4x fewer computational resources.
+The ViT is a visual model based on the architecture of a transformer originally designed for text-based tasks, as shown in the below figure. The ViT model represents an input image as a series of image patches, like the series of word embeddings used when using transformers to text, and directly predicts class labels for the image. ViT exhibits an extraordinary performance when trained on enough data, breaking the performance of a similar state-of-art CNN with 4x fewer computational resources. [[2](#references)]
 
 <p align="center">
   <img src="https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit.png" width=800 />  
 </p>
 <p align="center">
-  <em>Figure 1. Architecture of ViT</em>
+  <em>Figure 1. Architecture of ViT [<a href="#references">1</a>] </em>
 </p>
 
 ## Results
@@ -81,3 +81,7 @@ python validate.py -c configs/vit/vit_b32_224_ascend.yaml --data_dir /path/to/im
 
 To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md).
 
+### References
+[1] Dosovitskiy, Alexey, et al. “An image is worth 16x16 words: Transformers for image recognition at scale.” arXiv preprint arXiv:2010.11929 (2020).
+
+[2] "Vision Transformers (ViT) in Image Recognition – 2022 Guide", https://viso.ai/deep-learning/vision-transformer-vit/
