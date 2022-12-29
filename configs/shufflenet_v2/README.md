@@ -93,6 +93,6 @@ python validate.py -c configs/shufflenet_v2/shufflenet_v2_0.5_ascend.yaml --data
 
 To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md).
 
-### References
+## References
 <!--- Guideline: Citation format GB/T 7714 is suggested. -->
 [1] Ma N, Zhang X, Zheng H T, et al. Shufflenet v2: Practical guidelines for efficient cnn architecture design[C]//Proceedings of the European conference on computer vision (ECCV). 2018: 116-131.
