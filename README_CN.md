@@ -111,7 +111,7 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 
 ### 动手教程
 
-在开始上手MindCV前，可以阅读MindCV的[迁移学习教程](tutorials/finetune.ipynb)，该教程可以帮助用户快速了解MindCV的各个重要组件以及训练、验证、测试流程。
+在开始上手MindCV前，可以阅读MindCV的[迁移学习教程](tutorials/finetune_CN.ipynb)，该教程可以帮助用户快速了解MindCV的各个重要组件以及训练、验证、测试流程。
 
 以下是一些供您练习的代码片段。
 
@@ -130,14 +130,14 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 **图片分类示例**
 
 <p align="left">
-  <img src="./tutorials/dog.jpg" width=360 />
+  <img src="./tutorials/data/test/dog/dog.jpg" width=360 />
 </p>
 
 使用加载了预训练参数的SoTA模型对一张图片进行推理。
 
 ```python
 >>> !python
-infer.py - -model = swin_tiny - -image_path = './tutorials/dog.jpg'
+infer.py - -model = swin_tiny - -image_path = './tutorials/data/test/dog/dog.jpg'
 {'Labrador retriever': 0.5700152, 'golden retriever': 0.034551315, 'kelpie': 0.010108651,
  'Chesapeake Bay retriever': 0.008229004, 'Walker hound, Walker foxhound': 0.007791956}
 ```
@@ -218,12 +218,12 @@ python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download 
 
 我们提供了[jupyter notebook格式的教程](tutorials)
 
-- [了解模型配置](tutorials/learn_about_config.ipynb)
-- [模型推理](tutorials/inference.ipynb)
-- [自定义数据集上的模型微调训练](tutorials/finetune.ipynb)
+- [了解模型配置](tutorials/learn_about_config_CN.ipynb)
+- [模型推理](tutorials/inference_CN.ipynb)
+- [自定义数据集上的模型微调训练](tutorials/finetune_CN.ipynb)
 - [定制化模型] //coming soon
 - [vision transformer性能优化] //coming soon
-- [部署推理服务](tutorials/deployment.ipynb)
+- [部署推理服务](tutorials/deployment_CN.ipynb)
 
 ## 模型列表
 
@@ -351,7 +351,7 @@ python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download 
 
 我们感谢包括提出问题和代码提交等在内的所有形式的贡献，来让MindCV变得更好。
 
-有关贡献指南，请参阅[CONTRIBUTING.md](CONTRIBUTING.md)。请遵循[模型编写指南](mindcv/models/model-template.md)所规定的规则来贡献模型接口：)
+有关贡献指南，请参阅[CONTRIBUTING.md](CONTRIBUTING.md)。请遵循[模型编写指南](mindcv/models/model_template_CN.md)所规定的规则来贡献模型接口：)
 
 ### 许可证
 

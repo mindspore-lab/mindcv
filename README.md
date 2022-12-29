@@ -126,13 +126,13 @@ Below is a few code snippets for your taste.
 **Image classification demo**
 
 <p align="left">
-  <img src="./tutorials/dog.jpg" width=360 />
+  <img src="./tutorials/data/test/dog/dog.jpg" width=360 />
 </p>
 
 Infer the input image with a pretrained SoTA model,
 
 ```python
->>> !python infer.py --model=swin_tiny --image_path='./tutorials/dog.jpg'
+>>> !python infer.py --model=swin_tiny --image_path='./tutorials/data/test/dog/dog.jpg'
 {'Labrador retriever': 0.5700152, 'golden retriever': 0.034551315, 'kelpie': 0.010108651, 'Chesapeake Bay retriever': 0.008229004, 'Walker hound, Walker foxhound': 0.007791956}
 ```
 The top-1 prediction result is labrador retriever (拉布拉多犬), which is the breed of this cut dog.
@@ -330,7 +330,7 @@ Please see [configs](./configs) for the details about model performance and pret
 
 We appreciate all contributions including issues and PRs to make MindCV better. 
 
-Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline. Please follow the [Model Template and Guideline](mindcv/models/model-template.md) for contributing a model that fits the overall interface :)
+Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline. Please follow the [Model Template and Guideline](mindcv/models/model_template.md) for contributing a model that fits the overall interface :)
 
 ### License
 
