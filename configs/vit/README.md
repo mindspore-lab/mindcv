@@ -95,7 +95,7 @@ python validate.py -c configs/vit/vit_b32_224_ascend.yaml --data_dir /path/to/im
 
 To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md).
 
-### References
+## References
 <!--- Guideline: Citation format GB/T 7714 is suggested. -->
 [1] Dosovitskiy A, Beyer L, Kolesnikov A, et al. An image is worth 16x16 words: Transformers for image recognition at scale[J]. arXiv preprint arXiv:2010.11929, 2020.
 
