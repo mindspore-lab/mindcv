@@ -26,8 +26,8 @@ Table Format:
 - Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
 - Top-1 and Top-5: Keep 2 digits after the decimal point.
 - Params (M): # of model parameters in millions (10^6). Keep 2 digits after the decimal point
-- Recipe: Training recipe/configuration linked to a yaml config file. Use global url.  
-- Download: url of the pretrained model weights. Use global url.
+- Recipe: Training recipe/configuration linked to a yaml config file. Use absolute url path.  
+- Download: url of the pretrained model weights. Use absolute url path.
 -->
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
