@@ -1,19 +1,18 @@
-# Minimum + Color Jitter + Random Erasing
-# system config
+# system
 mode: 0
 distribute: True
 val_while_train: True
 val_interval: 1
 log_interval: 100
 
-# dataset config
+# dataset
 dataset: 'imagenet'
-data_dir: './imagenet'
+data_dir: '/path/to/imagenet'
 shuffle: True
 num_parallel_workers: 8
 batch_size: 64
 
-# augmentation config
+# augmentation
 image_resize: 224
 scale: [0.08, 1.0]
 ratio: [0.75, 1.333]
@@ -23,7 +22,7 @@ interpolation: 'bilinear'
 color_jitter: 0.4
 re_prob: 0.1
 
-# model config
+# model
 model: ''
 num_classes: 1000
 keep_checkpoint_max: 10
@@ -34,11 +33,11 @@ epoch_size: 200
 dataset_sink_mode: True
 amp_level: 'O3'
 
-# loss config
+# loss
 loss: 'CE'
 label_smoothing: 0.1
 
-# lr scheduler config
+# lr scheduler
 scheduler: 'cosine_decay'
 min_lr: 0.0
 lr: 0.1
@@ -47,7 +46,7 @@ warmup_factor: 0.01
 decay_epochs: 95
 lr_epoch_stair: True
 
-# optimizer config
+# optimizer
 opt: 'momentum'
 momentum: 0.9
 weight_decay: 0.0001

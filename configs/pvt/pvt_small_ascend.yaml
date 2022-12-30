@@ -1,17 +1,17 @@
-# system config
+# system
 mode: 0
 distribute: True
 num_parallel_workers: 8
 
-# dataset config
+# dataset
 dataset: 'imagenet'
-data_dir: './imagenet/'
+data_dir: '/path/to/imagenet'
 shuffle: True
 dataset_download: False
 batch_size: 128
 drop_remainder: True
 
-# Augmentation config
+# augmentation
 image_resize: 224
 scale: [0.08, 1.0]
 ratio: [0.75, 1.333]
@@ -25,30 +25,30 @@ cutmix_prob: 1.0
 crop_pct: 0.9
 color_jitter: 0.0
 
-# model config
+# model
 model: 'pvt_small'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''
 keep_checkpoint_max: 10
-ckpt_save_dir: './ckpt/'
+ckpt_save_dir: './ckpt'
 epoch_size: 500
 dataset_sink_mode: True
 amp_level: 'O2'
 drop_path_rate: 0.1
 
-# loss config
+# loss
 loss: 'CE'
 label_smoothing: 0.1
 
-# lr scheduler config
-scheduler: 'warmup_cosine_decay'
+# lr scheduler
+scheduler: 'cosine_decay'
 lr: 0.0005
 min_lr: 0.000001
 warmup_epochs: 10
 decay_epochs: 390
 
-# optimizer config
+# optimizer
 opt: 'adamw'
 weight_decay: 0.05
 loss_scale: 1024
