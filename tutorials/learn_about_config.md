@@ -2,6 +2,7 @@
 
 [![下载Notebook](https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.8/resource/_static/logo_notebook.png)](https://download.mindspore.cn/toolkits/mindcv/tutorials/learn_about_config.ipynb)&emsp;
 
+
 `mindcv` can parse the yaml file of the model through the `argparse` library and `pyyaml` library to configure parameters. Let's use squeezenet_1.0 model as an example to explain how to configure the corresponding parameters.
 
 
@@ -416,7 +417,7 @@ You can override the parameter settings in the yaml file by using parse to set p
 ```shell
 python train.py -c ./configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir ./data
 ```
-The above command overwrites the value of `args.data_dir` parameter from "./imaget2012" in yaml file to "./data".
+The above command overwrites the value of `args.data_dir` parameter from ./imaget2012 in yaml file to ./data.
 
 
 

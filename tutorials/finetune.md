@@ -2,11 +2,12 @@
 
 [![下载Notebook](https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.8/resource/_static/logo_notebook.png)](https://download.mindspore.cn/toolkits/mindcv/tutorials/finetune.ipynb)&emsp;
 
+
 In this tutorial, you will learn how to use MindCV for transfer Learning to solve the problem of image classification on custom datasets. In the deep learning task, we often encounter the problem of insufficient training data. At this time, it is difficult to train the entire network directly to achieve the desired accuracy. A better approach is to use a pretrained model on a large dataset (close to the task data), and then use the model to initialize the network's weight parameters or apply it to specific tasks as a fixed feature extractor.
 
 This tutorial will use the DenseNet model pretrained on ImageNet as an example to introduce two different fine-tuning strategies to solve the image classification problem of wolves and dogs in the case of small samples:
 
-1. Overall network fine-tuning.
+1. Overall model fine-tuning.
 2. Freeze backbone and only fine tune the classifier.
 
 > For details of transfer learning, see [Stanford University CS231n](https://cs231n.github.io/transfer-learning/#tf)
@@ -180,9 +181,11 @@ plt.show()
 ![png](output_11_0.png)
 
 
-## 1. Overall Model Fine-Tuning
+## Model Fine-Tuning
 
-### Pretraining Model Loading
+### 1. Overall Model Fine-Tuning
+
+#### Pretraining Model Loading
 We use `mindcv.models.densenet` to define the DenseNet121 network. When the `pretrained` parameter in the interface is set to True, the network weight can be automatically downloaded. Since the pretraining model is used to classify 1000 categories in the ImageNet dataset, we set `num_classes=2`, and the output of DenseNet's classifier (the last FC layer) is adjusted to two dimensions. At this time, only the pre training weights of backbone are loaded, while the classifier uses the initial value.
 
 
@@ -200,7 +203,7 @@ network = create_model(model_name='densenet121', num_classes=2, pretrained=True)
 
 >For the specific structure of DenseNet, see the [DenseNet paper](https://arxiv.org/pdf/1608.06993.pdf). 
 
-### Model Training
+#### Model Training
 Use the loaded and processed wolf and dog images with tags to fine-tune the DenseNet network. Note that smaller learning rates should be used when fine-tuning the overall model.
 
 
@@ -267,7 +270,7 @@ model.train(10, loader_train, callbacks=[LossMonitor(5), TimeMonitor(5)], datase
     Train epoch time: 1217.958 ms, per step time: 81.197 ms
     
 
-### Model Evaluation
+#### Model Evaluation
 
 After the training, we evaluate the accuracy of the model on the validation set.
 
@@ -280,7 +283,7 @@ print(res)
     {'accuracy': 1.0}
     
 
-#### Visual Model Inference Results
+##### Visual Model Inference Results
 Define `visualize_mode` function and visualize model prediction.
 
 
@@ -326,9 +329,9 @@ visualize_model(model, loader_val)
 ![png](output_23_0.png)
 
 
-## 2. Freeze Backbone and Fine-Tune the Classifier
+### 2. Freeze Backbone and Fine-Tune the Classifier
 
-### Freezing Backbone Parameters
+#### Freezing Backbone Parameters
 
 First, we need to freeze all network layers except the last layer classifier, that is, set the `requires_grad` attribute of the corresponding layer parameter to False, so that it does not calculate the gradient and update the parameters in the back propagation.
 
@@ -342,7 +345,7 @@ for param in network.get_parameters():
         param.requires_grad = False
 ```
 
-### Fine-Tune Classifier
+#### Fine-Tune Classifier
 
 Because the feature network has been fixed, we don't have to worry about distortpratised features in the training process. Therefore, compared with the first method, we can increase the learning rate.
 
@@ -432,7 +435,7 @@ print(res)
     {'accuracy': 1.0}
     
 
-#### Visual Model Prediction
+##### Visual Model Prediction
 
 Use the finely tuned model piece to predict the wolf and dog image data of the verification set. If the prediction font is blue, the prediction is correct; if the prediction font is red, the prediction is wrong.
 
