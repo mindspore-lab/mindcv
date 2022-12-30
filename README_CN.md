@@ -4,7 +4,7 @@
     <a href="https://mindcv.readthedocs.io/en/latest">
         <img alt="docs" src="https://img.shields.io/badge/docs-latest-blue">
     </a>
-    <a href="https://github.com/mindspore-lab/mindcv/blob/main/LICENSE">
+    <a href="https://github.com/mindspore-lab/mindcv/blob/main/LICENSE.md">
         <img alt="GitHub" src="https://img.shields.io/github/license/mindspore-lab/mindcv.svg">
     </a>
     <a href="https://github.com/mindspore-lab/mindcv/pulls">
@@ -92,19 +92,17 @@ pip install -r requirements.txt
 
 之后的说明将默认用户已正确安装好相关依赖。
 
-<!---
 ### pip安装
 
-MindCV可以通过pip安装。
+MindCV的已发布版本可以通过pip安装。
 
 ```shell
 pip install https://github.com/mindspore-lab/mindcv/releases/download/v0.0.1-beta/mindcv-0.0.1b0-py3-none-any.whl
 ```
--->
 
 ### 源码安装
 
-运行以下脚本，通过源码安装MindCV。
+Git上最新的MindCV可以通过以下指令安装。
 
 ```shell
 pip install git+https://github.com/mindspore-lab/mindcv.git

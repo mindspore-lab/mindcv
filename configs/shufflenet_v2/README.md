@@ -13,7 +13,7 @@ Therefore, based on these two principles, ShuffleNetV2 proposes four effective n
 - The impact of Element-wise operation is not negligible.
 
 <p align="center">
-  <img src="https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v2/ShuffleNetV2_Block.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/8156835/210043336-305a167f-d669-42e7-8b94-eef8e7b78a48.png" width=800 />  
 </p>
 <p align="center">
   <em>Figure 1. Architecture Design in ShuffleNetV2 [<a href="#references">1</a>] </em>
