@@ -15,7 +15,7 @@ As it produces feature maps of different levels, it qualifies as a backbone mode
 Their results reveal that 1) Locality Injection is a general methodology for MLP models; 2) RepMLPNet has favorable accuracy-efficiency
 trade-off compared to the other MLPs; 3) RepMLPNet is the first MLP that seamlessly transfer to Cityscapes semantic segmentation.
 
-![RepMLP](https://github.com/mindspore-lab/mindcv/blob/main/configs/repmlp/repmlpblock.png)
+![RepMLP](https://user-images.githubusercontent.com/74176172/210046952-c4f05321-76e9-4d7a-b419-df91aac64cdf.png)
 Figure 1. RepMLP Block.[[1](#References)]
 
 ## Results

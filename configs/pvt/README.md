@@ -6,7 +6,7 @@
 
 PVT is a general backbone network for dense prediction without convolution operation. PVT introduces a pyramid structure in Transformer to generate multi-scale feature maps for dense prediction tasks. PVT uses a gradual reduction strategy to control the size of the feature maps through the patch embedding layer, and proposes a spatial reduction attention (SRA) layer to replace the traditional multi head attention layer in the encoder, which greatly reduces the computing/memory overhead.[[1](#References)]
 
-![PVT](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt.png)
+![PVT](https://user-images.githubusercontent.com/74176172/210046926-2322161b-a963-4603-b3cb-86ecdca41262.png)
 
 ## Results
 

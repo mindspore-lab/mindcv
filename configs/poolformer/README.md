@@ -6,10 +6,10 @@
 
 Instead of designing complicated token mixer to achieve SOTA performance, the target of this work is to demonstrate the competence of Transformer models largely stem from the general architecture MetaFormer. Pooling/PoolFormer are just the tools to support the authors' claim.
 
-![MetaFormer](https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/metaformer.png)
+![MetaFormer](https://user-images.githubusercontent.com/74176172/210046827-c218f5d3-1ee8-47bf-a78a-482d821ece89.png)
 Figure 1. MetaFormer and performance of MetaFormer-based models on ImageNet-1K validation set. The authors argue that the competence of Transformer/MLP-like models primarily stem from the general architecture MetaFormer instead of the equipped specific token mixers. To demonstrate this, they exploit an embarrassingly simple non-parametric operator, pooling, to conduct extremely basic token mixing. Surprisingly, the resulted model PoolFormer consistently outperforms the DeiT and ResMLP as shown in (b), which well supports that MetaFormer is actually what we need to achieve competitive performance. RSB-ResNet in (b) means the results are from “ResNet Strikes Back” where ResNet is trained with improved training procedure for 300 epochs.
 
-![PoolFormer](https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/poolformer.png)
+![PoolFormer](https://user-images.githubusercontent.com/74176172/210046845-6caa1574-b6a4-47f3-8298-c8ca3b4f8fa4.png)
 Figure 2. (a) The overall framework of PoolFormer. (b) The architecture of PoolFormer block. Compared with Transformer block, it replaces attention with an extremely simple non-parametric operator, pooling, to conduct only basic token mixing.[[1](#References)]
 
 ## Results
