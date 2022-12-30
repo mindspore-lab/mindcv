@@ -92,9 +92,9 @@ pip install -r requirements.txt
 
 之后的说明将默认用户已正确安装好相关依赖。
 
-### pip安装
+### PyPI安装
 
-MindCV的已发布版本可以通过pip安装。
+MindCV的已发布版本可以通过PyPI安装。
 
 ```shell
 pip install https://github.com/mindspore-lab/mindcv/releases/download/v0.0.1-beta/mindcv-0.0.1b0-py3-none-any.whl
