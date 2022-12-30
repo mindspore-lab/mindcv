@@ -48,7 +48,8 @@ For consistency, it is recommended to provide distributed training commands base
   mpirun -n 8 python train.py --config configs/densenet/densenet_121_ascend.yaml --data_dir /path/to/imagenet
   
   ```
-  
+  > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
+ 
 #### URL and Hyperlink Format
 Please use **absolute path** in the hyperlink or url for linking the target resource in the readme file and table.
 
