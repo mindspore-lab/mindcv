@@ -65,12 +65,12 @@ python train.py --model swin_tiny --pretrained --opt adamw --lr 0.001 --data_dir
 
 </details>
 
-### 性能报告
+### 性能结果
 
-<!---使用MindCV进行训练的模型测试结果汇总在[benchmark_results.md](./benchmark_results.md)，测试使用的是标准的ImageNet测试集。
--->
+基于MindCV进行模型实现和重训练的汇总结果详见[benchmark_results.md](./benchmark_results.md), 所用到的训练策略和训练后的模型权重均可通过表中获取。
 
-即将更新
+各模型讲解和训练说明详见[configs](configs)目录。  
+
 
 ## 安装
 
@@ -194,7 +194,7 @@ mpirun --allow-run-as-root -n 4 python train.py --distribute \
 mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
 
-**用于模型训练的参数文件汇总在[`configs`](configs)文件夹中。**
+模型训练用到的参数配置和详细精度性能汇请见[`configs`](configs)文件夹。
 
 - 验证
 

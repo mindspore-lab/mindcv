@@ -11,9 +11,3 @@ To test the training process (in graph mode and pynative+ms_function mode) and t
 ```shell
 pytest tests/tasks/test_train_val_imagenet_subset.py
 ```
-
-To test training in distributed mode if you have multiple GPUs:
-
-```shell
-pytest tests/tasks/parallel/test_parallel_train_val.py
-```

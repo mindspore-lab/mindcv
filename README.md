@@ -67,10 +67,9 @@ __
 	
 ### Benchmark Results
 
-<!--- The performance of the models trained using MindCV is summarized in [benchmark_results.md](./benchmark_results.md), which is reported on the standard ImageNet benchmark. 
--->
+The performance of the models trained with MindCV is summarized in [benchmark_results.md](./benchmark_results.md), where the training recipes and weights are both available.  
 
-Coming soon.
+Model introduction and training details can be viewed in each subfolder under [configs](configs).
 
 ## Installation
 
@@ -188,7 +187,7 @@ You can configure your model and other components either by specifying external 
 mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
 
-**Well-defined config files for training SoTA models are placed in the [`configs`](configs) folder, along with their performance reported on ImageNet dataset.**
+Well-defined config files for training SoTA models can be seen in the [`configs`](configs) folder, along with their performance reported on ImageNet dataset.
 
 
 - Validation
