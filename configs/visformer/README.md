@@ -6,7 +6,7 @@
 Visformer, or Vision-friendly Transformer, is an architecture that combines Transformer-based architectural features with those from convolutional neural network architectures. Visformer adopts the stage-wise design for higher base performance. But self-attentions are only utilized in the last two stages, considering that self-attention in the high-resolution stage is relatively inefficient even when the FLOPs are balanced. Visformer employs bottleneck blocks in the first stage and utilizes group 3 × 3 convolutions in bottleneck blocks inspired by ResNeXt. It also introduces BatchNorm to patch embedding modules as in CNNs. [[2](#references)]
 
 <p align="center">
-  <img src="https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/8156835/210043162-8b861b87-73ba-4376-aae9-534496896c37.png" width=800 />  
 </p>
 <p align="center">
   <em>Figure 1. Network Configuration of Visformer  [<a href="https://arxiv.org/abs/2104.12533">1</a>] </em>
