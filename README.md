@@ -90,16 +90,15 @@ pip install -r requirements.txt
 MindSpore can be easily installed by following the official [instruction](https://www.mindspore.cn/install) where you can select your hardware platform for the best fit. To run in distributed mode, [openmpi](https://www.open-mpi.org/software/ompi/v4.0/) is required to install.   
 
 The following instructions assume the desired dependency is fulfilled. 
-<!---
+
 ### Install with pip
-MindCV can be installed with pip. 
+The released version of MindCV can be installed via `pip` as follows:
 ```shell
-pip install https://github.com/mindspore-lab/mindcv/releases/download/v0.0.1-beta/mindcv-0.0.1b0-py3-none-any.whl
+pip install mindcv
 ```
--->
 
 ### Install from source
-To install MindCV from source, please run:
+The latest version of MindCV can be installed as follows:
 ```shell
 pip install git+https://github.com/mindspore-lab/mindcv.git
 ```
@@ -130,7 +129,7 @@ Below is a few code snippets for your taste.
 **Image classification demo**
 
 <p align="left">
-  <img src="./tutorials/data/test/dog/dog.jpg" width=360 />
+  <img src="https://user-images.githubusercontent.com/8156835/210049681-89f68b9f-eb44-44e2-b689-4d30c93c6191.jpg" width=360 />
 </p>
 
 Infer the input image with a pretrained SoTA model,
