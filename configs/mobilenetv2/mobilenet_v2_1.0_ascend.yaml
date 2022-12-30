@@ -1,18 +1,18 @@
-# system config
+# system
 mode: 0
 distribute: True
 num_parallel_workers: 32
 
-# dataset config
+# dataset
 dataset: 'imagenet'
-data_dir: ''
+data_dir: '/path/to/imagenet'
 shuffle: True
 dataset_download: False
 batch_size: 256
 drop_remainder: True
 train_split: 'train'
 
-# Augmentation config
+# augmentation
 image_resize: 224
 scale: [0.08, 1.0]
 ratio: [0.75, 1.333]
@@ -20,29 +20,29 @@ hflip: 0.5
 interpolation: 'bilinear'
 crop_pct: 0.875
 
-# model config
+# model
 model: 'mobilenet_v2_100_224'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''
 keep_checkpoint_max: 100
-ckpt_save_dir: ''
+ckpt_save_dir: './ckpt'
 epoch_size: 300
 dataset_sink_mode: True
 amp_level: 'O0'
 
-# loss config
+# loss
 loss: 'CE'
 label_smoothing: 0.1
 
-# lr scheduler config
+# lr scheduler
 scheduler: 'cosine_decay'
 min_lr: 0.0
 lr: 0.4
 warmup_epochs: 4
 decay_epochs: 296
 
-# optimizer config
+# optimizer
 opt: 'momentum'
 filter_bias_and_bn: True
 momentum: 0.9
