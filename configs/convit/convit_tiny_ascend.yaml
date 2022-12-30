@@ -1,17 +1,17 @@
-# system config
+# system
 mode: 0
 distribute: True
 num_parallel_workers: 8
 
-# dataset config
+# dataset
 dataset: 'imagenet'
-data_dir: ''
+data_dir: '/path/to/imagenet'
 shuffle: True
 dataset_download: False
 batch_size: 256
 drop_remainder: True
 
-# Augmentation config
+# augmentation
 image_resize: 224
 scale: [0.08, 1.0]
 ratio: [0.75, 1.333]
@@ -24,7 +24,7 @@ cutmix_prob: 1.0
 crop_pct: 0.875
 color_jitter: 0.4
 
-# model config
+# model
 model: 'convit_tiny'
 num_classes: 1000
 pretrained: False
@@ -35,18 +35,18 @@ epoch_size: 300
 dataset_sink_mode: True
 amp_level: 'O2'
 
-# loss config
+# loss
 loss: 'CE'
 label_smoothing: 0.1
 
-# lr scheduler config
+# lr scheduler
 scheduler: 'cosine_decay'
 lr: 0.00072
 min_lr: 0.000001
 warmup_epochs: 5
 decay_epochs: 295
 
-# optimizer config
+# optimizer
 opt: 'adamw'
 weight_decay: 0.0001
 loss_scale: 1024
