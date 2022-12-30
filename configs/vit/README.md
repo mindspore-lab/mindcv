@@ -13,7 +13,7 @@ The ViT is a visual model based on the architecture of a transformer originally 
 <!--- Guideline: If an architecture table/figure is available in the paper, put one here and cite for intuitive illustration. -->
 
 <p align="center">
-  <img src="https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/8156835/210041797-6576b2f4-3d77-41d9-b5f0-16fed3f261d8.png" width=800 />  
 </p>
 <p align="center">
   <em> Figure 1. Architecture of ViT [<a href="#references">1</a>] </em>
@@ -98,6 +98,7 @@ To deploy online inference services with the trained model efficiently, please r
 
 ## References
 <!--- Guideline: Citation format GB/T 7714 is suggested. -->
+
 [1] Dosovitskiy A, Beyer L, Kolesnikov A, et al. An image is worth 16x16 words: Transformers for image recognition at scale[J]. arXiv preprint arXiv:2010.11929, 2020.
 
 [2] "Vision Transformers (ViT) in Image Recognition – 2022 Guide", https://viso.ai/deep-learning/vision-transformer-vit/
