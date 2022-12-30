@@ -13,7 +13,7 @@ limited memory. Additionally, with model compression techniques, SqueezeNet is a
 Middle: SqueezeNet with simple bypass; Right: SqueezeNet with complex bypass.
 
 <p align="center">
-  <img src="https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/8156835/210043440-5218ae6d-54ed-4d1e-a4ff-335d4a2baaa5.png" width=800 />  
 </p>
 <p align="center">
   <em>Figure 1. Architecture of SqueezeNet [<a href="#references">1</a>] </em>
