@@ -2,6 +2,7 @@
 
 [![下载Notebook](https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.8/resource/_static/logo_notebook.png)](https://download.mindspore.cn/toolkits/mindcv/tutorials/learn_about_config_CN.ipynb)&emsp;
 
+
 `mindcv`套件可以通过python的`argparse`库和`pyyaml`库解析模型的yaml文件来进行参数的配置，下面我们以squeezenet_1.0模型为例，解释如何配置相应的参数。
 
 
@@ -416,7 +417,7 @@ def train(args):
 ```shell
 python train.py -c ./configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir ./data
 ```
-上面的命令将`args.data_dir`参数的值由yaml文件中的"./imagenet2012"覆盖为"./data"。
+上面的命令将`args.data_dir`参数的值由yaml文件中的 ./imagenet2012 覆盖为 ./data。
 
 
 
