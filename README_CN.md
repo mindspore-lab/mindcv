@@ -194,7 +194,7 @@ mpirun --allow-run-as-root -n 4 python train.py --distribute \
 mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
 
-**用于模型训练的参数文件汇总在[`configs`](configs)文件夹中。**
+模型训练用到的参数配置和详细精度性能汇请见[`configs`](configs)文件夹。
 
 - 验证
 
