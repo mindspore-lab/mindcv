@@ -65,12 +65,12 @@ python train.py --model swin_tiny --pretrained --opt adamw --lr 0.001 --data_dir
 
 </details>
 
-### 性能报告
+### 性能结果
 
-<!---使用MindCV进行训练的模型测试结果汇总在[benchmark_results.md](./benchmark_results.md)，测试使用的是标准的ImageNet测试集。
--->
+基于MindCV进行模型实现和重训练的汇总结果详见[benchmark_results.md](./benchmark_results.md), 所用到的训练策略和训练后的模型权重均可通过表中获取。
 
-即将更新
+各模型说明及运行指令详见[`configs`](configs)目录。  
+
 
 ## 安装
 
