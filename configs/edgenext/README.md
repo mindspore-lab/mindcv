@@ -11,7 +11,7 @@ utilizes depth-wise convolution along with self-attention across channel dimensi
 to implicitly increase the receptive field and encode multi-scale features.[[1](#references)]
 
 <p align="center">
-  <img src="https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/52945530/210045582-d31f832d-22e0-47bd-927f-74cf2daed91a.png" width=800 />  
 </p>
 <p align="center">
   <em>Figure 1. Architecture of EdgeNeXt [<a href="#references">1</a>] </em>

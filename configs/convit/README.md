@@ -13,7 +13,7 @@ ConViT, outperforms the DeiT (Touvron et al., 2020) on ImageNet,
 while offering a much improved sample efficiency.[[1](#references)]
 
 <p align="center">
-  <img src="https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit.png" width=400 />  
+  <img src="https://user-images.githubusercontent.com/52945530/210045403-721c9697-fe7e-429a-bd38-ba244fc8bd1b.png" width=400 />  
 </p>
 <p align="center">
   <em>Figure 1. Architecture of ConViT [<a href="#references">1</a>] </em>

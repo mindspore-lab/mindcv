@@ -16,7 +16,7 @@ DenseNets have several compelling advantages: they alleviate the vanishing-gradi
 propagation, encourage feature reuse, and substantially reduce the number of parameters.[[1](#references)]
 
 <p align="center">
-  <img src="https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/52945530/210045537-7eda82c7-4575-4820-ba94-8fcab11c6482.png" width=800 />  
 </p>
 <p align="center">
   <em>Figure 1. Architecture of DenseNet [<a href="#references">1</a>] </em>
