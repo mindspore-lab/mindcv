@@ -24,9 +24,13 @@ Please follow the outline structure and **table format** shown in [densenet/READ
 
 #### Table Format
 
+<div align="center">
+
 | Model           | Context   |  Top-1 (%) | Top-5 (%)  |  Params (M) | Recipe  | Download |
 |-----------------|-----------|------------|------------|-------------|---------|----------|
 | densenet_121 | D910x8-G | 75.64  | 92.84    | 8.06    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/densenet/densenet121-120_5004_Ascend.ckpt)  |
+
+</div>
 
 Illustration:
 - Model: model name in lower case with _ seperator.
