@@ -26,7 +26,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 |    Model    | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                           | Download                                                                                     |
 |:-----------:|:--------:|:---------:|:---------:|:----------:|--------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
-| repmlp_t224 | D910x8-G |  76.686   |   93.30   |   38.30    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repmlp/repmlp_t224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repmlp/RepMLPNet_T224-8dbedd00.ckpt) |
+| repmlp_t224 | D910x8-G |   76.68   |   93.30   |   38.30    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repmlp/repmlp_t224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repmlp/RepMLPNet_T224-8dbedd00.ckpt) |
 
 </div>
 
@@ -57,7 +57,8 @@ It is easy to reproduce the reported results with the pre-defined training recip
 # distributed training on multiple GPU/Ascend devices
 mpirun -n 8 python train.py --config configs/repmlp/repmlp_t224_ascend.yaml --data_dir /path/to/imagenet
 ```
-  
+> If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
+
 Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
 For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
