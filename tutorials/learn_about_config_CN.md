@@ -1,5 +1,7 @@
 # 了解模型配置
 
+[![下载Notebook](https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.8/resource/_static/logo_notebook.png)](https://download.mindspore.cn/toolkits/mindcv/tutorials/learn_about_config_CN.ipynb)&emsp;
+
 `mindcv`套件可以通过python的`argparse`库和`pyyaml`库解析模型的yaml文件来进行参数的配置，下面我们以squeezenet_1.0模型为例，解释如何配置相应的参数。
 
 

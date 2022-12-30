@@ -1,5 +1,7 @@
 # 自定义数据集上的模型微调训练
 
+[![下载Notebook](https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.8/resource/_static/logo_notebook.png)](https://download.mindspore.cn/toolkits/mindcv/tutorials/finetune_CN.ipynb)&emsp;
+
 在此教程中，您将学会如何使用MindCV套件进行迁移学习，以解决自定义数据集上的图像分类问题。在深度学习任务中，常见遇到训练数据不足的问题，此时直接训练整个网络往往难以达到理想的精度。一个比较好的做法是，使用一个在大规模数据集上(与任务数据较为接近)预训练好的模型，然后使用该模型来初始化网络的权重参数或作为固定特征提取器应用于特定的任务中。
 
 此教程将以使用ImageNet上预训练的DenseNet模型为例，介绍两种不同的微调策略，解决小样本情况下狼和狗的图像分类问题: 
