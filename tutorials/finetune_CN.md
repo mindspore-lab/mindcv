@@ -4,7 +4,7 @@
 
 此教程将以使用ImageNet上预训练的DenseNet模型为例，介绍两种不同的微调策略，解决小样本情况下狼和狗的图像分类问题: 
 
-1. 整体网络微调。
+1. 整体模型微调。
 2. 冻结特征网络(freeze backbone)，只微调分类器。
 
 > 迁移学习详细内容见[Stanford University CS231n](https://cs231n.github.io/transfer-learning/#tf)
@@ -176,9 +176,11 @@ plt.show()
 ![png](output_11_0.png)
 
 
-## 1. 整体模型微调
+## 模型微调
 
-### 预训练模型加载
+### 1. 整体模型微调
+
+#### 预训练模型加载
 我们使用`mindcv.models.densenet`中定义DenseNet121网络，当接口中的`pretrained`参数设置为True时，可以自动下载网络权重。
 由于该预训练模型是针对ImageNet数据集中的1000个类别进行分类的，这里我们设定`num_classes=2`, DenseNet的classifier(即最后的FC层)输出调整为两维，此时只加载backbone的预训练权重，而classifier则使用初始值。
 
@@ -197,7 +199,7 @@ network = create_model(model_name='densenet121', num_classes=2, pretrained=True)
 
 > DenseNet的具体结构可参见[DenseNet论文](https://arxiv.org/pdf/1608.06993.pdf)。
 
-### 模型训练
+#### 模型训练
 
 使用已加载处理好的带标签的狼和狗图像，对DenseNet进行微调网络。 
 注意，对整体模型做微调时，应使用较小的learning rate。
@@ -265,7 +267,7 @@ model.train(10, loader_train, callbacks=[LossMonitor(5), TimeMonitor(5)], datase
     Train epoch time: 1217.958 ms, per step time: 81.197 ms
     
 
-### 模型评估
+#### 模型评估
 
 在训练完成后，我们在验证集上评估模型的精度。
 
@@ -278,7 +280,7 @@ print(res)
     {'accuracy': 1.0}
     
 
-#### 可视化模型推理结果
+##### 可视化模型推理结果
 
 定义 `visualize_mode` 函数，可视化模型预测。
 
@@ -325,9 +327,9 @@ visualize_model(model, loader_val)
 ![png](output_23_0.png)
 
 
-## 2. 冻结特征网络, 微调分类器
+### 2. 冻结特征网络, 微调分类器
 
-### 冻结特征网络的参数
+#### 冻结特征网络的参数
 
 首先，我们要冻结除最后一层分类器之外的所有网络层，即将相应的层参数的`requires_grad`属性设置为`False`，使其不在反向传播中计算梯度及更新参数。
 
@@ -341,7 +343,7 @@ for param in network.get_parameters():
         param.requires_grad = False
 ```
 
-### 微调分类器
+#### 微调分类器
 因为特征网络已经固定，我们不必担心训练过程会distort pratrained features，因此，相比于第一种方法，我们可以将learning rate调大一些。
 
 与没有预训练模型相比，将节约一大半时间，因为此时可以不用计算部分梯度。
@@ -430,7 +432,7 @@ print(res)
     {'accuracy': 1.0}
     
 
-#### 可视化模型预测
+##### 可视化模型预测
 
 使用微调过后的模型件对验证集的狼和狗图像数据进行预测。若预测字体为蓝色表示预测正确，若预测字体为红色表示预测错误。
 

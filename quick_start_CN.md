@@ -1,6 +1,6 @@
 # 快速入门
 
-本教程中我们将提供一个快速上手[mindcv](https://github.com/mindspore-lab/mindcv)的指南。
+[MindCV](https://github.com/mindspore-lab/mindcv)是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力于计算机视觉相关技术研发的开源工具箱。它提供大量的计算机视觉领域的经典模型和SoTA模型以及它们的预训练权重。同时，还提供了AutoAugment等SoTA算法来提高性能。通过解耦的模块设计，您可以轻松地将MindCV应用到您自己的CV任务中。本教程中我们将提供一个快速上手MindCV的指南。
 
 本教程将以DenseNet分类模型为例，实现对Cifar10数据集的迁移学习，并在此流程中对MindCV各模块的用法作讲解。
 
@@ -12,7 +12,7 @@
 
 
 ```python
-# instal mindcv from git repo
+# install MindCV from git repo
 !pip install git+https://github.com/mindspore-lab/mindcv.git
 ```
 
@@ -32,9 +32,6 @@
     Successfully built mindcv
     Installing collected packages: mindcv
     Successfully installed mindcv-0.0.2a0
-    
-    [1m[[0m[34;49mnotice[0m[1;39;49m][0m[39;49m A new release of pip available: [0m[31;49m22.1.2[0m[39;49m -> [0m[32;49m22.3.1[0m
-    [1m[[0m[34;49mnotice[0m[1;39;49m][0m[39;49m To update, run: [0m[32;49mpip install --upgrade pip[0m
     
 
 > 以下教程假设依赖包均已安装，若遇到依赖问题，请按照Git repo上的[安装指南](https://github.com/mindspore-lab/mindcv#dependency)进行安装
@@ -63,11 +60,11 @@ dataset_train = create_dataset(name='cifar10', root=cifar10_dir, split='train', 
 
 [create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset)参数说明:
 
-- name: 数据集名称，如MNIST、CIFAR10、ImageNeT、“ ”表示自定义数据集。默认值：“ ”。
+- name: 数据集名称，如mnist、cifar10、imagenet、' '表示自定义数据集。默认值：' '。
 
 - dataset_dir: 包含数据集文件的根目录路径。默认：‘./’。
 
-- split: “ ”或拆分名称字符串（train/val/test），如果是“ ”，则不使用拆分。否则，它是根目录的子文件夹，例如train、val、test。默认值：“train”。
+- split: ' '或拆分名称字符串（train/val/test），如果是' '，则不使用拆分。否则，它是根目录的子文件夹，例如train、val、test。默认值：'train'。
 
 - shuffle: 是否混洗数据集。默认值：True。
 
@@ -85,7 +82,7 @@ dataset_train = create_dataset(name='cifar10', root=cifar10_dir, split='train', 
 
 
 ## 数据处理及加载
-1. 通过[create_transforms](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_transforms)函数, 可直接得到标准数据集合适的数据处理增强策略(transform list)，包括Cifar10, imagenet上常用的数据处理策略。
+1. 通过[create_transforms](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_transforms)函数, 可直接得到标准数据集合适的数据处理增强策略(transform list)，包括Cifar10, ImageNet上常用的数据处理策略。
 
 
 ```python
@@ -379,7 +376,7 @@ print(acc)
 
 ## 使用YAML文件进行模型训练和验证
 
-我们还可以直接使用设置好模型参数的yaml文件，通过`train.py`和`validate.py`脚本来快速来对模型进行训练和验证。以下是在ImageNet上训练SqueezenetV1的示例 （需要将imagenet提前下载到目录下）
+我们还可以直接使用设置好模型参数的yaml文件，通过`train.py`和`validate.py`脚本来快速来对模型进行训练和验证。以下是在[ImageNet](https://www.image-net.org/challenges/LSVRC/2012/index.php)上训练SqueezenetV1的示例 （需要将ImageNet提前下载到目录下）
 
 > 详细教程请参考 [使用yaml文件的教程](https://mindcv.readthedocs.io/en/latest/tutorials/learn_about_config.html)
 
@@ -393,10 +390,11 @@ print(acc)
 
 
 ```python
-!python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml 
+#  单卡训练
+!python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 
 ```python
-!python validate.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml --ckpt_path "your ckpt path"
+!python validate.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /path/to/dataset --ckpt_path /path/to/ckpt
 ```

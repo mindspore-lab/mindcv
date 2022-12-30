@@ -1,6 +1,6 @@
 # Quick Start
 
-In this tutorial, we will provide a quick start guideline for [mindcv](https://github.com/mindspore-lab/mindcv).
+[MindCV](https://github.com/mindspore-lab/mindcv) is an open source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pretrained weights. SoTA methods such as AutoAugment are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks. In this tutorial, we will provide a quick start guideline for MindCV.
 
 This tutorial will take DenseNet classification model as an example to implement migration training for Cifar10 dataset, and explain the usage of MindCV modules in this process.
 
@@ -11,7 +11,7 @@ This tutorial will take DenseNet classification model as an example to implement
 
 
 ```python
-# instal mindcv from git repo
+# install MindCV from git repo
 !pip install git+https://github.com/mindspore-lab/mindcv.git
 ```
 
@@ -31,9 +31,6 @@ This tutorial will take DenseNet classification model as an example to implement
     Successfully built mindcv
     Installing collected packages: mindcv
     Successfully installed mindcv-0.0.2a0
-    
-    [1m[[0m[34;49mnotice[0m[1;39;49m][0m[39;49m A new release of pip available: [0m[31;49m22.1.2[0m[39;49m -> [0m[32;49m22.3.1[0m
-    [1m[[0m[34;49mnotice[0m[1;39;49m][0m[39;49m To update, run: [0m[32;49mpip install --upgrade pip[0m
     
 
 >The following tutorials assume that all dependent packages have been installed. If you encounter dependency problems, please follow the [installation guide](https://github.com/mindspore-lab/mindcv#dependency) on Git repo. 
@@ -63,11 +60,11 @@ dataset_train = create_dataset(name='cifar10', root=cifar10_dir, split='train', 
 
 [create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset) parameters:
 
-- name: dataset name like MNIST, CIFAR10, ImageNeT, ‘’. ‘’ means a customized dataset. Default: ‘’.
+- name: dataset name like mnist, cifar10, imagenet, ' ' means a customized dataset. Default: ' '.
 
-- dataset_dir: dataset root dir. Default: ‘./’.
+- dataset_dir: dataset root dir. Default: './'.
 
-- split: data split, ‘’ or split name string (train/val/test), if it is ‘’, no split is used. Otherwise, it is a subfolder of root dir, e.g., train, val, test. Default: ‘train’.
+- split: data split, ' ' or split name string (train/val/test), if it is ' ', no split is used. Otherwise, it is a subfolder of root dir, e.g., train, val, test. Default: ‘train’.
 
 - shuffle: whether to shuffle the dataset. Default: True.
 
@@ -380,7 +377,7 @@ print(acc)
 
 ## Use YAML files for model training and validation
 
-We can also use the yaml file with the model parameters set directly to quickly train and verify the model through `train.py` and `validate.py` scripts. The following is an example of training SqueezenetV1 on ImageNet (you need to download imagenet to the directory in advance)
+We can also use the yaml file with the model parameters set directly to quickly train and verify the model through `train.py` and `validate.py` scripts. The following is an example of training SqueezenetV1 on [ImageNet](https://www.image-net.org/challenges/LSVRC/2012/index.php) (you need to download ImageNet to the directory in advance)
 
 
 > For detailed tutorials, please refer to the [tutorial](https://mindcv.readthedocs.io/en/latest/tutorials/learn_about_config.html).
@@ -395,10 +392,11 @@ We can also use the yaml file with the model parameters set directly to quickly 
 
 
 ```python
-!python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml 
+# standalone training on a CPU/GPU/Ascend device
+!python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 
 ```python
-!python validate.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml --ckpt_path "your ckpt path"
+!python validate.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /path/to/dataset --ckpt_path /path/to/ckpt
 ```

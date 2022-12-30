@@ -414,7 +414,7 @@ You can override the parameter settings in the yaml file by using parse to set p
 ```shell
 python train.py -c ./configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir ./data
 ```
-The above command overwrites the value of `args.data_dir` parameter from "./imaget2012" in yaml file to "./data".
+The above command overwrites the value of `args.data_dir` parameter from ./imaget2012 in yaml file to ./data.
 
 
 
