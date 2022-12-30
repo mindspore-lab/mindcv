@@ -16,7 +16,7 @@ The ViT is a visual model based on the architecture of a transformer originally 
   <img src="https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit.png" width=800 />  
 </p>
 <p align="center">
-  <em>Figure 1. Architecture of ViT [<a href="#references">1</a>] </em>
+  <em> Figure 1. Architecture of ViT [<a href="#references">1</a>] </em>
 </p>
 
 ## Results
@@ -67,7 +67,8 @@ It is easy to reproduce the reported results with the pre-defined training recip
 # distrubted training on multiple GPU/Ascend devices
 mpirun -n 8 python train.py --config configs/vit/vit_b32_224_ascend.yaml --data_dir /path/to/imagenet
 ```
-  
+> If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
+ 
 Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
 For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
