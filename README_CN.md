@@ -92,9 +92,10 @@ pip install -r requirements.txt
 
 之后的说明将默认用户已正确安装好相关依赖。
 
-### pip安装
+### PyPI安装
 
-MindCV的已发布版本可以通过pip安装。
+MindCV的已发布版本可以通过PyPI安装。
+
 
 ```shell
 pip install https://github.com/mindspore-lab/mindcv/releases/download/v0.0.1-beta/mindcv-0.0.1b0-py3-none-any.whl
@@ -133,7 +134,7 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 **图片分类示例**
 
 <p align="left">
-  <img src="./tutorials/data/test/dog/dog.jpg" width=360 />
+  <img src="https://user-images.githubusercontent.com/8156835/210049681-89f68b9f-eb44-44e2-b689-4d30c93c6191.jpg" width=360 />
 </p>
 
 使用加载了预训练参数的SoTA模型对一张图片进行推理。
@@ -214,6 +215,7 @@ python validate.py --model resnet50 --dataset imagenet --val_split validation --
 ```shell
 python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download --epoch_size 10  
 ```
+> `train_with_func.py`为试验性的训练脚本，待MindSpore 2.0发布后改进。
 
 更多样例请参见[examples/scripts](examples/scripts)。
 
