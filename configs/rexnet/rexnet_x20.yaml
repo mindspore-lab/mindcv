@@ -1,55 +1,54 @@
-# system config
+# system
 mode: 0
 distribute: True
 num_parallel_workers: 16
-device_target: 'Ascend'
+device_target: "Ascend"
 
-# dataset config
-dataset: 'imagenet'
-data_url: '/cache/data'
-data_dir: '/cache/data/imagenet'
+# dataset
+dataset: "imagenet"
+data_url: "/cache/data"
+data_dir: "/path/to/imagenet"
 shuffle: True
 dataset_download: False
 batch_size: 64
 drop_remainder: True
 
-
-# Augmentation config
-interpolation: 'bicubic'
+# augmentation
+interpolation: "bicubic"
 re_prob: 0.2
-auto_augment: 'randaug-m9-mstd0.5'
-re_value: 'random'
+auto_augment: "randaug-m9-mstd0.5"
+re_value: "random"
 
-# model config
-model: 'rexnet_x20'
+# model
+model: "rexnet_x20"
 num_classes: 1000
 pretrained: False
-ckpt_path: ''
+ckpt_path: ""
 keep_checkpoint_max: 10
-ckpt_save_dir: '/cache/output'
-ckpt_save_policy: 'top_k'
-val_split: 'val'
+ckpt_save_dir: "./ckpt"
+ckpt_save_policy: "top_k"
+val_split: "val"
 val_while_train: True
 val_interval: 1
 epoch_size: 400
 dataset_sink_mode: True
-amp_level: 'O2'
+amp_level: "O2"
 drop_rate: 0.2
 drop_path_rate: 0.1
 
-# loss config
-loss: 'CE'
+# loss
+loss: "CE"
 label_smoothing: 0.1
 
-# lr scheduler config
-scheduler: 'warmup_cosine_decay'
+# lr scheduler
+scheduler: "warmup_cosine_decay"
 min_lr: 1.0e-6
 lr: 0.5
 warmup_epochs: 30
 decay_epochs: 370
 
-# optimizer config
-opt: 'sgd'
+# optimizer
+opt: "sgd"
 filter_bias_and_bn: True
 momentum: 0.9
 weight_decay: 1.0e-5
