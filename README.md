@@ -197,7 +197,7 @@ It is easy to validate a trained model with `validate.py`.
 python validate.py --model=resnet50 --dataset=imagenet --val_split=validation --ckpt_path='./ckpt/densenet121-best.ckpt' 
 ``` 
 
-- Pynative mode with ms_function (Experiental)
+- Pynative mode with ms_function (Experimental)
 
 By default, the training pipeline (`train.py`) is run in [graph mode](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html), which is optimized for efficienty and speed but may not be flexible enough for debugging. You may alter the parameter `--mode` to switch to pure pynative mode for debugging purpose.
 
@@ -206,6 +206,8 @@ By default, the training pipeline (`train.py`) is run in [graph mode](https://ww
 ``` shell
 python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download  --epoch_size=10  
 ```
+>Note: `train_with_func.py` is an experimental training pipeline and is less stable than `train.py`. It will be improved after MindSpore 2.0 released.
+
 
 For more examples, see [examples/scripts](examples/scripts). 
 
