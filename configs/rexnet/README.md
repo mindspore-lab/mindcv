@@ -4,62 +4,82 @@
 
 ##  Introduction
 ***
-This is a new paradigm for network architecture design. ReXNet proposes a set of design principles to solve the Representational Bottleneck problem in the existing network. Rexnet combines these design principles with the existing network units to obtain a new network, RexNet, which achieves a great performance improvement.
-
-
-
+ReXNets is a new model achieved based on parameterization. It utilizes a new search method for a channel configuration via piece-wise linear functions of block index.  The search space contains the conventions, and an effective channel configuration that can be parameterized by a linear function of the block index is used. ReXNets outperforms the recent lightweight models including NAS-based models and further showed remarkable fine-tuning performances on COCO object detection, instance segmentation, and fine-grained classifications.
 ## Results
+
 ***
 
-| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |
-|-----------------|-----------|-------|-------|------------|-------|--------|---|--------|--------------|
-| rexnet_x09 | D910x8-G | 77.07 | 93.41    |      |   |   | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/)  | [cfg]() | [log]() |
-| rexnet_x10 | D910x8-G | 77.38 | 93.60    |       |   |   | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/)  | [cfg]() | [log]() |
-| rexnet_x13 | D910x8-G | 79.06 | 94.28 |  |   |   | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/)  | [cfg]() | [log]() |
-| rexnet_x15 | D910x8-G | 79.94 | 94.74  |   |   |   | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/)  | [cfg]() | [log]() |
-| rexnet_x20 | D910x8-G | 80.6 | 94.99  |   |   |   | [model](https://download.mindspore.cn/toolkits/mindcv/rexnet/)  | [cfg]() | [log]() |
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+<div align="center">
+
+| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Recipe |  Download |
+|-----------------|-----------|-------|-------|------------|--------|---|
+| rexnet_x09 | D910x8-G | 77.07 | 93.41    |      |[yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt)  |
+| rexnet_x10 | D910x8-G | 77.38 | 93.60    |       |[yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt)  |
+| rexnet_x13 | D910x8-G | 79.06 | 94.28 |    |[yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt)  |
+| rexnet_x15 | D910x8-G | 79.94 | 94.74  |   |[yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt)  |
+| rexnet_x20 | D910x8-G | 80.6 | 94.99  |   |[yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt)  |
+
+</div>
 
 #### Notes
-
-- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
-- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K. 
 
 
 ## Quick Start
 
 ***
 
-### Train
+### Preparation
 
-- The [yaml config files](../../configs) that yield competitive results on ImageNet for different models are listed in the `configs` folder. To trigger training using preset yaml config. 
+#### Installation
+Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
 
-  ```shell
-  python train.py --config ./config/rexnet/rexnet_x10.yaml
-  ```
+#### Dataset Preparation
+Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/2012/index.php) dataset for model training and validation.
 
+### Training
 
-- Here is the example for finetuning a pretrained rexnet x1.0 on CIFAR10 dataset using Adam optimizer.
+* Distributed Training
 
-  ```shell
-  python train.py --model=rexnet_x10 --pretrained --opt=momentum --lr=0.001 dataset=cifar10 --num_classes=10 --dataset_download
-  ```
+It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
-Detailed adjustable parameters and their default value can be seen in [config.py](../../config.py).
+```shell
+# distrubted training on multiple GPU/Ascend devices
+mpirun -n 8 python train.py --config configs/vit/vit_b32_224_ascend.yaml --data_dir /path/to/imagenet
+```
+  
+Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
-### Eval
+For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
 
-- To validate the model, you can use `validate.py`. Here is an example to verify the accuracy of pretrained weights.
+**Note:**  As the global batch size  (batch_size x num_devices) is an important hyper-parameter, it is recommended to keep the global batch size unchanged for reproduction or adjust the learning rate linearly to a new global batch size.
 
-  ```shell
-  python validate.py --model=rexnet_x10 --dataset=imagenet --val_split=val --pretrained
-  ```
+* Standalone Training
 
-- To validate the model, you can use `validate.py`. Here is an example to verify the accuracy of your training.
+If you want to train or finetune the model on a smaller dataset without distributed training, please run:
 
-  ```shell
-  python validate.py --model=rexnet_x10 --dataset=imagenet --val_split=val --ckpt_path='./rexnetx10_ckpt/rexnet-best.ckpt'
-  ```
+```shell
+# standalone training on a CPU/GPU/Ascend device
+python train.py --config configs/vit/vit_b32_224_ascend.yaml --data_dir /path/to/dataset --distribute False
+```
 
-### Deployment (optional)
+### Validation
 
-Please refer to the deployment tutorial in MindCV.
+To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
+
+```
+python validate.py -c configs/vit/vit_b32_224_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+```
+
+### Deployment
+
+To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md).
+
+## References
+
+***
+
+[1] Han D, Yun S, Heo B, et al. Rethinking channel dimensions for efficient model design[C]//Proceedings of the IEEE/CVF conference on Computer Vision and Pattern Recognition. 2021: 732-741.
