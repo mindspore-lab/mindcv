@@ -1,5 +1,7 @@
 # Image Classification Prediction
 
+[![下载Notebook](https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.8/resource/_static/logo_notebook.png)](https://download.mindspore.cn/toolkits/mindcv/tutorials/inference.ipynb)&emsp;
+
 This tutorial introduces how to call the pretraining model in MindCV to make classification prediction on the test image.
 
 ## Model Loading

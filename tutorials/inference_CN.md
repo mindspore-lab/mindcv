@@ -1,5 +1,7 @@
 # 图像分类预测
 
+[![下载Notebook](https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.8/resource/_static/logo_notebook.png)](https://download.mindspore.cn/toolkits/mindcv/tutorials/inference_CN.ipynb)&emsp;
+
 本教程介绍如何在MindCV中调用预训练模型，在测试图像上进行分类预测。
 
 ## 模型加载

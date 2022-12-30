@@ -1,5 +1,9 @@
 # Quick Start
 
+
+[![下载Notebook](https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.8/resource/_static/logo_notebook.png)](https://download.mindspore.cn/toolkits/mindcv/tutorials/quick_start.ipynb)&emsp;
+
+
 In this tutorial, we will provide a quick start guideline for [mindcv](https://github.com/mindspore-lab/mindcv).
 
 This tutorial will take DenseNet classification model as an example to implement migration training for Cifar10 dataset, and explain the usage of MindCV modules in this process.
