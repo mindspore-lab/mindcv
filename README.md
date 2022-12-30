@@ -69,7 +69,7 @@ __
 
 The performance of the models trained with MindCV is summarized in [benchmark_results.md](./benchmark_results.md), where the training recipes and weights are both available.  
 
-Detailed description and usage for each model can be seen in the [`configs`](configs) folder.
+Detailed description and usage for each model can be seen in the [configs](configs) folder.
 
 ## Installation
 
