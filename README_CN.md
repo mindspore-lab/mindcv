@@ -96,6 +96,7 @@ pip install -r requirements.txt
 
 MindCV的已发布版本可以通过PyPI安装。
 
+
 ```shell
 pip install https://github.com/mindspore-lab/mindcv/releases/download/v0.0.1-beta/mindcv-0.0.1b0-py3-none-any.whl
 ```

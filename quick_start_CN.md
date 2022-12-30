@@ -1,5 +1,7 @@
 # 快速入门
 
+[![下载Notebook](https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.8/resource/_static/logo_notebook.png)](https://download.mindspore.cn/toolkits/mindcv/tutorials/quick_start_CN.ipynb)&emsp;
+
 本教程中我们将提供一个快速上手[mindcv](https://github.com/mindspore-lab/mindcv)的指南。
 
 本教程将以DenseNet分类模型为例，实现对Cifar10数据集的迁移学习，并在此流程中对MindCV各模块的用法作讲解。

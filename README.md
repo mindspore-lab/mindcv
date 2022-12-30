@@ -92,12 +92,14 @@ MindSpore can be easily installed by following the official [instruction](https:
 The following instructions assume the desired dependency is fulfilled. 
 
 ### Install with PyPI
+
 The released version of MindCV can be installed via `PyPI` as follows:
 ```shell
 pip install mindcv
 ```
 
 ### Install from Source
+
 The latest version of MindCV can be installed as follows:
 ```shell
 pip install git+https://github.com/mindspore-lab/mindcv.git
