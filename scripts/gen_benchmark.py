@@ -4,7 +4,7 @@ import re
 import pandas as pd
 
 clear_empty_urls = True
-rm_columns = ['Infer T.', 'Log']
+rm_columns = [] #['Infer T.', 'Log']
 
 # get all training recips
 recipes = sorted(glob.glob('configs/*/*.yaml'))
@@ -46,16 +46,16 @@ fout = open(output_path, 'w')
 kw = ['Model', 'Top', 'Download', 'Config']
 
 # process table head
-head = '| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Train T. | Infer T. |  Download | Config | Log |'
+head = '|       Model    | Context  | Top-1 (%) | Top-5 (%) | Params(M) |                                                 Recipe                                                  |                                    Download                                   |'
 fout.write(head + '\n')
 
-fout.write("|----------------|------------|-------|-------|----------|-------|--------|---|-----|-----|" + '\n')
+fout.write("| -------------- | -------- | --------- | --------- | --------- | ------------------------------------------------------------------------------------------------------- |  ---------------------------------------------------------------------------- |\n")
 
 attrs = head.replace(' ','')[1:-1].split('|')
 print('table attrs: ', attrs)
 
 result_kw = ['Results', 'Benchmark', 'Result'] #TODO: unify this name
-head_detect_kw = ['Model', 'Top', 'Config']
+head_detect_kw = ['Model', 'Top']
 
 # process each model readme
 parsed_models = []
@@ -77,30 +77,20 @@ for r in readmes:
                         state =2
                     else:
                         print('Detect head, but format is incorrect:')
-                        print(line)
+                        #print(line)
 
             # get table values
             elif state==2:
                 if len(line.split('|')) == len(head.split('|')):
-                    # try to parse each attr
-                    attr_vals = line.replace(' ','')[1:-1].split('|')
-                    download, config, log = attr_vals[-4:-1]
-                    # clear empty urls
-                    if clear_empty_urls:
-                        if '.ckpt' not in download:
-                            line = line.replace(download, "")
-                        if ('.yaml' not in config) and ('.yml' not in config):
-                            line = line.replace(config, "")
-                        if '.log' not in log:
-                            line = line.replace(log, "")
                     # clear empty model
-                    if '--' not in line and re.search(r'[a-zA-Z]', attr_vals[0]):
+                    if '--' not in line:
                         results.append(line)
+                        #print(line)
                         fout.write(line)
                         parsed_model_specs.append(line.split('|')[0])
                 else:
+                    parsed_models.append(r.split('/')[-2])
                     state = 3
-                    parsed_models.append(r.split('/')[1])
 
     if state==0:
         print('Fail to get Results')
@@ -113,10 +103,9 @@ print('Parsed models in benchmark: ', len(parsed_models))
 print('Parsed model specs in benchmark: ', len(parsed_model_specs))
 print('Readme using inconsistent result table format: \r\n', set(config_dirs) - set(parsed_models))
 
+'''
 fout.close()
-
 def md_to_pd(md_fp, md_has_col_name=True, save_csv=False):
-    '''assume the first row is the header '''
     # Convert the Markdown table to a list of lists
     with open(md_fp) as f:
         rows = []
@@ -155,9 +144,10 @@ md_doc = df.to_markdown(mode='w', index=False, tablefmt='pipe')
 
 fout = open(output_path, 'w')
 fout.write(md_doc)
-
+'''
 # write notes
 fout.write('\n#### Notes\n')
-fout.write('- All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.\n- Context: device x pieces - G/F, G - graph mode, F - pynative mode with ms function, where D910 is Ascend 910 NPU.')
+
+fout.write('- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.\n- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.')
 
 fout.close()
