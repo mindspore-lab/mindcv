@@ -1,14 +1,14 @@
-Welcome to MindSpore Computer Vision's documentation!
+Welcome to MindSpore CV's documentation!
 =============================================================================================
-You can switch between Chinese and English documents in the lower-left corner of the layout.
+(You can switch between Chinese and English documents in the lower-left corner of the layout.)
 
 .. toctree::
    :maxdepth: 1
-   :caption: MindSpore Classification
+   :caption: Introduction
 
    classification/definition.md
    classification/feature.md
-   classification/display.md
+   classification/benchmark_results.md
 
 .. toctree::
    :maxdepth: 1

@@ -1,3 +1,3 @@
-# Definition and Positioning
+# What is MindCV
 
-MindSpore CV suite is an open-source toolkit for computing visual directions based on MindSpore. It is mainly used to develop image classification tasks. It contains a large number of classic and cutting-edge deep learning classification models, such as ResNet, ViT, and SwinTransformer.
+MindCV is an open source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pretrained weights. SoTA methods such as AutoAugment are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks. 
