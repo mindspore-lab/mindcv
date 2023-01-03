@@ -74,6 +74,8 @@ if not os.path.exists('./quick_start'):
     os.makedirs('./quick_start')
 shutil.copy('../../quick_start.md', './quick_start/quick_start.md')
 
+shutil.copy('../../benchmark_results.md', './classification/benchmark_results.md')
+
 os.system('cp -R %s %s'% ('../../configs', './'))
 
 # Add any paths that contain templates here, relative to this directory.
