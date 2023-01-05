@@ -31,6 +31,8 @@ def create_parser():
                        help='Running in GRAPH_MODE(0) or PYNATIVE_MODE(1) (default=0)')
     group.add_argument('--distribute', type=str2bool, nargs='?', const=True, default=False,
                        help='Run distribute (default=False)')
+    group.add_argument('--enable_modelarts', type=str2bool, nargs='?', const=True, default=False,
+                       help='Run on modelarts or OpenI cloud platform(default=False)')
     group.add_argument('--val_while_train', type=str2bool, nargs='?', const=True, default=False,
                        help='Verify accuracy while training (default=False)')
     group.add_argument('--val_interval', type=int, default=1,

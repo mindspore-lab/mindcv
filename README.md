@@ -167,9 +167,7 @@ mpirun -n 4 python train.py --distribute \
 
 Detailed parameter definitions  can be seen in `config.py` and checked by running `python train.py --help'. 
 
-
-To resume training, please specify the `--ckpt_path` and `--ckpt_save_dir` arguments. The optimizer state including the learning rate of the last stopped epoch will also be recovered. 
-
+To resume training, please set the `--ckpt_path` and `--ckpt_save_dir` arguments. The optimizer state including the learning rate of the last stopped epoch will also be recovered. 
 
 - Config and Training Strategy
 
@@ -181,6 +179,16 @@ mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet
 
 **Pre-defined Training Strategies:** You can also reuse our training recipes that achieve SoTA results on ImageNet. Please look into the [`configs`](configs) folder for details about the performance and downloading the pre-trained weights.
 
+- Train on ModelArts/OpenI Platform
+
+To run training on the [ModelArts](https://www.huaweicloud.com/intl/en-us/product/modelarts.html) or [OpenI](https://openi.pcl.ac.cn/) cloud platform:
+
+```
+1. Create a new training task on the cloud platform.
+2. Add run parameter `config` and specify the path to the yaml config file on the website UI interface.
+3. Add run parameter `enable_modelarts` and set True on the website UI interface.
+4. Fill in other blanks on the website and launch the training task.
+```
 
 ### Validation
 

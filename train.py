@@ -291,4 +291,15 @@ def train(args):
 
 if __name__ == '__main__':
     args = parse_args()
+    
+    # data sync for cloud platform if enabled
+    if args.enable_modelarts:
+        import moxing as mox
+        args.data_dir = f'/cache/{args.data_url}'
+        mox.file.copy_parallel(src_url= os.path.join(args.data_url, args.dataset) , dst_url= args.data_dir)
+    
+    # core training
     train(args)
+
+    if args.enable_modelarts:
+        mox.file.copy_parallel(src_url= args.ckpt_save_dir, dst_url=args.train_url)
