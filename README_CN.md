@@ -37,7 +37,7 @@
 ## 简介
 
 MindCV是一个基于 [MindSpore](https://www.mindspore.cn/)
-开发的，致力于计算机视觉相关技术研发的开源工具箱。它提供大量的计算机视觉领域的经典模型和SoTA模型以及它们的预训练权重。同时，还提供了AutoAugment等SoTA算法来提高性能。通过解耦的模块设计，您可以轻松地将MindCV应用到您自己的CV任务中。
+开发的，致力于计算机视觉相关技术研发的开源工具箱。它提供大量的计算机视觉领域的经典模型和SoTA模型以及它们的预训练权重和策略。同时，还提供了自动增强等SoTA算法来提高模型性能。通过解耦的模块设计，您可以轻松地将MindCV应用到您自己的CV任务中。
 
 <details open>
 <summary> 主要特性 </summary>
@@ -154,7 +154,7 @@ infer.py - -model = swin_tiny - -image_path = './tutorials/data/test/dog/dog.jpg
 
 - 单卡训练
 
-用户可以使用`train.py`便捷地进行模型训练。下面是一个示例是在CIFAR10数据集上单卡训练DenseNet（单卡GPU）。
+用户可以使用`train.py`便捷地进行模型训练。下面是一个示例是在CIFAR10数据集上单卡训练ResNet（单卡GPU）。
 
 ```shell
 python train.py --model resnet50 --dataset cifar10 --dataset_download
@@ -207,7 +207,7 @@ python validate.py --model resnet50 --dataset imagenet --val_split validation --
 
 - 使用ms_function的调试模式 (试验性)
 
-在默认情况下，训练管道（`train.py`）在[图模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html) 下运行，虽然在该模型下运行的性能极佳，但是该模式不方便进行调试。为了方便调试，用户可以使用参数`--mode`将运行模式设置为调试模式。
+在默认情况下，模型训练（`train.py`）在[图模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html) 下运行，虽然在该模式下运行的性能极佳，但是该模式不方便进行调试。为了方便调试，用户可以使用参数`--mode`将运行模式设置为调试模式。
 
 
 [使用ms_function的调试模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) 是兼顾了MindSpore的效率和灵活的混合模式。用户可通过使用`train_with_func.py`文件来使用该混合模式进行训练。
@@ -312,8 +312,8 @@ python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download 
     * Stochastic Depth (depends on networks)
     * Dropout (depends on networks)
 * 损失函数
-    * Cross Entropy (w/ class weight and auxilary logit support)
-    * Binary Cross Entropy  (w/ class weight and auxilary logit support)
+    * Cross Entropy (w/ class weight and auxiliary  logit support)
+    * Binary Cross Entropy  (w/ class weight and auxiliary  logit support)
     * Soft Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
     * Soft Binary Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
 * 融合
