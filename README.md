@@ -60,8 +60,9 @@ Users can customize and launch their transfer learning or training task in one c
 ```
 
 - **State-of-The-Art.** MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model: 
-__
-- **Flexibility and efficiency.** MindCV is built on MindSpore which is an efficent DL framework that can run on different hardware platforms (GPU/CPU/Ascend). It supports both graph mode for high efficiency and pynative mode for flexibility.
+
+- **Flexibility and efficiency.** MindCV is built on MindSpore which is an efficent DL framework that can be run on different hardware platforms (GPU/CPU/Ascend). It supports both graph mode for high efficiency and pynative mode for flexibility.
+
 	
 </details>
 	

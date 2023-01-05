@@ -1,14 +1,14 @@
 欢迎来到 MindSpore计算机视觉 的中文文档！
 =========================================
-您可以在页面左下角切换中英文文档。
+（您可以在页面左下角切换中英文文档。）
 
 .. toctree::
    :maxdepth: 1
-   :caption: MindSpore分类
+   :caption: 介绍
 
    classification/definition_CN.md
    classification/feature_CN.md
-   classification/display_CN.md
+   classification/benchmark_results_CN.md
 
 .. toctree::
    :maxdepth: 1
