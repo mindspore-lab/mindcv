@@ -5,7 +5,7 @@ num_parallel_workers: 8
 
 # dataset
 dataset: 'imagenet'
-data_dir: '/data/imagenet'
+data_dir: '/path/to/imagenet'
 shuffle: True
 dataset_download: False
 batch_size: 64
