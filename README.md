@@ -111,7 +111,7 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 
 ### Hands-on Tutorial
 
-To get started with MindCV, please see the [transfer learning tutorial](tutorials/finetune.md), which will give a quick tour on each key component and the train/validate/predict pipelines in MindCV. 
+To get started with MindCV, please see the [transfer learning tutorial](tutorials/finetune.md), which will give you a quick tour on each key component and the train/validate/predict pipelines. 
 
 Below is a few code snippets for your taste. 
 
@@ -141,19 +141,57 @@ Infer the input image with a pretrained SoTA model,
 ```
 The top-1 prediction result is labrador retriever (拉布拉多犬), which is the breed of this cut dog.
 
-### Training and Validation
-It is easy to train your model on standard datasets or your own dataset with MindCV. Model training, transfer learning, or evaluaiton can be done using one or a few line of code with flexible configuration. 
+### Training
 
-- Standalone Training
+It is easy to train your model on a standard or customized dataset using `train.py`, where the training strategy (e.g., augmentation, LR scheduling) can be configured with external arguments or a yaml config file.
 
-It is easy to do model training with `train.py`. Here is an example for training a DenseNet on CIFAR10 dataset using one computing device (i.e., standalone GPU).
 ``` shell
+# standalone training 
 python train.py --model=resnet50 --dataset=cifar10 --dataset_download
 ```
 
-For more parameter description, please run `python train.py --help'. You can define change model, optimizer, and other hyper-parameters easily.
+Above is an example for training ResNet50 on CIFAR10 dataset on a CPU/GPU/Ascend device 
 
-**Validation while training.** To track the validation accuracy change during traing, please enable `--val_while_train`, for example
+- Distributed Training
+
+For large datasets like ImageNet, it is necessary to do training in distributed mode on multiple devices. The following script is an example for training DenseNet121 on ImageNet with 4 GPUs.   
+
+```shell
+export CUDA_VISIBLE_DEVICES=0,1,2,3  # 4 GPUs
+mpirun -n 4 python train.py --distribute \
+	--model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet   
+```
+> If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
+
+Detailed parameter defintion can be seen in `config.py` and checked by running `python train.py --help'. 
+
+
+To resume training, please specify the `--ckpt_path` and `--ckpt_save_dir` argument. The optimizer state including learning rate of the last epoch will also be recovered. 
+
+
+- Training Strategy 
+
+You can configure your model and other components either by specifying external parameters or by using a yaml config file. Here is an example for training using a preset yaml file.
+
+```shell
+mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
+```
+
+**Pre-defined Training Strategies: ** More than 20 training recipes that achieve SoTA results are provided! Please look into the [`configs`](configs) folder for details and accessing the pretrained weights.
+
+
+### Validation
+
+Please run `validate.py` to evalute the model performance, 
+
+```python
+# validate a trained checkpoint
+python validate.py --model=resnet50 --dataset=imagenet --val_split=validation --ckpt_path='./ckpt/densenet121-best.ckpt' 
+``` 
+
+- Validation while Training 
+
+You may track the validation accuracy during traing by enabling the `--val_while_train` option, e.g.,
 
 ```python
 python train.py --model=resnet50 --dataset=cifar10 \
@@ -162,55 +200,21 @@ python train.py --model=resnet50 --dataset=cifar10 \
 
 The training loss and validation accuracy for each epoch  will be saved in `{ckpt_save_dir}/results.log`.
 
-**Resume training.** To resume training, please specify `--ckpt_path` for the checkpoint where you want to resume and `--ckpt_save_dir`. The optimizer state including learning rate of the last epoch will also be recovered. 
 
-```python
-python train.py --model=resnet50 --dataset=cifar10 \
-		--ckpt_save_dir=checkpoints --ckpt_path=checkpoints/resnet50_30-100.ckpt
-``` 
-
-- Distributed Training
-
-For large datasets like ImageNet, it is necessary to do training in distributed mode on multiple devices, which is well supported in MindCV. The following script is an example for training DenseNet121 on ImageNet with 4 GPUs.   
-
-```shell
-export CUDA_VISIBLE_DEVICES=0,1,2,3  # suppose there are 4 GPUs
-mpirun --allow-run-as-root -n 4 python train.py --distribute \
-	--model=densenet121 --dataset=imagenet --data_dir=./datasets/imagenet   
-```
-
-- Configuration with Yaml
-
-You can configure your model and other components either by specifying external parameters or by using a yaml config file. Here is an example for training using a preset yaml file.
-
-```shell
-mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
-```
-
-Well-defined config files for training SoTA models can be seen in the [`configs`](configs) folder, along with their performance reported on ImageNet dataset.
+More examples can be seen in [examples/scripts](examples/scripts). 
 
 
-- Validation
+- Graph mode and Pynative mode 
 
-It is easy to validate a trained model with `validate.py`. 
-```python
-# validate a trained checkpoint
-python validate.py --model=resnet50 --dataset=imagenet --val_split=validation --ckpt_path='./ckpt/densenet121-best.ckpt' 
-``` 
+By default, the training pipeline (`train.py`) is run in [graph mode](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html), which is optimized for efficiency and parallel computing with a compiled static graph. In contrast, [pynative mode] is optimized for flexibility and easy debugging. You may alter the parameter `--mode` to switch to pure pynative mode for debugging purpose.
 
-- Pynative mode with ms_function (Experimental)
-
-By default, the training pipeline (`train.py`) is run in [graph mode](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html), which is optimized for efficienty and speed but may not be flexible enough for debugging. You may alter the parameter `--mode` to switch to pure pynative mode for debugging purpose.
-
-[Pynative mode with ms_function ](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) is a mixed mode for comprising flexibity and efficiency in MindSpore. To switch to pynative mode with ms_function, please use `train_with_func.py` instead, for example:
+[Pynative mode with ms_function ](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) is a mixed mode for comprising flexibity and efficiency in MindSpore. To apply pynative mode with ms_function for training, please run `train_with_func.py`, e.g.,
 
 ``` shell
 python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download  --epoch_size=10  
 ```
->Note: `train_with_func.py` is an experimental training pipeline and is less stable than `train.py`. It will be improved after MindSpore 2.0 released.
+>Note: `train_with_func.py` is still under improvement and experimenal. It is not stable on MindSpore 1.8.1 or earlier versions.
 
-
-For more examples, see [examples/scripts](examples/scripts). 
 
 ## Tutorials
 We provide the following jupyter notebook tutorials to help users learn to use MindCV. 
