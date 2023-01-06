@@ -151,12 +151,14 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 
 通过`train.py`，用户可以很容易地在标准数据集或自定义数据集上训练模型，用户可以通过外部变量或者yaml配文件来设置训练策略（如数据增强、学习路策略）。
 
+- 单卡训练
+
 ```shell
 # 单卡训练
 python train.py --model resnet50 --dataset cifar10 --dataset_download
 ```
 
-以上代码是在CIFAR10数据集上单卡（CPU/GPU/Ascend）训练ResNet的示例。
+以上代码是在CIFAR10数据集上单卡（CPU/GPU/Ascend）训练ResNet的示例，通过`model`和`dataset`参数分别指定需要训练的模型和数据集。
 
 - 分布式训练
 
@@ -169,7 +171,7 @@ mpirun --allow-run-as-root -n 4 python train.py --distribute \
 	--model densenet121 --dataset imagenet --data_dir ./datasets/imagenet   
 ```
 
-具体参数说明，请查看`config.py`或运行`python train.py --help`进行查看。
+完整的参数列表及说明在`config.py`中定义，可运行`python train.py --help`快速查看。
 
 如需恢复训练，请指定`--ckpt_path`和`--ckpt_save_dir`参数，脚本将加载路径中的模型权重和优化器状态，并恢复中断的训练进程。
 
