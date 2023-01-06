@@ -43,7 +43,7 @@ min_lr: 0.0
 lr: 0.1
 warmup_epochs: 5
 warmup_factor: 0.01
-decay_epochs: 95
+decay_epochs: 195
 lr_epoch_stair: True
 
 # optimizer
