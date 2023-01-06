@@ -1,0 +1,55 @@
+# system
+mode: 0
+distribute: True
+num_parallel_workers: 8
+val_while_train: True
+
+# dataset
+dataset: 'imagenet'
+data_dir: '/path/to/imagenet'
+shuffle: True
+dataset_download: False
+batch_size: 32
+drop_remainder: True
+
+# augmentation
+image_resize: 299
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+interpolation: 'bilinear'
+auto_augment: 'autoaug'
+re_prob: 0.25
+crop_pct: 0.875
+
+# model
+model: 'inception_v3'
+num_classes: 1000
+pretrained: False
+ckpt_path: ''
+keep_checkpoint_max: 10
+ckpt_save_dir: './ckpt'
+epoch_size: 200
+dataset_sink_mode: True
+amp_level: 'O0'
+aux_factor: 0.1
+
+# loss config
+loss: 'CE'
+label_smoothing: 0.1
+smooth_factor: 0.1
+
+# lr scheduler
+scheduler: 'warmup_cosine_decay'
+lr: 0.045
+min_lr: 0.0
+decay_epochs: 195
+warmup_epochs: 5
+
+# optimizer
+opt: 'momentum'
+filter_bias_and_bn: True
+momentum: 0.9
+weight_decay: 0.00004
+loss_scale: 1024
+use_nesterov: False
