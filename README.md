@@ -105,8 +105,7 @@ The latest version of MindCV can be installed as follows:
 pip install git+https://github.com/mindspore-lab/mindcv.git
 ```
 
-#### Notes: 
-* MindCV can be installed on Linux and Mac but not on Windows currently.
+> Notes: MindCV can be installed on Linux and Mac but not on Windows currently.
 
 ## Get Started 
 
@@ -146,6 +145,8 @@ The top-1 prediction result is labrador retriever (拉布拉多犬), which is th
 
 It is easy to train your model on a standard or customized dataset using `train.py`, where the training strategy (e.g., augmentation, LR scheduling) can be configured with external arguments or a yaml config file.
 
+- Standalone Training
+
 ``` shell
 # standalone training 
 python train.py --model=resnet50 --dataset=cifar10 --dataset_download
@@ -163,7 +164,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3  # 4 GPUs
 mpirun -n 4 python train.py --distribute \
 	--model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet   
 ```
-> If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
+> Notes: If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
 
 Detailed parameter definitions  can be seen in `config.py` and checked by running `python train.py --help'. 
 
@@ -183,7 +184,7 @@ mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet
 
 To run training on the [ModelArts](https://www.huaweicloud.com/intl/en-us/product/modelarts.html) or [OpenI](https://openi.pcl.ac.cn/) cloud platform:
 
-```
+```text
 1. Create a new training task on the cloud platform.
 2. Add run parameter `config` and specify the path to the yaml config file on the website UI interface.
 3. Add run parameter `enable_modelarts` and set True on the website UI interface.
@@ -201,7 +202,7 @@ python validate.py --model=resnet50 --dataset=imagenet --val_split=validation --
 
 - Validation while Training 
 
-You can also track the validation accuracy during training by enabling the `--val_while_train` option, e.g.,
+You can also track the validation accuracy during training by enabling the `--val_while_train` option.
 
 ```python
 python train.py --model=resnet50 --dataset=cifar10 \
