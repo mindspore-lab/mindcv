@@ -171,13 +171,13 @@ To resume training, please set the `--ckpt_path` and `--ckpt_save_dir` arguments
 
 - Config and Training Strategy
 
-You can configure your model and other components either by specifying external parameters or by using a yaml config file. Here is an example of training using a preset yaml file.
+You can configure your model and other components either by specifying external parameters or by writing a yaml config file. Here is an example of training using a preset yaml file.
 
 ```shell
 mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
 
-**Pre-defined Training Strategies:** You can also reuse our training recipes that achieve SoTA results on ImageNet. Please look into the [`configs`](configs) folder for details about the performance and downloading the pre-trained weights.
+**Pre-defined Training Strategies:** We provide more than 20 training recipes that achieve SoTA results on ImageNet currently. Please look into the [`configs`](configs) folder for details. Please feel free to adapt these training strategies to your own model for model improvement， which can be easily done by modifying the yaml file. 
 
 - Train on ModelArts/OpenI Platform
 
