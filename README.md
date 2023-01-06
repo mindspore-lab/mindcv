@@ -105,8 +105,7 @@ The latest version of MindCV can be installed as follows:
 pip install git+https://github.com/mindspore-lab/mindcv.git
 ```
 
-#### Notes: 
-* MindCV can be installed on Linux and Mac but not on Windows currently.
+> Notes: MindCV can be installed on Linux and Mac but not on Windows currently.
 
 ## Get Started 
 
@@ -146,6 +145,8 @@ The top-1 prediction result is labrador retriever (拉布拉多犬), which is th
 
 It is easy to train your model on a standard or customized dataset using `train.py`, where the training strategy (e.g., augmentation, LR scheduling) can be configured with external arguments or a yaml config file.
 
+- Standalone Training
+
 ``` shell
 # standalone training 
 python train.py --model=resnet50 --dataset=cifar10 --dataset_download
@@ -163,7 +164,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3  # 4 GPUs
 mpirun -n 4 python train.py --distribute \
 	--model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet   
 ```
-> If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
+> Notes: If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
 
 Detailed parameter definitions  can be seen in `config.py` and checked by running `python train.py --help'. 
 
@@ -171,19 +172,19 @@ To resume training, please set the `--ckpt_path` and `--ckpt_save_dir` arguments
 
 - Config and Training Strategy
 
-You can configure your model and other components either by specifying external parameters or by using a yaml config file. Here is an example of training using a preset yaml file.
+You can configure your model and other components either by specifying external parameters or by writing a yaml config file. Here is an example of training using a preset yaml file.
 
 ```shell
 mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
 
-**Pre-defined Training Strategies:** You can also reuse our training recipes that achieve SoTA results on ImageNet. Please look into the [`configs`](configs) folder for details about the performance and downloading the pre-trained weights.
+**Pre-defined Training Strategies:** We provide more than 20 training recipes that achieve SoTA results on ImageNet currently. Please look into the [`configs`](configs) folder for details. Please feel free to adapt these training strategies to your own model for performance improvement， which can be easily done by modifying the yaml file. 
 
 - Train on ModelArts/OpenI Platform
 
 To run training on the [ModelArts](https://www.huaweicloud.com/intl/en-us/product/modelarts.html) or [OpenI](https://openi.pcl.ac.cn/) cloud platform:
 
-```
+```text
 1. Create a new training task on the cloud platform.
 2. Add run parameter `config` and specify the path to the yaml config file on the website UI interface.
 3. Add run parameter `enable_modelarts` and set True on the website UI interface.
@@ -201,7 +202,7 @@ python validate.py --model=resnet50 --dataset=imagenet --val_split=validation --
 
 - Validation while Training 
 
-You can also track the validation accuracy during training by enabling the `--val_while_train` option, e.g.,
+You can also track the validation accuracy during training by enabling the `--val_while_train` option.
 
 ```python
 python train.py --model=resnet50 --dataset=cifar10 \
