@@ -291,7 +291,7 @@ python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download 
     * Mixup
     * RandomResizeCrop
     * Color Jitter, Flip, etc
-* 优化率
+* 优化器
     * Adam
     * Adamw
     * Adan (experimental)
@@ -301,7 +301,7 @@ python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download 
     * RMSProp
     * SGD
     * NAdam
-* 学习率策略
+* 学习率调度器
     * Warmup Cosine Decay
     * Step LR
     * Polynomial Decay
@@ -316,7 +316,7 @@ python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download 
     * Binary Cross Entropy  (w/ class weight and auxiliary  logit support)
     * Soft Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
     * Soft Binary Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
-* 融合
+* 模型融合
     * Warmup EMA (Exponential Moving Average)
 
 </details>
