@@ -42,32 +42,32 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/)
 <details open>
 <summary> 主要特性 </summary>
 
-- **高易用性** MindCV将视觉框架分解为各种可配置组件，方便您使用MindCV定制您的数据管道、模型和学习管道。
+- **高易用性** MindCV将视觉任务分解为各种可配置的组件，用户可以轻松地构建自己的数据处理和模型训练流程。
 
 ```python
 >>> import mindcv
-# 创建一个数据集
+# 创建数据集
 >>> dataset = mindcv.create_dataset('cifar10', download=True)
-# 创建一个模型
+# 创建模型
 >>> network = mindcv.create_model('resnet50', pretrained=True)
 ```
 
-用户可以在一个命令行中自定义和启动他们的迁移学习或训练任务。
+用户可通过预定义的训练和微调脚本，快速配置并完成训练或迁移学习任务。
 
 ```shell
-# 仅使用一个命令行即可启动迁移学习任务
-python train.py --model swin_tiny --pretrained --opt adamw --lr 0.001 --data_dir = {data_dir} 
+# 配置和启动迁移学习任务
+python train.py --model swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir=/path/to/dataset
 ```
 
-- **业内最佳** MindCV提供了大量包括SwinTransformer在内的基于CNN和基于Transformer结构的视觉模型。同时，还提供了它们的预训练权重以及性能测试报告，帮助用户正确地选择和使用他们所需要的模型。
+- **高性能** MindCV集成了大量基于CNN和和Transformer的高性能模型, 如SwinTransformer，并提供预训练权重、训练策略和性能报告，帮助用户快速选型并将其应用于视觉模型。
 
-- **灵活高效** MindCV是基于新一代高效的深度学习框架MindSpore编写的，可以运行在多种硬件平台上（CPU/GPU/Ascend），还同时支持高效的图模式和灵活的调试模式。
+- **灵活高效** MindCV基于高效的深度学习框架MindSpore开发，具有自动并行和自动微分等特性，支持不同硬件平台上（CPU/GPU/Ascend），同时支持效率优化的静态图模式和调试灵活的动态图模式。
 
 </details>
 
 ### 性能结果
 
-基于MindCV进行模型实现和重训练的汇总结果详见[benchmark_results.md](./benchmark_results.md), 所用到的训练策略和训练后的模型权重均可通过表中获取。
+基于MindCV进行模型实现和重训练的汇总结果详见[benchmark_results.md](./benchmark_results.md), 所用到的训练策略和训练后的模型权重均可通过表中链接获取。
 
 各模型讲解和训练说明详见[configs](configs)目录。  
 
@@ -113,11 +113,11 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 
 ## 快速入门
 
-### 动手教程
+### 上手教程
 
 在开始上手MindCV前，可以阅读MindCV的[迁移学习教程](tutorials/finetune_CN.md)，该教程可以帮助用户快速了解MindCV的各个重要组件以及训练、验证、测试流程。
 
-以下是一些供您练习的代码片段。
+以下是一些供您快速体验的代码样例。
 
 ```python
 >>> import mindcv
@@ -148,45 +148,35 @@ infer.py - -model = swin_tiny - -image_path = './tutorials/data/test/dog/dog.jpg
 
 预测结果排名前1的是拉布拉多犬，正是这张图片里的狗狗的品种。
 
-### 训练和验证
+### 模型训练
 
-使用MindCV，用户可以很容易地在标准数据集或自定义数据集上训练模型。仅几行代码就可以完成模型训练、迁移学习、模型验证等任务。
-
-- 单卡训练
-
-用户可以使用`train.py`便捷地进行模型训练。下面是一个示例是在CIFAR10数据集上单卡训练ResNet（单卡GPU）。
+用户使用`train.py`训练脚本便捷地进行模型训练任务，具体的数据流程、模型结构、训练策略均可通过外部参数或Yaml文件来定义。
 
 ```shell
+# 单卡训练
 python train.py --model resnet50 --dataset cifar10 --dataset_download
 ```
 
-更多参数说明，请运行`python train.py --help'。用户可以便捷地修改模型名称，优化器等其他超参。
+如上所示，为在CIFAR10数据集上训练ResNet50的示例（单卡，支持GPU/NPU/CPU）。
 
-**训练过程中进行验证** 要跟踪训练期间验证精度的变化，请启用参数`--val_while_train`。
-
-```shell
-python train.py -model resnet50 -dataset cifar10 -val_while_train -val_split test -val_interval 1
-``` 
-
-每个轮次的训练损失和验证精度将保存在`{ckpt_save_dir}/results.log`中。
-
-**恢复训练** 要恢复训练，需要为恢复的指定检查点`--ckpt_path`和`--ckpt_save_dir`。包括上一轮次的学习率在内的优化器状态也将被恢复。
-
-```shell
-python train.py --model resnet50 --dataset cifar10 --ckpt_save_dir checkpoints --ckpt_path checkpoints/resnet50_30-100.ckpt
-``` 
 
 - 分布式训练
 
-对于像ImageNet这样的大型数据集，有必要在多个设备上以分布式模式进行训练，MindCV对分布式相关功能支持良好。以下脚本是在ImageNet上使用4个GPU训练DenseNet121的示例。
+对于像ImageNet这样的大型数据集，往往需要在多个设备上以分布式模式进行训练，MindCV对分布式相关功能支持良好。以下脚本是在ImageNet上使用4个GPU训练DenseNet121的示例。
 
 ```shell
+# 分布式训练
 export CUDA_VISIBLE_DEVICES=0,1,2,3  # suppose there are 4 GPUs
 mpirun --allow-run-as-root -n 4 python train.py --distribute \
 	--model densenet121 --dataset imagenet --data_dir ./datasets/imagenet   
 ```
 
-- Yaml文件设置
+具体参数说明，请运行`python train.py --help'进行查看。
+
+如需恢复训练，请指定`--ckpt_path`和`--ckpt_save_dir`参数，脚本将加载路径中的模型权重和优化器状态，并恢复中断的训练进程。
+
+
+- 配置方式和预训练策略
 
 用户可以使用yaml文件或设置外部参数来指定要使用的模型等其他组件。以下是使用预设的yaml文件进行训练的示例。
 
@@ -194,16 +184,29 @@ mpirun --allow-run-as-root -n 4 python train.py --distribute \
 mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
 ```
 
-模型训练用到的参数配置和详细精度性能汇请见[`configs`](configs)文件夹。
+**预定义的训练策略** MindCV目前提前了超过20种模型训练策略，在ImageNet取得SoTA性能。具体的参数配置和详细精度性能汇总请见[`configs`](configs)文件夹。您可以便捷将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）
 
-- 验证
+
+
+### 模型验证
 
 使用`validate.py`可以便捷地验证训练好的模型。
 
 ```shell
-# 验证模型的预训练参数
+# 验证模型
 python validate.py --model resnet50 --dataset imagenet --val_split validation --ckpt_path './ckpt/densenet121-best.ckpt' 
 ``` 
+
+- 训练过程中进行验证
+
+当需要在训练过程中，跟踪模型在测试集上精度的变化时，请启用参数`--val_while_train`，如下
+
+```shell
+python train.py -model resnet50 -dataset cifar10 -val_while_train -val_split test -val_interval 1
+``` 
+
+各轮次的训练损失和测试精度将保存在`{ckpt_save_dir}/results.log`中。
+
 
 - 使用ms_function的调试模式 (试验性)
 
@@ -232,7 +235,7 @@ python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download 
 
 ## 模型列表
 
-目前，MindCV支持以下列出的模型族。更多包含预训练权重的模型正在开发中，将于近期发布。
+目前，MindCV支持以下模型。
 
 <details open>
 <summary> 支持模型 </summary>
@@ -273,14 +276,16 @@ python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download 
 * Vision Transformer (ViT) - https://arxiv.org/abs/2010.11929
 * Xception - https://arxiv.org/abs/1610.02357
 
-更多关于模型性能和预训练权重的信息请查看 [configs](./configs) 文件夹。
+关于模型性能和预训练权重的信息请查看 [configs](./configs) 文件夹。
+	
+我们将持续加入更多SoTA模型及其训练策略，敬请关注。
 
 </details>
 
 ## 支持算法
 
 <details open>
-<summary> 支持算法 </summary>
+<summary> 支持算法列表 </summary>
 
 * 数据增强
     * [AutoAugment](https://arxiv.org/abs/1805.09501)
