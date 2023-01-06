@@ -23,7 +23,7 @@ def create_parser():
                                help='YAML config file specifying default arguments (default='')')
 
     # The main parser. It inherits the --config argument for better help information.
-    parser = argparse.ArgumentParser(description='PyTorch ImageNet Training', parents=[parser_config])
+    parser = argparse.ArgumentParser(description='ImageNet Training', parents=[parser_config])
 
     # System parameters
     group = parser.add_argument_group('System parameters')
