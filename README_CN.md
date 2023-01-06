@@ -37,7 +37,7 @@
 ## 简介
 
 MindCV是一个基于 [MindSpore](https://www.mindspore.cn/)
-开发的，致力于计算机视觉相关技术研发的开源工具箱。它提供大量的计算机视觉领域的经典模型和SoTA模型以及它们的预训练权重和策略。同时，还提供了自动增强等SoTA算法来提高模型性能。通过解耦的模块设计，您可以轻松地将MindCV应用到您自己的CV任务中。
+开发的，致力于计算机视觉相关技术研发的开源工具箱。它提供大量的计算机视觉领域的经典模型和SoTA模型以及它们的预训练权重和训练策略。同时，还提供了自动增强等SoTA算法来提高模型性能。通过解耦的模块设计，您可以轻松地将MindCV应用到您自己的CV任务中。
 
 <details open>
 <summary> 主要特性 </summary>
@@ -67,6 +67,7 @@ python train.py --model swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir
 
 ### 性能结果
 
+
 基于MindCV进行模型实现和重训练的汇总结果详见[benchmark_results.md](./benchmark_results.md), 所用到的训练策略和训练后的模型权重均可通过表中链接获取。
 
 各模型讲解和训练说明详见[configs](configs)目录。  
@@ -80,7 +81,7 @@ python train.py --model swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir
 - numpy >= 1.17.0
 - pyyaml >= 5.3
 - tqdm
-- openmpi 4.0.3 (for distributed mode)
+- openmpi 4.0.3 (分布式模式需要使用)
 
 运行以下脚本，安装相关依赖。
 
@@ -88,7 +89,7 @@ python train.py --model swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir
 pip install -r requirements.txt
 ```
 
-用户可遵从[官方指导](https://www.mindspore.cn/install) 并根据自身使用的硬件平台选择最适合您的MindSpore版本来进行安装。如果需要在在分布式条件下使用，还需安装[openmpi](https://www.open-mpi.org/software/ompi/v4.0/) 。
+用户可遵从[官方指导](https://www.mindspore.cn/install) 并根据自身使用的硬件平台选择最适合您的MindSpore版本来进行安装。如果需要在分布式条件下使用，还需安装[openmpi](https://www.open-mpi.org/software/ompi/v4.0/) 。
 
 之后的说明将默认用户已正确安装好相关依赖。
 
@@ -96,9 +97,8 @@ pip install -r requirements.txt
 
 MindCV的已发布版本可以通过PyPI安装。
 
-
 ```shell
-pip install https://github.com/mindspore-lab/mindcv/releases/download/v0.0.1-beta/mindcv-0.0.1b0-py3-none-any.whl
+pip install mindcv
 ```
 
 ### 源码安装
@@ -121,7 +121,7 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 
 ```python
 >>> import mindcv
-# List and find a pretrained vision model 列出满足条件的预训练模型名称
+# 列出满足条件的预训练模型名称
 >>> mindcv.list_models("swin*", pretrained=True)
 ['swin_tiny']
 # 创建模型
@@ -140,8 +140,7 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 使用加载了预训练参数的SoTA模型对一张图片进行推理。
 
 ```python
->>> !python
-infer.py - -model = swin_tiny - -image_path = './tutorials/data/test/dog/dog.jpg'
+>>> !python infer.py - -model = swin_tiny - -image_path = './tutorials/data/test/dog/dog.jpg'
 {'Labrador retriever': 0.5700152, 'golden retriever': 0.034551315, 'kelpie': 0.010108651,
  'Chesapeake Bay retriever': 0.008229004, 'Walker hound, Walker foxhound': 0.007791956}
 ```
@@ -150,19 +149,18 @@ infer.py - -model = swin_tiny - -image_path = './tutorials/data/test/dog/dog.jpg
 
 ### 模型训练
 
-用户使用`train.py`训练脚本便捷地进行模型训练任务，具体的数据流程、模型结构、训练策略均可通过外部参数或Yaml文件来定义。
+通过`train.py`，用户可以很容易地在标准数据集或自定义数据集上训练模型，用户可以通过外部变量或者yaml配文件来设置训练策略（如数据增强、学习路策略）。
 
 ```shell
 # 单卡训练
 python train.py --model resnet50 --dataset cifar10 --dataset_download
 ```
 
-如上所示，为在CIFAR10数据集上训练ResNet50的示例（单卡，支持GPU/NPU/CPU）。
-
+以上代码是在CIFAR10数据集上单卡（CPU/GPU/Ascend）训练ResNet的示例。
 
 - 分布式训练
 
-对于像ImageNet这样的大型数据集，往往需要在多个设备上以分布式模式进行训练，MindCV对分布式相关功能支持良好。以下脚本是在ImageNet上使用4个GPU训练DenseNet121的示例。
+对于像ImageNet这样的大型数据集，有必要在多个设备上以分布式模式进行训练。基于MindSpore对分布式相关功能的良好支持，用户可以使用`mpirun`来进行模型的分布式训练。
 
 ```shell
 # 分布式训练
@@ -171,14 +169,15 @@ mpirun --allow-run-as-root -n 4 python train.py --distribute \
 	--model densenet121 --dataset imagenet --data_dir ./datasets/imagenet   
 ```
 
-具体参数说明，请运行`python train.py --help'进行查看。
+具体参数说明，请查看`config.py`或运行`python train.py --help`进行查看。
 
 如需恢复训练，请指定`--ckpt_path`和`--ckpt_save_dir`参数，脚本将加载路径中的模型权重和优化器状态，并恢复中断的训练进程。
 
 
-- 配置方式和预训练策略
+- 超参配置和预训练策略
 
-用户可以使用yaml文件或设置外部参数来指定要使用的模型等其他组件。以下是使用预设的yaml文件进行训练的示例。
+
+您可以编写yaml文件或设置外部参数来指定配置数据、模型、优化器等组件及其超参。以下是使用预设的训练策略（yaml文件）进行模型训练的示例。
 
 ```shell
 mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
@@ -187,6 +186,16 @@ mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet
 **预定义的训练策略** MindCV目前提前了超过20种模型训练策略，在ImageNet取得SoTA性能。具体的参数配置和详细精度性能汇总请见[`configs`](configs)文件夹。您可以便捷将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）
 
 
+- 在ModelArts/OpenI平台上训练
+
+在[ModelArts](https://www.huaweicloud.com/intl/en-us/product/modelarts.html)或[OpenI](https://openi.pcl.ac.cn/)云平台上进行训练，需要执行以下操作，：
+
+```
+1、在云平台上创建新的训练任务。
+2、在网站UI界面添加运行参数`config`，并指定yaml配置文件的路径。
+3、在网站UI界面添加运行参数`enable_modelarts`并设置为True。
+4、在网站上填写其他训练信息并启动培训任务。
+```
 
 ### 模型验证
 
@@ -208,19 +217,18 @@ python train.py -model resnet50 -dataset cifar10 -val_while_train -val_split tes
 各轮次的训练损失和测试精度将保存在`{ckpt_save_dir}/results.log`中。
 
 
-- 使用ms_function的调试模式 (试验性)
+- 静态图和动态图模式
 
-在默认情况下，模型训练（`train.py`）在[图模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html) 下运行，虽然在该模式下运行的性能极佳，但是该模式不方便进行调试。为了方便调试，用户可以使用参数`--mode`将运行模式设置为调试模式。
+在默认情况下，模型训练（`train.py`）在MindSpore上以[图模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html) 运行，该模式对使用静态图编译对性能和并行计算进行了优化。相比之下，[pynative模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html#%E5%8A%A8%E6%80%81%E5%9B%BE)的优势在于灵活性和易于调试。
+为了方便调试，您可以将参数`--mode`设为1以将运行模式设置为调试模式。
 
-
-[使用ms_function的调试模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) 是兼顾了MindSpore的效率和灵活的混合模式。用户可通过使用`train_with_func.py`文件来使用该混合模式进行训练。
+[基于ms_function的混合模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) 是兼顾了MindSpore的效率和灵活的混合模式。用户可通过使用`train_with_func.py`文件来使用该混合模式进行训练。
 
 ```shell
-python train_with_func.py --model resnet50 --dataset cifar10 --dataset_download --epoch_size 10  
+python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download --epoch_size=10  
 ```
-> `train_with_func.py`为试验性的训练脚本，待MindSpore 2.0发布后改进。
 
-更多样例请参见[examples/scripts](examples/scripts)。
+> 注：此为试验性质的训练脚本，仍在改进，在1.8.1或更早版本的MindSpore上使用此模式目前并不稳定。
 
 ## 教程
 
