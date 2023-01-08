@@ -31,8 +31,6 @@ def create_parser():
                        help='Running in GRAPH_MODE(0) or PYNATIVE_MODE(1) (default=0)')
     group.add_argument('--distribute', type=str2bool, nargs='?', const=True, default=False,
                        help='Run distribute (default=False)')
-    group.add_argument('--enable_modelarts', type=str2bool, nargs='?', const=True, default=False,
-                       help='Run on modelarts or OpenI cloud platform(default=False)')
     group.add_argument('--val_while_train', type=str2bool, nargs='?', const=True, default=False,
                        help='Verify accuracy while training (default=False)')
     group.add_argument('--val_interval', type=int, default=1,
@@ -202,6 +200,23 @@ def create_parser():
                        help='Aux loss factor (default=0.0)')
     group.add_argument('--reduction', type=str, default='mean',
                        help='Type of reduction to be applied to loss (default="mean")')
+
+    # modelarts
+    group = parser.add_argument_group('modelarts')
+    group.add_argument('--enable_modelarts', type=str2bool, nargs='?', const=True, default=False,
+                       help='Run on modelarts platform (default=False)')
+    group.add_argument('--device_target', type=str, default='Ascend')
+    group.add_argument('--multi_data_url',
+                       help='path to multi dataset',
+                       default= '/cache/data/')
+    group.add_argument('--data_url',
+                       help='path to dataset',
+                       default= '/cache/data/')
+    group.add_argument('--ckpt_url', help='pre_train_model path in obs')
+    group.add_argument('--train_url',
+                       help='model folder to save/load',
+                       default= '/cache/output/')
+
 
     return parser_config, parser
 
