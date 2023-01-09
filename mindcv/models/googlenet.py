@@ -28,7 +28,7 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'googlenet': _cfg(url='')
+    'googlenet': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/googlenet/googlenet_224.ckpt')
 }
 
 

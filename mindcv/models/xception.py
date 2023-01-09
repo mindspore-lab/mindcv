@@ -26,7 +26,7 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'xception': _cfg(url='')
+    'xception': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/xception/xception_299.ckpt')
 }
 
 
