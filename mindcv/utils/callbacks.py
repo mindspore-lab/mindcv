@@ -6,7 +6,7 @@ import numpy as np
 
 import mindspore as ms
 from mindspore import log as logger
-from mindspore import Tensor, save_checkpoint, SummaryRecord
+from mindspore import Tensor, ops, Model, save_checkpoint, SummaryRecord, ParameterTuple, load_param_into_net
 from mindspore.train.callback import Callback
 from mindspore.train._utils import _make_directory
 
@@ -19,7 +19,9 @@ class StateMonitor(Callback):
     best checkpoint file with highest validation accuracy.
     """
     def __init__(self,
-                 model,
+                 network,
+                 loss_fn=None,
+                 metrics=None,
                  summary_dir="./",
                  dataset_val=None,
                  val_interval=1,
@@ -35,10 +37,14 @@ class StateMonitor(Callback):
                  model_name='',
                  last_epoch=0,
                  keep_checkpoint_max=10,
-                 ckpt_save_policy=None
+                 ckpt_save_policy=None,
+                 use_ema=False
                  ):
         super().__init__()
-        self.model = model
+        self.network = network
+        self.loss_fn = loss_fn
+        self.metrics = metrics
+        self.model = Model(self.network, loss_fn=self.loss_fn, metrics=self.metrics)
         self.dataset_val = dataset_val
         self.val_start_epoch = val_start_epoch
         self.save_best_ckpt = save_best_ckpt
@@ -82,6 +88,11 @@ class StateMonitor(Callback):
 
         self.start = time()
         self.epoch_start = time()
+        self.map = ops.HyperMap()
+        self.use_ema = use_ema
+        if self.use_ema:
+            self.online_params = ParameterTuple(self.network.get_parameters())
+            self.swap_params = self.online_params.clone('swap', 'zeros')
 
     def __enter__(self):
         self.summary_record = SummaryRecord(self.summary_dir)
@@ -90,9 +101,22 @@ class StateMonitor(Callback):
     def __exit__(self, *exc_args):
         self.summary_record.close()
 
-    def apply_eval(self):
+    def apply_eval(self, run_context):
         """Model evaluation, return validation accuracy."""
-        return self.model.eval(self.dataset_val, dataset_sink_mode=False)
+        if self.use_ema:
+            cb_params = run_context.original_args()
+            self.map(ops.assign, self.swap_params, self.online_params)
+            ema_dict = dict()
+            for param in cb_params.train_network.network.get_parameters():
+                if param.name.startswith("ema"):
+                    new_name = param.name.split("ema.")[1]
+                    ema_dict[new_name] = param.data
+            load_param_into_net(self.network, ema_dict)
+            res = self.model.eval(self.dataset_val, dataset_sink_mode=False)
+            self.map(ops.assign, self.online_params, self.swap_params)
+        else:
+            res = self.model.eval(self.dataset_val, dataset_sink_mode=False)
+        return res
 
     def on_train_step_end(self, run_context):
         cb_params = run_context.original_args()
@@ -143,8 +167,9 @@ class StateMonitor(Callback):
         if self.dataset_val is not None:
             if cur_epoch >= self.val_start_epoch and (cur_epoch - self.val_start_epoch) % self.val_interval == 0:
                 val_time = time()
+                mind_res = self.apply_eval(run_context)
                 for i in range(len(self.metric_name)):
-                    res[i] = self.apply_eval()[self.metric_name[i]] * 100
+                    res[i] = mind_res[self.metric_name[i]] * 100
 
                 if self.device_num > 1:
                     res = self.all_reduce(res)

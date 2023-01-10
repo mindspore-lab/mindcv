@@ -246,7 +246,9 @@ def train(args):
     summary_dir = f"./{args.ckpt_save_dir}/summary"
     assert (args.ckpt_save_policy != 'top_k' or args.val_while_train == True), \
         "ckpt_save_policy is top_k, val_while_train must be True."
-    state_cb = StateMonitor(model, summary_dir=summary_dir,
+    state_cb = StateMonitor(network, loss_fn=loss,
+                            metrics=eval_metrics,
+                            summary_dir=summary_dir,
                             dataset_val=loader_eval,
                             val_interval=args.val_interval,
                             metric_name=list(eval_metrics.keys()),
@@ -259,7 +261,8 @@ def train(args):
                             keep_checkpoint_max=args.keep_checkpoint_max,
                             model_name=args.model,
                             last_epoch=begin_epoch,
-                            ckpt_save_policy=args.ckpt_save_policy)
+                            ckpt_save_policy=args.ckpt_save_policy,
+                            use_ema=args.use_ema)
 
     callbacks = [state_cb]
     # log
