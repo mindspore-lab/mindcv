@@ -6,9 +6,9 @@ Refer to Xception: Deep Learning with Depthwise Separable Convolutions.
 from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
 
-from mindcv.models.registry import register_model
-from mindcv.models.utils import load_pretrained
-from mindcv.models.layers import GlobalAvgPooling
+from .registry import register_model
+from .utils import load_pretrained
+from .layers import GlobalAvgPooling
 
 __all__ = [
     'Xception',
@@ -26,7 +26,7 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'xception': _cfg(url='')
+    'xception': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/xception/xception_299.ckpt')
 }
 
 
@@ -63,7 +63,7 @@ class Block(nn.Cell):
 
         if out_filters != in_filters or strides != 1:
             self.skip = nn.Conv2d(in_filters, out_filters, 1, stride=strides, pad_mode='valid', has_bias=False)
-            self.skipbn = nn.BatchNorm2d(out_filters, momentum=0.9)
+            self.skipbn = nn.BatchNorm2d(out_filters)
         else:
             self.skip = None
 
@@ -73,18 +73,18 @@ class Block(nn.Cell):
         if grow_first:
             rep.append(nn.ReLU())
             rep.append(SeparableConv2d(in_filters, out_filters, kernel_size=3, stride=1, padding=1))
-            rep.append(nn.BatchNorm2d(out_filters, momentum=0.9))
+            rep.append(nn.BatchNorm2d(out_filters))
             filters = out_filters
 
         for _ in range(reps - 1):
             rep.append(nn.ReLU())
             rep.append(SeparableConv2d(filters, filters, kernel_size=3, stride=1, padding=1))
-            rep.append(nn.BatchNorm2d(filters, momentum=0.9))
+            rep.append(nn.BatchNorm2d(filters))
 
         if not grow_first:
             rep.append(nn.ReLU())
             rep.append(SeparableConv2d(in_filters, out_filters, kernel_size=3, stride=1, padding=1))
-            rep.append(nn.BatchNorm2d(out_filters, momentum=0.9))
+            rep.append(nn.BatchNorm2d(out_filters))
 
         if not start_with_relu:
             rep = rep[1:]
@@ -123,10 +123,10 @@ class Xception(nn.Cell):
         self.num_classes = num_classes
         blocks = []
         self.conv1 = nn.Conv2d(in_channels, 32, 3, 2, pad_mode='valid')
-        self.bn1 = nn.BatchNorm2d(32, momentum=0.9)
+        self.bn1 = nn.BatchNorm2d(32)
         self.relu = nn.ReLU()
         self.conv2 = nn.Conv2d(32, 64, 3, pad_mode='valid')
-        self.bn2 = nn.BatchNorm2d(64, momentum=0.9)
+        self.bn2 = nn.BatchNorm2d(64)
 
         # Entry flow
         blocks.append(Block(64, 128, 2, 2, start_with_relu=False, grow_first=True))
@@ -143,9 +143,9 @@ class Xception(nn.Cell):
         self.blocks = nn.SequentialCell(blocks)
 
         self.conv3 = SeparableConv2d(1024, 1536, 3, 1, 1)
-        self.bn3 = nn.BatchNorm2d(1536, momentum=0.9)
+        self.bn3 = nn.BatchNorm2d(1536)
         self.conv4 = SeparableConv2d(1536, 2048, 3, 1, 1)
-        self.bn4 = nn.BatchNorm2d(2048, momentum=0.9)
+        self.bn4 = nn.BatchNorm2d(2048)
 
         self.pool = GlobalAvgPooling()
         self.dropout = nn.Dropout()
