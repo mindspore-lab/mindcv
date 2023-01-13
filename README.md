@@ -326,6 +326,10 @@ Please see [configs](./configs) for the details about model performance and pret
 
 ## Notes
 ### What is New 
+- 2023/01/10
+1. MindCV v0.1 released! It can be installed via PyPI `pip install mindcv` now.
+2. Add training recipe and trained weights of googlenet, inception_v3, inception_v4, xception
+
 - 2022/12/09
 1. Support lr warmup for all lr scheduling algorithms besides cosine decay.
 2. Add repeated augmentation, which can be enabled by setting `--aug_repeats` to be a value larger than 1 (typically, 3 or 4 is a common choice).
