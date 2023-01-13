@@ -340,6 +340,11 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
 
 ### 更新
 
+
+- 2023/01/10
+1. MindCV v0.1发布! 支持通过PyPI安装 (`pip install mindcv`).
+2. 新增4个模型的预训练权重及其策略： googlenet, inception_v3, inception_v4, xception
+
 - 2022/12/09
 
 1. 支持在所有学习率策略中添加学习率预热操作，除cosine decay策略外。
