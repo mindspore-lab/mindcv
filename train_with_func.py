@@ -45,7 +45,7 @@ def train(args):
         rank_id = None
         dist_sum = None 
 
-    set_seed(args.seed)
+    set_seed(args.seed, rank_id)
 
     # create dataset
     dataset_train = create_dataset(
