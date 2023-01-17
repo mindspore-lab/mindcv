@@ -41,7 +41,8 @@ def create_parser():
     group.add_argument('--ckpt_path', type=str, default='',
                        help='Initialize model from this checkpoint. If resume training, specify the checkpoint path. (default='')')
     group.add_argument('--resume_opt', type=str2bool, nargs='?', const=True, default=False, help='Resume optimizer state including LR (default=False)')
-
+    group.add_argument('--seed', type=int, default=42,
+                       help='Seed value for determining randomness in numpy, random, and mindspore')
 
     # Dataset parameters
     group = parser.add_argument_group('Dataset parameters')
