@@ -270,7 +270,7 @@ opt = create_optimizer(network.trainable_params(), opt='adam', lr=lr_scheduler)
 
 - nesterov: whether to use Nesterov Accelerated Gradient (NAG) algorithm to update the gradients. Default: False.
 
-- filter_bias_and_bn: whether to filter batch norm paramters and bias from weight decay. If True, weight decay will not apply on BN parameters and bias in Conv or Dense layers. Default: True.
+- filter_bias_and_bn: whether to filter batch norm parameters and bias from weight decay. If True, weight decay will not apply on BN parameters and bias in Conv or Dense layers. Default: True.
 
 - loss_scale: A floating point value for the loss scale, which must be larger than 0.0. Default: 1.0.
 
