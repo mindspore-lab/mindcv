@@ -11,7 +11,7 @@ from mindspore.train.callback import Callback
 from mindspore.train._utils import _make_directory
 
 from .checkpoint_manager import CheckpointManager
-from .reduce_manager import Allreduce
+from .reduce_manager import AllReduceSum
 
 class StateMonitor(Callback):
     """
@@ -78,7 +78,7 @@ class StateMonitor(Callback):
             self.best_ckpt_path = os.path.join(ckpt_dir, best_ckpt_name)
 
         if self.device_num > 1:
-            self.all_reduce = Allreduce()
+            self.all_reduce = AllReduceSum()
 
         self.start = time()
         self.epoch_start = time()

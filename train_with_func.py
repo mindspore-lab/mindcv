@@ -9,14 +9,14 @@ import mindspore as ms
 from mindspore import nn, Tensor, ops, SummaryRecord
 from mindspore.communication import init, get_rank, get_group_size
 from mindspore.parallel._utils import _get_device_num, _get_gradients_mean
-from mindspore.amp import LossScaler, DynamicLossScaler, StaticLossScaler
 
 from mindcv.models import create_model
 from mindcv.data import create_dataset, create_transforms, create_loader
 from mindcv.loss import create_loss
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
-from mindcv.utils import CheckpointManager, Allreduce, NoLossScaler
+from mindcv.utils import CheckpointManager, AllReduceSum, NoLossScaler
+from mindcv.utils.random import set_seed
 from config import parse_args
 
 logger = logging.getLogger('train')
@@ -26,13 +26,11 @@ formatter1 = logging.Formatter('%(message)s',)
 logger.addHandler(h1)
 h1.setFormatter(formatter1)
 
+
 def train(args):
     """Train network."""
-    SEED = 1
-    ms.set_seed(SEED)
-    np.random.seed(SEED)
 
-    ms.set_context(mode=ms.PYNATIVE_MODE)
+    ms.set_context(mode=args.mode)
 
     if args.distribute:
         init()
@@ -41,9 +39,13 @@ def train(args):
         ms.set_auto_parallel_context(device_num=device_num,
                                      parallel_mode='data_parallel',
                                      gradients_mean=True)
+        dist_sum = AllReduceSum()
     else:
         device_num = None
         rank_id = None
+        dist_sum = None 
+
+    set_seed(args.seed, rank_id)
 
     # create dataset
     dataset_train = create_dataset(
@@ -129,15 +131,13 @@ def train(args):
         # validation dataset count
         eval_count = dataset_eval.get_dataset_size()
         if args.distribute:
-            all_reduce = Allreduce()
-            eval_count = all_reduce(Tensor(eval_count, ms.int32))
+            eval_count = dist_sum(Tensor(eval_count, ms.int32))
 
     num_batches = loader_train.get_dataset_size()
     # Train dataset count
     train_count = dataset_train.get_dataset_size()
     if args.distribute:
-        all_reduce = Allreduce()
-        train_count = all_reduce(Tensor(train_count, ms.int32))
+        train_count = dist_sum(Tensor(train_count, ms.int32))
 
     # create model
     network = create_model(model_name=args.model,
@@ -186,6 +186,8 @@ def train(args):
                                  loss_scale=args.loss_scale,
                                  checkpoint_path=opt_ckpt_path)
     
+    from mindspore.amp import LossScaler, StaticLossScaler
+
     # set loss scale for mixed precision training
     if args.amp_level != 'O0':
         if args.dynamic_loss_scale:
@@ -257,6 +259,7 @@ def train(args):
                                      epoch=t,
                                      n_epochs=args.epoch_size,
                                      loss_scaler=loss_scaler,
+                                     reduce_fn=dist_sum,
                                      summary_record=summary_record,
                                      rank_id=rank_id,
                                      log_interval=args.log_interval)
@@ -268,7 +271,7 @@ def train(args):
                     if rank_id in [None, 0]:
                         logger.info('Validating...')
                     val_start = time()
-                    test_acc = test_epoch(network, loader_eval, rank_id=rank_id)
+                    test_acc = test_epoch(network, loader_eval, dist_sum, rank_id=rank_id)
                     test_acc = 100 * test_acc
                     if rank_id in [0, None]:
                         val_time = time() - val_start
@@ -314,7 +317,8 @@ def train(args):
 
     logger.info("Done!")
 
-def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, loss_scaler, summary_record=None, rank_id=None, log_interval=100):
+
+def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, loss_scaler, reduce_fn=None, summary_record=None, rank_id=None, log_interval=100):
     """Training an epoch network"""
     # Define forward function
     def forward_fn(data, label):
@@ -329,25 +333,14 @@ def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, loss_scal
         mean = _get_gradients_mean()
         degree = _get_device_num()
         grad_reducer = nn.DistributedGradReducer(optimizer.parameters, mean, degree)
+    else:
+        grad_reducer = ops.functional.identity
 
     # Define function of one-step training
     @ms.ms_function
-    def train_step_parallel(data, label):
-        (loss, logits), grads = grad_fn(data, label)
-        grads = grad_reducer(grads)
-        status = ms.amp.all_finite(grads)
-        if status:
-            loss = loss_scaler.unscale(loss)
-            grads = loss_scaler.unscale(grads)
-            loss = ops.depend(loss, optimizer(grads))
-        loss = ops.depend(loss, loss_scaler.adjust(status))
-
-        return loss, logits
-
-    @ms.ms_function
     def train_step(data, label):
         (loss, logits), grads = grad_fn(data, label)
-        loss = ops.depend(loss, optimizer(grads))
+        grads = grad_reducer(grads)
         status = ms.amp.all_finite(grads)
         if status:
             loss = loss_scaler.unscale(loss)
@@ -367,10 +360,7 @@ def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, loss_scal
 
     num_batches = dataset.get_dataset_size()
     for batch, (data, label) in enumerate(dataset.create_tuple_iterator()):
-        if args.distribute:
-            loss, logits = train_step_parallel(data, label)
-        else:
-            loss, logits = train_step(data, label)
+        loss, logits = train_step(data, label)
 
         if len(label.shape) == 1: 
             correct += (logits.argmax(1) == label).asnumpy().sum()
@@ -396,9 +386,8 @@ def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, loss_scal
                     summary_record.record(step)
                 
     if args.distribute:
-        all_reduce = Allreduce()
-        correct = all_reduce(Tensor(correct, ms.float32))
-        total = all_reduce(Tensor(total, ms.float32))
+        correct = reduce_fn(Tensor(correct, ms.float32))
+        total = reduce_fn(Tensor(total, ms.float32))
         correct /= total
         correct = correct.asnumpy()
     else:
@@ -414,19 +403,14 @@ def train_epoch(network, dataset, loss_fn, optimizer, epoch, n_epochs, loss_scal
     
     return loss
 
-def test_epoch(network, dataset, rank_id=None):
+
+def test_epoch(network, dataset, reduce_fn=None, rank_id=None):
     """Test network accuracy and loss."""
-
-    #@ms.ms_function
-    def test_forward_fn(data):
-        logits = network(data)
-        return logits
-
     network.set_train(False) # TODO: check freeze 
 
     correct, total = 0, 0
     for data, label in tqdm(dataset.create_tuple_iterator()):
-        pred = test_forward_fn(data)
+        pred = network(data)
         total += len(data)
         if len(label.shape) == 1: 
             correct += (pred.argmax(1) == label).asnumpy().sum()
@@ -434,9 +418,9 @@ def test_epoch(network, dataset, rank_id=None):
             correct += (pred.argmax(1) == label.argmax(1)).asnumpy().sum()
 
     if rank_id is not None:
-        all_reduce = Allreduce()
-        correct = all_reduce(Tensor(correct, ms.float32))
-        total = all_reduce(Tensor(total, ms.float32))
+        #dist_sum = AllReduceSum()
+        correct = reduce_fn(Tensor(correct, ms.float32))
+        total = reduce_fn(Tensor(total, ms.float32))
         correct /= total
         correct = correct.asnumpy()
     else:
@@ -460,4 +444,14 @@ def flush_from_cache(network):
 
 if __name__ == '__main__':
     args = parse_args()
+ 
+    # data sync for cloud platform if enabled
+    if args.enable_modelarts:
+        import moxing as mox
+        args.data_dir = f'/cache/{args.data_url}'
+        mox.file.copy_parallel(src_url= os.path.join(args.data_url, args.dataset) , dst_url= args.data_dir)
+    
     train(args)
+
+    if args.enable_modelarts:
+        mox.file.copy_parallel(src_url= args.ckpt_save_dir, dst_url=args.train_url)
