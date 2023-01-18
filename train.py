@@ -2,7 +2,6 @@
 import os
 import logging
 import mindspore as ms
-import random
 import numpy as np
 from mindspore import nn, Tensor
 from mindspore import FixedLossScaleManager, Model
@@ -14,12 +13,12 @@ from mindcv.data import create_dataset, create_transforms, create_loader
 from mindcv.loss import create_loss
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
-from mindcv.utils import StateMonitor, AllReduceSum, TrainOneStepWithEMA
-from mindcv.utils.random import set_seed
+from mindcv.utils import StateMonitor, Allreduce, TrainOneStepWithEMA
 from config import parse_args
 
+ms.set_seed(1)
+np.random.seed(1)
 
-# TODO: arg parser already has a logger
 logger = logging.getLogger('train')
 logger.setLevel(logging.INFO)
 h1 = logging.StreamHandler()
@@ -29,7 +28,6 @@ h1.setFormatter(formatter1)
 
 def train(args):
     ''' main train function'''
-
     ms.set_context(mode=args.mode)
     if args.distribute:
         init()
@@ -41,8 +39,6 @@ def train(args):
     else:
         device_num = None
         rank_id = None
-
-    set_seed(args.seed, rank_id)
 
     # create dataset
     dataset_train = create_dataset(
@@ -132,7 +128,7 @@ def train(args):
         # validation dataset count
         eval_count = dataset_eval.get_dataset_size()
         if args.distribute:
-            all_reduce = AllReduceSum()
+            all_reduce = Allreduce()
             eval_count = all_reduce(Tensor(eval_count, ms.int32))
     else:
         loader_eval = None
@@ -141,7 +137,7 @@ def train(args):
     # Train dataset count
     train_count = dataset_train.get_dataset_size()
     if args.distribute:
-        all_reduce = AllReduceSum()
+        all_reduce = Allreduce()
         train_count = all_reduce(Tensor(train_count, ms.int32))
 
     # create model
