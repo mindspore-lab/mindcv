@@ -166,7 +166,7 @@ python train.py --model resnet50 --dataset cifar10 --dataset_download
 
 ```shell
 # 分布式训练
-export CUDA_VISIBLE_DEVICES=0,1,2,3  # suppose there are 4 GPUs
+# 假设你有4张GPU或者NPU卡
 mpirun --allow-run-as-root -n 4 python train.py --distribute \
 	--model densenet121 --dataset imagenet --data_dir ./datasets/imagenet   
 ```
@@ -205,7 +205,7 @@ mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet
 
 ```shell
 # 验证模型
-python validate.py --model resnet50 --dataset imagenet --val_split validation --ckpt_path './ckpt/densenet121-best.ckpt' 
+python validate.py --model=resnet50 --dataset=imagenet --data_dir=/path/to/data --ckpt_path=/path/to/model.ckpt 
 ``` 
 
 - 训练过程中进行验证
@@ -213,7 +213,8 @@ python validate.py --model resnet50 --dataset imagenet --val_split validation --
 当需要在训练过程中，跟踪模型在测试集上精度的变化时，请启用参数`--val_while_train`，如下
 
 ```shell
-python train.py -model resnet50 -dataset cifar10 -val_while_train -val_split test -val_interval 1
+python train.py --model=resnet50 --dataset=cifar10 \
+		--val_while_train --val_split=test --val_interval=1
 ``` 
 
 各轮次的训练损失和测试精度将保存在`{ckpt_save_dir}/results.log`中。

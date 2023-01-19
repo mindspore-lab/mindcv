@@ -160,7 +160,7 @@ For large datasets like ImageNet, it is necessary to do training in distributed 
 
 ```shell
 # distributed training
-export CUDA_VISIBLE_DEVICES=0,1,2,3  # 4 GPUs
+# assume you have 4 GPUs/NPUs
 mpirun -n 4 python train.py --distribute \
 	--model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet   
 ```
@@ -195,16 +195,16 @@ To run training on the [ModelArts](https://www.huaweicloud.com/intl/en-us/produc
 
 To evalute the model performance, please run `validate.py` 
 
-```python
+```shell
 # validate a trained checkpoint
-python validate.py --model=resnet50 --dataset=imagenet --val_split=validation --ckpt_path='./ckpt/densenet121-best.ckpt' 
+python validate.py --model=resnet50 --dataset=imagenet --data_dir=/path/to/data --ckpt_path=/path/to/model.ckpt 
 ``` 
 
 - Validation while Training 
 
 You can also track the validation accuracy during training by enabling the `--val_while_train` option.
 
-```python
+```shell
 python train.py --model=resnet50 --dataset=cifar10 \
 		--val_while_train --val_split=test --val_interval=1
 ``` 
