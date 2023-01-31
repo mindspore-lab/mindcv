@@ -20,7 +20,7 @@ def create_loss(
     Args:
         name (str):  loss name : 'CE' for cross_entropy. 'BCE': binary cross entropy. Default: 'CE'.
         weight (Tensor): Class weight. A rescaling weight given to the loss of each batch element. If given, has to be a Tensor of size 'nbatch'.
-                Data type must be float16 or float32. 
+                Data type must be float16 or float32.
         reduction: Apply specific reduction method to the output: 'mean' or 'sum'. By default, the sum of the output will be divided by the number of elements in the output.
                 'sum': the output will be summed. Default:'mean'.
         label_smoothing: Label smoothing factor, a regularization tool used to prevent the model

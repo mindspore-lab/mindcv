@@ -7,9 +7,9 @@ from functools import partial
 from typing import Optional
 
 import mindspore
+from mindspore import Tensor
 from mindspore import nn
 from mindspore import ops
-from mindspore import Tensor
 from mindspore.common import initializer as weight_init
 
 from .layers.drop_path import DropPath
@@ -307,18 +307,17 @@ class PyramidVisionTransformer(nn.Cell):
         self.num_classes = num_classes
         self.head = nn.Dense(self.embed_dim, num_classes) if num_classes > 0 else Identity()
 
-    def _get_pos_embed(self, pos_embed, ph, pw, H, W):
-        if H * W == self.patch_embed1.num_patches:
+    def _get_pos_embed(self, pos_embed, ph, pw, h, w):
+        if h * w == self.patch_embed1.num_patches:
             return pos_embed
-        else:
-            resize_bilinear = nn.ResizeBilinear()
+        resize_bilinear = nn.ResizeBilinear()
 
-            pos_embed = self.transpose(self.reshape(pos_embed, (1, ph, pw, -1)), (0, 3, 1, 2))
-            pos_embed = resize_bilinear(pos_embed, (H, W))
+        pos_embed = self.transpose(self.reshape(pos_embed, (1, ph, pw, -1)), (0, 3, 1, 2))
+        pos_embed = resize_bilinear(pos_embed, (h, w))
 
-            pos_embed = self.transpose(self.reshape(pos_embed, (1, -1, H * W)), (0, 2, 1))
+        pos_embed = self.transpose(self.reshape(pos_embed, (1, -1, h * w)), (0, 2, 1))
 
-            return pos_embed
+        return pos_embed
 
     def forward_features(self, x):
         b = x.shape[0]

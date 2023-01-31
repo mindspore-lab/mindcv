@@ -50,7 +50,7 @@ class DWConv(nn.Cell):
     """Depthwise separable convolution"""
 
     def __init__(self, dim=768):
-        super(DWConv, self).__init__()
+        super().__init__()
         self.dwconv = nn.Conv2d(dim, dim, 3, 1, has_bias=True, group=dim)
 
     def construct(self, x, h, w):

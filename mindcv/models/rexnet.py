@@ -109,7 +109,7 @@ class ReXNetV1(nn.Cell):
         width_mult (float): The ratio of the channel. Default: 1.0.
         depth_mult (float): The ratio of num_layers. Default: 1.0.
         num_classes (int) : number of classification classes. Default: 1000.
-        use_se (bool): use SENet in LinearBottleneck. Default: True.
+        is_use_se (bool): use SENet in LinearBottleneck. Default: True.
         se_ratio: (float): SENet reduction ratio. Default 1/12.
         drop_rate (float): dropout ratio. Default: 0.2.
         ch_div (int): divisible by ch_div. Default: 1.
@@ -125,7 +125,7 @@ class ReXNetV1(nn.Cell):
                  width_mult=1.0,
                  depth_mult=1.0,
                  num_classes=1000,
-                 use_se=True,
+                 is_use_se=True,
                  se_ratio=1 / 12,
                  drop_rate=0.2,
                  drop_path_rate=0.,
@@ -142,7 +142,7 @@ class ReXNetV1(nn.Cell):
         layers = [ceil(element * depth_mult) for element in layers]
         strides = sum([[element] + [1] * (layers[idx] - 1)
                        for idx, element in enumerate(strides)], [])
-        if use_se:
+        if is_use_se:
             use_ses = sum([[element] * layers[idx] for idx, element in enumerate(use_ses)], [])
         else:
             use_ses = [False] * sum(layers[:])
@@ -173,11 +173,11 @@ class ReXNetV1(nn.Cell):
         curr_stride = 2
         features = []
         num_blocks = len(in_channels_group)
-        for block_idx, (in_c, out_c, exp_ratio, stride, use_se) in enumerate(zip(in_channels_group,
-                                                                                 out_channels_group,
-                                                                                 exp_ratios,
-                                                                                 strides,
-                                                                                 use_ses)):
+        for block_idx, (in_c, out_c, exp_ratio, stride, is_use_se) in enumerate(zip(in_channels_group,
+                                                                                    out_channels_group,
+                                                                                    exp_ratios,
+                                                                                    strides,
+                                                                                    use_ses)):
             if stride > 1:
                 fname = 'stem' if block_idx == 0 else f'features.{block_idx - 1}'
                 feature_info += [dict(num_chs=feat_chs[-1], reduction=curr_stride, module=fname)]
@@ -188,7 +188,7 @@ class ReXNetV1(nn.Cell):
                                              out_channels=out_c,
                                              exp_ratio=exp_ratio,
                                              stride=stride,
-                                             use_se=use_se,
+                                             use_se=is_use_se,
                                              se_ratio=se_ratio,
                                              act_layer=act_layer,
                                              dw_act_layer=dw_act_layer,

@@ -54,7 +54,7 @@ class StdConv2d(nn.Conv2d):
                  padding=0,
                  group=1
                  ) -> None:
-        super(StdConv2d, self).__init__(
+        super().__init__(
             in_channels,
             out_channels,
             kernel_size,

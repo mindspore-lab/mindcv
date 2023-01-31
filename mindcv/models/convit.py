@@ -93,12 +93,12 @@ class GPSA(nn.Cell):
         self.rel_indices = get_rel_indices()
 
     def construct(self, x: Tensor) -> Tensor:
-        B, N, C = x.shape
+        b, n, c = x.shape
         attn = self.get_attention(x)
-        v = ops.reshape(self.v(x), (B, N, self.num_heads, C // self.num_heads))
+        v = ops.reshape(self.v(x), (b, n, self.num_heads, c // self.num_heads))
         v = ops.transpose(v, (0, 2, 1, 3))
         x = ops.transpose(self.batch_matmul(attn, v), (0, 2, 1, 3))
-        x = ops.reshape(x, (B, N, C))
+        x = ops.reshape(x, (b, n, c))
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
@@ -148,12 +148,12 @@ class MHSA(nn.Cell):
         self.batch_matmul = ops.BatchMatMul()
 
     def construct(self, x: Tensor) -> Tensor:
-        B, N, C = x.shape
-        q = ops.reshape(self.q(x), (B, N, self.num_heads, C // self.num_heads))
+        b, n, c = x.shape
+        q = ops.reshape(self.q(x), (b, n, self.num_heads, c // self.num_heads))
         q = ops.transpose(q, (0, 2, 1, 3))
-        k = ops.reshape(self.k(x), (B, N, self.num_heads, C // self.num_heads))
+        k = ops.reshape(self.k(x), (b, n, self.num_heads, c // self.num_heads))
         k = ops.transpose(k, (0, 2, 3, 1))
-        v = ops.reshape(self.v(x), (B, N, self.num_heads, C // self.num_heads))
+        v = ops.reshape(self.v(x), (b, n, self.num_heads, c // self.num_heads))
         v = ops.transpose(v, (0, 2, 1, 3))
 
         attn = self.batch_matmul(q, k)
@@ -162,7 +162,7 @@ class MHSA(nn.Cell):
         attn = self.attn_drop(attn)
 
         x = ops.transpose(self.batch_matmul(attn, v), (0, 2, 1, 3))
-        x = ops.reshape(x, (B, N, C))
+        x = ops.reshape(x, (b, n, c))
         x = self.proj(x)
         x = self.proj_drop(x)
         return x

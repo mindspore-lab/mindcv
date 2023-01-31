@@ -15,7 +15,7 @@ from .utils import load_pretrained
 __all__ = [
     "RepMLPNet",
     "rep_mlp_net_t224",
-    "RepMLPNet_T256",
+    "rep_mlp_net_t256",
     "rep_mlp_net_b224",
     "rep_mlo_net_b256",
     "rep_mlp_net_d256",
@@ -142,7 +142,7 @@ class RepMLPBlock(nn.Cell):
             for k in reparam_conv_k:
                 conv_branch = conv_bn(num_sharesets, num_sharesets, kernel_size=k, stride=1, padding=k // 2,
                                       group=num_sharesets, has_bias=False)
-                self.__setattr__('repconv{}'.format(k), conv_branch)
+                self.__setattr__(f'repconv{k}', conv_branch)
                 self.conv_branch_k.append(conv_branch)
                 # print(conv_branch)
 
@@ -216,7 +216,7 @@ class RepMLPBlock(nn.Cell):
         #   Remove Local Perceptron
         if self.reparam_conv_k is not None:
             for k in self.reparam_conv_k:
-                self.__delattr__('repconv{}'.format(k))
+                self.__delattr__(f'repconv{k}')
         self.__delattr__('fc3')
         self.__delattr__('fc3_bn')
         self.fc3 = nn.Conv2d(self.s * self.h * self.w, self.s * self.h * self.w, 1, 1, 0, has_bias=True, group=self.s)
@@ -388,7 +388,7 @@ def locality_injection(self):
 
 @register_model
 def rep_mlp_net_t224(pretrained: bool = False, image_size: int = 224, num_classes: int = 1000, in_channels=3,
-                     deploy=False, **kwargs):
+                     deploy=False):
     """Get RepMLPNet_T224 model.
      Refer to the base class `models.RepMLPNet` for more details."""
     default_cfg = default_cfgs['RepMLPNet_T224']
@@ -404,8 +404,8 @@ def rep_mlp_net_t224(pretrained: bool = False, image_size: int = 224, num_classe
 
 
 @register_model
-def RepMLPNet_T256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
-                   deploy=False, **kwargs):
+def rep_mlp_net_t256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
+                     deploy=False):
     """Get RepMLPNet_T256 model.
      Refer to the base class `models.RepMLPNet` for more details."""
     default_cfg = default_cfgs['RepMLPNet_T256']

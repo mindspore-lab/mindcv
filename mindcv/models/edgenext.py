@@ -38,7 +38,7 @@ default_cfgs = {
 
 
 def ssplit(x: Tensor, dim, width):
-    b, c, h, w = x.shape
+    _, c, _, _ = x.shape
     if c % width == 0:
         return ops.split(x, dim, c // width)
     begin = 0
@@ -132,7 +132,7 @@ class ConvEncoder(nn.Cell):
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
 
     def construct(self, x: Tensor) -> Tensor:
-        input = x
+        original_input = x
         x = self.dwconv(x)
 
         x = ops.transpose(x, (0, 2, 3, 1))
@@ -143,7 +143,7 @@ class ConvEncoder(nn.Cell):
         if self.gamma1 is not None:
             x = self.gamma1 * x
         x = ops.transpose(x, (0, 3, 1, 2))
-        x = input + self.drop_path(x)
+        x = original_input + self.drop_path(x)
         return x
 
 
@@ -166,7 +166,7 @@ class SDTAEncoder(nn.Cell):
         else:
             self.nums = scales - 1
         convs = []
-        for i in range(self.nums):
+        for _ in range(self.nums):
             convs.append(nn.Conv2d(width, width, kernel_size=3, pad_mode="pad", padding=1, group=width, has_bias=True))
         self.convs = nn.CellList(convs)
 
@@ -186,7 +186,7 @@ class SDTAEncoder(nn.Cell):
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
 
     def construct(self, x: Tensor) -> Tensor:
-        input = x
+        original_input = x
 
         spx = ssplit(x, 1, self.width)
         sp = None
@@ -221,7 +221,7 @@ class SDTAEncoder(nn.Cell):
             x = self.gamma * x
         x = ops.transpose(x, (0, 3, 1, 2))  # (N, H, W, C) -> (N, C, H, W)
 
-        x = input + self.drop_path(x)
+        x = original_input + self.drop_path(x)
         return x
 
 
