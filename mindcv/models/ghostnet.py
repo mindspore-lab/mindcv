@@ -1,15 +1,14 @@
 """MindSpore implementation of `GhostNet`."""
 
 import math
-import numpy as np
 
+import numpy as np
 from mindspore import nn, ops, Tensor
 
-from .layers.squeeze_excite import SqueezeExcite
 from .layers.pooling import GlobalAvgPooling
-from .utils import load_pretrained, make_divisible
+from .layers.squeeze_excite import SqueezeExcite
 from .registry import register_model
-
+from .utils import load_pretrained, make_divisible
 
 __all__ = [
     'GhostNet',
@@ -51,7 +50,7 @@ class ConvBnAct(nn.Cell):
                  stride=1, act_layer=nn.ReLU):
         super().__init__()
         self.conv = nn.Conv2d(in_chs, out_chs, kernel_size=kernel_size, stride=stride,
-                              padding=kernel_size//2, pad_mode='pad', has_bias=False)
+                              padding=kernel_size // 2, pad_mode='pad', has_bias=False)
         self.bn1 = nn.BatchNorm2d(out_chs)
         self.act1 = act_layer(
 
@@ -77,16 +76,18 @@ class GhostModule(nn.Cell):
         super().__init__()
         self.oup = oup
         init_channels = math.ceil(oup / ratio)
-        new_channels = init_channels*(ratio-1)
+        new_channels = init_channels * (ratio - 1)
 
         self.primary_conv = nn.SequentialCell(
-            nn.Conv2d(inp, init_channels, kernel_size, stride=stride, padding=kernel_size//2, pad_mode='pad', has_bias=False),
+            nn.Conv2d(inp, init_channels, kernel_size, stride=stride, padding=kernel_size // 2, pad_mode='pad',
+                      has_bias=False),
             nn.BatchNorm2d(init_channels),
             nn.ReLU() if relu else nn.SequentialCell(),
         )
 
         self.cheap_operation = nn.SequentialCell(
-            nn.Conv2d(init_channels, new_channels, dw_size, stride=1, padding=dw_size//2, pad_mode='pad', group=init_channels, has_bias=False),
+            nn.Conv2d(init_channels, new_channels, dw_size, stride=1, padding=dw_size // 2, pad_mode='pad',
+                      group=init_channels, has_bias=False),
             nn.BatchNorm2d(new_channels),
             nn.ReLU() if relu else nn.SequentialCell(),
         )
@@ -125,7 +126,7 @@ class GhostBottleneck(nn.Cell):
 
         # Squeeze-and-excitation
         if has_se:
-            self.se = SqueezeExcite(mid_chs, rd_ratio=1./4, rd_divisor=4, act_layer=nn.ReLU, gate_layer=GhostGate)
+            self.se = SqueezeExcite(mid_chs, rd_ratio=1. / 4, rd_divisor=4, act_layer=nn.ReLU, gate_layer=GhostGate)
         else:
             self.se = None
 

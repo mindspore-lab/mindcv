@@ -1,5 +1,7 @@
 import os
+
 from mindspore import load_checkpoint, load_param_into_net
+
 from .registry import is_model, model_entrypoint
 
 __all__ = ["create_model"]
@@ -39,7 +41,7 @@ def create_model(
     if os.path.exists(checkpoint_path):
 
         checkpoint_param = load_checkpoint(checkpoint_path)
-        ema_param_dict = dict()
+        ema_param_dict = {}
         for param in checkpoint_param:
             if param.startswith("ema"):
                 new_name = param.split("ema.")[1]

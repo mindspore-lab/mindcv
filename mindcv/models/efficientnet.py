@@ -1,10 +1,10 @@
 """EfficientNet Architecture."""
 
 import copy
-from typing import List, Optional, Callable, Any, Union, Sequence
-from functools import partial
-
 import math
+from functools import partial
+from typing import List, Optional, Callable, Any, Union, Sequence
+
 import numpy as np
 from mindspore import Tensor
 from mindspore import nn
@@ -12,11 +12,11 @@ from mindspore import ops
 from mindspore.common import initializer as weight_init
 from mindspore.common.initializer import Uniform, Normal
 
-from .layers.squeeze_excite import SqueezeExcite
 from .layers.activation import Swish
 from .layers.drop_path import DropPath
-from .utils import load_pretrained, make_divisible
+from .layers.squeeze_excite import SqueezeExcite
 from .registry import register_model
+from .utils import load_pretrained, make_divisible
 
 __all__ = [
     'EfficientNet',  # registration mechanism to use yaml configuration
@@ -200,6 +200,7 @@ class MBConv(nn.Cell):
 
 class FusedMBConvConfig(MBConvConfig):
     """FusedMBConvConfig"""
+
     # Stores information listed at Table 4 of the EfficientNetV2 paper
     def __init__(
             self,
@@ -215,6 +216,7 @@ class FusedMBConvConfig(MBConvConfig):
 
 class FusedMBConv(nn.Cell):
     """FusedMBConv"""
+
     def __init__(
             self,
             cnf: FusedMBConvConfig,

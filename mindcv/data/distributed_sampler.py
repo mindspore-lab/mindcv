@@ -1,6 +1,8 @@
 ''' distributed sampler '''
 import math
+
 import numpy as np
+
 
 class RepeatAugSampler():
     """Sampler that restricts data loading to a subset of the dataset for distributed,
@@ -18,6 +20,7 @@ class RepeatAugSampler():
         num_repeats(int): num of repeated instances in repeated augmentation, Default:3.
         selected_round(int): round the total num of samples by this factor, Defailt:256.
     """
+
     def __init__(
             self,
             dataset_size,
@@ -33,7 +36,7 @@ class RepeatAugSampler():
         if rank_id is None:
             rank_id = 0
 
-        #assert isinstance(num_repeats, int), f'num_repeats should be Type integer, but got {type(num_repeats)}'
+        # assert isinstance(num_repeats, int), f'num_repeats should be Type integer, but got {type(num_repeats)}'
 
         self.dataset_size = dataset_size
         self.num_shards = num_shards
@@ -46,18 +49,18 @@ class RepeatAugSampler():
         # Determine the number of samples to select per epoch for each rank.
         if selected_round:
             self.num_selected_samples = int(math.floor(
-                 self.dataset_size // selected_round * selected_round / num_shards))
+                self.dataset_size // selected_round * selected_round / num_shards))
         else:
             self.num_selected_samples = int(math.ceil(self.dataset_size / num_shards))
 
     def __iter__(self):
         # deterministically shuffle based on epoch
-        #print('__iter__  generating new shuffled indices: ', self.epoch)
+        # print('__iter__  generating new shuffled indices: ', self.epoch)
         if self.shuffle:
             indices = np.random.RandomState(seed=self.epoch).permutation(self.dataset_size)
             indices = indices.tolist()
             self.epoch += 1
-            #print(indices[:30])
+            # print(indices[:30])
         else:
             indices = list(range(self.dataset_size))
         # produce repeats e.g. [0, 0, 0, 1, 1, 1, 2, 2, 2....]
@@ -82,17 +85,20 @@ class RepeatAugSampler():
     def set_epoch(self, epoch):
         self.epoch = epoch
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     num_devices = 2
     dataset_size = 20
     num_repeats = 3
     selected_round = 1
     shuffle = True
-    sampler1 = RepeatAugSampler(dataset_size, num_shards=num_devices, rank_id=0, num_repeats=num_repeats, selected_round=selected_round, shuffle=shuffle)
-    sampler2 = RepeatAugSampler(dataset_size, num_shards=num_devices, rank_id=1, num_repeats=num_repeats, selected_round=selected_round, shuffle=shuffle)
+    sampler1 = RepeatAugSampler(dataset_size, num_shards=num_devices, rank_id=0, num_repeats=num_repeats,
+                                selected_round=selected_round, shuffle=shuffle)
+    sampler2 = RepeatAugSampler(dataset_size, num_shards=num_devices, rank_id=1, num_repeats=num_repeats,
+                                selected_round=selected_round, shuffle=shuffle)
     output1 = list(sampler1.__iter__())
     output2 = list(sampler2.__iter__())
     print(output1)
     print(output2)
-    print(len(output1), len(output2), len(output1+output2))
+    print(len(output1), len(output2), len(output1 + output2))
     assert len(output1 + output2) == dataset_size, 'sizes of sampled outputs do not match dataset size'

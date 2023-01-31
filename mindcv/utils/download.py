@@ -1,15 +1,16 @@
 """Utility of downloading"""
-import hashlib
-import os
 import bz2
 import gzip
-import tarfile
-import zipfile
+import hashlib
+import os
 import ssl
+import tarfile
 import urllib
 import urllib.error
 import urllib.request
+import zipfile
 from typing import Optional
+
 from tqdm import tqdm
 
 from .path import detect_file_type

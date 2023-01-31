@@ -1,8 +1,7 @@
 """Scheduler Factory"""
-from .dynamic_lr import (constant_lr, linear_lr, linear_refined_lr, polynomial_lr, polynomial_refined_lr,
+from .dynamic_lr import (linear_lr, linear_refined_lr, polynomial_lr, polynomial_refined_lr,
                          exponential_lr, exponential_refined_lr, step_lr, multi_step_lr,
-                         cosine_decay_lr, cosine_decay_refined_lr,
-                         cosine_annealing_lr, cosine_annealing_warm_restarts_lr)
+                         cosine_decay_lr, cosine_decay_refined_lr)
 
 __all__ = ["create_scheduler"]
 
@@ -18,8 +17,8 @@ def create_scheduler(
         decay_rate: float = 0.9,
         milestones: list = None,
         num_epochs: int = 200,
-	num_cycles: int = 1,
-	cycle_decay: float = 1.0,
+        num_cycles: int = 1,
+        cycle_decay: float = 1.0,
         lr_epoch_stair: bool = False
 ):
     r"""Creates learning rate scheduler by name.

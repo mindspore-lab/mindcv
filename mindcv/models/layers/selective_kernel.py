@@ -24,6 +24,7 @@ class SelectiveKernelAttn(nn.Cell):
     """ Selective Kernel Attention Module
     Selective Kernel attention mechanism factored out into its own module.
     """
+
     def __init__(self,
                  channels: int,
                  num_paths: int = 2,
@@ -75,6 +76,7 @@ class SelectiveKernel(nn.Cell):
         activation (nn.Module): activation layer to use
         norm (nn.Module): batchnorm/norm layer to use
     """
+
     def __init__(self,
                  in_channels: int,
                  out_channels: Optional[int] = None,

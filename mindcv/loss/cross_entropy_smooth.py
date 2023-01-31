@@ -1,7 +1,8 @@
 ''' cross entorpy smooth '''
-#import warnings
+# import warnings
 from mindspore import nn
 from mindspore.ops import functional as F
+
 
 class CrossEntropySmooth(nn.LossBase):
     '''
@@ -23,6 +24,7 @@ class CrossEntropySmooth(nn.LossBase):
                 (1) Shape (N), sparse labels representing the class indinces. Must be int type.
                 (2) Shape [N, C], dense labels representing the ground truth class probability values, or the one-hot labels. Must be float type.
     '''
+
     def __init__(self, smoothing=0., aux_factor=0., reduction='mean', weight=None):
         super().__init__()
         self.smoothing = smoothing
@@ -37,10 +39,12 @@ class CrossEntropySmooth(nn.LossBase):
             main_logits = logits[0]
             for aux in logits[1:]:
                 if self.aux_factor > 0:
-                    loss_aux += F.cross_entropy(aux, labels, weight=self.weight, reduction=self.reduction, label_smoothing=self.smoothing)
+                    loss_aux += F.cross_entropy(aux, labels, weight=self.weight, reduction=self.reduction,
+                                                label_smoothing=self.smoothing)
         else:
             main_logits = logits
 
-        loss_logits = F.cross_entropy(main_logits, labels, weight=self.weight, reduction=self.reduction, label_smoothing=self.smoothing)
+        loss_logits = F.cross_entropy(main_logits, labels, weight=self.weight, reduction=self.reduction,
+                                      label_smoothing=self.smoothing)
         loss = loss_logits + self.aux_factor * loss_aux
         return loss

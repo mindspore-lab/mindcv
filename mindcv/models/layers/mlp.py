@@ -1,7 +1,9 @@
 """ MLP module w/ dropout and configurable activation layer
 """
 from typing import Optional
+
 from mindspore import nn, Tensor
+
 
 class Mlp(nn.Cell):
 

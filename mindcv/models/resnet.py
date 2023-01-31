@@ -8,8 +8,8 @@ from typing import Optional, Type, List, Union
 from mindspore import nn, Tensor
 
 from .layers.pooling import GlobalAvgPooling
-from .utils import load_pretrained
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     'ResNet',

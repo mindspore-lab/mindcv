@@ -3,13 +3,13 @@ MindSpore implementation of `poolformer`.
 Refer to PoolFormer: MetaFormer Is Actually What You Need for Vision.
 """
 
-import numpy as np
-from itertools import repeat
 import collections.abc
+from itertools import repeat
 
 import mindspore
-from mindspore import Tensor, nn, ops
 import mindspore.common.initializer as init
+import numpy as np
+from mindspore import Tensor, nn, ops
 
 from .layers import DropPath, Identity
 from .registry import register_model
@@ -35,7 +35,8 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = dict(
-    poolformer_s12=_cfg(url='https://download.mindspore.cn/toolkits/mindcv/poolformer/poolformer_s12-5be5c4e4.ckpt', crop_pct=0.9),
+    poolformer_s12=_cfg(url='https://download.mindspore.cn/toolkits/mindcv/poolformer/poolformer_s12-5be5c4e4.ckpt',
+                        crop_pct=0.9),
     poolformer_s24=_cfg(url='', crop_pct=0.9),
     poolformer_s36=_cfg(url='', crop_pct=0.9),
     poolformer_m36=_cfg(url='', crop_pct=0.95),
@@ -75,7 +76,7 @@ class ConvMlp(nn.Cell):
 
     def cls_init_weights(self):
         """Initialize weights for cells."""
-        for name, m in self.cells_and_names():
+        for m in self.cells_and_names():
             if isinstance(m, nn.Conv2d):
                 m.weight.set_data(
                     init.initializer(init.TruncatedNormal(sigma=.02), m.weight.shape, m.weight.dtype))
@@ -266,7 +267,7 @@ class PoolFormer(nn.Cell):
 
     def cls_init_weights(self):
         """Initialize weights for cells."""
-        for name, m in self.cells_and_names():
+        for m in self.cells_and_names():
             if isinstance(m, nn.Dense):
                 m.weight.set_data(
                     init.initializer(init.TruncatedNormal(sigma=.02), m.weight.shape, m.weight.dtype))

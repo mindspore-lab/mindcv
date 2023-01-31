@@ -5,13 +5,13 @@ Refer to Searching for MobileNetV3.
 
 import math
 
-from mindspore import nn, Tensor
 import mindspore.common.initializer as init
+from mindspore import nn, Tensor
 
-from .layers.squeeze_excite import SqueezeExcite
 from .layers.pooling import GlobalAvgPooling
-from .utils import load_pretrained, make_divisible
+from .layers.squeeze_excite import SqueezeExcite
 from .registry import register_model
+from .utils import load_pretrained, make_divisible
 
 __all__ = [
     "MobileNetV3",
@@ -32,8 +32,10 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'mobilenet_v3_small_1.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-Ascend.ckpt'),
-    'mobilenet_v3_large_1.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-Ascend.ckpt'),
+    'mobilenet_v3_small_1.0': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-Ascend.ckpt'),
+    'mobilenet_v3_large_1.0': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-Ascend.ckpt'),
     'mobilenet_v3_small_0.75': _cfg(url=''),
     'mobilenet_v3_large_0.75': _cfg(url='')
 }

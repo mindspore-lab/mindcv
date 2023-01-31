@@ -3,17 +3,17 @@ MindSpore implementation of `edgenext`.
 Refer to EdgeNeXt: Efficiently Amalgamated CNN-Transformer Architecture for Mobile Vision Applications.
 """
 
-import numpy as np
 import math
 from typing import Tuple
 
 import mindspore as ms
-from mindspore import nn, Tensor, Parameter, ops
 import mindspore.common.initializer as init
+import numpy as np
+from mindspore import nn, Tensor, Parameter, ops
 
-from .registry import register_model
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
+from .registry import register_model
 from .utils import load_pretrained
 
 __all__ = [
@@ -38,22 +38,22 @@ default_cfgs = {
 
 
 def ssplit(x: Tensor, dim, width):
-    B, C, H, W = x.shape
-    if C % width == 0:
-        return ops.split(x, dim, C // width)
-    else:
-        begin = 0
-        temp = []
-        while begin + width < C:
-            temp.append(x[:, begin:begin + width, :, :])
-            begin += width
-        temp.append(x[:, begin:, :, :])
-        return temp
+    b, c, h, w = x.shape
+    if c % width == 0:
+        return ops.split(x, dim, c // width)
+    begin = 0
+    temp = []
+    while begin + width < c:
+        temp.append(x[:, begin:begin + width, :, :])
+        begin += width
+    temp.append(x[:, begin:, :, :])
+    return temp
 
 
 class LayerNorm(nn.LayerNorm):
     r""" LayerNorm for channels_first tensors with 2d spatial dimensions (ie N, C, H, W).
     """
+
     def __init__(self,
                  normalized_shape: Tuple[int],
                  epsilon: float,
@@ -127,7 +127,8 @@ class ConvEncoder(nn.Cell):
         self.act = nn.GELU(approximate=False)
         self.pwconv2 = nn.Dense(expan_ratio * dim, dim)
 
-        self.gamma1 = Parameter(Tensor(layer_scale_init_value * np.ones(dim), ms.float32), requires_grad=True) if layer_scale_init_value > 0. else None
+        self.gamma1 = Parameter(Tensor(layer_scale_init_value * np.ones(dim), ms.float32),
+                                requires_grad=True) if layer_scale_init_value > 0. else None
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
 
     def construct(self, x: Tensor) -> Tensor:
@@ -202,15 +203,15 @@ class SDTAEncoder(nn.Cell):
                 out = ops.concat((out, sp), 1)
         x = ops.concat((out, spx[self.nums]), 1)
         # XCA
-        B, C, H, W = x.shape
-        x = ops.reshape(x, (B, C, H * W))
+        b, c, h, w = x.shape
+        x = ops.reshape(x, (b, c, h * w))
         x = ops.transpose(x, (0, 2, 1))
         if self.pos_embd is not None:
-            pos_encoding = ops.transpose(ops.reshape(self.pos_embd(B, H, W), (B, -1, x.shape[1])), (0, 2, 1))
+            pos_encoding = ops.transpose(ops.reshape(self.pos_embd(b, h, w), (b, -1, x.shape[1])), (0, 2, 1))
             x = x + pos_encoding
         x = x + self.drop_path(self.gamma_xca * self.xca(self.norm_xca(x)))
         x = x.astype(ms.float32)
-        x = ops.reshape(x, (B, H, W, C))
+        x = ops.reshape(x, (b, h, w, c))
         # Inverted Bottleneck
         x = self.norm(x)
         x = self.pwconv1(x)
@@ -241,8 +242,8 @@ class XCA(nn.Cell):
         self.proj_drop = nn.Dropout(1 - proj_drop)
 
     def construct(self, x: Tensor) -> Tensor:
-        B, N, C = x.shape
-        qkv = ops.reshape(self.qkv(x), (B, N, 3, self.num_heads, C // self.num_heads))
+        b, n, c = x.shape
+        qkv = ops.reshape(self.qkv(x), (b, n, 3, self.num_heads, c // self.num_heads))
         qkv = ops.transpose(qkv, (2, 0, 3, 1, 4))
         q, k, v = qkv[0], qkv[1], qkv[2]
 
@@ -256,7 +257,7 @@ class XCA(nn.Cell):
         # -------------------
         attn = ops.Softmax(-1)(attn)
         attn = self.attn_drop(attn)
-        x = ops.reshape(ops.transpose((ops.matmul(attn, v)), (0, 3, 1, 2)), (B, N, C))
+        x = ops.reshape(ops.transpose((ops.matmul(attn, v)), (0, 3, 1, 2)), (b, n, c))
         # # ------------------
         x = self.proj(x)
         x = self.proj_drop(x)
@@ -285,13 +286,30 @@ class EdgeNeXt(nn.Cell):
         use_pos_embd_global: use position embedding globally or not. Default: False
         d2_scales: scales of splitting channels
     """
+
     def __init__(self, in_chans=3, num_classes=1000,
-                 depths=[3, 3, 9, 3], dims=[24, 48, 88, 168],
-                 global_block=[0, 0, 0, 3], global_block_type=['None', 'None', 'None', 'SDTA'],
+                 depths=None, dims=None,
+                 global_block=None, global_block_type=None,
                  drop_path_rate=0., layer_scale_init_value=1e-6, head_init_scale=1., expan_ratio=4,
-                 kernel_sizes=[7, 7, 7, 7], heads=[8, 8, 8, 8], use_pos_embd_xca=[False, False, False, False],
-                 use_pos_embd_global=False, d2_scales=[2, 3, 4, 5], **kwargs):
+                 kernel_sizes=None, heads=None, use_pos_embd_xca=None,
+                 use_pos_embd_global=False, d2_scales=None):
         super().__init__()
+        if d2_scales is None:
+            d2_scales = [2, 3, 4, 5]
+        if use_pos_embd_xca is None:
+            use_pos_embd_xca = [False, False, False, False]
+        if heads is None:
+            heads = [8, 8, 8, 8]
+        if kernel_sizes is None:
+            kernel_sizes = [7, 7, 7, 7]
+        if global_block_type is None:
+            global_block_type = ['None', 'None', 'None', 'SDTA']
+        if global_block is None:
+            global_block = [0, 0, 0, 3]
+        if dims is None:
+            dims = [24, 48, 88, 168]
+        if depths is None:
+            depths = [3, 3, 9, 3]
         for g in global_block_type:
             assert g in ['None', 'SDTA']
         if use_pos_embd_global:
@@ -364,8 +382,8 @@ class EdgeNeXt(nn.Cell):
         x = self.downsample_layers[0](x)
         x = self.stages[0](x)
         if self.pos_embd is not None:
-            B, C, H, W = x.shape
-            x = x + self.pos_embd(B, H, W)
+            b, _, h, w = x.shape
+            x = x + self.pos_embd(b, h, w)
         for i in range(1, 4):
             x = self.downsample_layers[i](x)
             x = self.stages[i](x)

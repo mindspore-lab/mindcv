@@ -4,6 +4,7 @@
 import collections.abc
 from itertools import repeat
 
+
 def _ntuple(n):
     def parse(x):
         if isinstance(x, collections.abc.Iterable):
@@ -11,6 +12,7 @@ def _ntuple(n):
         return tuple(repeat(x, n))
 
     return parse
+
 
 to_1tuple = _ntuple(1)
 to_2tuple = _ntuple(2)

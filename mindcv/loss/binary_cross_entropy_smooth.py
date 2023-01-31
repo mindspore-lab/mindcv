@@ -1,8 +1,9 @@
 ''' cross entorpy smooth '''
-#import warnings
+# import warnings
 from mindspore import nn
 from mindspore.ops import functional as F
 from mindspore.ops import operations as P
+
 
 class BinaryCrossEntropySmooth(nn.LossBase):
     '''
@@ -26,6 +27,7 @@ class BinaryCrossEntropySmooth(nn.LossBase):
         labels (Tensor): Ground truth label, shape [N, C], has the same shape as `logits`. can be a class probability matrix or one-hot labels.
           Data type must be float16 or float32.
     '''
+
     def __init__(self, smoothing=0., aux_factor=0., reduction='mean', weight=None, pos_weight=None):
         super().__init__()
         self.smoothing = smoothing
@@ -61,11 +63,13 @@ class BinaryCrossEntropySmooth(nn.LossBase):
 
         if self.aux_factor > 0 and aux_logits is not None:
             for aux_logits in logits[1:]:
-                loss_aux += F.binary_cross_entropy_with_logits(aux_logits, labels, weight=weight, pos_weight=pos_weight, reduction=self.reduction)
+                loss_aux += F.binary_cross_entropy_with_logits(aux_logits, labels, weight=weight, pos_weight=pos_weight,
+                                                               reduction=self.reduction)
         # else:
         #    warnings.warn("There are logit tuple input, but the auxilary loss factor is 0.")
 
-        loss_logits = F.binary_cross_entropy_with_logits(main_logits, labels, weight=weight, pos_weight=pos_weight, reduction=self.reduction)
+        loss_logits = F.binary_cross_entropy_with_logits(main_logits, labels, weight=weight, pos_weight=pos_weight,
+                                                         reduction=self.reduction)
 
         loss = loss_logits + self.aux_factor * loss_aux
 

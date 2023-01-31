@@ -1,4 +1,4 @@
-""" Image to Patch Embedding using Conv2d 
+""" Image to Patch Embedding using Conv2d
 A convolution based approach to patchifying a 2D image w/ embedding projection."""
 from typing import Optional
 
@@ -6,6 +6,7 @@ from mindspore import nn
 from mindspore import ops, Tensor
 
 from .helpers import to_2tuple
+
 
 class PatchEmbed(nn.Cell):
     """ Image to Patch Embedding
@@ -18,11 +19,11 @@ class PatchEmbed(nn.Cell):
         norm_layer (nn.Cell, optional): Normalization layer. Default: None
     """
 
-    def __init__(self, 
-                 image_size: int = 224, 
-                 patch_size: int = 4, 
-                 in_chans: int = 3, 
-                 embed_dim: int = 96, 
+    def __init__(self,
+                 image_size: int = 224,
+                 patch_size: int = 4,
+                 in_chans: int = 3,
+                 embed_dim: int = 96,
                  norm_layer: Optional[nn.Cell] = None) -> None:
         super().__init__()
         image_size = to_2tuple(image_size)
@@ -48,9 +49,9 @@ class PatchEmbed(nn.Cell):
 
     def construct(self, x: Tensor) -> Tensor:
         """docstring"""
-        B = x.shape[0]
+        b = x.shape[0]
         # FIXME look at relaxing size constraints
-        x = ops.Reshape()(self.proj(x), (B, self.embed_dim, -1))  # B Ph*Pw C
+        x = ops.Reshape()(self.proj(x), (b, self.embed_dim, -1))  # B Ph*Pw C
         x = ops.Transpose()(x, (0, 2, 1))
 
         if self.norm is not None:

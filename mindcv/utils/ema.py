@@ -1,7 +1,7 @@
 """ema define"""
 
 import mindspore as ms
-from mindspore import nn, Tensor, Parameter, ParameterTuple
+from mindspore import nn, Tensor, Parameter
 from mindspore.common import RowTensor
 from mindspore.ops import composite as C
 from mindspore.ops import functional as F
@@ -16,6 +16,7 @@ _grad_overflow = C.MultitypeFuncGraph("_grad_overflow")
 @_ema_op.register("Tensor", "Tensor", "Tensor")
 def _ema_weights(factor, ema_weight, weight):
     return F.assign(ema_weight, ema_weight * factor + weight * (1 - factor))
+
 
 @_grad_scale.register("Tensor", "Tensor")
 def tensor_grad_scale(scale, grad):
@@ -33,15 +34,13 @@ class TrainOneStepWithEMA(nn.TrainOneStepWithLossScaleCell):
     """TrainOneStepWithEMA"""
 
     def __init__(self, network, optimizer, scale_sense=1.0, use_ema=False, ema_decay=0.9999, updates=0):
-        super(TrainOneStepWithEMA, self).__init__(network, optimizer, scale_sense)
+        super().__init__(network, optimizer, scale_sense)
         self.use_ema = use_ema
         self.ema_decay = ema_decay
         self.updates = Parameter(Tensor(updates, ms.float32))
         if self.use_ema:
             self.weights_all = ms.ParameterTuple(list(network.get_parameters()))
             self.ema_weight = self.weights_all.clone("ema", init='same')
-
-
 
     def ema_update(self):
         """Update EMA parameters."""

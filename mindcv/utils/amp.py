@@ -1,7 +1,6 @@
 ''' auto mixed precision related functions '''
-import mindspore as ms
-#from mindspore.amp import LossScaler  # this line of code leads to “get rank id error” in modelarts
 from mindspore.common.api import ms_class
+
 
 @ms_class
 class LossScaler():
@@ -15,6 +14,7 @@ class LossScaler():
     Note:
         This is an experimental interface that is subject to change or deletion.
     """
+
     def scale(self, inputs):
         """
         Scaling inputs by `scale_value`.
@@ -23,7 +23,6 @@ class LossScaler():
             inputs (Union(Tensor, tuple(Tensor))): the input loss value or gradients.
         """
         raise NotImplementedError
-
 
     def unscale(self, inputs):
         """
@@ -34,7 +33,6 @@ class LossScaler():
         """
         raise NotImplementedError
 
-
     def adjust(self, grads_finite):
         """
         Adjust the `scale_value` dependent on whether grads are finite.
@@ -44,10 +42,12 @@ class LossScaler():
         """
         raise NotImplementedError
 
+
 class NoLossScaler(LossScaler):
     """
     No LossScaler
     """
+
     def scale(self, inputs):
         return inputs
 

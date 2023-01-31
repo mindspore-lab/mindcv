@@ -4,12 +4,12 @@ Refer to: Learning Transferable Architectures for Scalable Image Recognition
 """
 import math
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import nn, ops, Tensor
 
-from .utils import load_pretrained
-from .registry import register_model
 from .layers.pooling import GlobalAvgPooling
+from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     'NASNetAMobile',
@@ -33,6 +33,7 @@ default_cfgs = {
 
 class SeparableConv2d(nn.Cell):
     """depth-wise convolutions + point-wise convolutions"""
+
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
@@ -55,6 +56,7 @@ class SeparableConv2d(nn.Cell):
 
 class BranchSeparables(nn.Cell):
     """NasNet model basic architecture"""
+
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
@@ -86,6 +88,7 @@ class BranchSeparables(nn.Cell):
 
 class BranchSeparablesStem(nn.Cell):
     """NasNet model basic architecture"""
+
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
@@ -117,6 +120,7 @@ class BranchSeparablesStem(nn.Cell):
 
 class BranchSeparablesReduction(BranchSeparables):
     """NasNet model Residual Connections"""
+
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
@@ -144,6 +148,7 @@ class BranchSeparablesReduction(BranchSeparables):
 
 class CellStem0(nn.Cell):
     """NasNet model basic architecture"""
+
     def __init__(self,
                  stem_filters: int,
                  num_filters: int = 42) -> None:
@@ -209,6 +214,7 @@ class CellStem0(nn.Cell):
 
 class CellStem1(nn.Cell):
     """NasNet model basic architecture"""
+
     def __init__(self,
                  stem_filters: int,
                  num_filters: int) -> None:
@@ -326,6 +332,7 @@ class CellStem1(nn.Cell):
 
 class FirstCell(nn.Cell):
     """NasNet model basic architecture"""
+
     def __init__(self,
                  in_channels_left: int,
                  out_channels_left: int,
@@ -415,6 +422,7 @@ class FirstCell(nn.Cell):
 
 class NormalCell(nn.Cell):
     """NasNet model basic architecture"""
+
     def __init__(self,
                  in_channels_left: int,
                  out_channels_left: int,
@@ -484,6 +492,7 @@ class NormalCell(nn.Cell):
 
 class ReductionCell0(nn.Cell):
     """NasNet model Residual Connections"""
+
     def __init__(self,
                  in_channels_left: int,
                  out_channels_left: int,
@@ -555,6 +564,7 @@ class ReductionCell0(nn.Cell):
 
 class ReductionCell1(nn.Cell):
     """NasNet model Residual Connections"""
+
     def __init__(self,
                  in_channels_left: int,
                  out_channels_left: int,
@@ -792,7 +802,7 @@ class NASNetAMobile(nn.Cell):
                                                       cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(init.initializer(init.Zero(),
-                                                      cell.bias.shape, cell.bias.dtype))
+                                                        cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, nn.BatchNorm2d):
                 cell.gamma.set_data(init.initializer(init.One(),
                                                      cell.gamma.shape, cell.gamma.dtype))

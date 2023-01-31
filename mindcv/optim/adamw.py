@@ -1,15 +1,13 @@
 """Gradient clipping wrapper for optimizers."""
 
-import numpy as np
-
 import mindspore as ms
+import numpy as np
 from mindspore import ops
+from mindspore._checkparam import Rel
 from mindspore._checkparam import Validator as validator
-
 from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
-from mindspore._checkparam import Rel
 from mindspore.nn.optim import Optimizer
 from mindspore.nn.optim.optimizer import opt_init_args_register
 
@@ -79,10 +77,10 @@ def _update_run_op(beta1_power, beta2_power, beta1, beta2, eps, lr, weight_decay
         gradient_fp32 = ops.cast(gradient, ms.float32)
 
         next_m = ops.mul(beta1, m_fp32) + ops.mul(ops.cast(ops.tuple_to_array((1.0,)), ms.float32)
-                                                - beta1, gradient_fp32)
+                                                  - beta1, gradient_fp32)
 
         next_v = ops.mul(beta2, v_fp32) + ops.mul(ops.cast(ops.tuple_to_array((1.0,)), ms.float32)
-                                                - beta2, ops.square(gradient_fp32))
+                                                  - beta2, ops.square(gradient_fp32))
 
         regulate_m = next_m / (_scaler_one - beta1_power)
         regulate_v = next_v / (_scaler_one - beta2_power)
@@ -106,6 +104,7 @@ class AdamW(Optimizer):
     """
     Implements the gradient clipping by norm for a AdamWeightDecay optimizer.
     """
+
     @opt_init_args_register
     def __init__(self, params, learning_rate=1e-3, beta1=0.9, beta2=0.999, eps=1e-8, \
                  weight_decay=0.0, loss_scale=1.0, clip=False):
@@ -137,17 +136,17 @@ class AdamW(Optimizer):
         if self.is_group:
             if self.is_group_lr:
                 optim_result = self.hyper_map(ops.partial(_adam_opt, beta1_power, beta2_power, \
-                                              self.beta1, self.beta2, self.eps),
+                                                          self.beta1, self.beta2, self.eps),
                                               lr, self.weight_decay, self.parameters, self.moments1, self.moments2,
                                               gradients, self.decay_flags, self.optim_filter)
             else:
                 optim_result = self.hyper_map(ops.partial(_adam_opt, beta1_power, beta2_power, \
-                                              self.beta1, self.beta2, self.eps, lr),
+                                                          self.beta1, self.beta2, self.eps, lr),
                                               self.weight_decay, self.parameters, self.moments1, self.moments2,
                                               gradients, self.decay_flags, self.optim_filter)
         else:
             optim_result = self.hyper_map(ops.partial(_adam_opt, beta1_power, beta2_power, self.beta1, self.beta2, \
-                                          self.eps, lr, self.weight_decay),
+                                                      self.eps, lr, self.weight_decay),
                                           self.parameters, self.moments1, self.moments2,
                                           gradients, self.decay_flags, self.optim_filter)
         if self.use_parallel:

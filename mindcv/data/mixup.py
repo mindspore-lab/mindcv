@@ -124,7 +124,7 @@ class Mixup:
         correct_lam (bool): apply lambda correction when cutmix bbox clipped by image borders
         label_smoothing (float): apply label smoothing to the mixed target tensor
         num_classes (int): number of classes for target
-        is_onehot_label (bool): indicate wheter the input label is onehot format. 
+        is_onehot_label (bool): indicate wheter the input label is onehot format.
     """
 
     def __init__(self, mixup_alpha=1., cutmix_alpha=0., cutmix_minmax=None, prob=1.0, switch_prob=0.5,
@@ -143,7 +143,7 @@ class Mixup:
         self.mode = mode
         self.correct_lam = correct_lam  # correct lambda based on clipped area for cutmix
         self.mixup_enabled = True  # set to false to disable mixing (intended tp be set by train loop)
-        self.is_onehot_label = is_onehot_label # 
+        self.is_onehot_label = is_onehot_label  #
 
     def _params_per_elem(self, batch_size):
         """_params_per_elem"""

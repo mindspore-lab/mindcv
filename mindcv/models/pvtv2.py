@@ -6,15 +6,15 @@ import math
 from functools import partial
 
 import mindspore
-import mindspore.nn as nn
-import mindspore.ops as ops
+from mindspore import nn
+from mindspore import ops
 from mindspore import Tensor
 from mindspore.common import initializer as weight_init
 
 from .layers import DropPath
 from .layers import Identity
-from .utils import load_pretrained
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     'PyramidVisionTransformerV2',
@@ -53,11 +53,11 @@ class DWConv(nn.Cell):
         super(DWConv, self).__init__()
         self.dwconv = nn.Conv2d(dim, dim, 3, 1, has_bias=True, group=dim)
 
-    def construct(self, x, H, W):
-        B, N, C = x.shape
-        x = ops.transpose(x, (0, 2, 1)).view((B, C, H, W))
+    def construct(self, x, h, w):
+        b, _, c = x.shape
+        x = ops.transpose(x, (0, 2, 1)).view((b, c, h, w))
         x = self.dwconv(x)
-        x = ops.transpose(x.view((B, C, H * W)), (0, 2, 1))
+        x = ops.transpose(x.view((b, c, h * w)), (0, 2, 1))
 
         return x
 
@@ -126,34 +126,34 @@ class Attention(nn.Cell):
             self.act = nn.GELU()
 
     def construct(self, x, H, W):
-        B, N, C = x.shape
+        b, n, c = x.shape
         q = self.q(x)
-        q = ops.reshape(q, (B, N, self.num_heads, C // self.num_heads))
+        q = ops.reshape(q, (b, n, self.num_heads, c // self.num_heads))
         q = ops.transpose(q, (0, 2, 1, 3))
 
         if not self.linear:
             if self.sr_ratio > 1:
 
-                x_ = ops.reshape(ops.transpose(x, (0, 2, 1)), (B, C, H, W))
+                x_ = ops.reshape(ops.transpose(x, (0, 2, 1)), (b, c, H, W))
 
                 x_ = self.sr(x_)
-                x_ = ops.transpose(ops.reshape(x_, (B, C, -1)), (0, 2, 1))
+                x_ = ops.transpose(ops.reshape(x_, (b, c, -1)), (0, 2, 1))
                 x_ = self.norm(x_)
 
                 kv = self.kv(x_)
-                kv = ops.transpose(ops.reshape(kv, (B, -1, 2, self.num_heads, C // self.num_heads)), (2, 0, 3, 1, 4))
+                kv = ops.transpose(ops.reshape(kv, (b, -1, 2, self.num_heads, c // self.num_heads)), (2, 0, 3, 1, 4))
             else:
                 kv = self.kv(x)
-                kv = ops.transpose(ops.reshape(kv, (B, -1, 2, self.num_heads, C // self.num_heads)), (2, 0, 3, 1, 4))
+                kv = ops.transpose(ops.reshape(kv, (b, -1, 2, self.num_heads, c // self.num_heads)), (2, 0, 3, 1, 4))
 
         else:
 
-            x_ = ops.reshape(ops.transpose(x, (0, 2, 1)), (B, C, H, W))
+            x_ = ops.reshape(ops.transpose(x, (0, 2, 1)), (b, c, H, W))
             x_ = self.sr(self.pool(x_))
-            x_ = ops.reshape(ops.transpose(x_, (0, 2, 1)), (B, C, -1))
+            x_ = ops.reshape(ops.transpose(x_, (0, 2, 1)), (b, c, -1))
             x_ = self.norm(x_)
             x_ = self.act(x_)
-            kv = ops.transpose(ops.reshape(self.kv(x_), (B, -1, 2, self.num_heads, C // self.num_heads)),
+            kv = ops.transpose(ops.reshape(self.kv(x_), (b, -1, 2, self.num_heads, c // self.num_heads)),
                                (2, 0, 3, 1, 4))
         k, v = kv[0], kv[1]
 
@@ -162,7 +162,7 @@ class Attention(nn.Cell):
         attn = self.attn_drop(attn)
 
         x = self.batmatmul(attn, v)
-        x = ops.reshape(ops.transpose(x, (0, 2, 1, 3)), (B, N, C))
+        x = ops.reshape(ops.transpose(x, (0, 2, 1, 3)), (b, n, c))
         x = self.proj(x)
         x = self.proj_drop(x)
 
@@ -173,7 +173,7 @@ class Block(nn.Cell):
     """ Block with Linear Spatial Reduction Attention and Convolutional Feed-Forward"""
 
     def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop=0., attn_drop=0.,
-                 drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm, sr_ratio=1, linear=False, block_id=0):
+                 drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm, sr_ratio=1, linear=False):
         super().__init__()
         self.norm1 = norm_layer([dim])
 
@@ -210,18 +210,18 @@ class OverlapPatchEmbed(nn.Cell):
 
         self.img_size = img_size
         self.patch_size = patch_size
-        self.H, self.W = img_size[0] // stride, img_size[1] // stride
-        self.num_patches = self.H * self.W
+        self.h, self.w = img_size[0] // stride, img_size[1] // stride
+        self.num_patches = self.h * self.w
         self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=stride, has_bias=True)
         self.norm = nn.LayerNorm([embed_dim])
 
     def construct(self, x):
         x = self.proj(x)
-        B, C, H, W = x.shape
-        x = ops.transpose(ops.reshape(x, (B, C, H * W)), (0, 2, 1))
+        b, c, h, w = x.shape
+        x = ops.transpose(ops.reshape(x, (b, c, h * w)), (0, 2, 1))
         x = self.norm(x)
 
-        return x, H, W
+        return x, h, w
 
 
 class PyramidVisionTransformerV2(nn.Cell):
@@ -248,11 +248,21 @@ class PyramidVisionTransformerV2(nn.Cell):
             linear(bool) :  use linear SRA.
         """
 
-    def __init__(self, img_size=224, patch_size=16, in_chans=3, num_classes=1000, embed_dims=[64, 128, 256, 512],
-                 num_heads=[1, 2, 4, 8], mlp_ratios=[4, 4, 4, 4], qkv_bias=False, qk_scale=None, drop_rate=0.,
+    def __init__(self, img_size=224, in_chans=3, num_classes=1000, embed_dims=None,
+                 num_heads=None, mlp_ratios=None, qkv_bias=False, qk_scale=None, drop_rate=0.,
                  attn_drop_rate=0., drop_path_rate=0., norm_layer=nn.LayerNorm,
-                 depths=[3, 4, 6, 3], sr_ratios=[8, 4, 2, 1], num_stages=4, linear=False):
+                 depths=None, sr_ratios=None, num_stages=4, linear=False):
         super().__init__()
+        if embed_dims is None:
+            embed_dims = [64, 128, 256, 512]
+        if sr_ratios is None:
+            sr_ratios = [8, 4, 2, 1]
+        if mlp_ratios is None:
+            mlp_ratios = [4, 4, 4, 4]
+        if num_heads is None:
+            num_heads = [1, 2, 4, 8]
+        if depths is None:
+            depths = [3, 4, 6, 3]
         self.num_classes = num_classes
         self.depths = depths
         self.num_stages = num_stages
@@ -329,23 +339,23 @@ class PyramidVisionTransformerV2(nn.Cell):
     def get_classifier(self):
         return self.head
 
-    def reset_classifier(self, num_classes, global_pool=''):
+    def reset_classifier(self, num_classes):
         self.num_classes = num_classes
         self.head = nn.Dense(self.embed_dim, num_classes) if num_classes > 0 else Identity()
 
     def forward_features(self, x):
-        B = x.shape[0]
+        b = x.shape[0]
 
         for i in range(self.num_stages):
             patch_embed = self.patch_embed_list[i]
             block = self.block_list[i]
             norm = self.norm_list[i]
-            x, H, W = patch_embed(x)
+            x, h, w = patch_embed(x)
             for blk in block:
-                x = blk(x, H, W)
+                x = blk(x, h, w)
             x = norm(x)
             if i != self.num_stages - 1:
-                x = ops.transpose(ops.reshape(x, (B, H, W, -1)), (0, 3, 1, 2))
+                x = ops.transpose(ops.reshape(x, (b, h, w, -1)), (0, 3, 1, 2))
 
         return x.mean(axis=1)
 
@@ -367,9 +377,11 @@ def pvt_v2_b0(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     """
     default_cfg = default_cfgs['pvt_v2_b0']
     model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
-        patch_size=4, embed_dims=[32, 64, 160, 256], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[2, 2, 2, 2], sr_ratios=[8, 4, 2, 1],
-        **kwargs)
+                                       patch_size=4, embed_dims=[32, 64, 160, 256], num_heads=[1, 2, 5, 8],
+                                       mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
+                                       norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[2, 2, 2, 2],
+                                       sr_ratios=[8, 4, 2, 1],
+                                       **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -385,9 +397,11 @@ def pvt_v2_b1(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     """
     default_cfg = default_cfgs['pvt_v2_b1']
     model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
-        patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[2, 2, 2, 2], sr_ratios=[8, 4, 2, 1],
-        **kwargs)
+                                       patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
+                                       mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
+                                       norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[2, 2, 2, 2],
+                                       sr_ratios=[8, 4, 2, 1],
+                                       **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -403,8 +417,10 @@ def pvt_v2_b2(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     """
     default_cfg = default_cfgs['pvt_v2_b2']
     model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
-        patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 4, 6, 3], sr_ratios=[8, 4, 2, 1], **kwargs)
+                                       patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
+                                       mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
+                                       norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 4, 6, 3],
+                                       sr_ratios=[8, 4, 2, 1], **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -420,8 +436,10 @@ def pvt_v2_b3(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     """
     default_cfg = default_cfgs['pvt_v2_b3']
     model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
-        patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 4, 18, 3], sr_ratios=[8, 4, 2, 1], **kwargs)
+                                       patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
+                                       mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
+                                       norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 4, 18, 3],
+                                       sr_ratios=[8, 4, 2, 1], **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
@@ -436,9 +454,11 @@ def pvt_v2_b4(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     """
     default_cfg = default_cfgs['pvt_v2_b4']
     model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
-        patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 8, 27, 3], sr_ratios=[8, 4, 2, 1],
-        **kwargs)
+                                       patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
+                                       mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
+                                       norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 8, 27, 3],
+                                       sr_ratios=[8, 4, 2, 1],
+                                       **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
@@ -453,14 +473,12 @@ def pvt_v2_b5(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     """
     default_cfg = default_cfgs['pvt_v2_b5']
     model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
-        patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[4, 4, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 6, 40, 3], sr_ratios=[8, 4, 2, 1],
-        **kwargs)
+                                       patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
+                                       mlp_ratios=[4, 4, 4, 4], qkv_bias=True,
+                                       norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 6, 40, 3],
+                                       sr_ratios=[8, 4, 2, 1],
+                                       **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
     return model
-
-
-
-

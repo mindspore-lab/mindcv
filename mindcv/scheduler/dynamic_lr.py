@@ -118,7 +118,7 @@ def cosine_decay_lr(decay_epochs, eta_min, *, eta_max, steps_per_epoch, epochs, 
     ''' update every epoch'''
     tot_steps = steps_per_epoch * epochs
     lrs = []
-    
+
     for c in range(num_cycles):
         lr_max = eta_max * (cycle_decay ** c)
         delta = 0.5 * (lr_max - eta_min)
@@ -178,21 +178,22 @@ def cosine_annealing_warm_restarts_lr(te, tm, eta_min, *, eta_max, steps_per_epo
     te_next = te
     lrs = []
     for epoch_idx in range(epochs):
-        for batch_idx in range(steps_per_epoch):
+        for _ in range(steps_per_epoch):
             lrs.append(eta_min + delta * (1.0 + math.cos(tt)))
             tt = tt + math.pi / te / steps_per_epoch
             if tt >= math.pi:
                 tt = tt - math.pi
         if epoch_idx + 1 == te_next:  # time to restart
-            tt = 0                    # by setting to 0 we set lr to lr_max, see above
-            te = te * tm              # change the period of restarts
-            te_next = te_next + te    # note the next restart's epoch
+            tt = 0  # by setting to 0 we set lr to lr_max, see above
+            te = te * tm  # change the period of restarts
+            te_next = te_next + te  # note the next restart's epoch
     return lrs
 
 
 if __name__ == '__main__':
     # Demonstrate how these schedulers work by printing & visualizing the returned list.
     import matplotlib.pyplot as plt
+
     table = (
         (("constant_lr", constant_lr(0.5, 4, lr=0.05, steps_per_epoch=2, epochs=10),),),
         (("linear_lr", linear_lr(0.5, 1.0, 4, lr=0.05, steps_per_epoch=2, epochs=10)),
@@ -206,7 +207,8 @@ if __name__ == '__main__':
         (("cosine_decay_lr", cosine_decay_lr(5, 1.0, eta_max=2.0, steps_per_epoch=2, epochs=10)),
          ("cosine_decay_refined_lr", cosine_decay_refined_lr(5, 1.0, eta_max=2.0, steps_per_epoch=2, epochs=10)),),
         (("cosine_annealing_lr", cosine_annealing_lr(5, 0.0, eta_max=1.0, steps_per_epoch=2, epochs=15)),
-         ("cosine_annealing_warm_restarts_lr", cosine_annealing_warm_restarts_lr(5, 2, 0.0, eta_max=1.0, steps_per_epoch=2, epochs=15)),)
+         ("cosine_annealing_warm_restarts_lr",
+          cosine_annealing_warm_restarts_lr(5, 2, 0.0, eta_max=1.0, steps_per_epoch=2, epochs=15)),)
     )
     for variants in table:
         n_variants = len(variants)

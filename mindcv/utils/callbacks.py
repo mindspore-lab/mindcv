@@ -1,23 +1,25 @@
 """Callbacks for mindspore.Model"""
 import os
 from time import time
-#import stat
-import numpy as np
 
 import mindspore as ms
-from mindspore import log as logger
+# import stat
+import numpy as np
 from mindspore import Tensor, save_checkpoint, SummaryRecord
-from mindspore.train.callback import Callback
+from mindspore import log as logger
 from mindspore.train._utils import _make_directory
+from mindspore.train.callback import Callback
 
 from .checkpoint_manager import CheckpointManager
 from .reduce_manager import AllReduceSum
+
 
 class StateMonitor(Callback):
     """
     Train loss and validation accuracy monitor, after each epoch save the
     best checkpoint file with highest validation accuracy.
     """
+
     def __init__(self,
                  model,
                  summary_dir="./",
@@ -28,7 +30,7 @@ class StateMonitor(Callback):
                  ckpt_dir="./",
                  ckpt_save_interval=1,
                  best_ckpt_name="best.ckpt",
-                 metric_name=["accuracy"],
+                 metric_name=None,
                  rank_id=None,
                  device_num=None,
                  log_interval=100,
@@ -38,6 +40,8 @@ class StateMonitor(Callback):
                  ckpt_save_policy=None
                  ):
         super().__init__()
+        if metric_name is None:
+            metric_name = ["accuracy"]
         self.model = model
         self.dataset_val = dataset_val
         self.val_start_epoch = val_start_epoch
@@ -53,7 +57,7 @@ class StateMonitor(Callback):
         self.ckpt_dir = ckpt_dir
         self.ckpt_save_interval = ckpt_save_interval
         self.last_epoch = last_epoch
-        self.best_epoch= -1
+        self.best_epoch = -1
 
         self.keep_checkpoint_max = keep_checkpoint_max
         self.ckpt_save_policy = ckpt_save_policy
@@ -66,11 +70,11 @@ class StateMonitor(Callback):
             self.log_txt_fp = os.path.join(ckpt_dir, 'result.log')
             result_log = 'Epoch\tTrainLoss\t'
             name_dict = {'Top_1_Accuracy': 'ValAcc@1', 'Top_5_Accuracy': 'ValAcc@5'}
-            for i in range(len(self.metric_name)):
-                if self.metric_name[i] in name_dict.keys():
-                    result_log += name_dict[self.metric_name[i]] + "\t"
+            for name in enumerate(self.metric_name):
+                if name in name_dict:
+                    result_log += name_dict[name] + "\t"
                 else:
-                    result_log += self.metric_name[i] + "\t"
+                    result_log += name + "\t"
             result_log += "Time\n"
             with open(self.log_txt_fp, 'w', encoding="utf-8") as fp:
                 fp.write(result_log)
@@ -97,7 +101,7 @@ class StateMonitor(Callback):
     def on_train_step_end(self, run_context):
         cb_params = run_context.original_args()
         num_batches = cb_params.batch_num
-        cur_epoch = cb_params.cur_epoch_num + self.last_epoch -1 #(global_step-1) // num_batches
+        cur_epoch = cb_params.cur_epoch_num + self.last_epoch - 1  # (global_step-1) // num_batches
         cur_step_in_epoch = int((cb_params.cur_step_num - 1) % cb_params.batch_num)
 
         if cb_params.optimizer is not None:
@@ -105,17 +109,17 @@ class StateMonitor(Callback):
         else:
             optimizer = cb_params.train_network.network.optimizer
 
-        if (cur_step_in_epoch  + 1) % self.log_interval == 0 or \
-                (cur_step_in_epoch  + 1) >= num_batches or cur_step_in_epoch == 0:
+        if (cur_step_in_epoch + 1) % self.log_interval == 0 or \
+                (cur_step_in_epoch + 1) >= num_batches or cur_step_in_epoch == 0:
             step = optimizer.global_step
             if optimizer.dynamic_lr:
-                cur_lr = optimizer.learning_rate(step-1)[0].asnumpy()
+                cur_lr = optimizer.learning_rate(step - 1)[0].asnumpy()
             else:
                 cur_lr = optimizer.learning_rate.asnumpy()
             loss = self._get_loss(cb_params)
 
-            print(f"Epoch: {cur_epoch+1}, "
-                  f"batch:[{cur_step_in_epoch+1}/{num_batches}], "
+            print(f"Epoch: {cur_epoch + 1}, "
+                  f"batch:[{cur_step_in_epoch + 1}/{num_batches}], "
                   f"loss:{loss.asnumpy():.6f}, lr: {cur_lr:.7f},  time:{time() - self.start:.6f}s")
             self.start = time()
 
@@ -133,7 +137,7 @@ class StateMonitor(Callback):
         # the global step may larger than batch_size * epoch due to graph mode async
         global_step = optimizer.global_step.asnumpy()[0]
         cur_epoch = cb_params.cur_epoch_num + self.last_epoch
-        cur_step_in_epoch = cb_params.batch_num #(global_step - 1) % cb_params.batch_num
+        cur_step_in_epoch = cb_params.batch_num  # (global_step - 1) % cb_params.batch_num
 
         loss = self._get_loss(cb_params)
         self.summary_record.add_value('scalar', f'train_loss_{self.rank_id}', loss)
@@ -143,8 +147,8 @@ class StateMonitor(Callback):
         if self.dataset_val is not None:
             if cur_epoch >= self.val_start_epoch and (cur_epoch - self.val_start_epoch) % self.val_interval == 0:
                 val_time = time()
-                for i in range(len(self.metric_name)):
-                    res[i] = self.apply_eval()[self.metric_name[i]] * 100
+                for i, name in enumerate(self.metric_name):
+                    res[i] = self.apply_eval()[name] * 100
 
                 if self.device_num > 1:
                     res = self.all_reduce(res)
@@ -152,9 +156,9 @@ class StateMonitor(Callback):
                 # record val acc
                 if self.rank_id in [0, None]:
                     metric_str = "Validation "
-                    for i in range(len(self.metric_name)):
-                        metric_str += self.metric_name[i] + ": " + str(res[i]) + ", "
-                    metric_str += f"time:{time() -val_time:.6f}s"
+                    for i, name in enumerate(self.metric_name):
+                        metric_str += name + ": " + str(res[i]) + ", "
+                    metric_str += f"time:{time() - val_time:.6f}s"
                     print(metric_str)
                     # Save the best ckpt file
                     if res[0] > self.best_res:
@@ -166,8 +170,8 @@ class StateMonitor(Callback):
 
                     if not isinstance(res, Tensor):
                         res = Tensor(res)
-                    for i in range(len(res)):
-                        self.summary_record.add_value('scalar', 'val_' + self.metric_name[i], res[i])
+                    for i, result in enumerate(res):
+                        self.summary_record.add_value('scalar', 'val_' + self.metric_name[i], result)
 
         # log
         if self.rank_id in [0, None]:
@@ -190,7 +194,7 @@ class StateMonitor(Callback):
                                                               save_path=ckpt_save_path)
                 if self.ckpt_save_policy == 'top_k':
                     print("Top K accuracy checkpoints:")
-                    print('\n'.join(ckpt + '\t' + str(acc)  for ckpt, acc in ckpoint_filelist))
+                    print('\n'.join(ckpt + '\t' + str(acc) for ckpt, acc in ckpoint_filelist))
                 else:
                     print(f"Saving model to {ckpt_save_path}")
 
@@ -199,8 +203,8 @@ class StateMonitor(Callback):
             print("-" * 80)
             self.epoch_start = time()
             result_log = f'{cur_epoch}\t\t\t{loss.asnumpy():.7f}\t\t\t'
-            for i in range(len(res)):
-                result_log += f"{res[i].asnumpy():.3f}\t\t\t"
+            for result in enumerate(res):
+                result_log += f"{result.asnumpy():.3f}\t\t\t"
             result_log += f"{epoch_time:.2f}\n"
             with open(self.log_txt_fp, 'a', encoding="utf-8") as fp:
                 fp.write(result_log)
@@ -260,8 +264,10 @@ class StateMonitor(Callback):
         ckpoint_files = sorted(self._ckpoint_filelist, key=os.path.getmtime)
         self.remove_ckpoint_file(ckpoint_files[0])
 
+
 class LossAccSummary(Callback):
     ''' A callback for recording loss and acc during training '''
+
     def __init__(self,
                  summary_dir,
                  model,
@@ -327,6 +333,7 @@ class LossAccSummary(Callback):
         loss = Tensor(np.mean(loss.asnumpy()))
         return loss
 
+
 class ValCallback(Callback):
     def __init__(self, log_step_interval=100):
         super().__init__()
@@ -334,6 +341,6 @@ class ValCallback(Callback):
 
     def on_eval_step_end(self, run_context):
         cb_params = run_context.original_args()
-        #cur_step_in_epoch = int((cb_params.cur_step_num - 1) % cb_params.batch_num)
+        # cur_step_in_epoch = int((cb_params.cur_step_num - 1) % cb_params.batch_num)
         if cb_params.cur_step_num % self.log_step_interval == 0:
-            print(f'{cb_params.cur_step_num }/{cb_params.batch_num}')
+            print(f'{cb_params.cur_step_num}/{cb_params.batch_num}')

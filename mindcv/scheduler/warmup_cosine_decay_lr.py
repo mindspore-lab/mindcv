@@ -6,14 +6,13 @@ from mindspore.nn.learning_rate_schedule import LearningRateSchedule
 class WarmupCosineDecayLR(LearningRateSchedule):
     """ CosineDecayLR with warmup
     Args:
-   
         min_lr: (float) lower lr bound for 'WarmupCosineDecayLR' schedulers.
         max_lr: (float) upper lr bound for 'WarmupCosineDecayLR' schedulers.
-        warmup_epochs: (int) the number of warm up epochs of learning rate. 
+        warmup_epochs: (int) the number of warm up epochs of learning rate.
         decay_epochs: (int) the number of decay epochs of learning rate.
         steps_per_epoch: (int) the number of steps per epoch.
         step_mode: (bool) determine decay along steps or epochs. True for steps, False for epochs.
-    
+
     The learning rate will increase from 0 to max_lr in `warmup_epochs` epochs, then decay to min_lr in `decay_epoches` epochs
     """
 

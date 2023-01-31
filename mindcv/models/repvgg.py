@@ -4,15 +4,14 @@ Refer to RepVGG: Making VGG_style ConvNets Great Again
 """
 
 import copy
-import numpy as np
 
-from mindspore import nn, ops, Tensor, save_checkpoint
 import mindspore.common.initializer as init
+import numpy as np
+from mindspore import nn, ops, Tensor, save_checkpoint
 
 from .layers import Identity, SqueezeExcite, GlobalAvgPooling
-from .utils import load_pretrained
 from .registry import register_model
-
+from .utils import load_pretrained
 
 __all__ = [
     'RepVGG',
@@ -47,6 +46,7 @@ def conv_bn(in_channels: int, out_channels: int, kernel_size: int,
 
 class RepVGGBlock(nn.Cell):
     """Basic Block of RepVGG"""
+
     def __init__(self, in_channels: int, out_channels: int, kernel_size: int,
                  stride: int = 1, padding: int = 0, dilation: int = 1,
                  group: int = 1, padding_mode: str = 'zeros',

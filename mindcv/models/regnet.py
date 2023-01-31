@@ -4,10 +4,10 @@ Refer to: Designing Network Design Spaces
 """
 
 import math
-import numpy as np
 
-from mindspore import nn
 import mindspore.common.initializer as init
+import numpy as np
+from mindspore import nn
 
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExcite
@@ -119,7 +119,7 @@ class ResStemCifar(nn.Cell):
     """ResNet stem for CIFAR: 3x3, BN, AF."""
 
     def __init__(self, w_in, w_out):
-        super(ResStemCifar, self).__init__()
+        super().__init__()
         self.conv = conv2d(w_in, w_out, 3)
         self.bn = norm2d(w_out)
         self.af = activation()
@@ -135,7 +135,7 @@ class ResStem(nn.Cell):
     """ResNet stem for ImageNet: 7x7, BN, AF, MaxPool."""
 
     def __init__(self, w_in, w_out):
-        super(ResStem, self).__init__()
+        super().__init__()
         self.conv = conv2d(w_in, w_out, 7, stride=2)
         self.bn = norm2d(w_out)
         self.af = activation()
@@ -153,7 +153,7 @@ class SimpleStem(nn.Cell):
     """Simple stem for ImageNet: 3x3, BN, AF."""
 
     def __init__(self, w_in, w_out):
-        super(SimpleStem, self).__init__()
+        super().__init__()
         self.conv = conv2d(w_in, w_out, 3, stride=2)
         self.bn = norm2d(w_out)
         self.af = activation()
@@ -169,7 +169,7 @@ class VanillaBlock(nn.Cell):
     """Vanilla block: [3x3 conv, BN, Relu] x2."""
 
     def __init__(self, w_in, w_out, stride, _params):
-        super(VanillaBlock, self).__init__()
+        super().__init__()
         self.a = conv2d(w_in, w_out, 3, stride=stride)
         self.a_bn = norm2d(w_out)
         self.a_af = activation()
@@ -191,7 +191,7 @@ class BasicTransform(nn.Cell):
     """Basic transformation: [3x3 conv, BN, Relu] x2."""
 
     def __init__(self, w_in, w_out, stride, _params):
-        super(BasicTransform, self).__init__()
+        super().__init__()
         self.a = conv2d(w_in, w_out, 3, stride=stride)
         self.a_bn = norm2d(w_out)
         self.a_af = activation()
@@ -212,7 +212,7 @@ class ResBasicBlock(nn.Cell):
     """Residual basic block: x + f(x), f = basic transform."""
 
     def __init__(self, w_in, w_out, stride, params):
-        super(ResBasicBlock, self).__init__()
+        super().__init__()
         self.proj, self.bn = None, None
         if (w_in != w_out) or (stride != 1):
             self.proj = conv2d(w_in, w_out, 1, stride=stride)
@@ -229,7 +229,7 @@ class BottleneckTransform(nn.Cell):
     """Bottleneck transformation: 1x1, 3x3 [+SE], 1x1."""
 
     def __init__(self, w_in, w_out, stride, params):
-        super(BottleneckTransform, self).__init__()
+        super().__init__()
         w_b = int(round(w_out * params["bot_mul"]))
         w_se = int(round(w_in * params["se_r"]))
         groups = w_b // params["group_w"]
@@ -261,7 +261,7 @@ class ResBottleneckBlock(nn.Cell):
     """Residual bottleneck block: x + f(x), f = bottleneck transform."""
 
     def __init__(self, w_in, w_out, stride, params):
-        super(ResBottleneckBlock, self).__init__()
+        super().__init__()
         self.proj, self.bn = None, None
         if (w_in != w_out) or (stride != 1):
             self.proj = conv2d(w_in, w_out, 1, stride=stride)
@@ -278,7 +278,7 @@ class ResBottleneckLinearBlock(nn.Cell):
     """Residual linear bottleneck block: x + f(x), f = bottleneck transform."""
 
     def __init__(self, w_in, w_out, stride, params):
-        super(ResBottleneckLinearBlock, self).__init__()
+        super().__init__()
         self.has_skip = (w_in == w_out) and (stride == 1)
         self.f = BottleneckTransform(w_in, w_out, stride, params)
 
@@ -290,7 +290,7 @@ class AnyStage(nn.Cell):
     """AnyNet stage (sequence of blocks w/ the same output shape)."""
 
     def __init__(self, w_in, w_out, stride, d, block_fun, params):
-        super(AnyStage, self).__init__()
+        super().__init__()
         self.blocks = nn.CellList()
         for _ in range(d):
             block = block_fun(w_in, w_out, stride, params)
@@ -307,7 +307,7 @@ class AnyHead(nn.Cell):
     """AnyNet head: optional conv, AvgPool, 1x1."""
 
     def __init__(self, w_in, head_width, num_classes):
-        super(AnyHead, self).__init__()
+        super().__init__()
         self.head_width = head_width
         if head_width > 0:
             self.conv = conv2d(w_in, head_width, 1)
@@ -332,7 +332,7 @@ def get_stem_fun(stem_type):
         "simple_stem_in": SimpleStem,
     }
     err_str = "Stem type '{}' not supported"
-    assert stem_type in stem_funs.keys(), err_str.format(stem_type)
+    assert stem_type in stem_funs, err_str.format(stem_type)
     return stem_funs[stem_type]
 
 
@@ -345,7 +345,7 @@ def get_block_fun(block_type):
         "res_bottleneck_linear_block": ResBottleneckLinearBlock,
     }
     err_str = "Block type '{}' not supported"
-    assert block_type in block_funs.keys(), err_str.format(block_type)
+    assert block_type in block_funs, err_str.format(block_type)
     return block_funs[block_type]
 
 
@@ -372,7 +372,7 @@ class AnyNet(nn.Cell):
 
     def __init__(self, depths, stem_type, stem_w, block_type, widths, strides, bot_muls, group_ws, head_w, num_classes,
                  se_r, in_channels):
-        super(AnyNet, self).__init__()
+        super().__init__()
         p = AnyNet.anynet_get_params(depths, stem_type, stem_w, block_type, widths, strides, bot_muls, group_ws, head_w,
                                      num_classes, se_r)
         stem_fun = get_stem_fun(p["stem_type"])
@@ -381,7 +381,7 @@ class AnyNet(nn.Cell):
         prev_w = p["stem_w"]
         keys = ["depths", "widths", "strides", "bot_muls", "group_ws"]
         self.stages = nn.CellList()
-        for i, (d, w, s, b, g) in enumerate(zip(*[p[k] for k in keys])):
+        for _, (d, w, s, b, g) in enumerate(zip(*[p[k] for k in keys])):
             params = {"bot_mul": b, "group_w": g, "se_r": p["se_r"]}
             stage = AnyStage(prev_w, w, s, d, block_fun, params)
             self.stages.append(stage)
@@ -493,9 +493,9 @@ class RegNet(AnyNet):
         params = RegNet.regnet_get_params(w_a, w_0, w_m, d, stride, bot_mul, group_w, stem_type, stem_w, block_type,
                                           head_w, num_classes, se_r)
         print(params)
-        super(RegNet, self).__init__(params['depths'], params['stem_type'], params['stem_w'], params['block_type'],
-                                     params['widths'], params['strides'], params['bot_muls'], params['group_ws'],
-                                     params['head_w'], params['num_classes'], params['se_r'], in_channels)
+        super().__init__(params['depths'], params['stem_type'], params['stem_w'], params['block_type'],
+                         params['widths'], params['strides'], params['bot_muls'], params['group_ws'],
+                         params['head_w'], params['num_classes'], params['se_r'], in_channels)
 
 
 @register_model

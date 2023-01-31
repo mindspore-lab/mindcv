@@ -3,23 +3,23 @@ MindSpore implementation of `RepMLP`.
 Refer to RepMLPNet: Hierarchical Vision MLP with Re-parameterized Locality.
 """
 
-import numpy as np
 from collections import OrderedDict
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+import numpy as np
+from mindspore import nn, ops, Tensor
 
 from .registry import register_model
 from .utils import load_pretrained
 
 __all__ = [
     "RepMLPNet",
-    "RepMLPNet_T224",
+    "rep_mlp_net_t224",
     "RepMLPNet_T256",
-    "RepMLPNet_B224",
-    "RepMLPNet_B256",
-    "RepMLPNet_D256",
-    "RepMLPNet_L256"
+    "rep_mlp_net_b224",
+    "rep_mlo_net_b256",
+    "rep_mlp_net_d256",
+    "rep_mlp_net_l256"
 ]
 
 
@@ -53,7 +53,7 @@ def conv_bn(in_channels, out_channels, kernel_size, stride, padding, group=1, ha
     return result
 
 
-def conv_bn_relu(in_channels, out_channels, kernel_size, stride, padding, group=1, has_bias=False):
+def conv_bn_relu(in_channels, out_channels, kernel_size, stride, padding, group=1):
     d = OrderedDict()
     conv2 = conv_bn(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, stride=stride,
                     padding=padding, group=group, has_bias=False)
@@ -71,18 +71,17 @@ def fuse_bn(conv_or_fc, bn):
 
     if len(t) == conv_or_fc.weight.size(0):
         return conv_or_fc.weight * t, bn.bias - bn.running_mean * bn.weight / std
-    else:
-        repeat_times = conv_or_fc.weight.size(0) // len(t)
-        repeated = t.repeat_interleave(repeat_times, 0)
-        return conv_or_fc.weight * repeated, (bn.bias - bn.running_mean * bn.weight / std).repeat_interleave(
-            repeat_times, 0)
+    repeat_times = conv_or_fc.weight.size(0) // len(t)
+    repeated = t.repeat_interleave(repeat_times, 0)
+    return conv_or_fc.weight * repeated, (bn.bias - bn.running_mean * bn.weight / std).repeat_interleave(
+        repeat_times, 0)
 
 
 class GlobalPerceptron(nn.Cell):
     """GlobalPerceptron Layers provides global information(One of the three components of RepMLPBlock)"""
 
     def __init__(self, input_channels, internal_neurons):
-        super(GlobalPerceptron, self).__init__()
+        super().__init__()
         self.fc1 = nn.Conv2d(in_channels=input_channels, out_channels=internal_neurons, kernel_size=(1, 1), stride=1,
                              has_bias=True)
         self.fc2 = nn.Conv2d(in_channels=internal_neurons, out_channels=input_channels, kernel_size=(1, 1), stride=1,
@@ -116,9 +115,9 @@ class RepMLPBlock(nn.Cell):
                  deploy=False):
         super().__init__()
 
-        self.C = in_channels
-        self.O = out_channels
-        self.S = num_sharesets
+        self.c = in_channels
+        self.o = out_channels
+        self.s = num_sharesets
 
         self.h, self.w = h, w
 
@@ -148,17 +147,17 @@ class RepMLPBlock(nn.Cell):
                 # print(conv_branch)
 
     def partition(self, x, h_parts, w_parts):
-        x = x.reshape(-1, self.C, h_parts, self.h, w_parts, self.w)
+        x = x.reshape(-1, self.c, h_parts, self.h, w_parts, self.w)
         input_perm = (0, 2, 4, 1, 3, 5)
         x = self.transpose(x, input_perm)
         return x
 
     def partition_affine(self, x, h_parts, w_parts):
-        fc_inputs = x.reshape(-1, self.S * self.h * self.w, 1, 1)
+        fc_inputs = x.reshape(-1, self.s * self.h * self.w, 1, 1)
         out = self.fc3(fc_inputs)
-        out = out.reshape(-1, self.S, self.h, self.w)
+        out = out.reshape(-1, self.s, self.h, self.w)
         out = self.fc3_bn(out)
-        out = out.reshape(-1, h_parts, w_parts, self.S, self.h, self.w)
+        out = out.reshape(-1, h_parts, w_parts, self.s, self.h, self.w)
         return out
 
     def construct(self, inputs):
@@ -177,11 +176,11 @@ class RepMLPBlock(nn.Cell):
 
         #   Local Perceptron
         if self.reparam_conv_k is not None and not self.deploy:
-            conv_inputs = self.reshape(partitions, (-1, self.S, self.h, self.w))
+            conv_inputs = self.reshape(partitions, (-1, self.s, self.h, self.w))
             conv_out = 0
             for k in self.conv_branch_k:
                 conv_out += k(conv_inputs)
-            conv_out = self.reshape(conv_out, (-1, h_parts, w_parts, self.S, self.h, self.w))
+            conv_out = self.reshape(conv_out, (-1, h_parts, w_parts, self.s, self.h, self.w))
             fc3_out += conv_out
 
         input_perm = (0, 3, 1, 4, 2, 5)
@@ -194,11 +193,11 @@ class RepMLPBlock(nn.Cell):
         fc_weight, fc_bias = fuse_bn(self.fc3, self.fc3_bn)
         if self.reparam_conv_k is not None:
             largest_k = max(self.reparam_conv_k)
-            largest_branch = self.__getattr__('repconv{}'.format(largest_k))
+            largest_branch = self.__getattr__(f'repconv{largest_k}')
             total_kernel, total_bias = fuse_bn(largest_branch.conv, largest_branch.bn)
             for k in self.reparam_conv_k:
                 if k != largest_k:
-                    k_branch = self.__getattr__('repconv{}'.format(k))
+                    k_branch = self.__getattr__(f'repconv{k}')
                     kernel, bias = fuse_bn(k_branch.conv, k_branch.bn)
                     total_kernel += nn.Pad(kernel, [(largest_k - k) // 2] * 4)
                     total_bias += bias
@@ -220,16 +219,16 @@ class RepMLPBlock(nn.Cell):
                 self.__delattr__('repconv{}'.format(k))
         self.__delattr__('fc3')
         self.__delattr__('fc3_bn')
-        self.fc3 = nn.Conv2d(self.S * self.h * self.w, self.S * self.h * self.w, 1, 1, 0, has_bias=True, group=self.S)
+        self.fc3 = nn.Conv2d(self.s * self.h * self.w, self.s * self.h * self.w, 1, 1, 0, has_bias=True, group=self.s)
         self.fc3_bn = ops.Identity()
         self.fc3.weight.data = fc3_weight
         self.fc3.bias.data = fc3_bias
 
     def _convert_conv_to_fc(self, conv_kernel, conv_bias):
-        I = ops.eye(self.h * self.w).repeat(1, self.S).reshape(self.h * self.w, self.S, self.h, self.w).to(
+        i = ops.eye(self.h * self.w).repeat(1, self.s).reshape(self.h * self.w, self.s, self.h, self.w).to(
             conv_kernel.device)
-        fc_k = ops.Conv2D(I, conv_kernel, pad=(conv_kernel.size(2) // 2, conv_kernel.size(3) // 2), group=self.S)
-        fc_k = fc_k.reshape(self.h * self.w, self.S * self.h * self.w).t()
+        fc_k = ops.Conv2D(i, conv_kernel, pad=(conv_kernel.size(2) // 2, conv_kernel.size(3) // 2), group=self.s)
+        fc_k = fc_k.reshape(self.h * self.w, self.s * self.h * self.w).t()
         fc_bias = conv_bias.repeat_interleave(self.h * self.w)
         return fc_k, fc_bias
 
@@ -309,7 +308,7 @@ class RepMLPNet(nn.Cell):
         assert num_stages == len(sharesets_nums)
 
         self.conv_embedding = conv_bn_relu(in_channels, channels[0], kernel_size=patch_size, stride=patch_size,
-                                           padding=0, has_bias=False)
+                                           padding=0)
         self.conv2d = nn.Conv2d(in_channels, channels[0], kernel_size=patch_size, stride=patch_size, padding=0)
 
         stages = []
@@ -337,7 +336,7 @@ class RepMLPNet(nn.Cell):
 
     def _initialize_weights(self):
         """Initialize weights for cells."""
-        for name, cell in self.cells_and_names():
+        for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 k = cell.group / (cell.in_channels * cell.kernel_size[0] * cell.kernel_size[1])
                 k = k ** 0.5
@@ -388,8 +387,8 @@ def locality_injection(self):
 
 
 @register_model
-def RepMLPNet_T224(pretrained: bool = False, image_size: int = 224, num_classes: int = 1000, in_channels=3,
-                   deploy=False, **kwargs):
+def rep_mlp_net_t224(pretrained: bool = False, image_size: int = 224, num_classes: int = 1000, in_channels=3,
+                     deploy=False, **kwargs):
     """Get RepMLPNet_T224 model.
      Refer to the base class `models.RepMLPNet` for more details."""
     default_cfg = default_cfgs['RepMLPNet_T224']
@@ -421,8 +420,8 @@ def RepMLPNet_T256(pretrained: bool = False, image_size: int = 256, num_classes:
 
 
 @register_model
-def RepMLPNet_B224(pretrained: bool = False, image_size: int = 224, num_classes: int = 1000, in_channels=3,
-                   deploy=False, **kwargs):
+def rep_mlp_net_b224(pretrained: bool = False, image_size: int = 224, num_classes: int = 1000, in_channels=3,
+                     deploy=False):
     """Get RepMLPNet_B224 model.
      Refer to the base class `models.RepMLPNet` for more details."""
     default_cfg = default_cfgs['RepMLPNet_B224']
@@ -437,8 +436,8 @@ def RepMLPNet_B224(pretrained: bool = False, image_size: int = 224, num_classes:
 
 
 @register_model
-def RepMLPNet_B256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
-                   deploy=False, **kwargs):
+def rep_mlo_net_b256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
+                     deploy=False):
     """Get RepMLPNet_B256 model.
      Refer to the base class `models.RepMLPNet` for more details."""
     default_cfg = default_cfgs['RepMLPNet_B256']
@@ -453,8 +452,8 @@ def RepMLPNet_B256(pretrained: bool = False, image_size: int = 256, num_classes:
 
 
 @register_model
-def RepMLPNet_D256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
-                   deploy=False, **kwargs):
+def rep_mlp_net_d256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
+                     deploy=False):
     """Get RepMLPNet_D256 model.
      Refer to the base class `models.RepMLPNet` for more details."""
     default_cfg = default_cfgs['RepMLPNet_D256']
@@ -469,8 +468,8 @@ def RepMLPNet_D256(pretrained: bool = False, image_size: int = 256, num_classes:
 
 
 @register_model
-def RepMLPNet_L256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
-                   deploy=False, **kwargs):
+def rep_mlp_net_l256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
+                     deploy=False):
     """Get RepMLPNet_L256 model.
      Refer to the base class `models.RepMLPNet` for more details."""
     default_cfg = default_cfgs['RepMLPNet_L256']
@@ -488,17 +487,17 @@ def RepMLPNet_L256(pretrained: bool = False, image_size: int = 256, num_classes:
 if __name__ == '__main__':
     # x = Tensor(np.ones([1, 3, 3, 3]).astype(np.float32))
     dummy_input = Tensor(np.ones([1, 3, 256, 256]).astype(np.float32))
-    model = RepMLPNet_B256()
-    # model = GlobalPerceptron(input_channels=96, internal_neurons=54)
-    # model = RepMLPBlock(in_channels=96, out_channels=96, h=56, w=56, reparam_conv_k=(1,3), num_sharesets=4)
-    # model = RepMLPNetUnit(channels=96, h=56, w=56, reparam_conv_k=(1, 3), globalperceptron_reduce=4, ffn_expand=4, num_sharesets=1, deploy=False)
+    rep_mlp_model = rep_mlo_net_b256()
+    # rep_mlp_model = GlobalPerceptron(input_channels=96, internal_neurons=54)
+    # rep_mlp_model = RepMLPBlock(in_channels=96, out_channels=96, h=56, w=56, reparam_conv_k=(1,3), num_sharesets=4)
+    # rep_mlp_model = RepMLPNetUnit(channels=96, h=56, w=56, reparam_conv_k=(1, 3), globalperceptron_reduce=4, ffn_expand=4, num_sharesets=1, deploy=False)
 
-    origin_y = model(dummy_input)
+    origin_y = rep_mlp_model(dummy_input)
 
-    # model.locality_injection()
+    # rep_mlp_model.locality_injection()
 
-    print(model)
-    # new_y = model(x)
+    print(rep_mlp_model)
+    # new_y = rep_mlp_model(x)
     # print((new_y - origin_y).abs().sum())
     print(origin_y)
     # print(origin_y.shape)

@@ -3,6 +3,7 @@ Dataset download
 """
 
 import os
+
 from mindcv.utils.download import DownLoad
 
 __all__ = [

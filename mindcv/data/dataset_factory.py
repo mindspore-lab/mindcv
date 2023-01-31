@@ -2,15 +2,16 @@
 Create dataset by name
 """
 
-from typing import Optional
 import os
+from typing import Optional
 
-from mindspore.dataset import MnistDataset, Cifar10Dataset, Cifar100Dataset, ImageFolderDataset, DistributedSampler
 import mindspore.dataset as ds
+from mindspore.dataset import MnistDataset, Cifar10Dataset, Cifar100Dataset, ImageFolderDataset, DistributedSampler
 
 from .dataset_download import MnistDownload, Cifar10Download, Cifar100Download
 from .distributed_sampler import RepeatAugSampler
-#from .dataset_reader import ImageNetDataset
+
+# from .dataset_reader import ImageNetDataset
 
 __all__ = ["create_dataset"]
 
@@ -20,7 +21,8 @@ _MINDSPORE_BASIC_DATASET = dict(
     cifar100=(Cifar100Dataset, Cifar100Download)
 )
 
-#_DATASET_SIZE = {'imagenet': }
+
+# _DATASET_SIZE = {'imagenet': }
 
 def create_dataset(
         name: str = '',
@@ -78,33 +80,35 @@ def create_dataset(
         Dataset object
     """
 
-    assert (num_samples is None) or (num_aug_repeats==0), 'num_samples and num_aug_repeats can NOT be set together.'
+    assert (num_samples is None) or (num_aug_repeats == 0), 'num_samples and num_aug_repeats can NOT be set together.'
 
     name = name.lower()
     # subset sampling
     if num_samples is not None and num_samples > 0:
         # TODO: rewrite ordered distributed sampler (subset sampling in distributed mode is not tested)
-        if num_shards is not None and num_shards > 1: # distributed
+        if num_shards is not None and num_shards > 1:  # distributed
             print('ns', num_shards, 'num_samples', num_samples)
             sampler = DistributedSampler(num_shards, shard_id, shuffle=shuffle, num_samples=num_samples)
-        else: # standalone
+        else:  # standalone
             if shuffle:
                 sampler = ds.RandomSampler(replacement=False, num_samples=num_samples)
             else:
                 sampler = ds.SequentialSampler(num_samples=num_samples)
         mindspore_kwargs = dict(shuffle=None, sampler=sampler,
-                            num_parallel_workers=num_parallel_workers, **kwargs)
+                                num_parallel_workers=num_parallel_workers, **kwargs)
     else:
         sampler = None
         mindspore_kwargs = dict(shuffle=shuffle, sampler=sampler, num_shards=num_shards, shard_id=shard_id,
-                            num_parallel_workers=num_parallel_workers, **kwargs)
+                                num_parallel_workers=num_parallel_workers, **kwargs)
 
     # sampler for repeated augmentation
     if num_aug_repeats > 0:
         dataset_size = get_dataset_size(name, root, split)
-        print(f'INFO: Repeated augmentation is enabled, num_aug_repeats: {num_aug_repeats}, original dataset size: ', dataset_size)
-        #since drop_remainder is usally True, we don't need to do rounding in sampling
-        sampler = RepeatAugSampler(dataset_size, num_shards=num_shards, rank_id=shard_id, num_repeats=num_aug_repeats, selected_round=0, shuffle=shuffle)
+        print(f'INFO: Repeated augmentation is enabled, num_aug_repeats: {num_aug_repeats}, original dataset size: ',
+              dataset_size)
+        # since drop_remainder is usally True, we don't need to do rounding in sampling
+        sampler = RepeatAugSampler(dataset_size, num_shards=num_shards, rank_id=shard_id, num_repeats=num_aug_repeats,
+                                   selected_round=0, shuffle=shuffle)
         mindspore_kwargs = dict(shuffle=None, sampler=sampler, num_shards=None, shard_id=None, **kwargs)
 
     # create dataset
@@ -124,15 +128,16 @@ def create_dataset(
                                 **mindspore_kwargs)
         # address ms dataset num_classes empty issue
         if name == 'mnist':
-            dataset.num_classes = lambda :10
+            dataset.num_classes = lambda: 10
         elif name == 'cifar10':
-            dataset.num_classes = lambda :10
+            dataset.num_classes = lambda: 10
         elif name == 'cifar100':
-            dataset.num_classes = lambda :100
+            dataset.num_classes = lambda: 100
 
     else:
         if name == "imagenet" and download:
-            raise ValueError("Imagenet dataset download is not supported. Please download imagenet from https://www.image-net.org/download.php, and parse the path of dateset directory via args.data_dir")
+            raise ValueError(
+                "Imagenet dataset download is not supported. Please download imagenet from https://www.image-net.org/download.php, and parse the path of dateset directory via args.data_dir")
 
         if os.path.isdir(root):
             root = os.path.join(root, split)
@@ -143,6 +148,7 @@ def create_dataset(
             dataset = ds.GeneratorDataset(imagenet_dataset, column_names=imagenet_dataset.column_names, sampler=sampler)
         '''
     return dataset
+
 
 def get_dataset_size(name, root, split):
     if name in _MINDSPORE_BASIC_DATASET:

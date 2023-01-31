@@ -7,6 +7,7 @@ class GlobalAvgPooling(nn.Cell):
     """
     GlobalAvgPooling, same as torch.nn.AdaptiveAvgPool2d when output shape is 1
     """
+
     def __init__(self,
                  keep_dims: bool = False
                  ) -> None:

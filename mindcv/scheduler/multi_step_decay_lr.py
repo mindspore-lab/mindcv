@@ -3,6 +3,7 @@ import mindspore as ms
 from mindspore import nn
 from mindspore.nn.learning_rate_schedule import LearningRateSchedule
 
+
 class MultiStepDecayLR(LearningRateSchedule):
     """ Multiple step learning rate
     The learning rate will decay once the number of step reaches one of the milestones.
@@ -16,14 +17,14 @@ class MultiStepDecayLR(LearningRateSchedule):
         cur_lr = lr
         k = 0
         for step in range(num_steps):
-            if step == milestones[k] * steps_per_epoch :
+            if step == milestones[k] * steps_per_epoch:
                 cur_lr = cur_lr * decay_rate
-                k = min(k+1, len(milestones)-1)
+                k = min(k + 1, len(milestones) - 1)
             step_lrs.append(cur_lr)
         if self.warmup_steps > 0:
             self.warmup_lr = nn.WarmUpLR(lr, self.warmup_steps)
         self.step_lrs = ms.Tensor(step_lrs, ms.float32)
-        #print(self.step_lrs)
+        # print(self.step_lrs)
 
     def construct(self, global_step):
         if self.warmup_steps > 0 and global_step < self.warmup_steps:

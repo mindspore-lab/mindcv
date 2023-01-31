@@ -7,12 +7,12 @@ import math
 from collections import OrderedDict
 from typing import Tuple
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import nn, ops, Tensor
 
 from .layers.pooling import GlobalAvgPooling
-from .utils import load_pretrained
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     "DenseNet",
@@ -150,7 +150,7 @@ class DenseNet(nn.Cell):
         layers['pool0'] = nn.SequentialCell([
             nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)), mode="CONSTANT"),
             nn.MaxPool2d(kernel_size=3, stride=2)
-            ])
+        ])
 
         # DenseBlock
         for i, num_layers in enumerate(block_config):

@@ -41,7 +41,9 @@ from .layers.classifier import ClassifierHead
 
 ## `__all__`
 
-> Python 没有原生的可见性控制，其可见性的维护是靠一套需要大家自觉遵守的”约定“。`__all__` 是针对模块公开接口的一种约定，以提供了”白名单“的形式暴露接口。如果定义了`__all__`，其他文件中使用`from xxx import *`导入该文件时，只会导入` __all__ `列出的成员，可以其他成员都被排除在外。
+> Python 没有原生的可见性控制，其可见性的维护是靠一套需要大家自觉遵守的”约定“。`__all__`
+> 是针对模块公开接口的一种约定，以提供了”白名单“的形式暴露接口。如果定义了`__all__`，其他文件中使用`from xxx import *`
+> 导入该文件时，只会导入` __all__ `列出的成员，可以其他成员都被排除在外。
 
 我们约定模型中对外暴露的接口包括主模型类以及返回不同规格模型的函数， 例如：
 
@@ -54,11 +56,14 @@ __all__ = [
 ]
 ```
 
-其中`"MLPMixer"`是主模型类，`"mlp_mixer_s_p32"`和`"mlp_mixer_s_p16"`等是返回不同规格模型的函数。一般来说子模型，即某`Layer`或某`Block`是不应该被其他文件所共用的。如若此，应当考虑将该子模型提取到`${MINDCLS}/models/layers`下面作为公用模块，如`SEBlock`等。
+其中`"MLPMixer"`是主模型类，`"mlp_mixer_s_p32"`和`"mlp_mixer_s_p16"`等是返回不同规格模型的函数。一般来说子模型，即某`Layer`
+或某`Block`是不应该被其他文件所共用的。如若此，应当考虑将该子模型提取到`${MINDCLS}/models/layers`
+下面作为公用模块，如`SEBlock`等。
 
 ## 子模型
 
-我们都知道一个深度模型是由多层组成的网络。其中某些层可以组成相同拓扑结构的子模型，我们一般称其为`Layer`或者`Block`，例如`ResidualBlock`等。这种抽象有利于我们理解整个模型结构，也有利于代码的编写。
+我们都知道一个深度模型是由多层组成的网络。其中某些层可以组成相同拓扑结构的子模型，我们一般称其为`Layer`或者`Block`
+，例如`ResidualBlock`等。这种抽象有利于我们理解整个模型结构，也有利于代码的编写。
 
 我们应当通过类注释对子模型进行功能的简要描述。在`MindSpore`中，模型的类继承于`nn.Cell`，一般来说我们需要重载以下两个函数：
 
@@ -100,16 +105,22 @@ class MixerBlock(nn.Cell):
 
 - CellList & SequentialCell
 
-  - CellList is just a container that contains a list of neural network layers(Cell). The Cells contained by it can be properly registered, and will be visible by all Cell methods. We must overwrite the forward calculation, that is, the construct function.
+    - CellList is just a container that contains a list of neural network layers(Cell). The Cells contained by it can be
+      properly registered, and will be visible by all Cell methods. We must overwrite the forward calculation, that is,
+      the construct function.
 
 
-  - SequentialCell is a container than holds a sequential list of layers(Cell). The Cells may have a name(OrderedDict) or not(List). We don't need to implement forward computation, which is done according to the order of the sequential list.
+- SequentialCell is a container than holds a sequential list of layers(Cell). The Cells may have a name(OrderedDict) or
+  not(List). We don't need to implement forward computation, which is done according to the order of the sequential
+  list.
 
 - construct
 
-  - Assert is not supported. [RuntimeError: ParseStatement] Unsupported statement 'Assert'.
+    - Assert is not supported. [RuntimeError: ParseStatement] Unsupported statement 'Assert'.
 
-  - Usage of single operator。调用算子时（如concat, reshape, mean），使用函数式接口 mindspore.ops.functional (如 output=ops.concat((x1, x2)))，避免先在__init__中实例化原始算子 ops.Primitive  (如self.concat=ops.Concat()) 再在construct中调用（output=self.concat((x1, x2))）。
+    - Usage of single operator。调用算子时（如concat, reshape, mean），使用函数式接口 mindspore.ops.functional (如
+      output=ops.concat((x1, x2)))，避免先在__init__中实例化原始算子 ops.Primitive  (如self.concat=ops.Concat())
+      再在construct中调用（output=self.concat((x1, x2))）。
 
 ## 主模型
 
@@ -195,7 +206,10 @@ class MLPMixer(nn.Cell):
 
 ## 规格函数
 
-论文中所提出的模型可能有不同规格的变种，如`channel`的大小、`depth`的大小等等。这些变种的具体配置应该通过规格函数体现，**规格的接口参数： pretrained, num_classes, in_channels 命名要统一**，同时在规格函数内还要进行pretrain loading操作。每一个规格函数对应一种确定配置的规格变种。配置通过入参传入主模型类的定义，并返回实例化的主模型类。另外，还需通过添加装饰器`@register_model`将该模型的此规格注册到包内。
+论文中所提出的模型可能有不同规格的变种，如`channel`的大小、`depth`的大小等等。这些变种的具体配置应该通过规格函数体现，*
+*规格的接口参数： pretrained, num_classes, in_channels 命名要统一**，同时在规格函数内还要进行pretrain
+loading操作。每一个规格函数对应一种确定配置的规格变种。配置通过入参传入主模型类的定义，并返回实例化的主模型类。另外，还需通过添加装饰器`@register_model`
+将该模型的此规格注册到包内。
 
 示例如下：
 

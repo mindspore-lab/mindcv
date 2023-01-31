@@ -3,12 +3,12 @@ MindSpore implementation of `MobileNetV1`.
 Refer to MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications.
 """
 
-from mindspore import nn, Tensor
 import mindspore.common.initializer as init
+from mindspore import nn, Tensor
 
-from .utils import load_pretrained
-from .registry import register_model
 from .layers.pooling import GlobalAvgPooling
+from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     'MobileNetV1',
@@ -29,10 +29,14 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'mobilenet_v1_0.25_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025_224-200_2502.ckpt'),
-    'mobilenet_v1_0.5_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_050_224-200_2502.ckpt'),
-    'mobilenet_v1_0.75_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_075_224-200_2502.ckpt'),
-    'mobilenet_v1_1.0_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_100_224-200_2502.ckpt'),
+    'mobilenet_v1_0.25_224': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025_224-200_2502.ckpt'),
+    'mobilenet_v1_0.5_224': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_050_224-200_2502.ckpt'),
+    'mobilenet_v1_0.75_224': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_075_224-200_2502.ckpt'),
+    'mobilenet_v1_1.0_224': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_100_224-200_2502.ckpt'),
 
 }
 
@@ -106,12 +110,12 @@ class MobileNetV1(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 cell.weight.set_data(init.initializer(init.XavierUniform(),
-                                                             cell.weight.shape,
-                                                             cell.weight.dtype))
+                                                      cell.weight.shape,
+                                                      cell.weight.dtype))
             if isinstance(cell, nn.Dense):
                 cell.weight.set_data(init.initializer(init.TruncatedNormal(),
-                                                             cell.weight.shape,
-                                                             cell.weight.dtype))
+                                                      cell.weight.shape,
+                                                      cell.weight.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)

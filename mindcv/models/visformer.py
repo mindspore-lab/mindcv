@@ -4,15 +4,15 @@ Refer to: Visformer: The Vision-friendly Transformer
 """
 
 from typing import List
-import numpy as np
 
 import mindspore
+import numpy as np
 from mindspore import nn, ops, Tensor
 from mindspore.common.initializer import initializer, HeNormal, Constant, TruncatedNormal
 
-from .utils import load_pretrained, _ntuple
 from .layers import Identity, GlobalAvgPooling, DropPath
 from .registry import register_model
+from .utils import load_pretrained, _ntuple
 
 __all__ = [
     'visformer_tiny',
@@ -51,7 +51,7 @@ class Mlp(nn.Cell):
                  drop: float = 0.,
                  group: int = 8,
                  spatial_conv: bool = False) -> None:
-        super(Mlp, self).__init__()
+        super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
         self.in_features = in_features
@@ -97,7 +97,7 @@ class Attention(nn.Cell):
                  qk_scale: float = None,
                  attn_drop: float = 0.,
                  proj_drop: float = 0.) -> None:
-        super(Attention, self).__init__()
+        super().__init__()
         self.dim = dim
         self.num_heads = num_heads
         head_dim = round(dim // num_heads * head_dim_ratio)
@@ -112,9 +112,9 @@ class Attention(nn.Cell):
         self.proj_drop = nn.Dropout(1 - proj_drop)
 
     def construct(self, x: Tensor) -> Tensor:
-        B, C, H, W = x.shape
+        b, _, h, w = x.shape
         x = self.qkv(x)
-        qkv = ops.reshape(x, (B, 3, self.num_heads, self.head_dim, H * W))
+        qkv = ops.reshape(x, (b, 3, self.num_heads, self.head_dim, h * w))
         qkv = qkv.transpose((1, 0, 2, 4, 3))
         q, k, v = qkv[0], qkv[1], qkv[2]
         attn = ops.matmul(q * self.scale, k.transpose(0, 1, 3, 2) * self.scale)
@@ -122,7 +122,7 @@ class Attention(nn.Cell):
         attn = self.attn_drop(attn)
         x = ops.matmul(attn, v)
 
-        x = x.transpose((0, 1, 3, 2)).reshape((B, -1, H, W))
+        x = x.transpose((0, 1, 3, 2)).reshape((b, -1, h, w))
         x = self.proj(x)
         x = self.proj_drop(x)
 
@@ -146,7 +146,7 @@ class Block(nn.Cell):
                  group: int = 8,
                  attn_disabled: bool = False,
                  spatial_conv: bool = False) -> None:
-        super(Block, self).__init__()
+        super().__init__()
         self.attn_disabled = attn_disabled
         self.spatial_conv = spatial_conv
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
@@ -174,7 +174,7 @@ class PatchEmbed(nn.Cell):
                  patch_size: int = 16,
                  in_chans: int = 3,
                  embed_dim: int = 768) -> None:
-        super(PatchEmbed, self).__init__()
+        super().__init__()
         img_size = to_2tuple(img_size)
         patch_size = to_2tuple(patch_size)
         num_patches = (img_size[1] // patch_size[1]) * (img_size[0] // patch_size[0])
@@ -238,7 +238,7 @@ class Visformer(nn.Cell):
                  pool: bool = True,
                  conv_init: bool = False) -> None:
 
-        super(Visformer, self).__init__()
+        super().__init__()
         self.num_classes = num_classes
         self.num_features = self.embed_dim = embed_dim
         self.init_channels = init_channels
@@ -246,8 +246,8 @@ class Visformer(nn.Cell):
         self.pool = pool
         self.conv_init = conv_init
         self.depth = depth
-        assert (isinstance(depth, list) or isinstance(depth, tuple)) and len(depth) == 4
-        if not (isinstance(num_heads, list) or isinstance(num_heads, tuple)):
+        assert (isinstance(depth, (list, tuple))) and len(depth) == 4
+        if not isinstance(num_heads, (list, tuple)):
             num_heads = [num_heads] * 4
 
         self.pos_embed = pos_embed

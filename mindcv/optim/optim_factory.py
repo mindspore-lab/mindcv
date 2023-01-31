@@ -1,10 +1,12 @@
 ''' optim factory '''
 import os
 from typing import Optional
-from mindspore import nn
+
 from mindspore import load_checkpoint, load_param_into_net
-from .adan import Adan
+from mindspore import nn
+
 from .adamw import AdamW
+from .adan import Adan
 from .nadam import NAdam
 
 __all__ = ["create_optimizer"]
@@ -42,14 +44,17 @@ def create_optimizer(
     r"""Creates optimizer by name.
 
     Args:
-        params: network parameters. Union[list[Parameter],list[dict]], which must be the list of parameters or list of dicts. 
+        params: network parameters. Union[list[Parameter],list[dict]], which must be the list of parameters or list of dicts.
             When the list element is a dictionary, the key of the dictionary can be "params", "lr", "weight_decay","grad_centralization" and "order_params".
         opt: Wrapped optimizer. You could choose like 'sgd', 'nesterov', 'momentum', 'adam', 'adamw', 'rmsprop', 'adagrad', 'lamb'.
             'adam' is the default choise for convolution-based networks.
             'adamw' is recommended for ViT-based networks. Default: 'adam'.
         lr: learning rate: float or lr scheduler. Fixed and dynamic learning rate are supported. Default: 1e-3.
-        weight_decay: weight decay factor. It should be noted that weight decay can be a constant value or a Cell. It is a Cell only when dynamic weight decay is applied. 
-            Dynamic weight decay is similar to dynamic learning rate, users need to customize a weight decay schedule only with global step as input, and during training, the optimizer calls the instance of WeightDecaySchedule to get the weight decay value of current step. 
+        weight_decay: weight decay factor. It should be noted that weight decay can be a constant value or a Cell.
+        It is a Cell only when dynamic weight decay is applied.
+            Dynamic weight decay is similar to dynamic learning rate, users need to customize a weight decay schedule
+            only with global step as input, and during training, the optimizer calls the instance of WeightDecaySchedule
+            to get the weight decay value of current step.
             Default: 0.
         momentum: momentum if the optimizer supports. Default: 0.9.
         nesterov: Whether to use Nesterov Accelerated Gradient (NAG) algorithm to update the gradients. Default: False.
@@ -83,12 +88,12 @@ def create_optimizer(
                            )
     elif opt in ['momentum', 'nesterov']:
         optimizer = nn.Momentum(params=params,
-                           learning_rate=lr,
-                           momentum=momentum,
-                           weight_decay=weight_decay,
-                           use_nesterov=nesterov,
-                           loss_scale=loss_scale,
-                           )
+                                learning_rate=lr,
+                                momentum=momentum,
+                                weight_decay=weight_decay,
+                                use_nesterov=nesterov,
+                                loss_scale=loss_scale,
+                                )
     # adaptive
     elif opt == 'adam':
         optimizer = nn.Adam(params=params,
@@ -99,23 +104,23 @@ def create_optimizer(
                             **opt_args)
     elif opt == 'adamw':
         optimizer = AdamW(params=params,
-                            learning_rate=lr,
-                            weight_decay=weight_decay,
-                            loss_scale=loss_scale,
-                            **opt_args)
+                          learning_rate=lr,
+                          weight_decay=weight_decay,
+                          loss_scale=loss_scale,
+                          **opt_args)
     elif opt == 'nadam':
         optimizer = NAdam(params=params,
-                            learning_rate=lr,
-                            weight_decay=weight_decay,
-                            loss_scale=loss_scale,
-                            schedule_decay=schedule_decay,
-                            **opt_args)
+                          learning_rate=lr,
+                          weight_decay=weight_decay,
+                          loss_scale=loss_scale,
+                          schedule_decay=schedule_decay,
+                          **opt_args)
     elif opt == 'adan':
         optimizer = Adan(params=params,
-                            learning_rate=lr,
-                            weight_decay=weight_decay,
-                            loss_scale=loss_scale,
-                            **opt_args)
+                         learning_rate=lr,
+                         weight_decay=weight_decay,
+                         loss_scale=loss_scale,
+                         **opt_args)
     elif opt == 'rmsprop':
         optimizer = nn.RMSProp(params=params,
                                learning_rate=lr,

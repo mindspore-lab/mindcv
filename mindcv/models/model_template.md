@@ -1,14 +1,13 @@
 # MindSpore Model.py Template
 
-This document provides a reference template for writing the model definition file `model.py` in the MindSpore, aiming to provide a unified code style.
+This document provides a reference template for writing the model definition file `model.py` in the MindSpore, aiming to
+provide a unified code style.
 
 Next, let's take `MLP-Mixer` as an example.
-
 
 ## File Header
 
 A brief description of the document. Include model name and paper title. As follows:
-
 
 ```python
 """
@@ -21,9 +20,12 @@ Refer to ${PAPER_NAME}.
 
 There are three types of module imports. Respectively
 
-- Python native or third-party libraries. For example, `import math` and `import numpy as np`. It should be placed in the first echelon.
-- MindSpore related modules. For example, `import mindspore.nn as nn` and `import mindspore.ops as ops`. It should be placed in the second echelon.
-- The module in the MindCV package. For example, `from .layers.classifier import ClassifierHead`. It should be placed in the third echelon and use relative import.
+- Python native or third-party libraries. For example, `import math` and `import numpy as np`. It should be placed in
+  the first echelon.
+- MindSpore related modules. For example, `import mindspore.nn as nn` and `import mindspore.ops as ops`. It should be
+  placed in the second echelon.
+- The module in the MindCV package. For example, `from .layers.classifier import ClassifierHead`. It should be placed in
+  the third echelon and use relative import.
 
 Examples are as follows:
 
@@ -43,9 +45,15 @@ Only import necessary modules or packages to avoid importing useless packages.
 
 ## `__all__`
 
-> Python has no native visibility control, and its visibility is maintained by a set of "conventions" that everyone should consciously abide by `__all__` is a convention for exposing interfaces to modules, and provides a "white list" to expose the interface. If `__all__` is defined, other files use `from xxx import *` to import this file, only the members listed in `__all__` will be imported, and other members can be excluded.
+> Python has no native visibility control, and its visibility is maintained by a set of "conventions" that everyone
+> should consciously abide by `__all__` is a convention for exposing interfaces to modules, and provides a "white list"
+> to
+> expose the interface. If `__all__` is defined, other files use `from xxx import *` to import this file, only the
+> members
+> listed in `__all__` will be imported, and other members can be excluded.
 
-We agree that the exposed interfaces in the model include the main model class and functions that return models of different specifications, such as:
+We agree that the exposed interfaces in the model include the main model class and functions that return models of
+different specifications, such as:
 
 ```python
 __all__ = [
@@ -56,15 +64,22 @@ __all__ = [
 ]
 ```
 
-Where `MLPMixer` is the main model class, and `mlp_mixer_s_p32` and `mlp_mixer_s_p16` are functions that return models of different specifications. Generally speaking, a submodel, that is, a `Layer` or a `Block`, should not be shared by other files. If this is the case, you should consider extracting the submodel under `${MINDCLS}/models/layers` as a common module, such as `SEBlock`.
+Where `MLPMixer` is the main model class, and `mlp_mixer_s_p32` and `mlp_mixer_s_p16` are functions that return models
+of different specifications. Generally speaking, a submodel, that is, a `Layer` or a `Block`, should not be shared by
+other files. If this is the case, you should consider extracting the submodel under `${MINDCLS}/models/layers` as a
+common module, such as `SEBlock`.
 
 ## Submodel
 
-We all know that a depth model is a network composed of multiple layers. Some of these layers can form sub models of the same topology, which we generally call `Layer` or `Block`, such as `ResidualBlock`. This kind of abstraction is conducive to our understanding of the whole model structure, and is also conducive to code writing.
+We all know that a depth model is a network composed of multiple layers. Some of these layers can form sub models of the
+same topology, which we generally call `Layer` or `Block`, such as `ResidualBlock`. This kind of abstraction is
+conducive to our understanding of the whole model structure, and is also conducive to code writing.
 
-We should briefly describe the function of the sub model through class annotations. In `MindSpore`, the model class inherits from `nn.Cell`. Generally speaking, we need to overload the following two functions:
+We should briefly describe the function of the sub model through class annotations. In `MindSpore`, the model class
+inherits from `nn.Cell`. Generally speaking, we need to overload the following two functions:
 
-- In the `__init__` function, we should define the neural network layer that needs to be used in the model (the parameters in `__init__` should be declared with parameter types, that is, type hint).
+- In the `__init__` function, we should define the neural network layer that needs to be used in the model (the
+  parameters in `__init__` should be declared with parameter types, that is, type hint).
 - In the `construct` function, we define the model forward logic.
 
 Examples are as follows:
@@ -102,26 +117,36 @@ In the process of compiling the `nn.Cell` class, there are two noteworthy aspect
 
 - CellList & SequentialCell
 
-  - CellList is just a container that contains a list of neural network layers(Cell). The Cells contained by it can be properly registered, and will be visible by all Cell methods. We must overwrite the forward calculation, that is, the construct function.
+    - CellList is just a container that contains a list of neural network layers(Cell). The Cells contained by it can be
+      properly registered, and will be visible by all Cell methods. We must overwrite the forward calculation, that is,
+      the construct function.
 
 
-  - SequentialCell is a container than holds a sequential list of layers(Cell). The Cells may have a name(OrderedDict) or not(List). We don't need to implement forward computation, which is done according to the order of the sequential list.
+- SequentialCell is a container than holds a sequential list of layers(Cell). The Cells may have a name(OrderedDict) or
+  not(List). We don't need to implement forward computation, which is done according to the order of the sequential
+  list.
 
 - construct
 
-  - Assert is not supported. [RuntimeError: ParseStatement] Unsupported statement 'Assert'.
+    - Assert is not supported. [RuntimeError: ParseStatement] Unsupported statement 'Assert'.
 
-  - Usage of single operator. When calling an operator (such as concat, reshape, mean), use the functional interface mindspore.ops.functional (such as output=ops.concat((x1, x2)) to avoid instantiating the original operator ops.Primary (such as self.Concat()) in __init__ before calling it in construct (output=self.concat((x1, x2)).
+    - Usage of single operator. When calling an operator (such as concat, reshape, mean), use the functional interface
+      mindspore.ops.functional (such as output=ops.concat((x1, x2)) to avoid instantiating the original operator
+      ops.Primary (such as self.Concat()) in __init__ before calling it in construct (output=self.concat((x1, x2)).
 
 ## Master Model
 
-The main model is the network model definition proposed in the paper, which is composed of multiple sub models. It is the top-level network suitable for classification, detection and other tasks. It is basically similar to the submodel in code writing, but there are several differences.
+The main model is the network model definition proposed in the paper, which is composed of multiple sub models. It is
+the top-level network suitable for classification, detection and other tasks. It is basically similar to the submodel in
+code writing, but there are several differences.
 
-- Class annotations. We should give the title and link of the paper here. In addition, since this class is exposed to the outside world, we'd better also add a description of the class initialization parameters. See code below.
+- Class annotations. We should give the title and link of the paper here. In addition, since this class is exposed to
+  the outside world, we'd better also add a description of the class initialization parameters. See code below.
 - `forward_features` function. The operational definition of the characteristic network of the model in the function.
 - `forward_head` function. The operation of the classifier of the model is defined in the function.
 - `construct` function. In function call feature network and classifier operation.
-- `_initialize_weights` function. We agree that the random initialization of model parameters is completed by this member function. See code below.
+- `_initialize_weights` function. We agree that the random initialization of model parameters is completed by this
+  member function. See code below.
 
 Examples are as follows:
 
@@ -197,7 +222,13 @@ class MLPMixer(nn.Cell):
 
 ## Specification Function
 
-The model proposed in the paper may have different specifications, such as the size of the `channel`, the size of the `depth`, and so on. The specific configuration of these variants should be reflected through the specification function. The specification interface parameters: **pretrained, num_classes, in_channels** should be named uniformly. At the same time, the pretrain loading operation should be performed in the specification function. Each specification function corresponds to a specification variant that determines the configuration. The configuration transfers the definition of the main model class through the input parameter, and returns the instantiated main model class. In addition, you need to register this specification of the model in the package by adding the decorator `@register_model`.
+The model proposed in the paper may have different specifications, such as the size of the `channel`, the size of
+the `depth`, and so on. The specific configuration of these variants should be reflected through the specification
+function. The specification interface parameters: **pretrained, num_classes, in_channels** should be named uniformly. At
+the same time, the pretrain loading operation should be performed in the specification function. Each specification
+function corresponds to a specification variant that determines the configuration. The configuration transfers the
+definition of the main model class through the input parameter, and returns the instantiated main model class. In
+addition, you need to register this specification of the model in the package by adding the decorator `@register_model`.
 
 Examples are as follows:
 
@@ -225,7 +256,8 @@ def mlp_mixer_b_p32(pretrained: bool = False, num_classes: int = 1000, in_channe
 
 ## Verify Main (Optional)
 
-The initial writing phase should ensure that the model is operational. The following code blocks can be used for basic verification:
+The initial writing phase should ensure that the model is operational. The following code blocks can be used for basic
+verification:
 
 ```python
 if __name__ == '__main__':

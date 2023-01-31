@@ -1,14 +1,14 @@
 """Define SwinTransformer model"""
 from typing import Optional, List, Tuple
-import numpy as np
 
-from mindspore import nn, ops, Tensor, Parameter, numpy
 import mindspore.common.initializer as init
+import numpy as np
 from mindspore import dtype as mstype
+from mindspore import nn, ops, Tensor, Parameter, numpy
 
-from .utils import load_pretrained, _ntuple
-from .registry import register_model
 from .layers import DropPath, Identity
+from .registry import register_model
+from .utils import load_pretrained, _ntuple
 
 __all__ = [
     'SwinTransformer',
@@ -74,11 +74,11 @@ def window_partition(x, window_size: int):
 
 
 class WindowPartition(nn.Cell):
-    
+
     def __init__(self,
                  window_size: int
                  ) -> None:
-        super(WindowPartition, self).__init__()
+        super().__init__()
 
         self.window_size = window_size
 
@@ -273,7 +273,7 @@ class SwinTransformerBlock(nn.Cell):
                  act_layer: Optional[nn.Cell] = nn.GELU,
                  norm_layer: Optional[nn.Cell] = nn.LayerNorm
                  ) -> None:
-        super(SwinTransformerBlock, self).__init__()
+        super().__init__()
         self.dim = dim
         self.input_resolution = input_resolution
         self.num_heads = num_heads
@@ -413,20 +413,20 @@ class PatchMerging(nn.Cell):
         # Default False
         self.reduction = nn.Dense(in_channels=4 * dim, out_channels=2 * dim, has_bias=False)
         self.norm = norm_layer([dim * 4, ])
-        self.H, self.W = self.input_resolution
-        self.H_2, self.W_2 = self.H // 2, self.W // 2
-        self.H2W2 = int(self.H * self.W // 4)
+        self.h, self.w = self.input_resolution
+        self.h_2, self.w_2 = self.h // 2, self.w // 2
+        self.h2w2 = int(self.h * self.w // 4)
         self.dim_mul_4 = int(dim * 4)
-        self.H2W2 = int(self.H * self.W // 4)
+        self.h2w2 = int(self.h * self.w // 4)
 
     def construct(self, x: Tensor) -> Tensor:
         """
         x: B, H*W, C
         """
         b = x.shape[0]
-        x = ops.reshape(x, (b, self.H_2, 2, self.W_2, 2, self.dim))
+        x = ops.reshape(x, (b, self.h_2, 2, self.w_2, 2, self.dim))
         x = ops.transpose(x, (0, 1, 3, 4, 2, 5))
-        x = ops.reshape(x, (b, self.H2W2, self.dim_mul_4))
+        x = ops.reshape(x, (b, self.h2w2, self.dim_mul_4))
         x = self.norm(x)
         x = self.reduction(x)
 
@@ -625,7 +625,7 @@ class SwinTransformer(nn.Cell):
         self.pos_drop = nn.Dropout(keep_prob=1.0 - drop_rate)
 
         # stochastic depth
-        dpr = [x for x in np.linspace(0, drop_path_rate, sum(depths))]  # stochastic depth decay rule
+        dpr = list(np.linspace(0, drop_path_rate, sum(depths)))  # stochastic depth decay rule
 
         # build layers
         self.layers = nn.CellList()

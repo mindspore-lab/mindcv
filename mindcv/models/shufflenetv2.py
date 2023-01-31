@@ -5,12 +5,12 @@ Refer to ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Desi
 
 from typing import Tuple
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import nn, ops, Tensor
 
 from .layers.pooling import GlobalAvgPooling
-from .utils import load_pretrained
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     "ShuffleNetV2",
@@ -31,10 +31,14 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'shufflenet_v2_0.5': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x0_5-Ascend.ckpt'),
-    'shufflenet_v2_1.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_0-Ascend.ckpt'),
-    'shufflenet_v2_1.5': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_5-Ascend.ckpt'),
-    'shufflenet_v2_2.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x2_0-Ascend.ckpt'),
+    'shufflenet_v2_0.5': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x0_5-Ascend.ckpt'),
+    'shufflenet_v2_1.0': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_0-Ascend.ckpt'),
+    'shufflenet_v2_1.5': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_5-Ascend.ckpt'),
+    'shufflenet_v2_2.0': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x2_0-Ascend.ckpt'),
 
 }
 

@@ -3,12 +3,12 @@ MindSpore implementation of Xception.
 Refer to Xception: Deep Learning with Depthwise Separable Convolutions.
 """
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import nn, ops, Tensor
 
+from .layers import GlobalAvgPooling
 from .registry import register_model
 from .utils import load_pretrained
-from .layers import GlobalAvgPooling
 
 __all__ = [
     'Xception',
@@ -52,6 +52,7 @@ class SeparableConv2d(nn.Cell):
 
 class Block(nn.Cell):
     '''Basic module of Xception'''
+
     def __init__(self,
                  in_filters: int,
                  out_filters: int,

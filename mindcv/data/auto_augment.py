@@ -12,8 +12,8 @@ Papers:
 
 import random
 import re
-import numpy as np
 
+import numpy as np
 from mindspore.dataset import vision
 from mindspore.dataset.vision import Inter
 
@@ -33,8 +33,7 @@ def _interpolation(kwargs):
     interpolation = kwargs.pop('resample', _DEFAULT_INTERPOLATION)
     if isinstance(interpolation, (list, tuple)):
         return random.choice(interpolation)
-    else:
-        return interpolation
+    return interpolation
 
 
 def _check_args_tf(kwargs):
@@ -108,31 +107,31 @@ def _randomly_negate(v):
     return -v if random.random() > 0.5 else v
 
 
-def _rotate_level_to_arg(level, _hparams):
+def _rotate_level_to_arg(level):
     # range [-30, 30]
     level = (level / _LEVEL_DENOM) * 30.
     level = _randomly_negate(level)
-    return level,
+    return level
 
 
-def _enhance_level_to_arg(level, _hparams):
+def _enhance_level_to_arg(level):
     # range [0.1, 1.9]
-    return (level / _LEVEL_DENOM) * 1.8 + 0.1,
+    return (level / _LEVEL_DENOM) * 1.8 + 0.1
 
 
-def _enhance_increasing_level_to_arg(level, _hparams):
+def _enhance_increasing_level_to_arg(level):
     # the 'no change' level is 1.0, moving from 1.0 to 0. or 2.0 to increases enhanced blending
     # range [0.1, 1.9] if level <= _LEVEL_DENOM
     level = (level / _LEVEL_DENOM) * .9
     level = max(0.1, 1.0 + _randomly_negate(level))  # keep it >= 0.1
-    return level,
+    return level
 
 
-def _shear_level_to_arg(level, _hparams):
+def _shear_level_to_arg(level):
     # range [-0.3, 0.3]
     level = (level / _LEVEL_DENOM) * 0.3
     level = _randomly_negate(level)
-    return level,
+    return level
 
 
 def _translate_level_to_arg(level, hparams):
@@ -140,36 +139,34 @@ def _translate_level_to_arg(level, hparams):
     translate_pct = hparams.get('translate_pct', 0.45)
     level = (level / _LEVEL_DENOM) * translate_pct
     level = _randomly_negate(level)
-    return level,
+    return level
 
 
-def _posterize_level_to_arg(level, _hparams):
-
-    return int((level / _LEVEL_DENOM) * 4),
+def _posterize_level_to_arg(level):
+    return int((level / _LEVEL_DENOM) * 4)
 
 
 def _posterize_increasing_level_to_arg(level, hparams):
+    return 4 - _posterize_level_to_arg(level, hparams)[0]
 
-    return 4 - _posterize_level_to_arg(level, hparams)[0],
 
-
-def _posterize_original_level_to_arg(level, _hparams):
+def _posterize_original_level_to_arg(level):
     # According to the original AutoAugment paper instructions
     # range [4, 8], 'keep 4 up to 8 MSB of image'
     # augmented intensity/severity decreases with level
-    return int((level / _LEVEL_DENOM) * 4) + 4,
+    return int((level / _LEVEL_DENOM) * 4) + 4
 
 
-def _solarize_level_to_arg(level, _hparams):
+def _solarize_level_to_arg(level):
     # range [0, 255]
     # augmented intensity/severity decreases with level
-    return int((level / _LEVEL_DENOM) * 255),
+    return int((level / _LEVEL_DENOM) * 255)
 
 
-def _solarize_increasing_level_to_arg(level, _hparams):
+def _solarize_increasing_level_to_arg(level):
     # range [0, 255]
     # augmented intensity/severity increases with level
-    return 255 - _solarize_level_to_arg(level, _hparams)[0],
+    return 255 - _solarize_level_to_arg(level)[0]
 
 
 LEVEL_TO_ARG = {
@@ -331,7 +328,7 @@ def auto_augment_policy(name='autoaug', hparams=None):
     elif name == 'autoaugr':
         return auto_augment_policy_posterize_increasing(hparams)
     else:
-        assert False, 'Unknown auto augment policy (%s)' % name
+        assert False, f'Unknown auto augment policy ({name})'
 
 
 class AutoAugment:
@@ -486,7 +483,7 @@ def rand_augment_transform(configs, hparams):
     """
     magnitude = _LEVEL_DENOM  # default to _LEVEL_DENOM for magnitude (currently 10)
     num_layers = 2  # default to 2 ops per image
-    hparams.setdefault('magnitude_std', 0.5)# default magnitude_std is set to 0.5
+    hparams.setdefault('magnitude_std', 0.5)  # default magnitude_std is set to 0.5
     weight_idx = None  # default to no probability weights for op choice
     transforms = _RAND_TRANSFORMS
     config = configs.split('-')

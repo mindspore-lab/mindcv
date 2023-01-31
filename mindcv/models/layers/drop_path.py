@@ -3,14 +3,15 @@ Mindspore implementations of DropPath (Stochastic Depth) regularization layers.
 Papers:
 Deep Networks with Stochastic Depth (https://arxiv.org/abs/1603.09382)
 """
+from mindspore import Tensor
 from mindspore import nn
 from mindspore import ops
-from mindspore import Tensor
 from mindspore.numpy import ones
 
 
 class DropPath(nn.Cell):
     """ DropPath (Stochastic Depth) regularization layers """
+
     def __init__(self,
                  drop_prob: float = 0.,
                  scale_by_keep: bool = True) -> None:

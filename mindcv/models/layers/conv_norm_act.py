@@ -6,6 +6,7 @@ from mindspore import nn
 
 class Conv2dNormActivation(nn.Cell):
     """ Conv2d + BN + Act"""
+
     def __init__(self,
                  in_channels: int,
                  out_channels: int,

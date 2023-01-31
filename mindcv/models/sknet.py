@@ -8,9 +8,9 @@ from typing import Optional, Type, List, Dict, Union
 from mindspore import nn, Tensor
 
 from .layers.selective_kernel import SelectiveKernel
-from .utils import load_pretrained
 from .registry import register_model
 from .resnet import ResNet
+from .utils import load_pretrained
 
 __all__ = [
     "SKNet",
@@ -149,6 +149,7 @@ class SKNet(ResNet):
         norm: normalization layer in blocks. Default: None.
         sk_kwargs: kwargs of selective kernel. Default: None.
     """
+
     def __init__(self,
                  block: Type[nn.Cell],
                  layers: List[int],

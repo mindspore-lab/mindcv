@@ -1,4 +1,5 @@
 """mindcv init"""
+from . import data, loss, models, optim, scheduler
 from .data import *
 from .loss import *
 from .models import *
@@ -6,8 +7,6 @@ from .optim import *
 from .scheduler import *
 from .utils import *
 from .version import __version__
-
-from . import data, loss, models, optim, scheduler
 
 __all__ = []
 __all__.extend(data.__all__)

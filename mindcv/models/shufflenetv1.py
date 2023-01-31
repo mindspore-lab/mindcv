@@ -3,12 +3,12 @@ MindSpore implementation of `ShuffleNetV1`.
 Refer to ShuffleNet: An Extremely Efficient Convolutional Neural Network for Mobile Devices
 """
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import nn, ops, Tensor
 
-from .utils import load_pretrained
-from .registry import register_model
 from .layers.pooling import GlobalAvgPooling
+from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     "ShuffleNetV1",
@@ -33,10 +33,14 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'shufflenet_v1_g3_0.5': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x0_5-Ascend.ckpt'),
-    'shufflenet_v1_g3_1.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x1_0-Ascend.ckpt'),
-    'shufflenet_v1_g3_1.5': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x1_5-Ascend.ckpt'),
-    'shufflenet_v1_g3_2.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x2_0-Ascend.ckpt'),
+    'shufflenet_v1_g3_0.5': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x0_5-Ascend.ckpt'),
+    'shufflenet_v1_g3_1.0': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x1_0-Ascend.ckpt'),
+    'shufflenet_v1_g3_1.5': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x1_5-Ascend.ckpt'),
+    'shufflenet_v1_g3_2.0': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x2_0-Ascend.ckpt'),
     'shufflenet_v1_g8_0.5': _cfg(url=''),
     'shufflenet_v1_g8_1.0': _cfg(url=''),
     'shufflenet_v1_g8_1.5': _cfg(url=''),

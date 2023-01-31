@@ -3,11 +3,11 @@ MindSpore implementation of pnasnet.
 Refer to Progressive Neural Architecture Search.
 '''
 
-from collections import OrderedDict
 import math
+from collections import OrderedDict
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import nn, ops, Tensor
 
 from .layers import GlobalAvgPooling
 from .registry import register_model

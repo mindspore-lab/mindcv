@@ -3,20 +3,20 @@ MindSpore implementation of `PVT`.
 Refer to PVT: Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions
 """
 import math
+from functools import partial
 from typing import Optional
 
 import mindspore
-import mindspore.nn as nn
-import mindspore.ops as ops
+from mindspore import nn
+from mindspore import ops
 from mindspore import Tensor
 from mindspore.common import initializer as weight_init
-from functools import partial
 
 from .layers.drop_path import DropPath
-from .layers.mlp import Mlp
 from .layers.identity import Identity
-from .utils import load_pretrained
+from .layers.mlp import Mlp
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     'PyramidVisionTransformer',
@@ -47,6 +47,7 @@ default_cfgs = {
 
 class Attention(nn.Cell):
     """spatial-reduction attention (SRA)"""
+
     def __init__(self,
                  dim: int,
                  num_heads: int = 8,
@@ -55,7 +56,7 @@ class Attention(nn.Cell):
                  attn_drop: float = 0.,
                  proj_drop: float = 0.,
                  sr_ratio: int = 1):
-        super(Attention, self).__init__()
+        super().__init__()
         assert dim % num_heads == 0, f"dim {dim} should be divided by num_heads {num_heads}."
 
         self.dim = dim
@@ -80,28 +81,28 @@ class Attention(nn.Cell):
             self.norm = nn.LayerNorm([dim])
 
     def construct(self, x, H, W):
-        B, N, C = x.shape
+        b, n, c = x.shape
         q = self.q(x)
-        q = self.reshape(q, (B, N, self.num_heads, C // self.num_heads))
+        q = self.reshape(q, (b, n, self.num_heads, c // self.num_heads))
         q = self.transpose(q, (0, 2, 1, 3))
         if self.sr_ratio > 1:
 
-            x_ = self.reshape(self.transpose(x, (0, 2, 1)), (B, C, H, W))
+            x_ = self.reshape(self.transpose(x, (0, 2, 1)), (b, c, H, W))
 
-            x_ = self.transpose(self.reshape(self.sr(x_), (B, C, -1)), (0, 2, 1))
+            x_ = self.transpose(self.reshape(self.sr(x_), (b, c, -1)), (0, 2, 1))
             x_ = self.norm(x_)
             kv = self.kv(x_)
 
-            kv = self.transpose(self.reshape(kv, (B, -1, 2, self.num_heads, C // self.num_heads)), (2, 0, 3, 1, 4))
+            kv = self.transpose(self.reshape(kv, (b, -1, 2, self.num_heads, c // self.num_heads)), (2, 0, 3, 1, 4))
         else:
             kv = self.kv(x)
-            kv = self.transpose(self.reshape(kv, (B, -1, 2, self.num_heads, C // self.num_heads)), (2, 0, 3, 1, 4))
+            kv = self.transpose(self.reshape(kv, (b, -1, 2, self.num_heads, c // self.num_heads)), (2, 0, 3, 1, 4))
         k, v = kv[0], kv[1]
         attn = self.qk_batmatmul(q, k) * self.scale
         attn = self.softmax(attn)
         attn = self.attn_drop(attn)
         x = self.batmatmul(attn, v)
-        x = self.reshape(self.transpose(x, (0, 2, 1, 3)), (B, N, C))
+        x = self.reshape(self.transpose(x, (0, 2, 1, 3)), (b, n, c))
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
@@ -109,9 +110,10 @@ class Attention(nn.Cell):
 
 class Block(nn.Cell):
     """ Block with spatial-reduction attention (SRA) and feed forward"""
+
     def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop=0., attn_drop=0.,
                  drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm, sr_ratio=1):
-        super(Block, self).__init__()
+        super().__init__()
         self.norm1 = norm_layer([dim], epsilon=1e-5)
         self.attn = Attention(
             dim,
@@ -144,24 +146,24 @@ class PatchEmbed(nn.Cell):
         self.img_size = img_size
         self.patch_size = patch_size
 
-        self.H, self.W = img_size[0] // patch_size[0], img_size[1] // patch_size[1]
-        self.num_patches = self.H * self.W
+        self.h, self.w = img_size[0] // patch_size[0], img_size[1] // patch_size[1]
+        self.num_patches = self.h * self.w
         self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size, has_bias=True)
         self.norm = nn.LayerNorm([embed_dim], epsilon=1e-5)
         self.reshape = ops.reshape
         self.transpose = ops.transpose
 
     def construct(self, x):
-        B, C, H, W = x.shape
+        b, c, h, w = x.shape
 
         x = self.proj(x)
         b, c, h, w = x.shape
         x = self.reshape(x, (b, c, h * w))
         x = self.transpose(x, (0, 2, 1))
         x = self.norm(x)
-        H, W = H // self.patch_size[0], W // self.patch_size[1]
+        h, w = h // self.patch_size[0], w // self.patch_size[1]
 
-        return x, (H, W)
+        return x, (h, w)
 
 
 class PyramidVisionTransformer(nn.Cell):
@@ -186,11 +188,22 @@ class PyramidVisionTransformer(nn.Cell):
             sr_ratios(list) : stride and kernel size of each attention.
             num_stages(int) : number of stage. Default: 4.
         """
-    def __init__(self, img_size=224, patch_size=4, in_chans=3, num_classes=1000, embed_dims=[64, 128, 320, 512],
-                 num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True, qk_scale=None, drop_rate=0.,
+
+    def __init__(self, img_size=224, patch_size=4, in_chans=3, num_classes=1000, embed_dims=None,
+                 num_heads=None, mlp_ratios=None, qkv_bias=True, qk_scale=None, drop_rate=0.,
                  attn_drop_rate=0., drop_path_rate=0., norm_layer=nn.LayerNorm,
-                 depths=[2, 2, 2, 2], sr_ratios=[8, 4, 2, 1], num_stages=4):
-        super(PyramidVisionTransformer, self).__init__()
+                 depths=None, sr_ratios=None, num_stages=4):
+        super().__init__()
+        if sr_ratios is None:
+            sr_ratios = [8, 4, 2, 1]
+        if depths is None:
+            depths = [2, 2, 2, 2]
+        if mlp_ratios is None:
+            mlp_ratios = [8, 8, 4, 4]
+        if embed_dims is None:
+            embed_dims = [64, 128, 320, 512]
+        if num_heads is None:
+            num_heads = [1, 2, 5, 8]
         self.num_classes = num_classes
         self.depths = depths
         self.num_stages = num_stages
@@ -243,7 +256,7 @@ class PyramidVisionTransformer(nn.Cell):
         num_patches = self.patch_embed4.num_patches + 1
         self.pos_embed4 = mindspore.Parameter(ops.zeros((1, num_patches, embed_dims[3]), mindspore.float16))
         self.pos_drop4 = nn.Dropout(1 - drop_rate)
-        self.Blocks = nn.CellList(b_list)
+        self.blocks = nn.CellList(b_list)
 
         self.norm = norm_layer([embed_dims[3]])
 
@@ -255,7 +268,7 @@ class PyramidVisionTransformer(nn.Cell):
         self.reshape = ops.reshape
         self.transpose = ops.transpose
         self.tile = ops.Tile()
-        self.Concat = ops.Concat(axis=1)
+        self.concat = ops.Concat(axis=1)
         self._initialize_weights()
 
     def _initialize_weights(self):
@@ -290,7 +303,7 @@ class PyramidVisionTransformer(nn.Cell):
     def get_classifier(self):
         return self.head
 
-    def reset_classifier(self, num_classes, global_pool=''):
+    def reset_classifier(self, num_classes):
         self.num_classes = num_classes
         self.head = nn.Dense(self.embed_dim, num_classes) if num_classes > 0 else Identity()
 
@@ -298,57 +311,57 @@ class PyramidVisionTransformer(nn.Cell):
         if H * W == self.patch_embed1.num_patches:
             return pos_embed
         else:
-            ResizeBilinear = nn.ResizeBilinear()
+            resize_bilinear = nn.ResizeBilinear()
 
             pos_embed = self.transpose(self.reshape(pos_embed, (1, ph, pw, -1)), (0, 3, 1, 2))
-            pos_embed = ResizeBilinear(pos_embed, (H, W))
+            pos_embed = resize_bilinear(pos_embed, (H, W))
 
             pos_embed = self.transpose(self.reshape(pos_embed, (1, -1, H * W)), (0, 2, 1))
 
             return pos_embed
 
     def forward_features(self, x):
-        B = x.shape[0]
+        b = x.shape[0]
 
-        x, (H, W) = self.patch_embed1(x)
+        x, (h, w) = self.patch_embed1(x)
         pos_embed = self.pos_embed1
         x = self.pos_drop1(x + pos_embed)
-        for blk in self.Blocks[0]:
-            x = blk(x, H, W)
-        x = self.transpose(self.reshape(x, (B, H, W, -1)), (0, 3, 1, 2))
+        for blk in self.blocks[0]:
+            x = blk(x, h, w)
+        x = self.transpose(self.reshape(x, (b, h, w, -1)), (0, 3, 1, 2))
 
-        x, (H, W) = self.patch_embed2(x)
-        ph, pw = self.patch_embed2.H, self.patch_embed2.W
-        pos_embed = self._get_pos_embed(self.pos_embed2, ph, pw, H, W)
+        x, (h, w) = self.patch_embed2(x)
+        ph, pw = self.patch_embed2.h, self.patch_embed2.w
+        pos_embed = self._get_pos_embed(self.pos_embed2, ph, pw, h, w)
         x = self.pos_drop2(x + pos_embed)
-        for blk in self.Blocks[1]:
-            x = blk(x, H, W)
-        x = self.transpose(self.reshape(x, (B, H, W, -1)), (0, 3, 1, 2))
+        for blk in self.blocks[1]:
+            x = blk(x, h, w)
+        x = self.transpose(self.reshape(x, (b, h, w, -1)), (0, 3, 1, 2))
 
-        x, (H, W) = self.patch_embed3(x)
-        ph, pw = self.patch_embed3.H, self.patch_embed3.W
-        pos_embed = self._get_pos_embed(self.pos_embed3, ph, pw, H, W)
+        x, (h, w) = self.patch_embed3(x)
+        ph, pw = self.patch_embed3.h, self.patch_embed3.w
+        pos_embed = self._get_pos_embed(self.pos_embed3, ph, pw, h, w)
         x = self.pos_drop3(x + pos_embed)
-        for blk in self.Blocks[2]:
-            x = blk(x, H, W)
-        x = self.transpose(self.reshape(x, (B, H, W, -1)), (0, 3, 1, 2))
+        for blk in self.blocks[2]:
+            x = blk(x, h, w)
+        x = self.transpose(self.reshape(x, (b, h, w, -1)), (0, 3, 1, 2))
 
-        x, (H, W) = self.patch_embed4(x)
-        cls_tokens = self.tile(self.cls_token, (B, 1, 1))
+        x, (h, w) = self.patch_embed4(x)
+        cls_tokens = self.tile(self.cls_token, (b, 1, 1))
 
-        x = self.Concat((cls_tokens, x))
-        ph, pw = self.patch_embed4.H, self.patch_embed4.W
-        pos_embed_ = self._get_pos_embed(self.pos_embed4[:, 1:], ph, pw, H, W)
-        pos_embed = self.Concat((self.pos_embed4[:, 0:1], pos_embed_))
+        x = self.concat((cls_tokens, x))
+        ph, pw = self.patch_embed4.h, self.patch_embed4.w
+        pos_embed_ = self._get_pos_embed(self.pos_embed4[:, 1:], ph, pw, h, w)
+        pos_embed = self.concat((self.pos_embed4[:, 0:1], pos_embed_))
         x = self.pos_drop4(x + pos_embed)
-        for blk in self.Blocks[3]:
-            x = blk(x, H, W)
+        for blk in self.blocks[3]:
+            x = blk(x, h, w)
 
         x = self.norm(x)
 
         return x[:, 0]
 
-    def forward_head(self , x: Tensor)->Tensor:
+    def forward_head(self, x: Tensor) -> Tensor:
         return self.head(x)
 
     def construct(self, x):
@@ -359,7 +372,8 @@ class PyramidVisionTransformer(nn.Cell):
 
 
 @register_model
-def pvt_tiny(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PyramidVisionTransformer:
+def pvt_tiny(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3,
+             **kwargs) -> PyramidVisionTransformer:
     """Get PVT tiny model
     Refer to the base class "models.PVT" for more details.
     """
@@ -377,7 +391,8 @@ def pvt_tiny(pretrained: bool = False, num_classes: int = 1000, in_channels: int
 
 
 @register_model
-def pvt_small(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PyramidVisionTransformer:
+def pvt_small(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3,
+              **kwargs) -> PyramidVisionTransformer:
     """Get PVT small model
     Refer to the base class "models.PVT" for more details.
     """
@@ -395,7 +410,8 @@ def pvt_small(pretrained: bool = False, num_classes: int = 1000, in_channels: in
 
 
 @register_model
-def pvt_medium(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PyramidVisionTransformer:
+def pvt_medium(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3,
+               **kwargs) -> PyramidVisionTransformer:
     """Get PVT medium model
     Refer to the base class "models.PVT" for more details.
     """
@@ -413,7 +429,8 @@ def pvt_medium(pretrained: bool = False, num_classes: int = 1000, in_channels: i
 
 
 @register_model
-def pvt_large(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PyramidVisionTransformer:
+def pvt_large(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3,
+              **kwargs) -> PyramidVisionTransformer:
     """Get PVT large model
     Refer to the base class "models.PVT" for more details.
     """
@@ -428,8 +445,3 @@ def pvt_large(pretrained: bool = False, num_classes: int = 1000, in_channels: in
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
     return model
-
-
-
-
-

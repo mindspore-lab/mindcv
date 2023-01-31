@@ -1,8 +1,10 @@
 ''' loss factory '''
 from typing import Optional
+
 from mindspore import Tensor
-from .cross_entropy_smooth import CrossEntropySmooth
+
 from .binary_cross_entropy_smooth import BinaryCrossEntropySmooth
+from .cross_entropy_smooth import CrossEntropySmooth
 
 __all__ = ["create_loss"]
 
@@ -41,7 +43,8 @@ def create_loss(
     if name == 'ce':
         loss = CrossEntropySmooth(smoothing=label_smoothing, aux_factor=aux_factor, reduction=reduction, weight=weight)
     elif name == 'bce':
-        loss = BinaryCrossEntropySmooth(smoothing=label_smoothing, aux_factor=aux_factor, reduction=reduction, weight=weight, pos_weight=None)
+        loss = BinaryCrossEntropySmooth(smoothing=label_smoothing, aux_factor=aux_factor, reduction=reduction,
+                                        weight=weight, pos_weight=None)
     else:
         raise NotImplementedError
 

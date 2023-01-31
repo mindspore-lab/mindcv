@@ -1,15 +1,13 @@
 '''nadam'''
-import numpy as np
-
 import mindspore as ms
+import numpy as np
 from mindspore import ops
+from mindspore._checkparam import Rel
 from mindspore._checkparam import Validator as validator
-
 from mindspore.common.api import ms_function
 from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
-from mindspore._checkparam import Rel
 from mindspore.nn.optim import Optimizer
 from mindspore.nn.optim.optimizer import opt_init_args_register
 
@@ -31,6 +29,7 @@ class NAdam(Optimizer):
     """
     Implements NAdam algorithm (a variant of Adam based on Nesterov momentum).
     """
+
     @opt_init_args_register
     def __init__(self, params, learning_rate=2e-3, beta1=0.9, beta2=0.999, eps=1e-8, \
                  weight_decay=0.0, loss_scale=1.0, schedule_decay=4e-3):

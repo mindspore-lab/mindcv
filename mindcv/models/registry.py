@@ -1,6 +1,6 @@
 '''model registry and list'''
-import sys
 import fnmatch
+import sys
 from collections import defaultdict
 
 __all__ = [
@@ -43,15 +43,16 @@ def register_model(fn):
         _model_has_pretrained.add(model_name)
     return fn
 
-def list_models(filter='', module='', pretrained=False, exclude_filters=''):
+
+def list_models(is_filter='', module='', pretrained=False, exclude_filters=''):
     if module:
         all_models = list(_module_to_models[module])
     else:
         all_models = _model_entrypoints.keys()
 
-    if filter:
+    if is_filter:
         models = []
-        include_filters = filter if isinstance(filter, (tuple, list)) else [filter]
+        include_filters = is_filter if isinstance(is_filter, (tuple, list)) else [is_filter]
         for f in include_filters:
             include_models = fnmatch.filter(all_models, f)  # include these models
             if include_models:

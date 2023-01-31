@@ -1,10 +1,11 @@
 '''checkpoint manager '''
 import os
 import stat
-import numpy as np
+
 import mindspore as ms
+import numpy as np
 from mindspore import log as logger
-from mindspore import ops, Tensor
+
 
 class CheckpointManager:
     """
@@ -75,14 +76,14 @@ class CheckpointManager:
                 continue
             self.remove_ckpoint_file(mv_file)
 
-    def top_K_checkpoint(self, network, K=10, metric=None, save_path=''):
+    def top_k_checkpoint(self, network, k=10, metric=None, save_path=''):
         """ Save and return Top K checkpoint address and accuracy. """
         last_file = self._ckpoint_filelist[-1] if self._ckpoint_filelist else None
-        if type(metric) is not np.ndarray:
+        if not isinstance(metric, np.ndarray):
             metric = metric.asnumpy()
-        if self.ckpoint_num < K or np.greater(metric, last_file[1]):
-            if self.ckpoint_num >= K:
-                delete = K - 1
+        if self.ckpoint_num < k or np.greater(metric, last_file[1]):
+            if self.ckpoint_num >= k:
+                delete = k - 1
                 if delete < 0 or self.ckpoint_num <= delete:
                     return
                 to_delete = self._ckpoint_filelist[delete:]
@@ -93,9 +94,9 @@ class CheckpointManager:
             self._ckpoint_filelist.append((save_path, float(metric)))
             self._ckpoint_filelist = sorted(self._ckpoint_filelist, key=lambda x: x[1], reverse=True)
 
-    def latest_K_checkpoint(self, network, K=10, save_path=''):
+    def latest_k_checkpoint(self, network, k=10, save_path=''):
         """ Save latest K checkpoint. """
-        if K and 0 < K <= self.ckpoint_num:
+        if k and 0 < k <= self.ckpoint_num:
             self.remove_oldest_ckpoint_file()
         ms.save_checkpoint(network, save_path, async_save=True)
         self._ckpoint_filelist.append(save_path)
@@ -107,10 +108,10 @@ class CheckpointManager:
         elif self.ckpt_save_policy == 'top_k':
             if metric is None:
                 raise ValueError(f"The expected 'metric' is not None, but got: {metric}.")
-            self.top_K_checkpoint(network, K=num_ckpt, metric=metric, save_path=save_path)
+            self.top_k_checkpoint(network, k=num_ckpt, metric=metric, save_path=save_path)
             return self._ckpoint_filelist
         elif self.ckpt_save_policy == 'latest_k':
-            self.latest_K_checkpoint(network, K=num_ckpt, save_path=save_path)
+            self.latest_k_checkpoint(network, k=num_ckpt, save_path=save_path)
             return self._ckpoint_filelist
         else:
             raise ValueError(f"The expected 'ckpt_save_policy' is None, top_k or latest_k,"

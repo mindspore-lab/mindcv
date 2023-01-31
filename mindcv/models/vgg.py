@@ -3,14 +3,14 @@ MindSpore implementation of `VGGNet`.
 Refer to SqueezeNet: Very Deep Convolutional Networks for Large-Scale Image Recognition.
 """
 
-from typing import List, Dict, Union
 import math
+from typing import List, Dict, Union
 
-from mindspore import nn, Tensor
 import mindspore.common.initializer as init
+from mindspore import nn, Tensor
 
-from .utils import load_pretrained
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     'VGG',
@@ -36,7 +36,6 @@ default_cfgs = {
     'vgg16': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/vgg/vgg16_224.ckpt'),
     'vgg19': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/vgg/vgg19_224.ckpt')
 }
-
 
 cfgs: Dict[str, List[Union[str, int]]] = {
     "vgg11": [64, "M", 128, "M", 256, 256, "M", 512, 512, "M", 512, 512, "M"],

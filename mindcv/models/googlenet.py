@@ -5,12 +5,12 @@ Refer to Going deeper with convolutions.
 
 from typing import Union, Tuple
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import nn, ops, Tensor
 
-from .utils import load_pretrained
-from .registry import register_model
 from .layers.pooling import GlobalAvgPooling
+from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     'GoogLeNet',
@@ -34,6 +34,7 @@ default_cfgs = {
 
 class BasicConv2d(nn.Cell):
     """A block for combine conv and relu"""
+
     def __init__(self,
                  in_channels: int,
                  out_channels: int,

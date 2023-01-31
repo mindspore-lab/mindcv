@@ -5,12 +5,12 @@ Refer to MnasNet: Platform-Aware Neural Architecture Search for Mobile.
 
 from typing import List
 
-from mindspore import nn, Tensor
 import mindspore.common.initializer as init
+from mindspore import nn, Tensor
 
 from .layers.pooling import GlobalAvgPooling
-from .utils import make_divisible, load_pretrained
 from .registry import register_model
+from .utils import make_divisible, load_pretrained
 
 __all__ = [
     'Mnasnet',

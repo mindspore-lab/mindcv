@@ -7,8 +7,7 @@ from math import ceil
 from typing import Any
 
 import mindspore.common.initializer as init
-import mindspore.nn as nn
-import numpy as np
+from mindspore import nn
 
 from .layers import Conv2dNormActivation, DropPath, GlobalAvgPooling, SqueezeExcite
 from .registry import register_model
@@ -44,19 +43,20 @@ default_cfgs = {
 
 class LinearBottleneck(nn.Cell):
     '''LinearBottleneck'''
+
     def __init__(self,
                  in_channels,
                  out_channels,
                  exp_ratio,
                  stride,
                  use_se=True,
-                 se_ratio=1/12,
+                 se_ratio=1 / 12,
                  ch_div=1,
                  act_layer=nn.SiLU,
                  dw_act_layer=nn.ReLU6,
                  drop_path=None,
                  **kwargs):
-        super(LinearBottleneck, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.use_shortcut = stride == 1 and in_channels <= out_channels
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -69,7 +69,7 @@ class LinearBottleneck(nn.Cell):
             self.conv_exp = None
 
         self.conv_dw = Conv2dNormActivation(dw_channels, dw_channels, 3, stride, padding=1,
-                                        groups=dw_channels, activation=None)
+                                            groups=dw_channels, activation=None)
 
         if use_se:
             self.se = SqueezeExcite(dw_channels,
@@ -105,7 +105,7 @@ class ReXNetV1(nn.Cell):
     Args:
         in_channels (int): number of the input channels. Default: 3.
         fi_channels (int): number of the final channels. Default: 180.
-        initial_channels (int): initialize inplanes. Default: 16. 
+        initial_channels (int): initialize inplanes. Default: 16.
         width_mult (float): The ratio of the channel. Default: 1.0.
         depth_mult (float): The ratio of num_layers. Default: 1.0.
         num_classes (int) : number of classification classes. Default: 1000.
@@ -121,19 +121,19 @@ class ReXNetV1(nn.Cell):
     def __init__(self,
                  in_channels=3,
                  fi_channels=180,
-                 initial_channels = 16,
+                 initial_channels=16,
                  width_mult=1.0,
                  depth_mult=1.0,
                  num_classes=1000,
                  use_se=True,
-                 se_ratio=1/12,
+                 se_ratio=1 / 12,
                  drop_rate=0.2,
                  drop_path_rate=0.,
                  ch_div=1,
                  act_layer=nn.SiLU,
                  dw_act_layer=nn.ReLU6,
                  cls_useconv=False):
-        super(ReXNetV1, self).__init__()
+        super().__init__()
 
         layers = [1, 2, 2, 3, 3, 5]
         strides = [1, 2, 2, 2, 1, 2]
@@ -174,10 +174,10 @@ class ReXNetV1(nn.Cell):
         features = []
         num_blocks = len(in_channels_group)
         for block_idx, (in_c, out_c, exp_ratio, stride, use_se) in enumerate(zip(in_channels_group,
-                                                                         out_channels_group,
-                                                                         exp_ratios,
-                                                                         strides,
-                                                                         use_ses)):
+                                                                                 out_channels_group,
+                                                                                 exp_ratios,
+                                                                                 strides,
+                                                                                 use_ses)):
             if stride > 1:
                 fname = 'stem' if block_idx == 0 else f'features.{block_idx - 1}'
                 feature_info += [dict(num_chs=feat_chs[-1], reduction=curr_stride, module=fname)]
@@ -188,7 +188,7 @@ class ReXNetV1(nn.Cell):
                                              out_channels=out_c,
                                              exp_ratio=exp_ratio,
                                              stride=stride,
-                                             use_se=use_se, 
+                                             use_se=use_se,
                                              se_ratio=se_ratio,
                                              act_layer=act_layer,
                                              dw_act_layer=dw_act_layer,
@@ -251,14 +251,15 @@ def _rexnet(arch: str,
             pretrained: bool,
             **kwargs: Any,
             ) -> ReXNetV1:
-    """ReXNet architecture."""        
+    """ReXNet architecture."""
     default_cfg = default_cfgs[arch]
     model = ReXNetV1(width_mult=width_mult, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
-    return model    
+    return model
+
 
 @register_model
 def rexnet_x09(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:

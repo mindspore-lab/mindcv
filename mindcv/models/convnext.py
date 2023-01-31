@@ -3,16 +3,16 @@ MindSpore implementation of `ConvNeXt`.
 Refer to: A ConvNet for the 2020s
 """
 from typing import List, Tuple
-import numpy as np
 
-from mindspore import nn, ops, Parameter, Tensor
-from mindspore import dtype as mstype
 import mindspore.common.initializer as init
+import numpy as np
+from mindspore import dtype as mstype
+from mindspore import nn, ops, Parameter, Tensor
 
-from .utils import load_pretrained
-from .registry import register_model
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
+from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     'ConvNeXt',
@@ -45,6 +45,7 @@ default_cfgs = {
 class ConvNextLayerNorm(nn.LayerNorm):
     r""" LayerNorm for channels_first tensors with 2d spatial dimensions (ie N, C, H, W).
     """
+
     def __init__(self,
                  normalized_shape: Tuple[int],
                  epsilon: float,
@@ -77,6 +78,7 @@ class Block(nn.Cell):
         drop_path (float): Stochastic depth rate. Default: 0.0
         layer_scale_init_value (float): Init value for Layer Scale. Default: 1e-6.
     """
+
     def __init__(self,
                  dim: int,
                  drop_path: float = 0.,
@@ -119,6 +121,7 @@ class ConvNeXt(nn.Cell):
         layer_scale_init_value (float) : the parameter of init for the classifier default : 1e-6.
         head_init_scale (float) : the parameter of init for the head default : 1.
     """
+
     def __init__(self,
                  in_channels: int,
                  num_classes: int,

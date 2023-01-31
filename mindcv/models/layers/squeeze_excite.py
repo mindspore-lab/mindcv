@@ -5,11 +5,11 @@ Paper: `Squeeze-and-Excitation Networks` - https://arxiv.org/abs/1709.01507
 """
 from typing import Optional
 
-from mindspore import nn
 from mindspore import Tensor
+from mindspore import nn
 
-from ..utils import make_divisible
 from .pooling import GlobalAvgPooling
+from ..utils import make_divisible
 
 
 class SqueezeExcite(nn.Cell):
@@ -20,6 +20,7 @@ class SqueezeExcite(nn.Cell):
         * reduction channels can be specified by float rd_ratio (default: 1/16)
         * customizable activation, normalization, and gate layer
     """
+
     def __init__(self,
                  in_channels: int,
                  rd_ratio: float = 1. / 16,

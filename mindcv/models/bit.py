@@ -9,12 +9,12 @@ import mindspore
 from mindspore import nn, Tensor, ops
 
 from .layers.pooling import GlobalAvgPooling
-from .utils import load_pretrained
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     'BiT',
-    'BiTresnet50',
+    'bi_tresnet50',
 ]
 
 
@@ -261,7 +261,7 @@ class BiT(nn.Cell):
 
 
 @register_model
-def BiTresnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+def bi_tresnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 50 layers ResNet model.
      Refer to the base class `models.BiT` for more details.
      """

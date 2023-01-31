@@ -7,8 +7,8 @@ import math
 from mindspore.dataset import vision
 from mindspore.dataset.vision import Inter
 
-from .constants import DEFAULT_CROP_PCT, IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from .auto_augment import auto_augment_transform, rand_augment_transform
+from .constants import DEFAULT_CROP_PCT, IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
 __all__ = ["create_transforms"]
 
@@ -63,7 +63,7 @@ def transforms_imagenet_train(
         elif auto_augment.startswith('autoaug') or auto_augment.startswith('autoaugr'):
             trans_list += [auto_augment_transform(auto_augment, augement_params)]
         else:
-            assert False, 'Unknown auto augment policy (%s)' % auto_augment
+            assert False, f'Unknown auto augment policy ({auto_augment})'
     elif color_jitter is not None:
         if isinstance(color_jitter, (list, tuple)):
             # color jitter shoulf be a 3-tuple/list for brightness/contrast/saturation

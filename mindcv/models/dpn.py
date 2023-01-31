@@ -7,13 +7,12 @@ import math
 from collections import OrderedDict
 from typing import Tuple
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import nn, ops, Tensor
 
-from .utils import load_pretrained
-from .registry import register_model
 from .layers.pooling import GlobalAvgPooling
-
+from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     'DPN',
@@ -43,6 +42,7 @@ default_cfgs = {
 
 class BottleBlock(nn.Cell):
     """ A block for the Dual Path Architecture"""
+
     def __init__(self,
                  in_channel: int,
                  num_1x1_a: int,
@@ -76,6 +76,7 @@ class BottleBlock(nn.Cell):
 
 class DualPathBlock(nn.Cell):
     """ A block for Dual Path Networks to combine proj, residual and densely network"""
+
     def __init__(self,
                  in_channel: int,
                  num_1x1_a: int,
@@ -109,7 +110,6 @@ class DualPathBlock(nn.Cell):
                                       pad_mode='pad', padding=0)
 
         self.layers = BottleBlock(in_channel, num_1x1_a, num_3x3_b, num_1x1_c, inc, g, key_stride)
-
 
     def construct(self, x: Tensor):
         if self.cat_input:
@@ -145,6 +145,7 @@ class DPN(nn.Cell):
         in_channels: int type, number of input channels. Default: 3.
         num_classes: int type, number of classification classes. Default: 1000.
     """
+
     def __init__(self,
                  num_init_channel: int = 64,
                  k_r: int = 96,
@@ -258,7 +259,7 @@ def dpn92(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kw
      Refer to the base class `models.DPN` for more details."""
     default_cfg = default_cfgs['dpn92']
     model = DPN(num_init_channel=64, k_r=96, g=32, k_sec=(3, 4, 20, 3), inc_sec=(16, 32, 24, 128),
-               num_classes=num_classes, in_channels=in_channels, **kwargs)
+                num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -272,7 +273,7 @@ def dpn98(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kw
      Refer to the base class `models.DPN` for more details."""
     default_cfg = default_cfgs['dpn98']
     model = DPN(num_init_channel=96, k_r=160, g=40, k_sec=(3, 6, 20, 3), inc_sec=(16, 32, 32, 128),
-               num_classes=num_classes, in_channels=in_channels, **kwargs)
+                num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -286,7 +287,7 @@ def dpn131(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **k
      Refer to the base class `models.DPN` for more details."""
     default_cfg = default_cfgs['dpn131']
     model = DPN(num_init_channel=128, k_r=160, g=40, k_sec=(4, 8, 28, 3), inc_sec=(16, 32, 32, 128),
-               num_classes=num_classes, in_channels=in_channels, **kwargs)
+                num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -300,7 +301,7 @@ def dpn107(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **k
      Refer to the base class `models.DPN` for more details."""
     default_cfg = default_cfgs['dpn107']
     model = DPN(num_init_channel=128, k_r=200, g=50, k_sec=(4, 8, 20, 3), inc_sec=(20, 64, 64, 128),
-               num_classes=num_classes, in_channels=in_channels, **kwargs)
+                num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)

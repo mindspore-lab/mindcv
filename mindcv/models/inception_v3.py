@@ -5,12 +5,12 @@ Refer to Rethinking the Inception Architecture for Computer Vision.
 
 from typing import Union, Tuple
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import nn, ops, Tensor
 
-from .utils import load_pretrained
-from .registry import register_model
 from .layers.pooling import GlobalAvgPooling
+from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     'InceptionV3',

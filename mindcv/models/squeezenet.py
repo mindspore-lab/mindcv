@@ -3,12 +3,12 @@ MindSpore implementation of `SqueezeNet`.
 Refer to SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size.
 """
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import nn, ops, Tensor
 
 from .layers.pooling import GlobalAvgPooling
-from .utils import load_pretrained
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     'SqueezeNet',
@@ -34,6 +34,7 @@ default_cfgs = {
 
 class Fire(nn.Cell):
     """define the basic block of squeezenet"""
+
     def __init__(self,
                  in_channels: int,
                  squeeze_channels: int,
