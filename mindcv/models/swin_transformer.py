@@ -33,6 +33,7 @@ to_2tuple = _ntuple(2)
 
 
 class Mlp(nn.Cell):
+    """ Mlp """
 
     def __init__(self,
                  in_features: int,
@@ -74,6 +75,7 @@ def window_partition(x, window_size: int):
 
 
 class WindowPartition(nn.Cell):
+    """ WindowPartition """
 
     def __init__(self,
                  window_size: int
@@ -100,6 +102,7 @@ class WindowPartition(nn.Cell):
 
 
 class WindowReverse(nn.Cell):
+    """ WindowReverse """
 
     def construct(self,
                   windows: Tensor,
@@ -125,6 +128,7 @@ class WindowReverse(nn.Cell):
 
 
 class RelativeBias(nn.Cell):
+    """ RelativeBias """
 
     def __init__(self,
                  window_size: int,
@@ -379,6 +383,7 @@ class SwinTransformerBlock(nn.Cell):
 
 
 class Roll(nn.Cell):
+    """ Roll """
 
     def __init__(self,
                  shift_size: int,

@@ -168,6 +168,7 @@ class Block(nn.Cell):
 
 
 class PatchEmbed(nn.Cell):
+    """visformer basic PatchEmbed"""
 
     def __init__(self,
                  img_size: int = 224,

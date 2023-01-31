@@ -287,7 +287,7 @@ class PyramidVisionTransformerV2(nn.Cell):
                 dim=embed_dims[i], num_heads=num_heads[i], mlp_ratio=mlp_ratios[i], qkv_bias=qkv_bias,
                 qk_scale=qk_scale,
                 drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[cur + j], norm_layer=norm_layer,
-                sr_ratio=sr_ratios[i], linear=linear, block_id=j)
+                sr_ratio=sr_ratios[i], linear=linear)
                 for j in range(depths[i])])
 
             norm = norm_layer([embed_dims[i]])
@@ -377,7 +377,7 @@ def pvt_v2_b0(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     """
     default_cfg = default_cfgs['pvt_v2_b0']
     model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
-                                       patch_size=4, embed_dims=[32, 64, 160, 256], num_heads=[1, 2, 5, 8],
+                                       embed_dims=[32, 64, 160, 256], num_heads=[1, 2, 5, 8],
                                        mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
                                        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[2, 2, 2, 2],
                                        sr_ratios=[8, 4, 2, 1],
@@ -397,7 +397,7 @@ def pvt_v2_b1(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     """
     default_cfg = default_cfgs['pvt_v2_b1']
     model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
-                                       patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
+                                       embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
                                        mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
                                        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[2, 2, 2, 2],
                                        sr_ratios=[8, 4, 2, 1],
@@ -417,7 +417,7 @@ def pvt_v2_b2(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     """
     default_cfg = default_cfgs['pvt_v2_b2']
     model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
-                                       patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
+                                       embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
                                        mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
                                        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 4, 6, 3],
                                        sr_ratios=[8, 4, 2, 1], **kwargs)
@@ -436,7 +436,7 @@ def pvt_v2_b3(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     """
     default_cfg = default_cfgs['pvt_v2_b3']
     model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
-                                       patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
+                                       embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
                                        mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
                                        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 4, 18, 3],
                                        sr_ratios=[8, 4, 2, 1], **kwargs)
@@ -454,7 +454,7 @@ def pvt_v2_b4(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     """
     default_cfg = default_cfgs['pvt_v2_b4']
     model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
-                                       patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
+                                       embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
                                        mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
                                        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 8, 27, 3],
                                        sr_ratios=[8, 4, 2, 1],
@@ -473,7 +473,7 @@ def pvt_v2_b5(pretrained: bool = False, num_classes: int = 1000, in_channels: in
     """
     default_cfg = default_cfgs['pvt_v2_b5']
     model = PyramidVisionTransformerV2(in_chans=in_channels, num_classes=num_classes,
-                                       patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
+                                       embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8],
                                        mlp_ratios=[4, 4, 4, 4], qkv_bias=True,
                                        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 6, 40, 3],
                                        sr_ratios=[8, 4, 2, 1],

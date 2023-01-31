@@ -125,6 +125,7 @@ class GPSA(nn.Cell):
 
 
 class MHSA(nn.Cell):
+    """ MHSA """
 
     def __init__(self,
                  dim: int,

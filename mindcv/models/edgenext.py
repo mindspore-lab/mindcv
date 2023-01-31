@@ -74,6 +74,8 @@ class LayerNorm(nn.LayerNorm):
 
 
 class PositionalEncodingFourier(nn.Cell):
+    """ PositionalEncodingFourier """
+
     def __init__(self, hidden_dim=32, dim=768, temperature=10000):
         super().__init__()
         self.token_projection = nn.Conv2d(hidden_dim * 2, dim, kernel_size=1, has_bias=True)
@@ -113,6 +115,8 @@ class PositionalEncodingFourier(nn.Cell):
 
 
 class ConvEncoder(nn.Cell):
+    """ ConvEncoder """
+
     def __init__(self,
                  dim,
                  drop_path=0.,
@@ -226,6 +230,8 @@ class SDTAEncoder(nn.Cell):
 
 
 class XCA(nn.Cell):
+    """ XCA """
+
     def __init__(self,
                  dim,
                  num_heads=8,

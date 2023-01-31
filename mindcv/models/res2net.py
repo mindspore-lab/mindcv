@@ -44,6 +44,8 @@ default_cfgs = {
 
 
 class Bottle2neck(nn.Cell):
+    """ Bottle2neck """
+
     expansion: int = 4
 
     def __init__(self,

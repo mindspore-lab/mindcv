@@ -173,7 +173,7 @@ class ReXNetV1(nn.Cell):
         curr_stride = 2
         features = []
         num_blocks = len(in_channels_group)
-        for block_idx, (in_c, out_c, exp_ratio, stride, is_use_se) in enumerate(zip(in_channels_group,
+        for block_idx, (in_c, out_c, exp_ratio, stride, use_se) in enumerate(zip(in_channels_group,
                                                                                     out_channels_group,
                                                                                     exp_ratios,
                                                                                     strides,

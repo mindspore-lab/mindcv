@@ -173,12 +173,12 @@ class RepVGGBlock(nn.Cell):
         self.rbr_reparam.bias.data = bias
         for para in self.parameters():
             para.detach_()
-        self.__delattr__('rbr_dense')
-        self.__delattr__('rbr_1x1')
+        del self.rbr_dense
+        del self.rbr_1x1
         if hasattr(self, 'rbr_identity'):
-            self.__delattr__('rbr_identity')
+            del self.rbr_identity
         if hasattr(self, 'id_tensor'):
-            self.__delattr__('id_tensor')
+            del self.id_tensor
         self.deploy = True
 
 

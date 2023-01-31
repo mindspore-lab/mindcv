@@ -217,8 +217,8 @@ class RepMLPBlock(nn.Cell):
         if self.reparam_conv_k is not None:
             for k in self.reparam_conv_k:
                 self.__delattr__(f'repconv{k}')
-        self.__delattr__('fc3')
-        self.__delattr__('fc3_bn')
+        del self.fc3
+        del self.fc3_bn
         self.fc3 = nn.Conv2d(self.s * self.h * self.w, self.s * self.h * self.w, 1, 1, 0, has_bias=True, group=self.s)
         self.fc3_bn = ops.Identity()
         self.fc3.weight.data = fc3_weight

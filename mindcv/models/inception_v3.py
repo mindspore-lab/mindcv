@@ -57,6 +57,8 @@ class BasicConv2d(nn.Cell):
 
 
 class InceptionA(nn.Cell):
+    """ InceptionA """
+
     def __init__(self,
                  in_channels: int,
                  pool_features: int
@@ -88,6 +90,8 @@ class InceptionA(nn.Cell):
 
 
 class InceptionB(nn.Cell):
+    """ InceptionB """
+
     def __init__(self, in_channels: int) -> None:
         super().__init__()
         self.branch0 = BasicConv2d(in_channels, 384, kernel_size=3, stride=2, pad_mode='valid')
@@ -108,6 +112,8 @@ class InceptionB(nn.Cell):
 
 
 class InceptionC(nn.Cell):
+    """ InceptionC """
+
     def __init__(self,
                  in_channels: int,
                  channels_7x7: int
@@ -141,6 +147,8 @@ class InceptionC(nn.Cell):
 
 
 class InceptionD(nn.Cell):
+    """ InceptionD """
+
     def __init__(self, in_channels: int) -> None:
         super().__init__()
         self.branch0 = nn.SequentialCell([
@@ -164,6 +172,8 @@ class InceptionD(nn.Cell):
 
 
 class InceptionE(nn.Cell):
+    """ InceptionE """
+
     def __init__(self, in_channels: int) -> None:
         super().__init__()
         self.branch0 = BasicConv2d(in_channels, 320, kernel_size=1)
