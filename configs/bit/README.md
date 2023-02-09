@@ -20,8 +20,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 <div align="center">
 
 |       Model    | Context  | Top-1 (%) | Top-5 (%) | Params(M) |                                                 Recipe                                                  |                                    Download                                   |                 
-| -------------- | -------- | --------- | --------- | --------- | ------------------------------------------------------------------------------------------------------- |  ---------------------------------------------------------------------------- |
-|  bit_resnet50  | D910x8-G |   76.81   |   93.17   |   25.55   |  [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt) | 
+| -------------- | -------- | --------- | --------- |-----------| ------------------------------------------------------------------------------------------------------- |  ---------------------------------------------------------------------------- |
+|  bit_resnet50  | D910x8-G |   76.81   |   93.17   | 44.54     |  [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt) | 
 
 </div>
 
