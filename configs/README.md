@@ -40,6 +40,16 @@ Illustration:
 - Recipe: Training recipe/configuration linked to a yaml config file. 
 - Download: url of the pretrained model weights
 
+### Model Checkpoint Format
+ The checkpoint (i.e., model weight) name should follow this format:  **{model_name}_{specification}-{sha256sum}.ckpt**, e.g., `poolformer_s12-5be5c4e4.ckpt`. 
+ 
+ You can run the following command and take the first 8 characters of the computing result as the sha256sum value in the checkpoint name.
+ 
+ ```shell
+ sha256sum your_model.ckpt
+ ```
+
+ 
 #### Training Script Format
 
 For consistency, it is recommended to provide distributed training commands based on `mpirun -n {num_devices} python train.py`, instead of using shell script such as `distrubuted_train.sh`. 
