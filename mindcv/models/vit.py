@@ -59,7 +59,7 @@ default_cfgs = {
 
 class PatchEmbedding(nn.Cell):
     """
-    Path embedding layer forv ViT. First rearrange b c (h p) (w p) -> b (h w) (p p c).
+    Path embedding layer for ViT. First rearrange b c (h p) (w p) -> b (h w) (p p c).
 
     Args:
         image_size (int): Input image size. Default: 224.
