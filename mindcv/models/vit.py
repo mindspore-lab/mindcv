@@ -48,12 +48,12 @@ def _cfg(url='', **kwargs):
     }
 
 default_cfgs = {
-    "vit_b_16_224": _cfg(url="https://download.mindspore.cn/vision/classification/vit_b_16_224.ckpt"),
-    "vit_b_16_384": _cfg(url="https://download.mindspore.cn/vision/classification/vit_b_16_384.ckpt", input_size=(3, 384, 384)),
+    "vit_b_16_224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vit_b_16_224.ckpt"),
+    "vit_b_16_384": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vit_b_16_384.ckpt", input_size=(3, 384, 384)),
     "vit_l_16_224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224.ckpt"),
-    "vit_l_16_384": _cfg(url="https://download.mindspore.cn/vision/classification/vit_l_16_384.ckpt", input_size=(3, 384, 384)),
+    "vit_l_16_384": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vit_l_16_384.ckpt", input_size=(3, 384, 384)),
     "vit_b_32_224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt"),
-    "vit_b_32_384": _cfg(url="https://download.mindspore.cn/vision/classification/vit_b_32_384.ckpt", input_size=(3, 384, 384)),
+    "vit_b_32_384": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vit_b_32_384.ckpt", input_size=(3, 384, 384)),
     "vit_l_32_224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224.ckpt"),
     }
 
