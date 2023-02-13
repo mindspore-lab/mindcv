@@ -64,12 +64,14 @@ class StdConv2d(nn.Conv2d):
             padding,
             group)
         self.mean_op = ops.ReduceMean(keep_dims=True)
+        self.cast = ops.Cast()
 
     def construct(self, x):
         w = self.weight
+        w = self.cast(w, x.dtype)
         m = self.mean_op(w, [1, 2, 3])
         v = w.var((1, 2, 3), keepdims=True)
-        w = (w - m) / mindspore.ops.sqrt(v + 1e-10)
+        w = (w - m) / ops.sqrt(v + 1e-10)
         output = self.conv2d(x, w)
         return output
 
