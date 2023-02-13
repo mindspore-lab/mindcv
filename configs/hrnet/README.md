@@ -79,7 +79,7 @@ If you want to train or finetune the model on a smaller dataset without distribu
 
 ```shell
 # standalone training on a CPU/GPU/Ascend device
-python train.py --config configs/vit/hrnet_w32_ascend.yaml --data_dir /path/to/dataset --distribute False
+python train.py --config configs/hrnet/hrnet_w32_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 ### Validation
@@ -87,7 +87,7 @@ python train.py --config configs/vit/hrnet_w32_ascend.yaml --data_dir /path/to/d
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```
-python validate.py -c configs/vit/vit_b32_224_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+python validate.py -c configs/hrnet/hrnet_w32_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 ### Deployment
