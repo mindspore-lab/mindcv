@@ -6,7 +6,7 @@ import numpy as np
 
 import mindspore as ms
 from mindspore import log as logger
-from mindspore import Tensor, save_checkpoint, SummaryRecord
+from mindspore import Tensor, ops, save_checkpoint, SummaryRecord, ParameterTuple, load_param_into_net
 from mindspore.train.callback import Callback
 from mindspore.train._utils import _make_directory
 
@@ -35,7 +35,9 @@ class StateMonitor(Callback):
                  model_name='',
                  last_epoch=0,
                  keep_checkpoint_max=10,
-                 ckpt_save_policy=None
+                 ckpt_save_policy=None,
+                 use_ema=False,
+                 dataset_sink_mode=True
                  ):
         super().__init__()
         self.model = model
@@ -59,6 +61,7 @@ class StateMonitor(Callback):
         self.ckpt_save_policy = ckpt_save_policy
         self._manager = CheckpointManager(ckpt_save_policy=self.ckpt_save_policy)
         self._need_flush_from_cache = True
+        self.dataset_sink_mode = dataset_sink_mode
 
         if self.rank_id in [0, None]:
             if not os.path.isdir(ckpt_dir):
@@ -82,6 +85,11 @@ class StateMonitor(Callback):
 
         self.start = time()
         self.epoch_start = time()
+        self.map = ops.HyperMap()
+        self.use_ema = use_ema
+        if self.use_ema:
+            self.online_params = ParameterTuple(self.model.train_network.get_parameters())
+            self.swap_params = self.online_params.clone('swap', 'zeros')
 
     def __enter__(self):
         self.summary_record = SummaryRecord(self.summary_dir)
@@ -90,9 +98,27 @@ class StateMonitor(Callback):
     def __exit__(self, *exc_args):
         self.summary_record.close()
 
-    def apply_eval(self):
+    def apply_eval(self, run_context):
         """Model evaluation, return validation accuracy."""
-        return self.model.eval(self.dataset_val, dataset_sink_mode=False)
+        if self.use_ema:
+            cb_params = run_context.original_args()
+            self.map(ops.assign, self.swap_params, self.online_params)
+            ema_dict = dict()
+            if self.dataset_sink_mode:
+                net = cb_params.train_network.network
+            else:
+                net = cb_params.train_network
+            for param in net.get_parameters():
+                if param.name.startswith("ema"):
+                    new_name = param.name.split("ema.")[1]
+                    ema_dict[new_name] = param.data
+            load_param_into_net(self.model.train_network.network, ema_dict)
+            res = self.model.eval(self.dataset_val, dataset_sink_mode=False)
+            self.map(ops.assign, self.online_params, self.swap_params)
+        else:
+            res = self.model.eval(self.dataset_val, dataset_sink_mode=False)
+
+        return res
 
     def on_train_step_end(self, run_context):
         cb_params = run_context.original_args()
@@ -102,8 +128,10 @@ class StateMonitor(Callback):
 
         if cb_params.optimizer is not None:
             optimizer = cb_params.optimizer
-        else:
+        elif self.dataset_sink_mode:
             optimizer = cb_params.train_network.network.optimizer
+        else:
+            optimizer = cb_params.train_network.optimizer
 
         if (cur_step_in_epoch  + 1) % self.log_interval == 0 or \
                 (cur_step_in_epoch  + 1) >= num_batches or cur_step_in_epoch == 0:
@@ -127,8 +155,10 @@ class StateMonitor(Callback):
         cb_params = run_context.original_args()
         if cb_params.optimizer is not None:
             optimizer = cb_params.optimizer
-        else:
+        elif self.dataset_sink_mode:
             optimizer = cb_params.train_network.network.optimizer
+        else:
+            optimizer = cb_params.train_network.optimizer
 
         # the global step may larger than batch_size * epoch due to graph mode async
         global_step = optimizer.global_step.asnumpy()[0]
@@ -143,8 +173,9 @@ class StateMonitor(Callback):
         if self.dataset_val is not None:
             if cur_epoch >= self.val_start_epoch and (cur_epoch - self.val_start_epoch) % self.val_interval == 0:
                 val_time = time()
+                mind_res = self.apply_eval(run_context)
                 for i in range(len(self.metric_name)):
-                    res[i] = self.apply_eval()[self.metric_name[i]] * 100
+                    res[i] = mind_res[self.metric_name[i]] * 100
 
                 if self.device_num > 1:
                     res = self.all_reduce(res)
