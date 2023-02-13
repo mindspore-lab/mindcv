@@ -58,19 +58,12 @@ class TrainOneStepWithEMA(nn.TrainOneStepWithLossScaleCell):
         loss = self.network(*inputs)
         scaling_sens = self.scale_sense
 
-        status, scaling_sens = self.start_overflow_check(loss, scaling_sens)
-
         scaling_sens_filled = C.ones_like(loss) * F.cast(scaling_sens, F.dtype(loss))
         grads = self.grad(self.network, weights)(*inputs, scaling_sens_filled)
         grads = self.hyper_map(F.partial(_grad_scale, scaling_sens), grads)
         # apply grad reducer on grads
         grads = self.grad_reducer(grads)
-        # get the overflow buffer
-        cond = self.get_overflow_status(status, grads)
-        overflow = self.process_loss_scale(cond)
-        # if there is no overflow, do optimize
-        if not overflow:
-            loss = F.depend(loss, self.optimizer(grads))
-            if self.use_ema:
-                self.ema_update()
+        loss = F.depend(loss, self.optimizer(grads))
+        if self.use_ema:
+            self.ema_update()
         return loss
