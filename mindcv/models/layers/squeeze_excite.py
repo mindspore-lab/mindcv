@@ -7,6 +7,7 @@ from typing import Optional
 
 from mindspore import nn
 from mindspore import Tensor
+from mindspore import ops
 
 from ..utils import make_divisible
 from .pooling import GlobalAvgPooling
@@ -58,5 +59,51 @@ class SqueezeExcite(nn.Cell):
         x_se = self.act(x_se)
         x_se = self.conv_expand(x_se)
         x_se = self.gate(x_se)
+        x = x * x_se
+        return x
+
+
+class SqueezeExciteV2(nn.Cell):
+    """ SqueezeExcite Module as defined in original SE-Nets with a few additions.
+    V1 uses 1x1conv to replace fc layers, and V2 uses nn.Dense to implement directly.
+    """
+    def __init__(self,
+                 in_channels: int,
+                 rd_ratio: float = 1. / 16,
+                 rd_channels: Optional[int] = None,
+                 rd_divisor: int = 8,
+                 norm: Optional[nn.Cell] = None,
+                 act_layer: nn.Cell = nn.ReLU,
+                 gate_layer: nn.Cell = nn.Sigmoid
+                 ) -> None:
+        super().__init__()
+        self.norm = norm
+        self.act = act_layer()
+        self.gate = gate_layer()
+        if not rd_channels:
+            rd_channels = make_divisible(in_channels * rd_ratio, rd_divisor)
+
+        self.conv_reduce = nn.Dense(in_channels=in_channels,
+                                    out_channels=rd_channels,
+                                    has_bias=True
+                                    )
+        if self.norm:
+            self.bn = nn.BatchNorm2d(rd_channels)
+        self.conv_expand = nn.Dense(in_channels=rd_channels,
+                                    out_channels=in_channels,
+                                    has_bias=True
+                                    )
+        self.pool = GlobalAvgPooling(keep_dims=False)
+
+    def construct(self, x: Tensor) -> Tensor:
+        x_se = self.pool(x)
+        x_se = self.conv_reduce(x_se)
+        if self.norm:
+            x_se = self.bn(x_se)
+        x_se = self.act(x_se)
+        x_se = self.conv_expand(x_se)
+        x_se = self.gate(x_se)
+        x_se = ops.expand_dims(x_se, -1)
+        x_se = ops.expand_dims(x_se, -1)
         x = x * x_se
         return x
