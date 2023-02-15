@@ -1,5 +1,5 @@
 """
-MindSpore implementation of `BiT`.
+MindSpore implementation of `BiT_ResNet`.
 Refer to Big Transfer (BiT): General Visual Representation Learning.
 """
 
@@ -13,8 +13,9 @@ from .utils import load_pretrained
 from .registry import register_model
 
 __all__ = [
-    'BiT',
+    'BiT_ResNet',
     'BiTresnet50',
+    'BiTresnet101',
 ]
 
 
@@ -28,13 +29,13 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'BiTresnet50': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt')
+    'BiTresnet50': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt'),
+    'BiTresnet101': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet101.ckpt')
 }
 
 
 class StdConv2d(nn.Conv2d):
     r"""Conv2d with Weight Standardization
-
           Args:
               in_channels(int): The channel number of the input tensor of the Conv2d layer.
               out_channels(int): The channel number of the output tensor of the Conv2d layer.
@@ -75,7 +76,6 @@ class StdConv2d(nn.Conv2d):
 
 class Bottleneck(nn.Cell):
     """define the basic block of BiT
-
         Args:
               in_channels(int): The channel number of the input tensor of the Conv2d layer.
               channels(int): The channel number of the output tensor of the middle Conv2d layer.
@@ -140,12 +140,11 @@ class Bottleneck(nn.Cell):
         return out
 
 
-class BiT(nn.Cell):
-    r"""BiT model class, based on
+class BiT_ResNet(nn.Cell):
+    r"""BiT_ResNet model class, based on
     `"Big Transfer (BiT): General Visual Representation Learning" <https://arxiv.org/abs/1912.11370>`_
-
     Args:
-        block(Union[Bottleneck]): block of BiT.
+        block(Union[Bottleneck]): block of BiT_ResNetv2.
         layers(tuple(int)): number of layers of each stage.
         wf(int): width of each layer. Default: 1.
         num_classes(int): number of classification classes. Default: 1000.
@@ -263,10 +262,23 @@ class BiT(nn.Cell):
 @register_model
 def BiTresnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 50 layers ResNet model.
-     Refer to the base class `models.BiT` for more details.
+     Refer to the base class `models.BiT_Resnet` for more details.
      """
     default_cfg = default_cfgs['BiTresnet50']
-    model = BiT(Bottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
+    model = BiT_ResNet(Bottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
+    return model
+
+@register_model
+def BiTresnet101(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    """Get 101 layers ResNet model.
+     Refer to the base class `models.BiT_Resnet` for more details.
+     """
+    default_cfg = default_cfgs['BiTresnet101']
+    model = BiT_ResNet(Bottleneck, [3, 4, 23, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)

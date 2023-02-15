@@ -1,5 +1,6 @@
 ''' Model training pipeline '''
 import os
+import copy
 import logging
 import mindspore as ms
 import random
@@ -217,23 +218,14 @@ def train(args):
     # init model
     if args.use_ema:
         net_with_loss = nn.WithLossCell(network, loss)
-
-        if args.dynamic_loss_scale:
-            loss_scale_manager = nn.DynamicLossScaleUpdateCell(loss_scale_value=args.loss_scale, scale_factor=2,
-                                                               scale_window=1000)
-        else:
-            loss_scale_manager = nn.FixedLossScaleUpdateCell(loss_scale_value=args.loss_scale)
+        loss_scale_manager = nn.FixedLossScaleUpdateCell(loss_scale_value=args.loss_scale)
         ms.amp.auto_mixed_precision(net_with_loss, amp_level=args.amp_level)
         net_with_loss = TrainOneStepWithEMA(net_with_loss, optimizer, scale_sense=loss_scale_manager,
                                             use_ema=args.use_ema, ema_decay=args.ema_decay)
         eval_network = nn.WithEvalCell(network, loss, args.amp_level in ["O2", "O3", "auto"])
         model = Model(net_with_loss, eval_network=eval_network, metrics=eval_metrics, eval_indexes=[0, 1, 2])
     else:
-        if args.dynamic_loss_scale:
-            loss_scale_manager = ms.amp.DynamicLossScaleManager(init_loss_scale=args.loss_scale, scale_factor=2,
-                                                                scale_window=1000)
-        else:
-            loss_scale_manager = FixedLossScaleManager(loss_scale=args.loss_scale, drop_overflow_update=False)
+        loss_scale_manager = FixedLossScaleManager(loss_scale=args.loss_scale, drop_overflow_update=False)
         model = Model(network, loss_fn=loss, optimizer=optimizer, metrics=eval_metrics, amp_level=args.amp_level,
                       loss_scale_manager=loss_scale_manager)
 
@@ -263,7 +255,9 @@ def train(args):
                             keep_checkpoint_max=args.keep_checkpoint_max,
                             model_name=args.model,
                             last_epoch=begin_epoch,
-                            ckpt_save_policy=args.ckpt_save_policy)
+                            ckpt_save_policy=args.ckpt_save_policy,
+                            use_ema=args.use_ema,
+                            dataset_sink_mode=args.dataset_sink_mode)
 
     callbacks = [state_cb]
     # log
