@@ -400,7 +400,7 @@ def RepMLPNet_T224(pretrained: bool = False, image_size: int = 224, num_classes:
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-    model.image_size = image_size
+
     return model
 
 
@@ -416,7 +416,7 @@ def RepMLPNet_T256(pretrained: bool = False, image_size: int = 256, num_classes:
                       deploy=deploy)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-    model.image_size = image_size
+
     return model
 
 
@@ -432,7 +432,7 @@ def RepMLPNet_B224(pretrained: bool = False, image_size: int = 224, num_classes:
                       deploy=deploy)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-    model.image_size = image_size
+
     return model
 
 
@@ -448,7 +448,7 @@ def RepMLPNet_B256(pretrained: bool = False, image_size: int = 256, num_classes:
                       deploy=deploy)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-    model.image_size = image_size
+
     return model
 
 
@@ -464,7 +464,7 @@ def RepMLPNet_D256(pretrained: bool = False, image_size: int = 256, num_classes:
                       deploy=deploy)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-    model.image_size = image_size
+
     return model
 
 
@@ -480,7 +480,7 @@ def RepMLPNet_L256(pretrained: bool = False, image_size: int = 256, num_classes:
                       deploy=deploy)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-    model.image_size = image_size
+
     return model
 
 

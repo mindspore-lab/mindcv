@@ -8,7 +8,7 @@ from mindspore import Tensor
 import mindspore as ms
 import mindspore
 from mindcv import list_models, list_modules
-from mindcv.models import create_model, model_entrypoint, is_model_in_modules, is_model_pretrained
+from mindcv.models import create_model, model_entrypoint, is_model_in_modules, is_model_pretrained, get_pretrained_cfg_value
 from mindcv.loss import create_loss
 from mindcv.optim import create_optimizer
 from mindspore.nn import TrainOneStepCell, WithLossCell
@@ -25,14 +25,15 @@ def test_model_forward(name):
     #ms.set_context(mode=ms.PYNATIVE_MODE)
     bs = 2
     c = 10
-    model= create_model(model_name=name, num_classes=c)
-    if hasattr(model, 'image_size'):
-        image_size = model.image_size
+    model = create_model(model_name=name, num_classes=c)
+    input_size = get_pretrained_cfg_value(model_name=name, cfg_key="input_size")
+    if input_size:
+        input_size = (bs,) + tuple(input_size)
     else:
-        image_size = 224
-    dummy_input = Tensor(np.random.rand(bs, 3, image_size, image_size), dtype=mindspore.float32)
+        input_size = (bs, 3, 224, 224)
+    dummy_input = Tensor(np.random.rand(*input_size), dtype=mindspore.float32)
     y = model(dummy_input)
-    assert y.shape==(bs, 10), 'output shape not match'
+    assert y.shape == (bs, 10), 'output shape not match'
 
 '''
 @pytest.mark.parametrize('name', model_name_list)

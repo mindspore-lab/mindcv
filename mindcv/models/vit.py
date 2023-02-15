@@ -521,7 +521,6 @@ class ViT(nn.Cell):
         super().__init__()
 
         #Validator.check_string(pool, ["cls", "mean"], "pool type")
-        #self.image_size = image_size
 
         self.patch_embedding = PatchEmbedding(image_size=image_size,
                                               patch_size=patch_size,
@@ -626,7 +625,6 @@ def vit(image_size: int,
                          num_classes=num_classes)
 
     model = BaseClassifier(backbone=backbone, head=head)
-    model.image_size = image_size
 
     if pretrained:
         # Download the pre-trained checkpoint file from url, and load ckpt file.
