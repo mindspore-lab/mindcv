@@ -34,9 +34,9 @@ This tutorial will take DenseNet classification model as an example to implement
     Successfully built mindcv
     Installing collected packages: mindcv
     Successfully installed mindcv-0.0.2a0
-    
 
->The following tutorials assume that all dependent packages have been installed. If you encounter dependency problems, please follow the [installation guide](https://github.com/mindspore-lab/mindcv#dependency) on Git repo. 
+
+>The following tutorials assume that all dependent packages have been installed. If you encounter dependency problems, please follow the [installation guide](https://github.com/mindspore-lab/mindcv#dependency) on Git repo.
 
 
 ## Dataset Load
@@ -58,8 +58,8 @@ download = not os.path.exists(cifar10_dir)
 dataset_train = create_dataset(name='cifar10', root=cifar10_dir, split='train', shuffle=True, num_parallel_workers=num_workers, download=download)
 ```
 
-    170052608B [01:13, 2328662.39B/s]                                
-    
+    170052608B [01:13, 2328662.39B/s]
+
 
 [create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset) parameters:
 
@@ -138,7 +138,7 @@ num_batches = loader_train.get_dataset_size()
 - cutmix_prob: prob of doing cutmix for an image (default=0.0)
 
 - num_classes: the number of classes. Default: 1000.
-    
+
 - transform: the list of transformations that wil be applied on the image, which is obtained by create_transform. If None, the default imagenet transformation for evaluation will be applied. Default: None.
 
 - target_transform: the list of transformations that will be applied on the label. If None, the label will be converted to the type of ms.int32. Default: None.
@@ -148,7 +148,7 @@ num_batches = loader_train.get_dataset_size()
 - python_multiprocessing: Parallelize Python operations with multiple worker processes. This option could be beneficial if the Python operation is computational heavy (default=False).
 
 
->Avoid repeatedly executing a single cell of [create_loader](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_loader) in notebook, or execute again after executing [create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset). 
+>Avoid repeatedly executing a single cell of [create_loader](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_loader) in notebook, or execute again after executing [create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset).
 
 ## Model Creation and Loading
 
@@ -162,11 +162,11 @@ from mindcv.models import create_model
 network = create_model(model_name='densenet121', num_classes=num_classes, pretrained=True)
 ```
 
-    32293888B [00:01, 28754770.92B/s]                               
+    32293888B [00:01, 28754770.92B/s]
     [WARNING] ME(1769:281472959711936,MainProcess):2022-12-21-16:03:22.690.392 [mindspore/train/serialization.py:712] For 'load_param_into_net', 2 parameters in the 'net' are not loaded, because they are not in the 'parameter_dict', please check whether the network structure is consistent when training and loading checkpoint.
     [WARNING] ME(1769:281472959711936,MainProcess):2022-12-21-16:03:22.691.960 [mindspore/train/serialization.py:714] classifier.weight is not loaded.
     [WARNING] ME(1769:281472959711936,MainProcess):2022-12-21-16:03:22.692.908 [mindspore/train/serialization.py:714] classifier.bias is not loaded.
-    
+
 
 > Because the number of classes required by Cifar10 and ImageNet datasets is different, the classifier parameters cannot be shared, and the warning that the classifier parameters cannot be loaded does not affect the fine tuning.
 
@@ -253,7 +253,7 @@ Use [create_optimizer](https://mindcv.readthedocs.io/en/latest/api/mindcv.optim.
 from mindcv.optim import create_optimizer
 
 # create optimizer
-opt = create_optimizer(network.trainable_params(), opt='adam', lr=lr_scheduler) 
+opt = create_optimizer(network.trainable_params(), opt='adam', lr=lr_scheduler)
 ```
 
 [create_optimizer](https://mindcv.readthedocs.io/en/latest/api/mindcv.optim.html#mindcv.optim.create_optimizer) parameters:
@@ -295,7 +295,7 @@ Use the [`mindspore.Model.train`](https://mindspore.cn/docs/zh-CN/r1.8/api_pytho
 from mindspore import LossMonitor, TimeMonitor, CheckpointConfig, ModelCheckpoint
 
 # Set the callback function for saving network parameters during training.
-ckpt_save_dir = './ckpt' 
+ckpt_save_dir = './ckpt'
 ckpt_config = CheckpointConfig(save_checkpoint_steps=num_batches)
 ckpt_cb = ModelCheckpoint(prefix='densenet121-cifar10',
                           directory=ckpt_save_dir,
@@ -305,17 +305,17 @@ model.train(5, loader_train, callbacks=[LossMonitor(num_batches//5), TimeMonitor
 ```
 
     [WARNING] DEVICE(1769,ffff87c70ac0,python):2022-12-21-16:04:30.001.890 [mindspore/ccsrc/plugin/device/ascend/hal/device/kernel_select_ascend.cc:330] FilterRaisedOrReducePrecisionMatchedKernelInfo] Operator:[Default/network-WithLossCell/_loss_fn-CrossEntropySmooth/GatherD-op5273] don't support int64, reduce precision from int64 to int32.
-    
+
 
     epoch: 1 step: 156, loss is 2.0816354751586914
     epoch: 1 step: 312, loss is 1.4474115371704102
     epoch: 1 step: 468, loss is 0.8935483694076538
     epoch: 1 step: 624, loss is 0.5588696002960205
     epoch: 1 step: 780, loss is 0.3161369860172272
-    
+
 
     [WARNING] DEVICE(1769,ffff87c70ac0,python):2022-12-21-16:09:20.261.851 [mindspore/ccsrc/plugin/device/ascend/hal/device/kernel_select_ascend.cc:330] FilterRaisedOrReducePrecisionMatchedKernelInfo] Operator:[Default/network-WithLossCell/_loss_fn-CrossEntropySmooth/GatherD-op16720] don't support int64, reduce precision from int64 to int32.
-    
+
 
     Train epoch time: 416429.509 ms, per step time: 532.519 ms
     epoch: 2 step: 154, loss is 0.19752007722854614
@@ -342,7 +342,7 @@ model.train(5, loader_train, callbacks=[LossMonitor(num_batches//5), TimeMonitor
     epoch: 5 step: 616, loss is 0.014183484017848969
     epoch: 5 step: 772, loss is 0.09367241710424423
     Train epoch time: 154978.618 ms, per step time: 198.182 ms
-    
+
 
 
 ```python
@@ -370,13 +370,13 @@ print(acc)
 ```
 
     [WARNING] DEVICE(1769,ffff87c70ac0,python):2022-12-21-16:24:11.927.472 [mindspore/ccsrc/plugin/device/ascend/hal/device/kernel_select_ascend.cc:330] FilterRaisedOrReducePrecisionMatchedKernelInfo] Operator:[Default/network-WithLossCell/_loss_fn-CrossEntropySmooth/GatherD-op24314] don't support int64, reduce precision from int64 to int32.
-    
+
 
     {'accuracy': 0.951}
-    
+
 
     [WARNING] DEVICE(1769,ffff87c70ac0,python):2022-12-21-16:25:01.871.273 [mindspore/ccsrc/plugin/device/ascend/hal/device/kernel_select_ascend.cc:330] FilterRaisedOrReducePrecisionMatchedKernelInfo] Operator:[Default/network-WithLossCell/_loss_fn-CrossEntropySmooth/GatherD-op27139] don't support int64, reduce precision from int64 to int32.
-    
+
 
 ## Use YAML files for model training and validation
 

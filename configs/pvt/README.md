@@ -14,7 +14,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-|   Model    | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                       | Download                                                                         |  
+|   Model    | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                       | Download                                                                         |
 |:----------:|:--------:|:---------:|:---------:|:----------:|----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
 |  PVT_tiny  | D910x8-G |   74.81   |   92.18   |   13.23    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_tiny_ascend.yaml)   | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_tiny_224.ckpt)   |
 | PVT_small  | D910x8-G |   79.66   |   94.71   |   24.49    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_small_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_small_224.ckpt)  |
@@ -25,7 +25,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 #### Notes
 
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
 - Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start

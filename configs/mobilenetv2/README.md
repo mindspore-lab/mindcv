@@ -8,7 +8,7 @@ The model is a new neural network architecture that is specifically tailored for
 The main innovation of the model is the proposal of a new layer module: The Inverted Residual with Linear Bottleneck. The module takes as input a low-dimensional compressed representation that is first extended to high-dimensionality and then filtered with lightweight depth convolution. Linear convolution is then used to project the features back to the low-dimensional representation.[[1](#references)]
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/53842165/210044190-8b5aab08-75fe-4e2c-87cc-d3529d9c60cd.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/53842165/210044190-8b5aab08-75fe-4e2c-87cc-d3529d9c60cd.png" width=800 />
 </p>
 <p align="center">
   <em>Figure 1. Architecture of MobileNetV2 [<a href="#references">1</a>] </em>
@@ -20,7 +20,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model            | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                      | Download                                                                                                         | 
+| Model            | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                      | Download                                                                                                         |
 |------------------|----------|-----------|-----------|------------|-------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
 | MobileNet_v2_075 | D910x8-G | 69.76     | 89.28     | 2.66       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_075_224-400_625.ckpt) |
 | MobileNet_v2_100 | D910x8-G | 72.02     | 90.92     | 3.54       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_1.0_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_100_224-300_625.ckpt) |
@@ -30,8 +30,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 #### Notes
 
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.  
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -50,12 +50,12 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
 ```shell
-# distrubted training on multiple GPU/Ascend devices
+# distributed training on multiple GPU/Ascend devices
 mpirun -n 8 python train.py --config configs/mobilenetv2/mobilenet_v2_0.75_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
-  
+
 Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
 For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).

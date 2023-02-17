@@ -7,13 +7,13 @@ assignees: ''
 
 ---
 
-If this is your first time, please read our contributor guidelines: 
+If this is your first time, please read our contributor guidelines:
 https://github.com/mindspore-lab/mindcv/blob/main/CONTRIBUTING.md
 
 **Describe the bug/ 问题描述 (Mandatory / 必填)**
 A clear and concise description of what the bug is.
 
-- **Hardware Environment(`Ascend`/`GPU`/`CPU`)  / 硬件环境**: 
+- **Hardware Environment(`Ascend`/`GPU`/`CPU`)  / 硬件环境**:
 > Please delete the backend not involved / 请删除不涉及的后端:
 > /device ascend/GPU/CPU/kirin/等其他芯片
 
@@ -21,9 +21,9 @@ A clear and concise description of what the bug is.
 -- MindSpore version (e.g., 1.7.0.Bxxx) :
 -- Python version (e.g., Python 3.7.5) :
 -- OS platform and distribution (e.g., Linux Ubuntu 16.04):
--- GCC/Compiler version (if compiled from source): 
+-- GCC/Compiler version (if compiled from source):
 
-- **Excute Mode / 执行模式 (Mandatory / 必填)(`PyNative`/`Graph`)**: 
+- **Excute Mode / 执行模式 (Mandatory / 必填)(`PyNative`/`Graph`)**:
 > Please delete the mode not involved / 请删除不涉及的模式:
 > /mode pynative
 > /mode graph

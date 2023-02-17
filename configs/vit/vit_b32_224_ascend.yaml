@@ -1,4 +1,4 @@
-# system 
+# system
 mode: 0
 distribute: True
 num_parallel_workers: 8
@@ -13,7 +13,7 @@ dataset_download: False
 batch_size: 256
 drop_remainder: True
 
-# augmentation 
+# augmentation
 image_resize: 224
 scale: [0.08, 1.0]
 ratio: [0.75, 1.333]
@@ -29,8 +29,8 @@ auto_augment: "randaug-m7-mstd0.5"
 
 # model
 model: "vit_b_32_224"
-drop_rate: 0.1 
-drop_path_rate: 0.1 
+drop_rate: 0.1
+drop_path_rate: 0.1
 num_classes: 1000
 pretrained: False
 ckpt_path: ""
@@ -48,7 +48,7 @@ label_smoothing: 0.1
 
 # lr scheduler
 scheduler: "warmup_cosine_decay"
-lr: 0.003 
+lr: 0.003
 min_lr: 1e-6
 warmup_epochs: 32
 decay_epochs: 568

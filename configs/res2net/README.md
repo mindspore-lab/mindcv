@@ -7,7 +7,7 @@
 Res2Net is a novel building block for CNNs proposed by constructing hierarchical residual-like connections within one single residual block. The Res2Net represents multi-scale features at a granular level and increases the range of receptive fields for each network layer. Res2Net block can be plugged into the state-of-the-art backbone CNN models, e.g., ResNet, ResNeXt, and DLA. Ablation studies and experimental results on representative computer vision tasks, i.e., object detection, class activation mapping, and salient object detection, verify the superiority of the Res2Net over the state-of-the-art baseline methods such as ResNet-50, DLA-60 and etc.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/121591093/210049799-ee3971d5-fad9-41d2-a8cd-ef64aa9d4724.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/121591093/210049799-ee3971d5-fad9-41d2-a8cd-ef64aa9d4724.png" width=800 />
 </p>
 <p align="center">
   <em>Figure 1. Architecture of Res2Net [<a href="#references">1</a>] </em>
@@ -29,8 +29,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 </div>
 
 #### Notes
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K. 
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 
 ## Quick Start
@@ -50,7 +50,7 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
 ```shell
-# distrubted training on multiple GPU/Ascend devices
+# distributed training on multiple GPU/Ascend devices
 mpirun -n 8 python train.py --config configs/res2net/res2net_50_ascend.yaml --data_dir /path/to/imagenet
 ```
 

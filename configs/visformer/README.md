@@ -6,7 +6,7 @@
 Visformer, or Vision-friendly Transformer, is an architecture that combines Transformer-based architectural features with those from convolutional neural network architectures. Visformer adopts the stage-wise design for higher base performance. But self-attentions are only utilized in the last two stages, considering that self-attention in the high-resolution stage is relatively inefficient even when the FLOPs are balanced. Visformer employs bottleneck blocks in the first stage and utilizes group 3 × 3 convolutions in bottleneck blocks inspired by ResNeXt. It also introduces BatchNorm to patch embedding modules as in CNNs. [[2](#references)]
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/8156835/210043162-8b861b87-73ba-4376-aae9-534496896c37.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/8156835/210043162-8b861b87-73ba-4376-aae9-534496896c37.png" width=800 />
 </p>
 <p align="center">
   <em>Figure 1. Network Configuration of Visformer  [<a href="https://arxiv.org/abs/2104.12533">1</a>] </em>
@@ -19,19 +19,19 @@ Visformer, or Vision-friendly Transformer, is an architecture that combines Tran
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
-  
-| Model           | Context   |  Top-1 (%) | Top-5 (%)  |  Params (M) | Recipe  | Download |
-|-----------------|-----------|------------|------------|-------------|---------|----------|
-| visformer_tiny | D910x8-G | 78.28  | 94.15    | 10.33    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny.ckpt)  |
-| visformer_tiny_v2 | D910x8-G | 78.82  | 94.41    | 9.38    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_v2_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny_v2.ckpt)  |
-| visformer_small | D910x8-G | 81.73  | 95.88    |  40.25    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small.ckpt)  |
-| visformer_small_v2 | D910x8-G | 82.17  | 95.90    | 23.52    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_v2_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small_v2.ckpt)  |
+
+| Model              | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                     | Download                                                                                   |
+|--------------------|----------|-----------|-----------|------------|------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| visformer_tiny     | D910x8-G | 78.28     | 94.15     | 10.33      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml)     | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny.ckpt)     |
+| visformer_tiny_v2  | D910x8-G | 78.82     | 94.41     | 9.38       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_v2_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny_v2.ckpt)  |
+| visformer_small    | D910x8-G | 81.73     | 95.88     | 40.25      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_ascend.yaml)    | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small.ckpt)    |
+| visformer_small_v2 | D910x8-G | 82.17     | 95.90     | 23.52      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_v2_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small_v2.ckpt) |
 
 </div>
 
 #### Notes
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K. 
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 ### Preparation
@@ -49,10 +49,10 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
 ```shell
-# distrubted training on multiple GPU/Ascend devices
+# distributed training on multiple GPU/Ascend devices
 mpirun -n 8 python train.py --config configs/visformer/visformer_tiny_ascend.yaml --data_dir /path/to/imagenet
 ```
-  
+
 Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
 For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).

@@ -7,7 +7,7 @@
 ShuffleNet is a computationally efficient CNN model proposed by KuangShi Technology in 2017, which, like MobileNet and SqueezeNet, etc., is mainly intended to be applied to mobile.  ShuffleNet uses two operations at its core: pointwise group convolution and channel shuffle, which greatly reduces the model computation while maintaining accuracy.   ShuffleNet designs more efficient network structures to achieve smaller and faster models, instead of compressing or migrating a large trained model.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/121591093/210049793-562b41bf-fc38-4c33-8144-5bfe75a88375.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/121591093/210049793-562b41bf-fc38-4c33-8144-5bfe75a88375.png" width=800 />
 </p>
 <p align="center">
   <em>Figure 1. Architecture of ShuffleNetV1 [<a href="#references">1</a>] </em>
@@ -20,18 +20,18 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model           | Context   |  Top-1 (%)  | Top-5 (%)  |  Params (M)    | Recipe                                                                                                        |  Download |
-|-----------------|-----------|-------|-------|------------|---------------------------------------------------------------------------------------------------------------|---|
-| shufflenet_v1_g3_x0_5 | D910x8-G     | 57.05     | 79.73     | 0.73      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v1/shufflenet_v1_0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x0_5-42cfe109.ckpt)  |
-|shufflenet_v1_g3_x1_0 | D910x8-G     | 67.77     | 87.73     | 1.89       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v1/shufflenet_v1_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x1_0-245f0ccf.ckpt)  |
-| shufflenet_v1_g3_x1_5 | D910x8-G     | 71.53     | 90.17     | 3.48   | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v1/shufflenet_v1_1.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x1_5-40caaa99.ckpt)  |
-| shufflenet_v1_g3_x2_0 | D910x8-G     | 74.02     | 91.74     | 5.50     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v1/shufflenet_v1_2.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x2_0-df3f5199.ckpt)  |
+| Model                 | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                        | Download                                                                                                             |
+|-----------------------|----------|-----------|-----------|------------|---------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| shufflenet_v1_g3_x0_5 | D910x8-G | 57.05     | 79.73     | 0.73       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v1/shufflenet_v1_0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x0_5-42cfe109.ckpt) |
+| shufflenet_v1_g3_x1_0 | D910x8-G | 67.77     | 87.73     | 1.89       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v1/shufflenet_v1_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x1_0-245f0ccf.ckpt) |
+| shufflenet_v1_g3_x1_5 | D910x8-G | 71.53     | 90.17     | 3.48       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v1/shufflenet_v1_1.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x1_5-40caaa99.ckpt) |
+| shufflenet_v1_g3_x2_0 | D910x8-G | 74.02     | 91.74     | 5.50       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v1/shufflenet_v1_2.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_x2_0-df3f5199.ckpt) |
 
 </div>
 
 #### Notes
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K. 
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 
 ## Quick Start
@@ -51,7 +51,7 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
 ```shell
-# distrubted training on multiple GPU/Ascend devices
+# distributed training on multiple GPU/Ascend devices
 mpirun -n 8 python train.py --config configs/shufflenet_v1/shufflenet_v1_0.5_ascend.yaml --data_dir /path/to/imagenet
 ```
 

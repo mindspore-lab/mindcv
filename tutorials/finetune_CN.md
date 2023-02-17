@@ -5,7 +5,7 @@
 
 在此教程中，您将学会如何使用MindCV套件进行迁移学习，以解决自定义数据集上的图像分类问题。在深度学习任务中，常见遇到训练数据不足的问题，此时直接训练整个网络往往难以达到理想的精度。一个比较好的做法是，使用一个在大规模数据集上(与任务数据较为接近)预训练好的模型，然后使用该模型来初始化网络的权重参数或作为固定特征提取器应用于特定的任务中。
 
-此教程将以使用ImageNet上预训练的DenseNet模型为例，介绍两种不同的微调策略，解决小样本情况下狼和狗的图像分类问题: 
+此教程将以使用ImageNet上预训练的DenseNet模型为例，介绍两种不同的微调策略，解决小样本情况下狼和狗的图像分类问题:
 
 1. 整体模型微调。
 2. 冻结特征网络(freeze backbone)，只微调分类器。
@@ -70,11 +70,11 @@ dataset_train = create_dataset(root=data_dir, split='train', num_parallel_worker
 dataset_val = create_dataset(root=data_dir, split='val', num_parallel_workers=num_workers)
 ```
 
-> 注意: 自定义数据集的目录结构应与ImageNet一样，即root -> split -> class -> image 的层次结构 
+> 注意: 自定义数据集的目录结构应与ImageNet一样，即root -> split -> class -> image 的层次结构
 
 ```Text
 DATASET_NAME
-    ├── split1(e.g. train)/  
+    ├── split1(e.g. train)/
     │  ├── class1/
     │  │   ├── 000001.jpg
     │  │   ├── 000002.jpg
@@ -83,7 +83,7 @@ DATASET_NAME
     │      ├── 000001.jpg
     │      ├── 000002.jpg
     │      └── ....
-    └── split2/   
+    └── split2/
        ├── class1/
        │   ├── 000001.jpg
        │   ├── 000002.jpg
@@ -96,7 +96,7 @@ DATASET_NAME
 
 ### 数据处理及增强
 
-首先我们通过调用`create_transforms`函数, 获得预设的数据处理和增强策略(transform list)，此任务中，因狼狗图像和ImageNet数据一致（即domain一致），我们指定参数`dataset_name`为ImageNet，直接用预设好的ImageNet的数据处理和图像增强策略。`create_transforms` 同样支持多种自定义的处理和增强操作，以及自动增强策略(AutoAug)。详见API说明。 
+首先我们通过调用`create_transforms`函数, 获得预设的数据处理和增强策略(transform list)，此任务中，因狼狗图像和ImageNet数据一致（即domain一致），我们指定参数`dataset_name`为ImageNet，直接用预设好的ImageNet的数据处理和图像增强策略。`create_transforms` 同样支持多种自定义的处理和增强操作，以及自动增强策略(AutoAug)。详见API说明。
 
 我们将得到的transform list传入`create_loader()`，并指定`batch_size`和其他参数，即可完成训练和验证数据的准备，返回`Dataset` Object，作为模型的输入。
 
@@ -106,7 +106,7 @@ DATASET_NAME
 trans_train = create_transforms(dataset_name='ImageNet', is_training=True)
 trans_val = create_transforms(dataset_name='ImageNet',is_training=False)
 
-# 
+#
 loader_train = create_loader(
         dataset=dataset_train,
         batch_size=16,
@@ -115,7 +115,7 @@ loader_train = create_loader(
         transform=trans_train,
         num_parallel_workers=num_workers,
     )
-    
+
 
 loader_val = create_loader(
         dataset=dataset_val,
@@ -143,7 +143,7 @@ print("Labels:", labels)
 
     Tensor of image (16, 3, 224, 224)
     Labels: [0 1 1 1 1 0 0 0 0 0 1 0 1 0 1 1]
-    
+
 
 对获取到的图像及标签数据进行可视化，标题为图像对应的label名称。
 
@@ -197,14 +197,14 @@ network = create_model(model_name='densenet121', num_classes=2, pretrained=True)
     [WARNING] ME(116613:140051982694208,MainProcess):2022-09-20-03:44:58.786.568 [mindspore/train/serialization.py:709] For 'load_param_into_net', 2 parameters in the 'net' are not loaded, because they are not in the 'parameter_dict', please check whether the network structure is consistent when training and loading checkpoint.
     [WARNING] ME(116613:140051982694208,MainProcess):2022-09-20-03:44:58.787.703 [mindspore/train/serialization.py:714] classifier.weight is not loaded.
     [WARNING] ME(116613:140051982694208,MainProcess):2022-09-20-03:44:58.788.408 [mindspore/train/serialization.py:714] classifier.bias is not loaded.
-    
+
 
 
 > DenseNet的具体结构可参见[DenseNet论文](https://arxiv.org/pdf/1608.06993.pdf)。
 
 #### 模型训练
 
-使用已加载处理好的带标签的狼和狗图像，对DenseNet进行微调网络。 
+使用已加载处理好的带标签的狼和狗图像，对DenseNet进行微调网络。
 注意，对整体模型做微调时，应使用较小的learning rate。
 
 
@@ -216,11 +216,11 @@ from mindspore import Model, LossMonitor, TimeMonitor #, CheckpointConfig, Model
 
 
 # 定义优化器和损失函数
-opt = create_optimizer(network.trainable_params(), opt='adam', lr=1e-4) 
+opt = create_optimizer(network.trainable_params(), opt='adam', lr=1e-4)
 loss = create_loss(name='CE')
 
 # 实例化模型
-model = Model(network, loss_fn=loss, optimizer=opt, metrics={'accuracy'}) 
+model = Model(network, loss_fn=loss, optimizer=opt, metrics={'accuracy'})
 ```
 
 
@@ -268,7 +268,7 @@ model.train(10, loader_train, callbacks=[LossMonitor(5), TimeMonitor(5)], datase
     epoch: 10 step: 10, loss is 0.13094250857830048
     epoch: 10 step: 15, loss is 0.020028553903102875
     Train epoch time: 1217.958 ms, per step time: 81.197 ms
-    
+
 
 #### 模型评估
 
@@ -281,7 +281,7 @@ print(res)
 ```
 
     {'accuracy': 1.0}
-    
+
 
 ##### 可视化模型推理结果
 
@@ -336,7 +336,7 @@ visualize_model(model, loader_val)
 
 首先，我们要冻结除最后一层分类器之外的所有网络层，即将相应的层参数的`requires_grad`属性设置为`False`，使其不在反向传播中计算梯度及更新参数。
 
-因为`mindcv.models` 中所有的模型均以`classifier` 来标识和命名模型的分类器(即Dense层)，所以通过 `classifier.weight` 和 `classifier.bias` 即可筛选出分类器外的各层参数，将其`requires_grad`属性设置为`False`. 
+因为`mindcv.models` 中所有的模型均以`classifier` 来标识和命名模型的分类器(即Dense层)，所以通过 `classifier.weight` 和 `classifier.bias` 即可筛选出分类器外的各层参数，将其`requires_grad`属性设置为`False`.
 
 
 ```python
@@ -365,11 +365,11 @@ loader_train = create_loader(
     )
 
 # 定义优化器和损失函数
-opt = create_optimizer(network.trainable_params(), opt='adam', lr=1e-3) 
+opt = create_optimizer(network.trainable_params(), opt='adam', lr=1e-3)
 loss = create_loss(name='CE')
 
 # 实例化模型
-model = Model(network, loss_fn=loss, optimizer=opt, metrics={'accuracy'}) 
+model = Model(network, loss_fn=loss, optimizer=opt, metrics={'accuracy'})
 
 model.train(10, loader_train, callbacks=[LossMonitor(5), TimeMonitor(5)], dataset_sink_mode=False)
 ```
@@ -414,7 +414,7 @@ model.train(10, loader_train, callbacks=[LossMonitor(5), TimeMonitor(5)], datase
     epoch: 10 step: 10, loss is 0.00829876959323883
     epoch: 10 step: 15, loss is 0.008352771401405334
     Train epoch time: 465.600 ms, per step time: 31.040 ms
-    
+
 
 
 ```python
@@ -433,7 +433,7 @@ print(res)
 ```
 
     {'accuracy': 1.0}
-    
+
 
 ##### 可视化模型预测
 

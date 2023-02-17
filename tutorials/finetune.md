@@ -76,7 +76,7 @@ dataset_val = create_dataset(root=data_dir, split='val', num_parallel_workers=nu
 
 ```Text
 DATASET_NAME
-    ├── split1(e.g. train)/  
+    ├── split1(e.g. train)/
     │  ├── class1/
     │  │   ├── 000001.jpg
     │  │   ├── 000002.jpg
@@ -85,7 +85,7 @@ DATASET_NAME
     │      ├── 000001.jpg
     │      ├── 000002.jpg
     │      └── ....
-    └── split2/   
+    └── split2/
        ├── class1/
        │   ├── 000001.jpg
        │   ├── 000002.jpg
@@ -108,7 +108,7 @@ We will transfer the obtained transform list to the `create_loader()`, and speci
 trans_train = create_transforms(dataset_name='ImageNet', is_training=True)
 trans_val = create_transforms(dataset_name='ImageNet',is_training=False)
 
-# 
+#
 loader_train = create_loader(
         dataset=dataset_train,
         batch_size=16,
@@ -117,7 +117,7 @@ loader_train = create_loader(
         transform=trans_train,
         num_parallel_workers=num_workers,
     )
-    
+
 
 loader_val = create_loader(
         dataset=dataset_val,
@@ -145,7 +145,7 @@ print("Labels:", labels)
 
     Tensor of image (16, 3, 224, 224)
     Labels: [0 1 1 1 1 0 0 0 0 0 1 0 1 0 1 1]
-    
+
 
 Visualize the acquired image and label data, and the title is the label name corresponding to the image.
 
@@ -198,10 +198,10 @@ network = create_model(model_name='densenet121', num_classes=2, pretrained=True)
     [WARNING] ME(116613:140051982694208,MainProcess):2022-09-20-03:44:58.786.568 [mindspore/train/serialization.py:709] For 'load_param_into_net', 2 parameters in the 'net' are not loaded, because they are not in the 'parameter_dict', please check whether the network structure is consistent when training and loading checkpoint.
     [WARNING] ME(116613:140051982694208,MainProcess):2022-09-20-03:44:58.787.703 [mindspore/train/serialization.py:714] classifier.weight is not loaded.
     [WARNING] ME(116613:140051982694208,MainProcess):2022-09-20-03:44:58.788.408 [mindspore/train/serialization.py:714] classifier.bias is not loaded.
-    
 
 
->For the specific structure of DenseNet, see the [DenseNet paper](https://arxiv.org/pdf/1608.06993.pdf). 
+
+>For the specific structure of DenseNet, see the [DenseNet paper](https://arxiv.org/pdf/1608.06993.pdf).
 
 #### Model Training
 Use the loaded and processed wolf and dog images with tags to fine-tune the DenseNet network. Note that smaller learning rates should be used when fine-tuning the overall model.
@@ -216,11 +216,11 @@ from mindspore import Model, LossMonitor, TimeMonitor #, CheckpointConfig, Model
 
 
 # Define optimizer and loss function
-opt = create_optimizer(network.trainable_params(), opt='adam', lr=1e-4) 
+opt = create_optimizer(network.trainable_params(), opt='adam', lr=1e-4)
 loss = create_loss(name='CE')
 
 # Instantiated model
-model = Model(network, loss_fn=loss, optimizer=opt, metrics={'accuracy'}) 
+model = Model(network, loss_fn=loss, optimizer=opt, metrics={'accuracy'})
 ```
 
 
@@ -268,7 +268,7 @@ model.train(10, loader_train, callbacks=[LossMonitor(5), TimeMonitor(5)], datase
     epoch: 10 step: 10, loss is 0.13094250857830048
     epoch: 10 step: 15, loss is 0.020028553903102875
     Train epoch time: 1217.958 ms, per step time: 81.197 ms
-    
+
 
 #### Model Evaluation
 
@@ -281,7 +281,7 @@ print(res)
 ```
 
     {'accuracy': 1.0}
-    
+
 
 ##### Visual Model Inference Results
 Define `visualize_mode` function and visualize model prediction.
@@ -365,11 +365,11 @@ loader_train = create_loader(
     )
 
 # Define optimizer and loss function
-opt = create_optimizer(network.trainable_params(), opt='adam', lr=1e-3) 
+opt = create_optimizer(network.trainable_params(), opt='adam', lr=1e-3)
 loss = create_loss(name='CE')
 
 # Instantiated model
-model = Model(network, loss_fn=loss, optimizer=opt, metrics={'accuracy'}) 
+model = Model(network, loss_fn=loss, optimizer=opt, metrics={'accuracy'})
 
 model.train(10, loader_train, callbacks=[LossMonitor(5), TimeMonitor(5)], dataset_sink_mode=False)
 ```
@@ -414,7 +414,7 @@ model.train(10, loader_train, callbacks=[LossMonitor(5), TimeMonitor(5)], datase
     epoch: 10 step: 10, loss is 0.00829876959323883
     epoch: 10 step: 15, loss is 0.008352771401405334
     Train epoch time: 465.600 ms, per step time: 31.040 ms
-    
+
 
 
 ```python
@@ -433,7 +433,7 @@ print(res)
 ```
 
     {'accuracy': 1.0}
-    
+
 
 ##### Visual Model Prediction
 

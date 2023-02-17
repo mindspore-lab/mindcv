@@ -10,7 +10,7 @@ dataset: "imagenet"
 data_dir: "/path/to/imagenet"
 shuffle: True
 dataset_download: False
-batch_size: 48 
+batch_size: 48
 drop_remainder: True
 
 # augmentation

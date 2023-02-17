@@ -3,7 +3,7 @@
 
 ## Introduction
 
-GoogLeNet is a new deep learning structure proposed by Christian Szegedy in 2014. Prior to this, AlexNet, VGG and other 
+GoogLeNet is a new deep learning structure proposed by Christian Szegedy in 2014. Prior to this, AlexNet, VGG and other
 structures achieved better training effects by increasing the depth (number of layers) of the network, but the increase
 in the number of layers It will bring many negative effects, such as overfit, gradient disappearance, gradient
 explosion, etc. The proposal of inception improves the training results from another perspective: it can use computing
@@ -11,7 +11,7 @@ resources more efficiently, and can extract more features under the same amount 
 training results.[[1](#references)]
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/53842165/210749903-5ff23c0e-547f-487d-bb64-70b6e99031ea.jpg" width=500 />  
+  <img src="https://user-images.githubusercontent.com/53842165/210749903-5ff23c0e-547f-487d-bb64-70b6e99031ea.jpg" width=500 />
 </p>
 <p align="center">
   <em>Figure 1. Architecture of GoogLENet [<a href="#references">1</a>] </em>
@@ -23,7 +23,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model     | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                            | Download                                                                              | 
+| Model     | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                            | Download                                                                              |
 |-----------|----------|-----------|-----------|------------|---------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
 | GoogLeNet | D910x8-G | 71.66     | 90.01     | 6.99       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/googlenet/googlenet_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/googlenet/googlenet_224.ckpt) |
 
@@ -31,8 +31,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 #### Notes
 
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.  
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -51,12 +51,12 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
 ```shell
-# distrubted training on multiple GPU/Ascend devices
+# distributed training on multiple GPU/Ascend devices
 mpirun -n 8 python train.py --config configs/googlenet/googlenet_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
-  
+
 Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
 For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
