@@ -1,0 +1,9 @@
+[tool.isort]
+profile = "black"
+line_length = 120
+known_mindspore = ["mindspore"]
+known_first_party = ["mindcv"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "MINDSPORE", "FIRSTPARTY", "LOCALFOLDER"]
+
+[tool.black]
+line-length = 120
