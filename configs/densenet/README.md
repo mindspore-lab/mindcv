@@ -16,7 +16,7 @@ DenseNets have several compelling advantages: they alleviate the vanishing-gradi
 propagation, encourage feature reuse, and substantially reduce the number of parameters.[[1](#references)]
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/52945530/210045537-7eda82c7-4575-4820-ba94-8fcab11c6482.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/52945530/210045537-7eda82c7-4575-4820-ba94-8fcab11c6482.png" width=800 />
 </p>
 <p align="center">
   <em>Figure 1. Architecture of DenseNet [<a href="#references">1</a>] </em>
@@ -24,12 +24,12 @@ propagation, encourage feature reuse, and substantially reduce the number of par
 
 ## Results
 <!--- Guideline:
-Table Format: 
+Table Format:
 - Model: model name in lower case with _ seperator.
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
 - Top-1 and Top-5: Keep 2 digits after the decimal point.
 - Params (M): # of model parameters in millions (10^6). Keep 2 digits after the decimal point
-- Recipe: Training recipe/configuration linked to a yaml config file. Use absolute url path.  
+- Recipe: Training recipe/configuration linked to a yaml config file. Use absolute url path.
 - Download: url of the pretrained model weights. Use absolute url path.
 -->
 
@@ -37,8 +37,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-|    Model     | Context  | Top-1 (%) | Top-5 (%) | Params (M) |                                              Recipe                                                 |                                              Download                                            | 
-|--------------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+| Model        | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                              | Download                                                                                           |
+|--------------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
 | densenet_121 | D910x8-G | 75.64     | 92.84     | 8.06       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/densenet/densenet121-120_5004_Ascend.ckpt) |
 | densenet_161 | D910x8-G | 79.09     | 94.66     | 28.90      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_161_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/densenet/densenet161-120_5004_Ascend.ckpt) |
 | densenet_169 | D910x8-G | 77.26     | 93.71     | 14.31      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_169_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/densenet/densenet169-120_5004_Ascend.ckpt) |
@@ -48,8 +48,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 #### Notes
 
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K. 
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -69,7 +69,7 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
 ```shell
-# distrubted training on multiple GPU/Ascend devices
+# distributed training on multiple GPU/Ascend devices
 mpirun -n 8 python train.py --config configs/densenet/densenet_121_ascend.yaml --data_dir /path/to/imagenet
 ```
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.

@@ -6,7 +6,7 @@
 Compared with the traditional convolutional neural network, MobileNetV1's parameters and the amount of computation are greatly reduced on the premise that the accuracy rate is slightly reduced. (Compared to VGG16, the accuracy rate is reduced by 0.9%, but the model parameters are only 1/32 of VGG). The model is based on a streamlined architecture that uses depthwise separable convolutions to build lightweight deep neural networks. At the same time, two simple global hyperparameters are introduced, which can effectively trade off latency and accuracy.[[1](#references)]
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/53842165/210044118-20dcc78a-96cd-4a3f-9cd1-fefa00c12227.png" width=400 />  
+  <img src="https://user-images.githubusercontent.com/53842165/210044118-20dcc78a-96cd-4a3f-9cd1-fefa00c12227.png" width=400 />
 </p>
 <p align="center">
   <em>Figure 1. Architecture of MobileNetV1 [<a href="#references">1</a>] </em>
@@ -18,8 +18,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model            | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                      | Download                                                                                                          | 
-|----------------- |----------|-----------|-----------|------------|-------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| Model            | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                      | Download                                                                                                          |
+|------------------|----------|-----------|-----------|------------|-------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
 | MobileNet_v1_025 | D910x8-G | 54.64     | 78.29     | 0.47       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.25_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025_224-200_2502.ckpt) |
 | MobileNet_v1_050 | D910x8-G | 66.39     | 86.71     | 1.34       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.5_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_050_224-200_2502.ckpt) |
 | MobileNet_v1_075 | D910x8-G | 70.66     | 89.49     | 2.60       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_075_224-200_2502.ckpt) |
@@ -29,8 +29,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 #### Notes
 
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.  
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -49,12 +49,12 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
 ```shell
-# distrubted training on multiple GPU/Ascend devices
+# distributed training on multiple GPU/Ascend devices
 mpirun -n 8 python train.py --config configs/mobilenetv1/mobilenet_v1_0.25_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
-  
+
 Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
 For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).

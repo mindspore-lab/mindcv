@@ -70,7 +70,7 @@ python train.py --model swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir
 
 基于MindCV进行模型实现和重训练的汇总结果详见[benchmark_results.md](./benchmark_results.md), 所用到的训练策略和训练后的模型权重均可通过表中链接获取。
 
-各模型讲解和训练说明详见[configs](configs)目录。  
+各模型讲解和训练说明详见[configs](configs)目录。
 
 
 ## 安装
@@ -168,7 +168,7 @@ python train.py --model resnet50 --dataset cifar10 --dataset_download
 # 分布式训练
 # 假设你有4张GPU或者NPU卡
 mpirun --allow-run-as-root -n 4 python train.py --distribute \
-	--model densenet121 --dataset imagenet --data_dir ./datasets/imagenet   
+	--model densenet121 --dataset imagenet --data_dir ./datasets/imagenet
 ```
 
 完整的参数列表及说明在`config.py`中定义，可运行`python train.py --help`快速查看。
@@ -182,7 +182,7 @@ mpirun --allow-run-as-root -n 4 python train.py --distribute \
 您可以编写yaml文件或设置外部参数来指定配置数据、模型、优化器等组件及其超参。以下是使用预设的训练策略（yaml文件）进行模型训练的示例。
 
 ```shell
-mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
+mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml
 ```
 
 **预定义的训练策略** MindCV目前提前了超过20种模型训练策略，在ImageNet取得SoTA性能。具体的参数配置和详细精度性能汇总请见[`configs`](configs)文件夹。您可以便捷将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）
@@ -205,8 +205,8 @@ mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet
 
 ```shell
 # 验证模型
-python validate.py --model=resnet50 --dataset=imagenet --data_dir=/path/to/data --ckpt_path=/path/to/model.ckpt 
-``` 
+python validate.py --model=resnet50 --dataset=imagenet --data_dir=/path/to/data --ckpt_path=/path/to/model.ckpt
+```
 
 - 训练过程中进行验证
 
@@ -215,7 +215,7 @@ python validate.py --model=resnet50 --dataset=imagenet --data_dir=/path/to/data 
 ```shell
 python train.py --model=resnet50 --dataset=cifar10 \
 		--val_while_train --val_split=test --val_interval=1
-``` 
+```
 
 各轮次的训练损失和测试精度将保存在`{ckpt_save_dir}/results.log`中。
 
@@ -228,7 +228,7 @@ python train.py --model=resnet50 --dataset=cifar10 \
 [基于ms_function的混合模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) 是兼顾了MindSpore的效率和灵活的混合模式。用户可通过使用`train_with_func.py`文件来使用该混合模式进行训练。
 
 ```shell
-python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download --epoch_size=10  
+python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download --epoch_size=10
 ```
 
 > 注：此为试验性质的训练脚本，仍在改进，在1.8.1或更早版本的MindSpore上使用此模式目前并不稳定。
@@ -288,7 +288,7 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
 * Xception - https://arxiv.org/abs/1610.02357
 
 关于模型性能和预训练权重的信息请查看 [configs](./configs) 文件夹。
-	
+
 我们将持续加入更多SoTA模型及其训练策略，敬请关注。
 
 </details>

@@ -117,7 +117,7 @@ When reporting issues, refer to this format:
 
 ### Propose PRs
 
-- Raise your idea as an *issue* on [GitHub](https://github.com/mindlab-ai/mindcv/issues) 
+- Raise your idea as an *issue* on [GitHub](https://github.com/mindlab-ai/mindcv/issues)
 - If it is a new feature that needs lots of design details, a design proposal should also be submitted.
 - After reaching consensus in the issue discussions and design proposal reviews, complete the development on the forked repo and submit a PR.
 - None of PRs is not permitted until it receives **2+ LGTM** from approvers. Please NOTICE that approver is NOT allowed to add *LGTM* on his own PR.

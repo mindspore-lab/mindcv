@@ -18,14 +18,14 @@
 2. yaml文件样例
 
 ```text
-mode: 0 
-distribute: True 
+mode: 0
+distribute: True
 ...
 ```
 
 3. parse参数设置
 
-```text 
+```text
 python train.py --mode 0 --distribute False ...
 ```
 
@@ -78,14 +78,14 @@ data_dir: './imagenet2012'
 shuffle: True
 dataset_download: False
 batch_size: 32
-drop_remainder: True 
+drop_remainder: True
 num_parallel_workers: 8
 ...
 ```
 
 3. parse参数设置
 
-```text 
+```text
 python train.py ... --dataset imagenet --data_dir ./imagenet2012 --shuffle True \
             --dataset_download False --batch_size 32 --drop_remainder True \
             --num_parallel_workers 8 ...
@@ -107,10 +107,10 @@ def train(args):
         num_parallel_workers=args.num_parallel_workers,
         download=args.dataset_download,
         num_aug_repeats=args.aug_repeats)
-    
+
     ...
     target_transform = transforms.OneHot(num_classes) if args.loss == 'BCE' else None
-    
+
     loader_train = create_loader(
         dataset=dataset_train,
         batch_size=args.batch_size,
@@ -124,7 +124,7 @@ def train(args):
         target_transform=target_transform,
         num_parallel_workers=args.num_parallel_workers,
     )
-    
+
     ...
 ```
 
@@ -418,6 +418,3 @@ def train(args):
 python train.py -c ./configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir ./data
 ```
 上面的命令将`args.data_dir`参数的值由yaml文件中的 ./imagenet2012 覆盖为 ./data。
-
-
-

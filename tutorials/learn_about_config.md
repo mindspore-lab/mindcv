@@ -18,14 +18,14 @@
 2. Sample yaml file
 
 ```text
-mode: 0 
-distribute: True 
+mode: 0
+distribute: True
 ...
 ```
 
 3. Parse parameter setting
 
-```text 
+```text
 python train.py --mode 0 --distribute False ...
 ```
 
@@ -78,14 +78,14 @@ data_dir: './imagenet2012'
 shuffle: True
 dataset_download: False
 batch_size: 32
-drop_remainder: True 
+drop_remainder: True
 num_parallel_workers: 8
 ...
 ```
 
 3. Parse parameter setting
 
-```text 
+```text
 python train.py ... --dataset imagenet --data_dir ./imagenet2012 --shuffle True \
             --dataset_download False --batch_size 32 --drop_remainder True \
             --num_parallel_workers 8 ...
@@ -107,10 +107,10 @@ def train(args):
         num_parallel_workers=args.num_parallel_workers,
         download=args.dataset_download,
         num_aug_repeats=args.aug_repeats)
-    
+
     ...
     target_transform = transforms.OneHot(num_classes) if args.loss == 'BCE' else None
-    
+
     loader_train = create_loader(
         dataset=dataset_train,
         batch_size=args.batch_size,
@@ -124,7 +124,7 @@ def train(args):
         target_transform=target_transform,
         num_parallel_workers=args.num_parallel_workers,
     )
-    
+
     ...
 ```
 
@@ -418,7 +418,3 @@ You can override the parameter settings in the yaml file by using parse to set p
 python train.py -c ./configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir ./data
 ```
 The above command overwrites the value of `args.data_dir` parameter from ./imaget2012 in yaml file to ./data.
-
-
-
-

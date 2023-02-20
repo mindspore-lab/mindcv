@@ -13,7 +13,7 @@ Therefore, based on these two principles, ShuffleNetV2 proposes four effective n
 - The impact of Element-wise operation is not negligible.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/8156835/210043336-305a167f-d669-42e7-8b94-eef8e7b78a48.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/8156835/210043336-305a167f-d669-42e7-8b94-eef8e7b78a48.png" width=800 />
 </p>
 <p align="center">
   <em>Figure 1. Architecture Design in ShuffleNetV2 [<a href="#references">1</a>] </em>
@@ -25,7 +25,7 @@ Therefore, based on these two principles, ShuffleNetV2 proposes four effective n
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
-  
+
 | Model           | Context   |  Top-1 (%) | Top-5 (%)  |  Params (M) | Recipe  | Download |
 |-----------------|-----------|------------|------------|-------------|---------|----------|
 | shufflenet_v2_x0_5 | D910x8-G |  60.68     | 82.44     | 1.37    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v2/shufflenet_v2_0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x0_5-Ascend.ckpt)  |
@@ -36,13 +36,13 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 </div>
 
 #### Notes
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K. 
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 #### Notes
 
 - All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
-- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.  
+- Context: GPU_TYPE x pieces - G/F, G - graph mode, F - pynative mode with ms function.
 
 
 ## Quick Start
@@ -62,10 +62,10 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
 ```shell
-# distrubted training on multiple GPU/Ascend devices
+# distributed training on multiple GPU/Ascend devices
 mpirun -n 8 python train.py --config configs/shufflenet_v2/shufflenet_v2_0.5_ascend.yaml --data_dir /path/to/imagenet
 ```
-  
+
 Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
 For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).

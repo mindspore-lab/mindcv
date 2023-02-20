@@ -59,8 +59,8 @@ model = create_model(model_name='resnet50', num_classes=1000, pretrained=True)
 # Switch the execution logic of the network to the inference scenario
 model.set_train(False)
 ```
-    102453248B [00:16, 6092186.31B/s]                                                                                      
-    
+    102453248B [00:16, 6092186.31B/s]
+
     ResNet<
       (conv1): Conv2d<input_channels=3, output_channels=64, kernel_size=(7, 7), stride=(2, 2), pad_mode=pad, padding=3, dilation=(1, 1), group=1, has_bias=False, weight_init=normal, bias_init=zeros, format=NCHW>
       (bn1): BatchNorm2d<num_features=64, eps=1e-05, momentum=0.9, gamma=Parameter (name=bn1.gamma, shape=(64,), dtype=Float32, requires_grad=True), beta=Parameter (name=bn1.beta, shape=(64,), dtype=Float32, requires_grad=True), moving_mean=Parameter (name=bn1.moving_mean, shape=(64,), dtype=Float32, requires_grad=False), moving_variance=Parameter (name=bn1.moving_variance, shape=(64,), dtype=Float32, requires_grad=False)>
@@ -146,4 +146,3 @@ print('predict: {}'.format(idx2label[pred]))
 ```
 
     predict: Labrador retriever
-    

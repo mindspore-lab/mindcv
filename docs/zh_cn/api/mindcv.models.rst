@@ -82,4 +82,3 @@ mindcv.models
 .. autoclass:: mindcv.models.ViT
 
 .. autoclass:: mindcv.models.Xception
-

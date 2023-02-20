@@ -130,10 +130,10 @@ def postprocess(score):
     return idx2label[max_idx]
 
 def predict():
-    client = Client("127.0.0.1:5500", "mobilenet_v3_small_100", "predict") 
+    client = Client("127.0.0.1:5500", "mobilenet_v3_small_100", "predict")
     instances = []
     images, _ = next(data_loader.create_tuple_iterator())
-    image_np = images.asnumpy().squeeze()   
+    image_np = images.asnumpy().squeeze()
     instances.append({"image": image_np})
     result = client.infer(instances)
 
@@ -149,4 +149,3 @@ If the following information is displayed, Serving service has correctly execute
 ```text
 Labrador retriever
 ```
-

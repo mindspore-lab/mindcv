@@ -58,7 +58,7 @@ model = create_model(model_name='resnet50', num_classes=1000, pretrained=True)
 # 切换网络的执行逻辑为推理场景
 model.set_train(False)
 ```
-    102453248B [00:16, 6092186.31B/s]                                                                                      
+    102453248B [00:16, 6092186.31B/s]
 
     ResNet<
       (conv1): Conv2d<input_channels=3, output_channels=64, kernel_size=(7, 7), stride=(2, 2), pad_mode=pad, padding=3, dilation=(1, 1), group=1, has_bias=False, weight_init=normal, bias_init=zeros, format=NCHW>
@@ -157,4 +157,3 @@ print('predict: {}'.format(idx2label[pred]))
 ```
 
     predict: Labrador retriever
-    

@@ -11,7 +11,7 @@ High-resolution representations are essential for position-sensitive vision prob
 <!--- Guideline: If an architecture table/figure is available in the paper, put one here and cite for intuitive illustration. -->
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/8342575/218354682-4256e17e-bb69-4e51-8bb9-a08fc29087c4.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/8342575/218354682-4256e17e-bb69-4e51-8bb9-a08fc29087c4.png" width=800 />
 </p>
 <p align="center">
   <em> Figure 1. Architecture of HRNet [<a href="#references">1</a>] </em>
@@ -19,30 +19,30 @@ High-resolution representations are essential for position-sensitive vision prob
 
 ## Results
 <!--- Guideline:
-Table Format: 
+Table Format:
 - Model: model name in lower case with _ seperator.
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
 - Top-1 and Top-5: Keep 2 digits after the decimal point.
 - Params (M): # of model parameters in millions (10^6). Keep 2 digits after the decimal point
-- Recipe: Training recipe/configuration linked to a yaml config file. Use absolute url path.  
+- Recipe: Training recipe/configuration linked to a yaml config file. Use absolute url path.
 - Download: url of the pretrained model weights. Use absolute url path.
 -->
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
-  
-| Model           | Context   |  Top-1 (%) | Top-5 (%)  |  Params (M) | Recipe  | Download |
-|-----------------|-----------|------------|------------|-------------|---------|----------|
-| hrnet_w32 | D910x8-G | 80.64 | 95.44 | 41.30 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w32_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w32_224.ckpt)  |
-| hrnet_w48 | D910x8-G | 81.19 | 95.69 | 77.57 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w48_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w48_224.ckpt)  |
+
+| Model     | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                        | Download                                                                          |
+|-----------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| hrnet_w32 | D910x8-G | 80.64     | 95.44     | 41.30      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w32_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w32_224.ckpt) |
+| hrnet_w48 | D910x8-G | 81.19     | 95.69     | 77.57      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w48_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w48_224.ckpt) |
 
 
 </div>
 
 #### Notes
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K. 
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 
 ## Quick Start
@@ -62,11 +62,11 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
 ```shell
-# distrubted training on multiple GPU/Ascend devices
+# distributed training on multiple GPU/Ascend devices
 mpirun -n 8 python train.py --config configs/hrnet/hrnet_w32_ascend.yaml --data_dir /path/to/imagenet
 ```
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
- 
+
 Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
 For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).

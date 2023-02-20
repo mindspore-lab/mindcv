@@ -21,7 +21,7 @@ root_dir = "./"
 
 if not os.path.exists(os.path.join(root_dir, 'data/Canidae')):
     DownLoad().download_and_extract_archive(dataset_url, root_dir)
-    
+
 from mindcv.data import create_dataset, create_transforms, create_loader
 
 num_workers = 8
@@ -37,7 +37,6 @@ dataset_val = create_dataset(root=data_dir, split='val', num_parallel_workers=nu
 trans_train = create_transforms(dataset_name='ImageNet', is_training=True)
 trans_val = create_transforms(dataset_name='ImageNet',is_training=False)
 
-# 
 loader_train = create_loader(
         dataset=dataset_train,
         batch_size=16,
@@ -46,7 +45,7 @@ loader_train = create_loader(
         transform=trans_train,
         num_parallel_workers=num_workers,
     )
-    
+
 
 loader_val = create_loader(
         dataset=dataset_val,
@@ -92,7 +91,7 @@ network = create_model(model_name='densenet121', num_classes=2, pretrained=True)
 
 # 定义优化器和损失函数
 lr = 1e-3 if freeze_backbone else 1e-4
-opt = create_optimizer(network.trainable_params(), opt='adam', lr=lr) 
+opt = create_optimizer(network.trainable_params(), opt='adam', lr=lr)
 loss = create_loss(name='CE')
 
 if freeze_backbone:
@@ -101,9 +100,9 @@ if freeze_backbone:
         if param.name not in ["classifier.weight", "classifier.bias"]:
             param.requires_grad = False
 
-            
+
 # 实例化模型
-model = Model(network, loss_fn=loss, optimizer=opt, metrics={'accuracy'}) 
+model = Model(network, loss_fn=loss, optimizer=opt, metrics={'accuracy'})
 print('Training...')
 model.train(10, loader_train, callbacks=[LossMonitor(5), TimeMonitor(5)], dataset_sink_mode=False)
 print('Evaluating...')

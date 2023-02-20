@@ -7,7 +7,7 @@
 Resnet is a residual learning framework to ease the training of networks that are substantially deeper than those used previously, which is explicitly reformulated that the layers are learning residual functions with reference to the layer inputs, instead of learning unreferenced functions. Lots of comprehensive empirical evidence showing that these residual networks are easier to optimize, and can gain accuracy from considerably increased depth.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/121591093/210049796-79b70294-4250-4d0f-b078-2471880884cf.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/121591093/210049796-79b70294-4250-4d0f-b078-2471880884cf.png" width=800 />
 </p>
 <p align="center">
   <em>Figure 1. Architecture of ResNet [<a href="#references">1</a>] </em>
@@ -30,8 +30,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 </div>
 
 #### Notes
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K. 
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 
 ## Quick Start
@@ -51,7 +51,7 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
 ```shell
-# distrubted training on multiple GPU/Ascend devices
+# distributed training on multiple GPU/Ascend devices
 mpirun -n 8 python train.py --config configs/resnet/resnet_18_ascend.yaml --data_dir /path/to/imagenet
 ```
 

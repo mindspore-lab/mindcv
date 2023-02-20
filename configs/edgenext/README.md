@@ -4,14 +4,14 @@
 
 ## Introduction
 
-EdgeNeXt effectively combines the strengths of both CNN and Transformer models and is a 
-new efficient hybrid architecture. EdgeNeXt introduces a split depth-wise transpose 
-attention (SDTA) encoder that splits input tensors into multiple channel groups and 
-utilizes depth-wise convolution along with self-attention across channel dimensions 
+EdgeNeXt effectively combines the strengths of both CNN and Transformer models and is a
+new efficient hybrid architecture. EdgeNeXt introduces a split depth-wise transpose
+attention (SDTA) encoder that splits input tensors into multiple channel groups and
+utilizes depth-wise convolution along with self-attention across channel dimensions
 to implicitly increase the receptive field and encode multi-scale features.[[1](#references)]
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/52945530/210045582-d31f832d-22e0-47bd-927f-74cf2daed91a.png" width=800 />  
+  <img src="https://user-images.githubusercontent.com/52945530/210045582-d31f832d-22e0-47bd-927f-74cf2daed91a.png" width=800 />
 </p>
 <p align="center">
   <em>Figure 1. Architecture of EdgeNeXt [<a href="#references">1</a>] </em>
@@ -23,16 +23,16 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model          | Context  |  Top-1 (%) | Top-5 (%) |  Params (M) |                                                 Recipe                                                |                                      Download                                       | 
-|----------------|----------|------------|-----------|-------------|-------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
-| edgenext_small | D910x8-G | 79.15      |  94.39    | 5.59        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt) |
+| Model          | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                | Download                                                                              |
+|----------------|----------|-----------|-----------|------------|-------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| edgenext_small | D910x8-G | 79.15     | 94.39     | 5.59       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt) |
 
 </div>
 
 #### Notes
 
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode. 
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K. 
+- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -53,7 +53,7 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
 ```shell
-# distrubted training on multiple GPU/Ascend devices
+# distributed training on multiple GPU/Ascend devices
 mpirun -n 8 python train.py --config configs/edgenext/edgenext_small_ascend.yaml --data_dir /path/to/imagenet
 ```
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.

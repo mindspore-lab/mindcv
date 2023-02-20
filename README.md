@@ -33,19 +33,19 @@ English | [中文](README_CN.md)
 [Tutorials](#tutorials) |
 [Model List](#model-list) |
 [Supported Algorithms](#supported-algorithms) |
-[Notes](#notes) 
+[Notes](#notes)
 
 
 ## Introduction
-MindCV is an open-source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pre-trained weights and training strategies. SoTA methods such as auto augmentation are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks. 
+MindCV is an open-source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pre-trained weights and training strategies. SoTA methods such as auto augmentation are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks.
 
 <details open>
 <summary> Major Features </summary>
-	
-- **Easy-to-Use.** MindCV decomposes the vision framework into various configurable components. It is easy to customize your data pipeline, models, and learning pipeline with MindCV: 
+
+- **Easy-to-Use.** MindCV decomposes the vision framework into various configurable components. It is easy to customize your data pipeline, models, and learning pipeline with MindCV:
 
 ```python
->>> import mindcv 
+>>> import mindcv
 # create a dataset
 >>> dataset = mindcv.create_dataset('cifar10', download=True)
 # create a model
@@ -56,19 +56,19 @@ Users can customize and launch their transfer learning or training task in one c
 
 ``` python
 # transfer learning in one command line
->>> !python train.py --model=swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir={data_dir} 
+>>> !python train.py --model=swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir={data_dir}
 ```
 
-- **State-of-The-Art.** MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model: 
+- **State-of-The-Art.** MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model:
 
 - **Flexibility and efficiency.** MindCV is built on MindSpore which is an efficent DL framework that can be run on different hardware platforms (GPU/CPU/Ascend). It supports both graph mode for high efficiency and pynative mode for flexibility.
 
-	
+
 </details>
-	
+
 ### Benchmark Results
 
-The performance of the models trained with MindCV is summarized in [benchmark_results.md](./benchmark_results.md), where the training recipes and weights are both available.  
+The performance of the models trained with MindCV is summarized in [benchmark_results.md](./benchmark_results.md), where the training recipes and weights are both available.
 
 Model introduction and training details can be viewed in each subfolder under [configs](configs).
 
@@ -80,16 +80,16 @@ Model introduction and training details can be viewed in each subfolder under [c
 - numpy >= 1.17.0
 - pyyaml >= 5.3
 - tqdm
-- openmpi 4.0.3 (for distributed mode) 
+- openmpi 4.0.3 (for distributed mode)
 
 To install the dependency, please run
 ```shell
 pip install -r requirements.txt
 ```
 
-MindSpore can be easily installed by following the official [instructions](https://www.mindspore.cn/install) where you can select your hardware platform for the best fit. To run in distributed mode, [openmpi](https://www.open-mpi.org/software/ompi/v4.0/) is required to install.   
+MindSpore can be easily installed by following the official [instructions](https://www.mindspore.cn/install) where you can select your hardware platform for the best fit. To run in distributed mode, [openmpi](https://www.open-mpi.org/software/ompi/v4.0/) is required to install.
 
-The following instructions assume the desired dependency is fulfilled. 
+The following instructions assume the desired dependency is fulfilled.
 
 ### Install with PyPI
 
@@ -107,17 +107,17 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 
 > Notes: MindCV can be installed on Linux and Mac but not on Windows currently.
 
-## Get Started 
+## Get Started
 
 ### Hands-on Tutorial
 
-To get started with MindCV, please see the [transfer learning tutorial](tutorials/finetune.md), which will give you a quick tour on each key component and the train/validate/predict pipelines. 
+To get started with MindCV, please see the [transfer learning tutorial](tutorials/finetune.md), which will give you a quick tour on each key component and the train/validate/predict pipelines.
 
-Below are a few code snippets for your taste. 
+Below are a few code snippets for your taste.
 
 ```python
->>> import mindcv 
-# List and find a pretrained vision model 
+>>> import mindcv
+# List and find a pretrained vision model
 >>> mindcv.list_models("swin*", pretrained=True)
 ['swin_tiny']
 # Create the model object
@@ -148,11 +148,11 @@ It is easy to train your model on a standard or customized dataset using `train.
 - Standalone Training
 
 ``` shell
-# standalone training 
+# standalone training
 python train.py --model=resnet50 --dataset=cifar10 --dataset_download
 ```
 
-Above is an example for training ResNet50 on CIFAR10 dataset on a CPU/GPU/Ascend device 
+Above is an example for training ResNet50 on CIFAR10 dataset on a CPU/GPU/Ascend device
 
 - Distributed Training
 
@@ -162,23 +162,23 @@ For large datasets like ImageNet, it is necessary to do training in distributed 
 # distributed training
 # assume you have 4 GPUs/NPUs
 mpirun -n 4 python train.py --distribute \
-	--model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet   
+	--model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet
 ```
 > Notes: If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
 
-Detailed parameter definitions  can be seen in `config.py` and checked by running `python train.py --help'. 
+Detailed parameter definitions  can be seen in `config.py` and checked by running `python train.py --help'.
 
-To resume training, please set the `--ckpt_path` and `--ckpt_save_dir` arguments. The optimizer state including the learning rate of the last stopped epoch will also be recovered. 
+To resume training, please set the `--ckpt_path` and `--ckpt_save_dir` arguments. The optimizer state including the learning rate of the last stopped epoch will also be recovered.
 
 - Config and Training Strategy
 
 You can configure your model and other components either by specifying external parameters or by writing a yaml config file. Here is an example of training using a preset yaml file.
 
 ```shell
-mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml    
+mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml
 ```
 
-**Pre-defined Training Strategies:** We provide more than 20 training recipes that achieve SoTA results on ImageNet currently. Please look into the [`configs`](configs) folder for details. Please feel free to adapt these training strategies to your own model for performance improvement， which can be easily done by modifying the yaml file. 
+**Pre-defined Training Strategies:** We provide more than 20 training recipes that achieve SoTA results on ImageNet currently. Please look into the [`configs`](configs) folder for details. Please feel free to adapt these training strategies to your own model for performance improvement， which can be easily done by modifying the yaml file.
 
 - Train on ModelArts/OpenI Platform
 
@@ -193,47 +193,47 @@ To run training on the [ModelArts](https://www.huaweicloud.com/intl/en-us/produc
 
 ### Validation
 
-To evalute the model performance, please run `validate.py` 
+To evalute the model performance, please run `validate.py`
 
 ```shell
 # validate a trained checkpoint
-python validate.py --model=resnet50 --dataset=imagenet --data_dir=/path/to/data --ckpt_path=/path/to/model.ckpt 
-``` 
+python validate.py --model=resnet50 --dataset=imagenet --data_dir=/path/to/data --ckpt_path=/path/to/model.ckpt
+```
 
-- Validation while Training 
+- Validation while Training
 
 You can also track the validation accuracy during training by enabling the `--val_while_train` option.
 
 ```shell
 python train.py --model=resnet50 --dataset=cifar10 \
 		--val_while_train --val_split=test --val_interval=1
-``` 
+```
 
 The training loss and validation accuracy for each epoch  will be saved in `{ckpt_save_dir}/results.log`.
 
-More examples about training and validation can be seen in [examples/scripts](examples/scripts). 
+More examples about training and validation can be seen in [examples/scripts](examples/scripts).
 
-- Graph Mode and Pynative Mode 
+- Graph Mode and Pynative Mode
 
 By default, the training pipeline `train.py` is run in [graph mode](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html#%E9%9D%99%E6%80%81%E5%9B%BE) on MindSpore, which is optimized for efficiency and parallel computing with a compiled static graph. In contrast, [pynative mode](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html#%E5%8A%A8%E6%80%81%E5%9B%BE) is optimized for flexibility and easy debugging. You may alter the parameter `--mode` to switch to pure pynative mode for debugging purpose.
 
 [Pynative mode with ms_function ](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) is a mixed mode for comprising flexibility and efficiency in MindSpore. To apply pynative mode with ms_function for training, please run `train_with_func.py`, e.g.,
 
 ``` shell
-python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download  --epoch_size=10  
+python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download  --epoch_size=10
 ```
 >Note: this is an **experimental** function under improvement. It is not stable on MindSpore 1.8.1 or earlier versions.
 
 
 ## Tutorials
-We provide the following jupyter notebook tutorials to help users learn to use MindCV. 
+We provide the following jupyter notebook tutorials to help users learn to use MindCV.
 
-- [Learn about configs](tutorials/learn_about_config.md)  
-- [Inference with a pretrained model](tutorials/inference.md) 
-- [Finetune a pretrained model on custom datasets](tutorials/finetune.md) 
+- [Learn about configs](tutorials/learn_about_config.md)
+- [Inference with a pretrained model](tutorials/inference.md)
+- [Finetune a pretrained model on custom datasets](tutorials/finetune.md)
 - [Customize your model]() //coming soon
 - [Optimizing performance for vision transformer]() //coming soon
-- [Deployment demo](tutorials/deployment.md) 
+- [Deployment demo](tutorials/deployment.md)
 
 ## Model List
 
@@ -288,7 +288,7 @@ Please see [configs](./configs) for the details about model performance and pret
 
 * Augmentation
 	* [AutoAugment](https://arxiv.org/abs/1805.09501)
-	* [RandAugment](https://arxiv.org/abs/1909.13719) 
+	* [RandAugment](https://arxiv.org/abs/1909.13719)
 	* [Repeated Augmentation](https://openaccess.thecvf.com/content_CVPR_2020/papers/Hoffer_Augment_Your_Batch_Improving_Generalization_Through_Instance_Repetition_CVPR_2020_paper.pdf)
 	* RandErasing (Cutout)
 	* CutMix
@@ -325,7 +325,7 @@ Please see [configs](./configs) for the details about model performance and pret
 </details>
 
 ## Notes
-### What is New 
+### What is New
 - 2023/01/10
 1. MindCV v0.1 released! It can be installed via PyPI `pip install mindcv` now.
 2. Add training recipe and trained weights of googlenet, inception_v3, inception_v4, xception
@@ -334,7 +334,7 @@ Please see [configs](./configs) for the details about model performance and pret
 1. Support lr warmup for all lr scheduling algorithms besides cosine decay.
 2. Add repeated augmentation, which can be enabled by setting `--aug_repeats` to be a value larger than 1 (typically, 3 or 4 is a common choice).
 3. Add EMA.
-4. Improve BCE loss to support mixup/cutmix. 
+4. Improve BCE loss to support mixup/cutmix.
 
 - 2022/11/21
 1. Add visualization for loss and acc curves
@@ -342,16 +342,16 @@ Please see [configs](./configs) for the details about model performance and pret
 - 2022/11/09
 1. Add 7 pretrained ViT models.
 2. Add RandAugment augmentation.
-3. Fix CutMix efficiency issue and CutMix and Mixup can be used together. 
+3. Fix CutMix efficiency issue and CutMix and Mixup can be used together.
 4. Fix lr plot and scheduling bug.
 - 2022/10/12
 1. Both BCE and CE loss now support class-weight config, label smoothing, and auxiliary logit input (for networks like inception).
 - 2022/09/13
-1. Add Adan optimizer (experimental) 
+1. Add Adan optimizer (experimental)
 
 ### How to Contribute
 
-We appreciate all kind of contributions including issues and PRs to make MindCV better. 
+We appreciate all kind of contributions including issues and PRs to make MindCV better.
 
 Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline. Please follow the [Model Template and Guideline](mindcv/models/model_template.md) for contributing a model that fits the overall interface :)
 
@@ -361,7 +361,7 @@ This project follows the [Apache License 2.0](LICENSE.md) open-source license.
 
 ### Acknowledgement
 
-MindCV is an open-source project jointly developed by the MindSpore team, Xidian University, and Xi'an Jiaotong University. 
+MindCV is an open-source project jointly developed by the MindSpore team, Xidian University, and Xi'an Jiaotong University.
 Sincere thanks to all participating researchers and developers for their hard work on this project.
 We also acknowledge the computing resources provided by [OpenI](https://openi.pcl.ac.cn/).
 
