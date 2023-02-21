@@ -163,15 +163,15 @@ class MLPMixer(nn.Cell):
         self.layer_norm = nn.LayerNorm((n_channels,))
         self.mlp_head = nn.Dense(n_channels, n_classes)
         self._initialize_weights()
-    
+
     def forward_features(self, x: Tensor) -> Tensor:
-    	x = self.to_patch_embedding(x)
+        x = self.to_patch_embedding(x)
         x = self.mixer_blocks(x)
         x = self.layer_norm(x)
         return ops.mean(x, 1)
-    
+
     def forward_head(self, x: Tensor)-> Tensor:
-    	return self.mlp_head(x)
+        return self.mlp_head(x)
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.forward_features(x)
@@ -207,7 +207,7 @@ def mlp_mixer_s_p16(pretrained: bool = False, num_classes: int = 1000, in_channe
     model = MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs, token_dim=ds,
      				channel_dim=dc, in_chans=in_chans, n_classes=num_classes, **kwargs)
     if pretrained:
-    	load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
 
 @register_model
@@ -217,7 +217,7 @@ def mlp_mixer_b_p32(pretrained: bool = False, num_classes: int = 1000, in_channe
     model = MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs, token_dim=ds,
                     channel_dim=dc, in_chans=in_chans, n_classes=num_classes, **kwargs)
     if pretrained:
-    	load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
 ```
 

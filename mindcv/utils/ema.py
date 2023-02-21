@@ -1,7 +1,7 @@
 """ema define"""
 
 import mindspore as ms
-from mindspore import nn, Tensor, Parameter, ParameterTuple
+from mindspore import Parameter, ParameterTuple, Tensor, nn
 from mindspore.common import RowTensor
 from mindspore.ops import composite as C
 from mindspore.ops import functional as F
@@ -17,6 +17,7 @@ _grad_overflow = C.MultitypeFuncGraph("_grad_overflow")
 def _ema_weights(factor, ema_weight, weight):
     return F.assign(ema_weight, ema_weight * factor + weight * (1 - factor))
 
+
 @_grad_scale.register("Tensor", "Tensor")
 def tensor_grad_scale(scale, grad):
     return grad * F.cast(reciprocal(scale), F.dtype(grad))
@@ -24,9 +25,11 @@ def tensor_grad_scale(scale, grad):
 
 @_grad_scale.register("Tensor", "RowTensor")
 def tensor_grad_scale_row_tensor(scale, grad):
-    return RowTensor(grad.indices,
-                     grad.values * F.cast(reciprocal(scale), F.dtype(grad.values)),
-                     grad.dense_shape)
+    return RowTensor(
+        grad.indices,
+        grad.values * F.cast(reciprocal(scale), F.dtype(grad.values)),
+        grad.dense_shape,
+    )
 
 
 class TrainOneStepWithEMA(nn.TrainOneStepWithLossScaleCell):
@@ -39,9 +42,7 @@ class TrainOneStepWithEMA(nn.TrainOneStepWithLossScaleCell):
         self.updates = Parameter(Tensor(updates, ms.float32))
         if self.use_ema:
             self.weights_all = ms.ParameterTuple(list(network.get_parameters()))
-            self.ema_weight = self.weights_all.clone("ema", init='same')
-
-
+            self.ema_weight = self.weights_all.clone("ema", init="same")
 
     def ema_update(self):
         """Update EMA parameters."""

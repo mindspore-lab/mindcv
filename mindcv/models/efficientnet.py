@@ -1,25 +1,24 @@
 """EfficientNet Architecture."""
 
 import copy
-from typing import List, Optional, Callable, Any, Union, Sequence
-from functools import partial
-
 import math
-import numpy as np
-from mindspore import Tensor
-from mindspore import nn
-from mindspore import ops
-from mindspore.common import initializer as weight_init
-from mindspore.common.initializer import Uniform, Normal
+from functools import partial
+from typing import Any, Callable, List, Optional, Sequence, Union
 
-from .layers.squeeze_excite import SqueezeExcite
+import numpy as np
+
+from mindspore import Tensor, nn, ops
+from mindspore.common import initializer as weight_init
+from mindspore.common.initializer import Normal, Uniform
+
 from .layers.activation import Swish
 from .layers.drop_path import DropPath
-from .utils import load_pretrained, make_divisible
+from .layers.squeeze_excite import SqueezeExcite
 from .registry import register_model
+from .utils import load_pretrained, make_divisible
 
 __all__ = [
-    'EfficientNet',  # registration mechanism to use yaml configuration
+    "EfficientNet",  # registration mechanism to use yaml configuration
     "efficientnet_b0",
     "efficientnet_b1",
     "efficientnet_b2",
@@ -35,28 +34,28 @@ __all__ = [
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
+        "url": url,
+        "num_classes": 1000,
         # 'first_conv': 'features.0.features.0', 'classifier': 'classifier',
-        **kwargs
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'efficientnet_b0': _cfg(url=''),
-    'efficientnet_b1': _cfg(url=''),
-    'efficientnet_b2': _cfg(url=''),
-    'efficientnet_b3': _cfg(url=''),
-    'efficientnet_b4': _cfg(url=''),
-    'efficientnet_b5': _cfg(url=''),
-    'efficientnet_b6': _cfg(url=''),
-    'efficientnet_b7': _cfg(url=''),
-    'efficientnet_v2_s': _cfg(url=''),
-    'efficientnet_v2_m': _cfg(url=''),
-    'efficientnet_v2_l': _cfg(url=''),
-    'efficientnet_v2_xl': _cfg(url=''),
+    "efficientnet_b0": _cfg(url=""),
+    "efficientnet_b1": _cfg(url=""),
+    "efficientnet_b2": _cfg(url=""),
+    "efficientnet_b3": _cfg(url=""),
+    "efficientnet_b4": _cfg(url=""),
+    "efficientnet_b5": _cfg(url=""),
+    "efficientnet_b6": _cfg(url=""),
+    "efficientnet_b7": _cfg(url=""),
+    "efficientnet_v2_s": _cfg(url=""),
+    "efficientnet_v2_m": _cfg(url=""),
+    "efficientnet_v2_l": _cfg(url=""),
+    "efficientnet_v2_xl": _cfg(url=""),
 }
 
 
@@ -82,16 +81,17 @@ class MBConvConfig:
         >>> print(cnf.input_channels)
     """
 
-    def __init__(self,
-                 expand_ratio: float,
-                 kernel_size: int,
-                 stride: int,
-                 in_chs: int,
-                 out_chs: int,
-                 num_layers: int,
-                 width_cnf: float = 1.0,
-                 depth_cnf: float = 1.0,
-                 ) -> None:
+    def __init__(
+        self,
+        expand_ratio: float,
+        kernel_size: int,
+        stride: int,
+        in_chs: int,
+        out_chs: int,
+        num_layers: int,
+        width_cnf: float = 1.0,
+        depth_cnf: float = 1.0,
+    ) -> None:
         self.expand_ratio = expand_ratio
         self.kernel_size = kernel_size
         self.stride = stride
@@ -147,11 +147,11 @@ class MBConv(nn.Cell):
     """
 
     def __init__(
-            self,
-            cnf: MBConvConfig,
-            keep_prob: float = 0.8,
-            norm: Optional[nn.Cell] = None,
-            se_layer: Callable[..., nn.Cell] = SqueezeExcite,
+        self,
+        cnf: MBConvConfig,
+        keep_prob: float = 0.8,
+        norm: Optional[nn.Cell] = None,
+        se_layer: Callable[..., nn.Cell] = SqueezeExcite,
     ) -> None:
         super().__init__()
 
@@ -165,7 +165,7 @@ class MBConv(nn.Cell):
             layers.extend([
                 nn.Conv2d(cnf.input_channels, expanded_channels, kernel_size=1),
                 norm(expanded_channels),
-                Swish()
+                Swish(),
             ])
 
         # depthwise conv: splits the filter into groups.
@@ -173,7 +173,7 @@ class MBConv(nn.Cell):
             nn.Conv2d(expanded_channels, expanded_channels, kernel_size=cnf.kernel_size,
                       stride=cnf.stride, group=expanded_channels),
             norm(expanded_channels),
-            Swish()
+            Swish(),
         ])
 
         # squeeze and excitation
@@ -183,7 +183,7 @@ class MBConv(nn.Cell):
         # project
         layers.extend([
             nn.Conv2d(expanded_channels, cnf.out_channels, kernel_size=1),
-            norm(cnf.out_channels)
+            norm(cnf.out_channels),
         ])
 
         self.block = nn.SequentialCell(layers)
@@ -200,26 +200,28 @@ class MBConv(nn.Cell):
 
 class FusedMBConvConfig(MBConvConfig):
     """FusedMBConvConfig"""
+
     # Stores information listed at Table 4 of the EfficientNetV2 paper
     def __init__(
-            self,
-            expand_ratio: float,
-            kernel_size: int,
-            stride: int,
-            in_chs: int,
-            out_chs: int,
-            num_layers: int,
+        self,
+        expand_ratio: float,
+        kernel_size: int,
+        stride: int,
+        in_chs: int,
+        out_chs: int,
+        num_layers: int,
     ) -> None:
         super().__init__(expand_ratio, kernel_size, stride, in_chs, out_chs, num_layers)
 
 
 class FusedMBConv(nn.Cell):
     """FusedMBConv"""
+
     def __init__(
-            self,
-            cnf: FusedMBConvConfig,
-            keep_prob: float,
-            norm: Optional[nn.Cell] = None,
+        self,
+        cnf: FusedMBConvConfig,
+        keep_prob: float,
+        norm: Optional[nn.Cell] = None,
     ) -> None:
         super().__init__()
 
@@ -237,20 +239,20 @@ class FusedMBConv(nn.Cell):
                 nn.Conv2d(cnf.input_channels, expanded_channels, kernel_size=cnf.kernel_size,
                           stride=cnf.stride),
                 norm(expanded_channels),
-                Swish()
+                Swish(),
             ])
 
             # project
             layers.extend([
                 nn.Conv2d(expanded_channels, cnf.out_channels, kernel_size=1),
-                norm(cnf.out_channels)
+                norm(cnf.out_channels),
             ])
         else:
             layers.extend([
                 nn.Conv2d(cnf.input_channels, cnf.out_channels, kernel_size=cnf.kernel_size,
                           stride=cnf.stride),
                 norm(cnf.out_channels),
-                Swish()
+                Swish(),
             ])
 
         self.block = nn.SequentialCell(layers)
@@ -289,17 +291,18 @@ class EfficientNet(nn.Cell):
         Tensor of shape :math:`(N, 1000)`.
     """
 
-    def __init__(self,
-                 arch: str,
-                 dropout_rate: float,
-                 width_mult: float = 1.0,
-                 depth_mult: float = 1.0,
-                 in_channels: int = 3,
-                 num_classes: int = 1000,
-                 inverted_residual_setting: Optional[Sequence[Union[MBConvConfig, FusedMBConvConfig]]] = None,
-                 keep_prob: float = 0.2,
-                 norm_layer: Optional[nn.Cell] = None,
-                 ) -> None:
+    def __init__(
+        self,
+        arch: str,
+        dropout_rate: float,
+        width_mult: float = 1.0,
+        depth_mult: float = 1.0,
+        in_channels: int = 3,
+        num_classes: int = 1000,
+        inverted_residual_setting: Optional[Sequence[Union[MBConvConfig, FusedMBConvConfig]]] = None,
+        keep_prob: float = 0.2,
+        norm_layer: Optional[nn.Cell] = None,
+    ) -> None:
         super().__init__()
         self.last_channel = None
 
@@ -371,7 +374,7 @@ class EfficientNet(nn.Cell):
         layers.extend([
             nn.Conv2d(in_channels, firstconv_output_channels, kernel_size=3, stride=2),
             norm_layer(firstconv_output_channels),
-            Swish()
+            Swish(),
         ])
 
         # building MBConv blocks
@@ -411,7 +414,7 @@ class EfficientNet(nn.Cell):
         layers.extend([
             nn.Conv2d(lastconv_input_channels, lastconv_output_channels, kernel_size=1),
             norm_layer(lastconv_output_channels),
-            Swish()
+            Swish(),
         ])
 
         self.features = nn.SequentialCell(layers)
@@ -442,34 +445,29 @@ class EfficientNet(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Dense):
                 init_range = 1.0 / np.sqrt(cell.weight.shape[0])
-                cell.weight.set_data(weight_init.initializer(Uniform(init_range),
-                                                             cell.weight.shape,
-                                                             cell.weight.dtype))
+                cell.weight.set_data(weight_init.initializer(Uniform(init_range), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(weight_init.initializer(weight_init.Zero(),
-                                                               cell.bias.shape,
-                                                               cell.bias.dtype))
+                    cell.bias.set_data(weight_init.initializer(weight_init.Zero(), cell.bias.shape, cell.bias.dtype))
             if isinstance(cell, nn.Conv2d):
                 out_channel, _, kernel_size_h, kernel_size_w = cell.weight.shape
                 stddev = np.sqrt(2 / int(out_channel * kernel_size_h * kernel_size_w))
-                cell.weight.set_data(weight_init.initializer(Normal(sigma=stddev),
-                                                             cell.weight.shape,
-                                                             cell.weight.dtype))
+                cell.weight.set_data(
+                    weight_init.initializer(Normal(sigma=stddev), cell.weight.shape, cell.weight.dtype)
+                )
                 if cell.bias is not None:
-                    cell.bias.set_data(weight_init.initializer(weight_init.Zero(),
-                                                               cell.bias.shape,
-                                                               cell.bias.dtype))
+                    cell.bias.set_data(weight_init.initializer(weight_init.Zero(), cell.bias.shape, cell.bias.dtype))
 
 
-def _efficientnet(arch: str,
-                  width_mult: float,
-                  depth_mult: float,
-                  dropout: float,
-                  in_channels: int,
-                  num_classes: int,
-                  pretrained: bool,
-                  **kwargs: Any,
-                  ) -> EfficientNet:
+def _efficientnet(
+    arch: str,
+    width_mult: float,
+    depth_mult: float,
+    dropout: float,
+    in_channels: int,
+    num_classes: int,
+    pretrained: bool,
+    **kwargs: Any,
+) -> EfficientNet:
     """EfficientNet architecture."""
 
     model = EfficientNet(arch, dropout, width_mult, depth_mult, in_channels, num_classes, **kwargs)
@@ -659,7 +657,7 @@ def efficientnet_v2_s(pretrained: bool = False, num_classes: int = 1000, in_chan
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_v2_s", 1., 1., 0.2, in_channels, num_classes, pretrained, **kwargs)
+    return _efficientnet("efficientnet_v2_s", 1.0, 1.0, 0.2, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
@@ -679,7 +677,7 @@ def efficientnet_v2_m(pretrained: bool = False, num_classes: int = 1000, in_chan
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_v2_m", 1., 1., 0.2, in_channels, num_classes, pretrained, **kwargs)
+    return _efficientnet("efficientnet_v2_m", 1.0, 1.0, 0.2, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
@@ -699,7 +697,7 @@ def efficientnet_v2_l(pretrained: bool = False, num_classes: int = 1000, in_chan
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_v2_l", 1., 1., 0.2, in_channels, num_classes, pretrained, **kwargs)
+    return _efficientnet("efficientnet_v2_l", 1.0, 1.0, 0.2, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
@@ -719,4 +717,4 @@ def efficientnet_v2_xl(pretrained: bool = False, num_classes: int = 1000, in_cha
     Outputs:
         Tensor of shape :math:`(N, CLASSES_{out})`.
     """
-    return _efficientnet("efficientnet_v2_xl", 1., 1., 0.2, in_channels, num_classes, pretrained, **kwargs)
+    return _efficientnet("efficientnet_v2_xl", 1.0, 1.0, 0.2, in_channels, num_classes, pretrained, **kwargs)

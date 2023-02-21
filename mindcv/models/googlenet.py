@@ -3,45 +3,48 @@ MindSpore implementation of `GoogLeNet`.
 Refer to Going deeper with convolutions.
 """
 
-from typing import Union, Tuple
+from typing import Tuple, Union
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import Tensor, nn, ops
 
-from .utils import load_pretrained
-from .registry import register_model
 from .layers.pooling import GlobalAvgPooling
+from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
-    'GoogLeNet',
-    'googlenet'
+    "GoogLeNet",
+    "googlenet",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'conv1.conv', 'classifier': 'classifier',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "conv1.conv",
+        "classifier": "classifier",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'googlenet': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/googlenet/googlenet_224.ckpt')
+    "googlenet": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/googlenet/googlenet_224.ckpt"),
 }
 
 
 class BasicConv2d(nn.Cell):
     """A block for combine conv and relu"""
-    def __init__(self,
-                 in_channels: int,
-                 out_channels: int,
-                 kernel_size: int = 1,
-                 stride: int = 1,
-                 padding: int = 0,
-                 pad_mode: str = 'same'
-                 ) -> None:
+
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int = 1,
+        stride: int = 1,
+        padding: int = 0,
+        pad_mode: str = "same",
+    ) -> None:
         super().__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
                               padding=padding, pad_mode=pad_mode)
@@ -56,28 +59,29 @@ class BasicConv2d(nn.Cell):
 class Inception(nn.Cell):
     """Inception module of GoogLeNet."""
 
-    def __init__(self,
-                 in_channels: int,
-                 ch1x1: int,
-                 ch3x3red: int,
-                 ch3x3: int,
-                 ch5x5red: int,
-                 ch5x5: int,
-                 pool_proj: int
-                 ) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        ch1x1: int,
+        ch3x3red: int,
+        ch3x3: int,
+        ch5x5red: int,
+        ch5x5: int,
+        pool_proj: int,
+    ) -> None:
         super().__init__()
         self.b1 = BasicConv2d(in_channels, ch1x1, kernel_size=1)
         self.b2 = nn.SequentialCell([
             BasicConv2d(in_channels, ch3x3red, kernel_size=1),
-            BasicConv2d(ch3x3red, ch3x3, kernel_size=3)
+            BasicConv2d(ch3x3red, ch3x3, kernel_size=3),
         ])
         self.b3 = nn.SequentialCell([
             BasicConv2d(in_channels, ch5x5red, kernel_size=1),
-            BasicConv2d(ch5x5red, ch5x5, kernel_size=5)
+            BasicConv2d(ch5x5red, ch5x5, kernel_size=5),
         ])
         self.b4 = nn.SequentialCell([
-            nn.MaxPool2d(kernel_size=3, stride=1, pad_mode='same'),
-            BasicConv2d(in_channels, pool_proj, kernel_size=1)
+            nn.MaxPool2d(kernel_size=3, stride=1, pad_mode="same"),
+            BasicConv2d(in_channels, pool_proj, kernel_size=1),
         ])
 
     def construct(self, x: Tensor) -> Tensor:
@@ -91,11 +95,12 @@ class Inception(nn.Cell):
 class InceptionAux(nn.Cell):
     """Inception module for the aux classifier head"""
 
-    def __init__(self,
-                 in_channels: int,
-                 num_classes: int,
-                 drop_rate: float = 0.7
-                 ) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        num_classes: int,
+        drop_rate: float = 0.7,
+    ) -> None:
         super().__init__()
         self.avg_pool = nn.AvgPool2d(kernel_size=5, stride=3)
         self.conv = BasicConv2d(in_channels, 128, kernel_size=1)
@@ -128,13 +133,14 @@ class GoogLeNet(nn.Cell):
         drop_rate_aux: dropout rate of the layer before auxiliary classifier. Default: 0.7.
     """
 
-    def __init__(self,
-                 num_classes: int = 1000,
-                 aux_logits: bool = False,
-                 in_channels: int = 3,
-                 drop_rate: float = 0.2,
-                 drop_rate_aux: float = 0.7
-                 ) -> None:
+    def __init__(
+        self,
+        num_classes: int = 1000,
+        aux_logits: bool = False,
+        in_channels: int = 3,
+        drop_rate: float = 0.2,
+        drop_rate_aux: float = 0.7,
+    ) -> None:
         super().__init__()
         self.aux_logits = aux_logits
         self.conv1 = BasicConv2d(in_channels, 64, kernel_size=7, stride=2)
@@ -224,8 +230,8 @@ class GoogLeNet(nn.Cell):
 @register_model
 def googlenet(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> GoogLeNet:
     """Get GoogLeNet model.
-     Refer to the base class `models.GoogLeNet` for more details."""
-    default_cfg = default_cfgs['googlenet']
+    Refer to the base class `models.GoogLeNet` for more details."""
+    default_cfg = default_cfgs["googlenet"]
     model = GoogLeNet(num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:

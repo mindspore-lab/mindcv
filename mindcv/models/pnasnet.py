@@ -1,35 +1,36 @@
-'''
+"""
 MindSpore implementation of pnasnet.
 Refer to Progressive Neural Architecture Search.
-'''
+"""
 
-from collections import OrderedDict
 import math
+from collections import OrderedDict
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import Tensor, nn, ops
 
 from .layers import GlobalAvgPooling
 from .registry import register_model
 from .utils import load_pretrained
 
 __all__ = [
-    'Pnasnet',
-    'pnasnet'
+    "Pnasnet",
+    "pnasnet",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'conv_0.conv', 'classifier': 'last_linear',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "conv_0.conv",
+        "classifier": "last_linear",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'pnasnet': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pnasnet/pnasnet_224.ckpt')
+    "pnasnet": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/pnasnet/pnasnet_224.ckpt"),
 }
 
 
@@ -38,15 +39,17 @@ class MaxPool(nn.Cell):
     MaxPool: MaxPool2d with zero padding.
     """
 
-    def __init__(self,
-                 kernel_size: int,
-                 stride: int = 1,
-                 zero_pad: bool = False) -> None:
+    def __init__(
+        self,
+        kernel_size: int,
+        stride: int = 1,
+        zero_pad: bool = False,
+    ) -> None:
         super().__init__()
         self.pad = zero_pad
         if self.pad:
             self.zero_pad = nn.Pad(paddings=((0, 0), (0, 0), (1, 0), (1, 0)))
-        self.pool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride, pad_mode='same')
+        self.pool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride, pad_mode="same")
 
     def construct(self, x: Tensor) -> Tensor:
         if self.pad:
@@ -63,19 +66,21 @@ class SeparableConv2d(nn.Cell):
     a depthwise spatial convolution followed by a pointwise convolution.
     """
 
-    def __init__(self,
-                 in_channels: int,
-                 out_channels: int,
-                 dw_kernel_size: int,
-                 dw_stride: int,
-                 dw_padding: int) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        dw_kernel_size: int,
+        dw_stride: int,
+        dw_padding: int,
+    ) -> None:
         super().__init__()
         self.depthwise_conv2d = nn.Conv2d(in_channels=in_channels, out_channels=in_channels,
                                           kernel_size=dw_kernel_size, stride=dw_stride,
-                                          pad_mode='pad', padding=dw_padding,
+                                          pad_mode="pad", padding=dw_padding,
                                           group=in_channels, has_bias=False)
         self.pointwise_conv2d = nn.Conv2d(in_channels=in_channels, out_channels=out_channels,
-                                          kernel_size=1, pad_mode='pad', has_bias=False)
+                                          kernel_size=1, pad_mode="pad", has_bias=False)
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.depthwise_conv2d(x)
@@ -89,13 +94,15 @@ class BranchSeparables(nn.Cell):
                       ReLU + SeparableConv2d + BatchNorm2d
     """
 
-    def __init__(self,
-                 in_channels: int,
-                 out_channels: int,
-                 kernel_size: int,
-                 stride: int = 1,
-                 stem_cell: bool = False,
-                 zero_pad: bool = False) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int,
+        stride: int = 1,
+        stem_cell: bool = False,
+        zero_pad: bool = False,
+    ) -> None:
         super().__init__()
         padding = kernel_size // 2
         middle_channels = out_channels if stem_cell else in_channels
@@ -135,16 +142,18 @@ class ReluConvBn(nn.Cell):
     ReluConvBn: ReLU + Conv2d + BatchNorm2d
     """
 
-    def __init__(self,
-                 in_channels: int,
-                 out_channels: int,
-                 kernel_size: int,
-                 stride: int = 1) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int,
+        stride: int = 1,
+    ) -> None:
         super().__init__()
         self.relu = nn.ReLU()
 
         self.conv = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size,
-                              stride=stride, pad_mode='pad', has_bias=False)
+                              stride=stride, pad_mode="pad", has_bias=False)
         self.bn = nn.BatchNorm2d(num_features=out_channels, eps=0.001, momentum=0.9)
 
     def construct(self, x: Tensor) -> Tensor:
@@ -160,27 +169,29 @@ class FactorizedReduction(nn.Cell):
     of the left input of a cell approximately by a factor of 2.
     """
 
-    def __init__(self,
-                 in_channels: int,
-                 out_channels: int) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+    ) -> None:
         super().__init__()
         self.relu = nn.ReLU()
 
         path_1 = OrderedDict([
-            ('avgpool', nn.AvgPool2d(kernel_size=1, stride=2, pad_mode='valid')),
-            ('conv', nn.Conv2d(in_channels=in_channels, out_channels=out_channels // 2, kernel_size=1,
-                               pad_mode='pad', has_bias=False)),
+            ("avgpool", nn.AvgPool2d(kernel_size=1, stride=2, pad_mode="valid")),
+            ("conv", nn.Conv2d(in_channels=in_channels, out_channels=out_channels // 2, kernel_size=1,
+                               pad_mode="pad", has_bias=False)),
         ])
         self.path_1 = nn.SequentialCell(path_1)
 
         self.path_2 = nn.CellList([])
         self.path_2.append(nn.Pad(paddings=((0, 0), (0, 0), (0, 1), (0, 1)), mode="CONSTANT"))
         self.path_2.append(
-            nn.AvgPool2d(kernel_size=1, stride=2, pad_mode='valid')
+            nn.AvgPool2d(kernel_size=1, stride=2, pad_mode="valid")
         )
         self.path_2.append(
             nn.Conv2d(in_channels=in_channels, out_channels=out_channels // 2 + int(out_channels % 2),
-                      kernel_size=1, stride=1, pad_mode='pad', has_bias=False)
+                      kernel_size=1, stride=1, pad_mode="pad", has_bias=False)
         )
 
         self.final_path_bn = nn.BatchNorm2d(num_features=out_channels, eps=0.001, momentum=0.9)
@@ -240,11 +251,13 @@ class CellStem0(CellBase):
     CellStemp0:PNASNet Stem0 unit
     """
 
-    def __init__(self,
-                 in_channels_left: int,
-                 out_channels_left: int,
-                 in_channels_right: int,
-                 out_channels_right: int) -> None:
+    def __init__(
+        self,
+        in_channels_left: int,
+        out_channels_left: int,
+        in_channels_right: int,
+        out_channels_right: int,
+    ) -> None:
         super().__init__()
         self.conv_1x1 = ReluConvBn(in_channels_right, out_channels_right,
                                    kernel_size=1)
@@ -253,10 +266,10 @@ class CellStem0(CellBase):
                                                  kernel_size=5, stride=2,
                                                  stem_cell=True)
         comb_iter_0_right = OrderedDict([
-            ('max_pool', MaxPool(3, stride=2)),
-            ('conv', nn.Conv2d(in_channels_left, out_channels_left,
+            ("max_pool", MaxPool(3, stride=2)),
+            ("conv", nn.Conv2d(in_channels_left, out_channels_left,
                                kernel_size=1, has_bias=False)),
-            ('bn', nn.BatchNorm2d(out_channels_left, eps=0.001, momentum=0.9))
+            ("bn", nn.BatchNorm2d(out_channels_left, eps=0.001, momentum=0.9))
         ])
         self.comb_iter_0_right = nn.SequentialCell(comb_iter_0_right)
 
@@ -293,14 +306,16 @@ class Cell(CellBase):
     Cell class that is used as a 'layer' in image architectures
     """
 
-    def __init__(self,
-                 in_channels_left: int,
-                 out_channels_left: int,
-                 in_channels_right: int,
-                 out_channels_right: int,
-                 is_reduction: bool = False,
-                 zero_pad: bool = False,
-                 match_prev_layer_dimensions: bool = False) -> None:
+    def __init__(
+        self,
+        in_channels_left: int,
+        out_channels_left: int,
+        in_channels_right: int,
+        out_channels_right: int,
+        is_reduction: bool = False,
+        zero_pad: bool = False,
+        match_prev_layer_dimensions: bool = False,
+    ) -> None:
         super().__init__()
 
         stride = 2 if is_reduction else 1
@@ -360,16 +375,18 @@ class Pnasnet(nn.Cell):
         num_classes: number of classification classes. Default: 1000.
     """
 
-    def __init__(self,
-                 in_channels: int = 3,
-                 num_classes: int = 1000) -> None:
+    def __init__(
+        self,
+        in_channels: int = 3,
+        num_classes: int = 1000,
+    ) -> None:
         super().__init__()
         self.num_classes = num_classes
 
         self.conv_0 = nn.SequentialCell(OrderedDict([
-            ('conv', nn.Conv2d(in_channels=in_channels, out_channels=32, kernel_size=3, stride=2,
-                               pad_mode='pad', has_bias=False)),
-            ('bn', nn.BatchNorm2d(num_features=32, eps=0.001, momentum=0.9))
+            ("conv", nn.Conv2d(in_channels=in_channels, out_channels=32, kernel_size=3, stride=2,
+                               pad_mode="pad", has_bias=False)),
+            ("bn", nn.BatchNorm2d(num_features=32, eps=0.001, momentum=0.9))
         ]))
 
         self.cell_stem_0 = CellStem0(in_channels_left=32, out_channels_left=13,
@@ -418,22 +435,18 @@ class Pnasnet(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 n = cell.kernel_size[0] * cell.kernel_size[1] * cell.out_channels
-                cell.weight.set_data(init.initializer(init.Normal(math.sqrt(2. / n), 0),
-                                                      cell.weight.shape, cell.weight.dtype))
+                cell.weight.set_data(
+                    init.initializer(init.Normal(math.sqrt(2.0 / n), 0), cell.weight.shape, cell.weight.dtype)
+                )
                 if cell.bias is not None:
-                    cell.bias.set_data(init.initializer(init.Zero(),
-                                                        cell.bias.shape, cell.bias.dtype))
+                    cell.bias.set_data(init.initializer(init.Zero(), cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(init.initializer(init.One(),
-                                                     cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(init.initializer(init.Zero(),
-                                                    cell.beta.shape, cell.beta.dtype))
+                cell.gamma.set_data(init.initializer(init.One(), cell.gamma.shape, cell.gamma.dtype))
+                cell.beta.set_data(init.initializer(init.Zero(), cell.beta.shape, cell.beta.dtype))
             elif isinstance(cell, nn.Dense):
-                cell.weight.set_data(init.initializer(init.Normal(0.01, 0),
-                                                      cell.weight.shape, cell.weight.dtype))
+                cell.weight.set_data(init.initializer(init.Normal(0.01, 0), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(init.initializer(init.Zero(),
-                                                        cell.bias.shape, cell.bias.dtype))
+                    cell.bias.set_data(init.initializer(init.Zero(), cell.bias.shape, cell.bias.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
         x_conv_0 = self.conv_0(x)
@@ -470,8 +483,8 @@ class Pnasnet(nn.Cell):
 @register_model
 def pnasnet(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> Pnasnet:
     """Get Pnasnet model.
-     Refer to the base class `models.Pnasnet` for more details."""
-    default_cfg = default_cfgs['pnasnet']
+    Refer to the base class `models.Pnasnet` for more details."""
+    default_cfg = default_cfgs["pnasnet"]
     model = Pnasnet(in_channels=in_channels, num_classes=num_classes, **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)

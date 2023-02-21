@@ -4,7 +4,7 @@ Custom operators.
 
 from mindspore import nn
 
-__all__ = ['Swish']
+__all__ = ["Swish"]
 
 
 class Swish(nn.Cell):

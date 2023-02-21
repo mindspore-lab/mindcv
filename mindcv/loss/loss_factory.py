@@ -1,24 +1,27 @@
-''' loss factory '''
+""" loss factory """
 from typing import Optional
+
 from mindspore import Tensor
-from .cross_entropy_smooth import CrossEntropySmooth
+
 from .binary_cross_entropy_smooth import BinaryCrossEntropySmooth
+from .cross_entropy_smooth import CrossEntropySmooth
 
 __all__ = ["create_loss"]
 
 
 def create_loss(
-        name: str = 'CE',
-        weight: Optional[Tensor] = None,
-        reduction: str = 'mean',
-        label_smoothing: float = 0.,
-        aux_factor: float = 0.):
+    name: str = "CE",
+    weight: Optional[Tensor] = None,
+    reduction: str = "mean",
+    label_smoothing: float = 0.0,
+    aux_factor: float = 0.0,
+):
     r"""Creates loss function
 
     Args:
         name (str):  loss name : 'CE' for cross_entropy. 'BCE': binary cross entropy. Default: 'CE'.
         weight (Tensor): Class weight. A rescaling weight given to the loss of each batch element. If given, has to be a Tensor of size 'nbatch'.
-                Data type must be float16 or float32. 
+                Data type must be float16 or float32.
         reduction: Apply specific reduction method to the output: 'mean' or 'sum'. By default, the sum of the output will be divided by the number of elements in the output.
                 'sum': the output will be summed. Default:'mean'.
         label_smoothing: Label smoothing factor, a regularization tool used to prevent the model
@@ -38,10 +41,12 @@ def create_loss(
     """
     name = name.lower()
 
-    if name == 'ce':
+    if name == "ce":
         loss = CrossEntropySmooth(smoothing=label_smoothing, aux_factor=aux_factor, reduction=reduction, weight=weight)
-    elif name == 'bce':
-        loss = BinaryCrossEntropySmooth(smoothing=label_smoothing, aux_factor=aux_factor, reduction=reduction, weight=weight, pos_weight=None)
+    elif name == "bce":
+        loss = BinaryCrossEntropySmooth(
+            smoothing=label_smoothing, aux_factor=aux_factor, reduction=reduction, weight=weight, pos_weight=None
+        )
     else:
         raise NotImplementedError
 

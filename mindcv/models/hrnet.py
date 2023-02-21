@@ -26,12 +26,8 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "hrnet_w32": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w32_224.ckpt"
-    ),
-    "hrnet_w48": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w48_224.ckpt"
-    ),
+    "hrnet_w32": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w32_224.ckpt"),
+    "hrnet_w48": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w48_224.ckpt"),
 }
 
 
@@ -226,11 +222,7 @@ class HRModule(nn.Cell):
         stride: int = 1,
     ) -> nn.SequentialCell:
         downsample = None
-        if (
-            stride != 1
-            or self.num_inchannels[branch_index]
-            != num_channels[branch_index] * block.expansion
-        ):
+        if stride != 1 or self.num_inchannels[branch_index] != num_channels[branch_index] * block.expansion:
             downsample = nn.SequentialCell(
                 nn.Conv2d(
                     self.num_inchannels[branch_index],

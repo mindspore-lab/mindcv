@@ -1,19 +1,21 @@
 import sys
-sys.path.append('../..')
+
+sys.path.append("../..")
 
 import pytest
 
-from mindcv.data import create_dataset, create_transforms, create_loader
 import mindspore as ms
-from mindspore.communication import init, get_rank, get_group_size
+from mindspore.communication import get_group_size, get_rank, init
+
+from mindcv.data import create_dataset, create_loader, create_transforms
 
 
-@pytest.mark.parametrize('mode', [0, 1])
-@pytest.mark.parametrize('name', ['ImageNet'])
-@pytest.mark.parametrize('image_resize', [224, 256, 320])
-@pytest.mark.parametrize('is_training', [True, False])
+@pytest.mark.parametrize("mode", [0, 1])
+@pytest.mark.parametrize("name", ["ImageNet"])
+@pytest.mark.parametrize("image_resize", [224, 256, 320])
+@pytest.mark.parametrize("is_training", [True, False])
 def test_transforms_distribute_imagenet(mode, name, image_resize, is_training):
-    '''
+    """
     test transform_list API(distribute)
     command: mpirun -n 8 pytest -s test_transforms.py::test_transforms_distribute_imagenet
 
@@ -22,32 +24,34 @@ def test_transforms_distribute_imagenet(mode, name, image_resize, is_training):
         image_resize=224,
         is_training=False,
         **kwargs
-    '''
+    """
     ms.set_context(mode=mode)
 
     init("nccl")
     device_num = get_group_size()
     rank_id = get_rank()
-    ms.set_auto_parallel_context(device_num=device_num,
-                                 parallel_mode='data_parallel',
-                                 gradients_mean=True)
+    ms.set_auto_parallel_context(
+        device_num=device_num,
+        parallel_mode="data_parallel",
+        gradients_mean=True,
+    )
 
-    root = '/data0/dataset/imagenet2012/imagenet_original/'
+    root = "/data0/dataset/imagenet2012/imagenet_original/"
     dataset = create_dataset(
         name=name,
         root=root,
-        split='train',
+        split="train",
         num_shards=device_num,
         shard_id=rank_id,
         num_parallel_workers=8,
-        download=False
+        download=False,
     )
 
     # create transforms
     transform_list = create_transforms(
         dataset_name=name,
         image_resize=image_resize,
-        is_training=is_training
+        is_training=is_training,
     )
 
     # load dataset
@@ -63,16 +67,16 @@ def test_transforms_distribute_imagenet(mode, name, image_resize, is_training):
     print(loader)
     print(loader.output_shapes())
 
-    assert loader.output_shapes()[0][2] == image_resize, 'image_resize error !'
+    assert loader.output_shapes()[0][2] == image_resize, "image_resize error !"
 
 
-@pytest.mark.parametrize('mode', [0, 1])
-@pytest.mark.parametrize('name', ['MNIST', 'CIFAR10'])
-@pytest.mark.parametrize('image_resize', [224, 256, 320])
-@pytest.mark.parametrize('is_training', [True, False])
-@pytest.mark.parametrize('download', [True, False])
+@pytest.mark.parametrize("mode", [0, 1])
+@pytest.mark.parametrize("name", ["MNIST", "CIFAR10"])
+@pytest.mark.parametrize("image_resize", [224, 256, 320])
+@pytest.mark.parametrize("is_training", [True, False])
+@pytest.mark.parametrize("download", [True, False])
 def test_transforms_distribute_imagenet_mc(mode, name, image_resize, is_training, download):
-    '''
+    """
     test transform_list API(distribute)
     command: mpirun -n 8 pytest -s test_transforms.py::test_transforms_distribute_imagenet_mc
 
@@ -81,30 +85,32 @@ def test_transforms_distribute_imagenet_mc(mode, name, image_resize, is_training
         image_resize=224,
         is_training=False,
         **kwargs
-    '''
+    """
     ms.set_context(mode=mode)
 
     init("nccl")
     device_num = get_group_size()
     rank_id = get_rank()
-    ms.set_auto_parallel_context(device_num=device_num,
-                                 parallel_mode='data_parallel',
-                                 gradients_mean=True)
+    ms.set_auto_parallel_context(
+        device_num=device_num,
+        parallel_mode="data_parallel",
+        gradients_mean=True,
+    )
 
     dataset = create_dataset(
         name=name,
-        split='train',
+        split="train",
         num_shards=device_num,
         shard_id=rank_id,
         num_parallel_workers=8,
-        download=download
+        download=download,
     )
 
     # create transforms
     transform_list = create_transforms(
         dataset_name=name,
         image_resize=image_resize,
-        is_training=is_training
+        is_training=is_training,
     )
 
     # load dataset
@@ -120,4 +126,4 @@ def test_transforms_distribute_imagenet_mc(mode, name, image_resize, is_training
     print(loader)
     print(loader.output_shapes())
 
-    assert loader.output_shapes()[0][2] == image_resize, 'image_resize error !'
+    assert loader.output_shapes()[0][2] == image_resize, "image_resize error !"

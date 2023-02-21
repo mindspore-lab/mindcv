@@ -3,61 +3,62 @@ MindSpore implementation of `Res2Net`.
 Refer to Res2Net: A New Multi-scale Backbone Architecture.
 """
 
-from typing import Optional, Type, List
-
 import math
+from typing import List, Optional, Type
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import Tensor, nn, ops
 
 from .layers.pooling import GlobalAvgPooling
-from .utils import load_pretrained
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
-    'Res2Net',
-    'res2net50',
-    'res2net101',
-    'res2net152',
-    'res2net50_v1b',
-    'res2net101_v1b',
-    'res2net152_v1b',
+    "Res2Net",
+    "res2net50",
+    "res2net101",
+    "res2net152",
+    "res2net50_v1b",
+    "res2net101_v1b",
+    "res2net152_v1b",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'conv1', 'classifier': 'classifier',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "conv1",
+        "classifier": "classifier",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'res2net50': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/res2net/res2net50-200_5004.ckpt'),
-    'res2net101': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/res2net/res2net101-140_5004.ckpt'),
-    'res2net152': _cfg(url=''),
-    'res2net50_v1b': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/res2net/res2net50_v1b-300_5004.ckpt'),
-    'res2net101_v1b': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/res2net/res2net101_v1b-200_5004.ckpt'),
-    'res2net152_v1b': _cfg(url='')
+    "res2net50": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/res2net/res2net50-200_5004.ckpt"),
+    "res2net101": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/res2net/res2net101-140_5004.ckpt"),
+    "res2net152": _cfg(url=""),
+    "res2net50_v1b": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/res2net/res2net50_v1b-300_5004.ckpt"),
+    "res2net101_v1b": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/res2net/res2net101_v1b-200_5004.ckpt"),
+    "res2net152_v1b": _cfg(url=""),
 }
 
 
 class Bottle2neck(nn.Cell):
     expansion: int = 4
 
-    def __init__(self,
-                 in_channels: int,
-                 out_channels: int,
-                 stride: int = 1,
-                 groups: int = 1,
-                 base_width: int = 26,
-                 scale: int = 4,
-                 stype: str = 'normal',
-                 norm: Optional[nn.Cell] = None,
-                 down_sample: Optional[nn.Cell] = None
-                 ) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        stride: int = 1,
+        groups: int = 1,
+        base_width: int = 26,
+        scale: int = 4,
+        stype: str = "normal",
+        norm: Optional[nn.Cell] = None,
+        down_sample: Optional[nn.Cell] = None,
+    ) -> None:
         super().__init__()
         if norm is None:
             norm = nn.BatchNorm2d
@@ -71,16 +72,16 @@ class Bottle2neck(nn.Cell):
             self.nums = 1
         else:
             self.nums = scale - 1
-        if stype == 'stage':
+        if stype == "stage":
             self.pool = nn.SequentialCell([
-            nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)), mode="CONSTANT"),
-            nn.AvgPool2d(kernel_size=3, stride=stride)
+                nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)), mode="CONSTANT"),
+                nn.AvgPool2d(kernel_size=3, stride=stride),
             ])
 
         self.convs = nn.CellList()
         self.bns = nn.CellList()
         for _ in range(self.nums):
-            self.convs.append(nn.Conv2d(width, width, kernel_size=3, stride = stride, padding=1, pad_mode='pad'))
+            self.convs.append(nn.Conv2d(width, width, kernel_size=3, stride=stride, padding=1, pad_mode="pad"))
             self.bns.append(norm(width))
 
         self.conv3 = nn.Conv2d(width * scale, out_channels * self.expansion,
@@ -91,10 +92,9 @@ class Bottle2neck(nn.Cell):
         self.down_sample = down_sample
         self.stype = stype
         self.scale = scale
-        self.width  = width
+        self.width = width
 
     def construct(self, x: Tensor) -> Tensor:
-
         identity = x
 
         out = self.conv1(x)
@@ -109,7 +109,7 @@ class Bottle2neck(nn.Cell):
         out = sp
 
         for i in range(1, self.nums):
-            if self.stype == 'stage':
+            if self.stype == "stage":
                 sp = spx[i]
             else:
                 sp = sp[:, :, :, :]
@@ -120,9 +120,9 @@ class Bottle2neck(nn.Cell):
 
             out = ops.concat((out, sp), axis=1)
 
-        if self.scale != 1 and self.stype=='normal':
+        if self.scale != 1 and self.stype == "normal":
             out = ops.concat((out, spx[self.nums]), axis=1)
-        elif self.scale != 1 and self.stype=='stage':
+        elif self.scale != 1 and self.stype == "stage":
             out = ops.concat((out, self.pool(spx[self.nums])), axis=1)
 
         out = self.conv3(out)
@@ -153,19 +153,20 @@ class Res2Net(nn.Cell):
         norm: normalization layer in blocks. Default: None.
     """
 
-    def __init__(self,
-                 block: Type[nn.Cell],
-                 layer_nums: List[int],
-                 version: str = 'res2net',
-                 num_classes: int = 1000,
-                 in_channels: int = 3,
-                 groups: int = 1,
-                 base_width: int = 26,
-                 scale = 4,
-                 norm: Optional[nn.Cell] = None
-                 ) -> None:
+    def __init__(
+        self,
+        block: Type[nn.Cell],
+        layer_nums: List[int],
+        version: str = "res2net",
+        num_classes: int = 1000,
+        in_channels: int = 3,
+        groups: int = 1,
+        base_width: int = 26,
+        scale=4,
+        norm: Optional[nn.Cell] = None,
+    ) -> None:
         super().__init__()
-        assert version in ['res2net', 'res2net_v1b']
+        assert version in ["res2net", "res2net_v1b"]
         self.version = version
 
         if norm is None:
@@ -177,21 +178,21 @@ class Res2Net(nn.Cell):
         self.groups = groups
         self.base_width = base_width
         self.scale = scale
-        if self.version == 'res2net':
+        if self.version == "res2net":
             self.conv1 = nn.Conv2d(in_channels, self.input_channels, kernel_size=7,
-                                stride=2, padding=3, pad_mode='pad')
-        elif self.version == 'res2net_v1b':
+                                   stride=2, padding=3, pad_mode="pad")
+        elif self.version == "res2net_v1b":
             self.conv1 = nn.SequentialCell([
                 nn.Conv2d(in_channels, self.input_channels // 2, kernel_size=3,
-                                stride=2, padding=1, pad_mode='pad'),
+                          stride=2, padding=1, pad_mode="pad"),
                 norm(self.input_channels // 2),
                 nn.ReLU(),
                 nn.Conv2d(self.input_channels // 2, self.input_channels // 2, kernel_size=3,
-                                stride=1, padding=1, pad_mode='pad'),
+                          stride=1, padding=1, pad_mode="pad"),
                 norm(self.input_channels // 2),
                 nn.ReLU(),
                 nn.Conv2d(self.input_channels // 2, self.input_channels, kernel_size=3,
-                                stride=1, padding=1, pad_mode='pad'),
+                          stride=1, padding=1, pad_mode="pad"),
             ])
 
         self.bn1 = norm(self.input_channels)
@@ -199,7 +200,7 @@ class Res2Net(nn.Cell):
         self.max_pool = nn.SequentialCell([
             nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)), mode="CONSTANT"),
             nn.MaxPool2d(kernel_size=3, stride=2)
-            ])
+        ])
         self.layer1 = self._make_layer(block, 64, layer_nums[0])
         self.layer2 = self._make_layer(block, 128, layer_nums[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layer_nums[2], stride=2)
@@ -215,39 +216,40 @@ class Res2Net(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 cell.weight.set_data(
-                    init.initializer(init.HeNormal(math.sqrt(5), mode='fan_out', nonlinearity='relu'),
+                    init.initializer(init.HeNormal(math.sqrt(5), mode="fan_out", nonlinearity="relu"),
                                     cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(
-                        init.initializer(init.HeUniform(math.sqrt(5), mode='fan_in', nonlinearity='leaky_relu'),
+                        init.initializer(init.HeUniform(math.sqrt(5), mode="fan_in", nonlinearity="leaky_relu"),
                                         cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(init.initializer('ones', cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(init.initializer('zeros', cell.beta.shape, cell.beta.dtype))
+                cell.gamma.set_data(init.initializer("ones", cell.gamma.shape, cell.gamma.dtype))
+                cell.beta.set_data(init.initializer("zeros", cell.beta.shape, cell.beta.dtype))
             elif isinstance(cell, nn.Dense):
                 cell.weight.set_data(
-                    init.initializer(init.HeUniform(math.sqrt(5), mode='fan_in', nonlinearity='leaky_relu'),
+                    init.initializer(init.HeUniform(math.sqrt(5), mode="fan_in", nonlinearity="leaky_relu"),
                                     cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+                    cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
 
-    def _make_layer(self,
-                    block: Type[nn.Cell],
-                    channels: int,
-                    block_nums: int,
-                    stride: int = 1
-                    ) -> nn.SequentialCell:
+    def _make_layer(
+        self,
+        block: Type[nn.Cell],
+        channels: int,
+        block_nums: int,
+        stride: int = 1,
+    ) -> nn.SequentialCell:
         down_sample = None
 
         if stride != 1 or self.input_channels != channels * block.expansion:
-            if stride == 1 or self.version == 'res2net':
+            if stride == 1 or self.version == "res2net":
                 down_sample = nn.SequentialCell([
                     nn.Conv2d(self.input_channels, channels * block.expansion, kernel_size=1, stride=stride),
                     self.norm(channels * block.expansion)
                 ])
             else:
                 down_sample = nn.SequentialCell([
-                    nn.AvgPool2d(kernel_size=stride, stride=stride, pad_mode='same'),
+                    nn.AvgPool2d(kernel_size=stride, stride=stride, pad_mode="same"),
                     nn.Conv2d(self.input_channels, channels * block.expansion, kernel_size=1, stride=1),
                     self.norm(channels * block.expansion)
                 ])
@@ -261,9 +263,9 @@ class Res2Net(nn.Cell):
                 down_sample=down_sample,
                 groups=self.groups,
                 base_width=self.base_width,
-                scale = self.scale,
-                stype='stage',
-                norm=self.norm
+                scale=self.scale,
+                stype="stage",
+                norm=self.norm,
             )
         )
         self.input_channels = channels * block.expansion
@@ -276,7 +278,7 @@ class Res2Net(nn.Cell):
                     groups=self.groups,
                     base_width=self.base_width,
                     scale=self.scale,
-                    norm=self.norm
+                    norm=self.norm,
                 )
             )
 
@@ -304,12 +306,13 @@ class Res2Net(nn.Cell):
         x = self.forward_head(x)
         return x
 
+
 @register_model
 def res2net50(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
     """Get 50 layers Res2Net model.
-     Refer to the base class `models.Res2Net` for more details.
-     """
-    default_cfg = default_cfgs['res2net50']
+    Refer to the base class `models.Res2Net` for more details.
+    """
+    default_cfg = default_cfgs["res2net50"]
     model = Res2Net(Bottle2neck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -321,9 +324,9 @@ def res2net50(pretrained: bool = False, num_classes: int = 1001, in_channels=3, 
 @register_model
 def res2net101(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
     """Get 101 layers Res2Net model.
-     Refer to the base class `models.Res2Net` for more details.
-     """
-    default_cfg = default_cfgs['res2net101']
+    Refer to the base class `models.Res2Net` for more details.
+    """
+    default_cfg = default_cfgs["res2net101"]
     model = Res2Net(Bottle2neck, [3, 4, 23, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -331,12 +334,13 @@ def res2net101(pretrained: bool = False, num_classes: int = 1001, in_channels=3,
 
     return model
 
+
 @register_model
 def res2net152(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
     """Get 152 layers Res2Net model.
-     Refer to the base class `models.Res2Net` for more details.
-     """
-    default_cfg = default_cfgs['res2net152']
+    Refer to the base class `models.Res2Net` for more details.
+    """
+    default_cfg = default_cfgs["res2net152"]
     model = Res2Net(Bottle2neck, [3, 8, 36, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -344,10 +348,11 @@ def res2net152(pretrained: bool = False, num_classes: int = 1001, in_channels=3,
 
     return model
 
+
 @register_model
 def res2net50_v1b(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['res2net50_v1b']
-    model = Res2Net(Bottle2neck, [3, 4, 6, 3], version='res2net_v1b', num_classes=num_classes,
+    default_cfg = default_cfgs["res2net50_v1b"]
+    model = Res2Net(Bottle2neck, [3, 4, 6, 3], version="res2net_v1b", num_classes=num_classes,
                     in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -358,8 +363,8 @@ def res2net50_v1b(pretrained: bool = False, num_classes: int = 1001, in_channels
 
 @register_model
 def res2net101_v1b(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['res2net101_v1b']
-    model = Res2Net(Bottle2neck, [3, 4, 23, 3], version='res2net_v1b', num_classes=num_classes,
+    default_cfg = default_cfgs["res2net101_v1b"]
+    model = Res2Net(Bottle2neck, [3, 4, 23, 3], version="res2net_v1b", num_classes=num_classes,
                     in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -367,10 +372,11 @@ def res2net101_v1b(pretrained: bool = False, num_classes: int = 1001, in_channel
 
     return model
 
+
 @register_model
 def res2net152_v1b(pretrained: bool = False, num_classes: int = 1001, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['res2net152_v1b']
-    model = Res2Net(Bottle2neck, [3, 8, 36, 3], version='res2net_v1b', num_classes=num_classes,
+    default_cfg = default_cfgs["res2net152_v1b"]
+    model = Res2Net(Bottle2neck, [3, 8, 36, 3], version="res2net_v1b", num_classes=num_classes,
                     in_channels=in_channels, **kwargs)
 
     if pretrained:

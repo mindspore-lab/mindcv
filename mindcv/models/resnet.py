@@ -3,47 +3,48 @@ MindSpore implementation of `ResNet`.
 Refer to Deep Residual Learning for Image Recognition.
 """
 
-from typing import Optional, Type, List, Union
+from typing import List, Optional, Type, Union
 
-from mindspore import nn, Tensor
+from mindspore import Tensor, nn
 
 from .layers.pooling import GlobalAvgPooling
-from .utils import load_pretrained
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
-    'ResNet',
-    'resnet18',
-    'resnet34',
-    'resnet50',
-    'resnet101',
-    'resnet152',
-    'resnext50_32x4d',
-    'resnext101_32x4d',
-    'resnext101_64x4d',
-    'resnext152_64x4d'
+    "ResNet",
+    "resnet18",
+    "resnet34",
+    "resnet50",
+    "resnet101",
+    "resnet152",
+    "resnext50_32x4d",
+    "resnext101_32x4d",
+    "resnext101_64x4d",
+    "resnext152_64x4d",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'conv1', 'classifier': 'classifier',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "conv1",
+        "classifier": "classifier",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'resnet18': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/resnet/resnet18_224.ckpt'),
-    'resnet34': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/resnet/resnet34_224.ckpt'),
-    'resnet50': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/resnet/resnet50_224.ckpt'),
-    'resnet101': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/resnet/resnet101_224.ckpt'),
-    'resnet152': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/resnet/resnet152_224.ckpt'),
-    'resnext50_32x4d': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/resnext/resnext50_32x4d_224.ckpt'),
-    'resnext101_32x4d': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/resnext/resnext101_32x4d_224.ckpt'),
-    'resnext101_64x4d': _cfg(url=''),
-    'resnext152_64x4d': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/resnext/resnext152_64x4d_224.ckpt')
+    "resnet18": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet18_224.ckpt"),
+    "resnet34": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet34_224.ckpt"),
+    "resnet50": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet50_224.ckpt"),
+    "resnet101": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet101_224.ckpt"),
+    "resnet152": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet152_224.ckpt"),
+    "resnext50_32x4d": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext50_32x4d_224.ckpt"),
+    "resnext101_32x4d": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext101_32x4d_224.ckpt"),
+    "resnext101_64x4d": _cfg(url=""),
+    "resnext152_64x4d": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext152_64x4d_224.ckpt"),
 }
 
 
@@ -51,27 +52,28 @@ class BasicBlock(nn.Cell):
     """define the basic block of resnet"""
     expansion: int = 1
 
-    def __init__(self,
-                 in_channels: int,
-                 channels: int,
-                 stride: int = 1,
-                 groups: int = 1,
-                 base_width: int = 64,
-                 norm: Optional[nn.Cell] = None,
-                 down_sample: Optional[nn.Cell] = None
-                 ) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        channels: int,
+        stride: int = 1,
+        groups: int = 1,
+        base_width: int = 64,
+        norm: Optional[nn.Cell] = None,
+        down_sample: Optional[nn.Cell] = None,
+    ) -> None:
         super().__init__()
         if norm is None:
             norm = nn.BatchNorm2d
-        assert groups == 1, 'BasicBlock only supports groups=1'
-        assert base_width == 64, 'BasicBlock only supports base_width=64'
+        assert groups == 1, "BasicBlock only supports groups=1"
+        assert base_width == 64, "BasicBlock only supports base_width=64"
 
         self.conv1 = nn.Conv2d(in_channels, channels, kernel_size=3,
-                               stride=stride, padding=1, pad_mode='pad')
+                               stride=stride, padding=1, pad_mode="pad")
         self.bn1 = norm(channels)
         self.relu = nn.ReLU()
         self.conv2 = nn.Conv2d(channels, channels, kernel_size=3,
-                               stride=1, padding=1, pad_mode='pad')
+                               stride=1, padding=1, pad_mode="pad")
         self.bn2 = norm(channels)
         self.down_sample = down_sample
 
@@ -101,15 +103,16 @@ class Bottleneck(nn.Cell):
     """
     expansion: int = 4
 
-    def __init__(self,
-                 in_channels: int,
-                 channels: int,
-                 stride: int = 1,
-                 groups: int = 1,
-                 base_width: int = 64,
-                 norm: Optional[nn.Cell] = None,
-                 down_sample: Optional[nn.Cell] = None
-                 ) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        channels: int,
+        stride: int = 1,
+        groups: int = 1,
+        base_width: int = 64,
+        norm: Optional[nn.Cell] = None,
+        down_sample: Optional[nn.Cell] = None,
+    ) -> None:
         super().__init__()
         if norm is None:
             norm = nn.BatchNorm2d
@@ -119,7 +122,7 @@ class Bottleneck(nn.Cell):
         self.conv1 = nn.Conv2d(in_channels, width, kernel_size=1, stride=1)
         self.bn1 = norm(width)
         self.conv2 = nn.Conv2d(width, width, kernel_size=3, stride=stride,
-                               padding=1, pad_mode='pad', group=groups)
+                               padding=1, pad_mode="pad", group=groups)
         self.bn2 = norm(width)
         self.conv3 = nn.Conv2d(width, channels * self.expansion,
                                kernel_size=1, stride=1)
@@ -164,15 +167,16 @@ class ResNet(nn.Cell):
         norm: normalization layer in blocks. Default: None.
     """
 
-    def __init__(self,
-                 block: Type[Union[BasicBlock, Bottleneck]],
-                 layers: List[int],
-                 num_classes: int = 1000,
-                 in_channels: int = 3,
-                 groups: int = 1,
-                 base_width: int = 64,
-                 norm: Optional[nn.Cell] = None
-                 ) -> None:
+    def __init__(
+        self,
+        block: Type[Union[BasicBlock, Bottleneck]],
+        layers: List[int],
+        num_classes: int = 1000,
+        in_channels: int = 3,
+        groups: int = 1,
+        base_width: int = 64,
+        norm: Optional[nn.Cell] = None,
+    ) -> None:
         super().__init__()
         if norm is None:
             norm = nn.BatchNorm2d
@@ -183,10 +187,10 @@ class ResNet(nn.Cell):
         self.base_with = base_width
 
         self.conv1 = nn.Conv2d(in_channels, self.input_channels, kernel_size=7,
-                               stride=2, pad_mode='pad', padding=3)
+                               stride=2, pad_mode="pad", padding=3)
         self.bn1 = norm(self.input_channels)
         self.relu = nn.ReLU()
-        self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='same')
+        self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")
         self.layer1 = self._make_layer(block, 64, layers[0])
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
@@ -196,12 +200,13 @@ class ResNet(nn.Cell):
         self.num_features = 512 * block.expansion
         self.classifier = nn.Dense(self.num_features, num_classes)
 
-    def _make_layer(self,
-                    block: Type[Union[BasicBlock, Bottleneck]],
-                    channels: int,
-                    block_nums: int,
-                    stride: int = 1
-                    ) -> nn.SequentialCell:
+    def _make_layer(
+        self,
+        block: Type[Union[BasicBlock, Bottleneck]],
+        channels: int,
+        block_nums: int,
+        stride: int = 1,
+    ) -> nn.SequentialCell:
         """build model depending on cfgs"""
         down_sample = None
 
@@ -220,7 +225,7 @@ class ResNet(nn.Cell):
                 down_sample=down_sample,
                 groups=self.groups,
                 base_width=self.base_with,
-                norm=self.norm
+                norm=self.norm,
             )
         )
         self.input_channels = channels * block.expansion
@@ -265,9 +270,9 @@ class ResNet(nn.Cell):
 @register_model
 def resnet18(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 18 layers ResNet model.
-     Refer to the base class `models.ResNet` for more details.
-     """
-    default_cfg = default_cfgs['resnet18']
+    Refer to the base class `models.ResNet` for more details.
+    """
+    default_cfg = default_cfgs["resnet18"]
     model = ResNet(BasicBlock, [2, 2, 2, 2], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -279,9 +284,9 @@ def resnet18(pretrained: bool = False, num_classes: int = 1000, in_channels=3, *
 @register_model
 def resnet34(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 34 layers ResNet model.
-     Refer to the base class `models.ResNet` for more details.
-     """
-    default_cfg = default_cfgs['resnet34']
+    Refer to the base class `models.ResNet` for more details.
+    """
+    default_cfg = default_cfgs["resnet34"]
     model = ResNet(BasicBlock, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -293,9 +298,9 @@ def resnet34(pretrained: bool = False, num_classes: int = 1000, in_channels=3, *
 @register_model
 def resnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 50 layers ResNet model.
-     Refer to the base class `models.ResNet` for more details.
-     """
-    default_cfg = default_cfgs['resnet50']
+    Refer to the base class `models.ResNet` for more details.
+    """
+    default_cfg = default_cfgs["resnet50"]
     model = ResNet(Bottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -307,9 +312,9 @@ def resnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, *
 @register_model
 def resnet101(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 101 layers ResNet model.
-     Refer to the base class `models.ResNet` for more details.
-     """
-    default_cfg = default_cfgs['resnet101']
+    Refer to the base class `models.ResNet` for more details.
+    """
+    default_cfg = default_cfgs["resnet101"]
     model = ResNet(Bottleneck, [3, 4, 23, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -321,9 +326,9 @@ def resnet101(pretrained: bool = False, num_classes: int = 1000, in_channels=3, 
 @register_model
 def resnet152(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 152 layers ResNet model.
-     Refer to the base class `models.ResNet` for more details.
-     """
-    default_cfg = default_cfgs['resnet152']
+    Refer to the base class `models.ResNet` for more details.
+    """
+    default_cfg = default_cfgs["resnet152"]
     model = ResNet(Bottleneck, [3, 8, 36, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -335,9 +340,9 @@ def resnet152(pretrained: bool = False, num_classes: int = 1000, in_channels=3, 
 @register_model
 def resnext50_32x4d(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 50 layers ResNeXt model with 32 groups of GPConv.
-     Refer to the base class `models.ResNet` for more details.
-     """
-    default_cfg = default_cfgs['resnext50_32x4d']
+    Refer to the base class `models.ResNet` for more details.
+    """
+    default_cfg = default_cfgs["resnext50_32x4d"]
     model = ResNet(Bottleneck, [3, 4, 6, 3], groups=32, base_width=4, num_classes=num_classes,
                    in_channels=in_channels, **kwargs)
 
@@ -350,9 +355,9 @@ def resnext50_32x4d(pretrained: bool = False, num_classes: int = 1000, in_channe
 @register_model
 def resnext101_32x4d(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 101 layers ResNeXt model with 32 groups of GPConv.
-     Refer to the base class `models.ResNet` for more details.
-     """
-    default_cfg = default_cfgs['resnext101_32x4d']
+    Refer to the base class `models.ResNet` for more details.
+    """
+    default_cfg = default_cfgs["resnext101_32x4d"]
     model = ResNet(Bottleneck, [3, 4, 23, 3], groups=32, base_width=4, num_classes=num_classes,
                    in_channels=in_channels, **kwargs)
 
@@ -365,9 +370,9 @@ def resnext101_32x4d(pretrained: bool = False, num_classes: int = 1000, in_chann
 @register_model
 def resnext101_64x4d(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 101 layers ResNeXt model with 64 groups of GPConv.
-     Refer to the base class `models.ResNet` for more details.
-     """
-    default_cfg = default_cfgs['resnext101_64x4d']
+    Refer to the base class `models.ResNet` for more details.
+    """
+    default_cfg = default_cfgs["resnext101_64x4d"]
     model = ResNet(Bottleneck, [3, 4, 23, 3], groups=64, base_width=4, num_classes=num_classes,
                    in_channels=in_channels, **kwargs)
 
@@ -379,7 +384,7 @@ def resnext101_64x4d(pretrained: bool = False, num_classes: int = 1000, in_chann
 
 @register_model
 def resnext152_64x4d(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['resnext101_64x4d']
+    default_cfg = default_cfgs["resnext101_64x4d"]
     model = ResNet(Bottleneck, [3, 8, 36, 3], groups=64, base_width=4, num_classes=num_classes,
                    in_channels=in_channels, **kwargs)
 

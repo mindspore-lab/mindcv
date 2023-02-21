@@ -1,13 +1,13 @@
 """ Selective Kernel Convolution/Attention
 Paper: Selective Kernel Networks (https://arxiv.org/abs/1903.06586)
 """
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
-from mindspore import nn, ops, Tensor
+from mindspore import Tensor, nn, ops
 
+from ..utils import make_divisible
 from .conv_norm_act import Conv2dNormActivation
 from .pooling import GlobalAvgPooling
-from ..utils import make_divisible
 
 
 def _kernel_valid(k):
@@ -21,16 +21,18 @@ def _kernel_valid(k):
 
 
 class SelectiveKernelAttn(nn.Cell):
-    """ Selective Kernel Attention Module
+    """Selective Kernel Attention Module
     Selective Kernel attention mechanism factored out into its own module.
     """
-    def __init__(self,
-                 channels: int,
-                 num_paths: int = 2,
-                 attn_channels: int = 32,
-                 activation: Optional[nn.Cell] = nn.ReLU,
-                 norm: Optional[nn.Cell] = nn.BatchNorm2d
-                 ):
+
+    def __init__(
+        self,
+        channels: int,
+        num_paths: int = 2,
+        attn_channels: int = 32,
+        activation: Optional[nn.Cell] = nn.ReLU,
+        norm: Optional[nn.Cell] = nn.BatchNorm2d,
+    ):
         super().__init__()
         self.num_paths = num_paths
         self.mean = GlobalAvgPooling(keep_dims=True)
@@ -53,7 +55,7 @@ class SelectiveKernelAttn(nn.Cell):
 
 
 class SelectiveKernel(nn.Cell):
-    """ Selective Kernel Convolution Module
+    """Selective Kernel Convolution Module
     As described in Selective Kernel Networks (https://arxiv.org/abs/1903.06586) with some modifications.
     Largest change is the input split, which divides the input channels across each convolution path, this can
     be viewed as a grouping of sorts, but the output channel counts expand to the module level value. This keeps
@@ -75,22 +77,23 @@ class SelectiveKernel(nn.Cell):
         activation (nn.Module): activation layer to use
         norm (nn.Module): batchnorm/norm layer to use
     """
-    def __init__(self,
-                 in_channels: int,
-                 out_channels: Optional[int] = None,
-                 kernel_size: Optional[Union[int, List]] = None,
-                 stride: int = 1,
-                 dilation: int = 1,
-                 groups: int = 1,
-                 rd_ratio: float = 1. / 16,
-                 rd_channels: Optional[int] = None,
-                 rd_divisor: int = 8,
-                 keep_3x3: bool = True,
-                 split_input: bool = True,
-                 activation: Optional[nn.Cell] = nn.ReLU,
-                 norm: Optional[nn.Cell] = nn.BatchNorm2d
-                 ):
 
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: Optional[int] = None,
+        kernel_size: Optional[Union[int, List]] = None,
+        stride: int = 1,
+        dilation: int = 1,
+        groups: int = 1,
+        rd_ratio: float = 1.0 / 16,
+        rd_channels: Optional[int] = None,
+        rd_divisor: int = 8,
+        keep_3x3: bool = True,
+        split_input: bool = True,
+        activation: Optional[nn.Cell] = nn.ReLU,
+        norm: Optional[nn.Cell] = nn.BatchNorm2d,
+    ):
         super().__init__()
         out_channels = out_channels or in_channels
         kernel_size = kernel_size or [3, 5]  # default to one 3x3 and one 5x5 branch. 5x5 -> 3x3 + dilation

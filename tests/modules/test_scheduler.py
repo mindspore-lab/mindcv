@@ -1,15 +1,17 @@
 import sys
-sys.path.append('.')
 
-import pytest
+sys.path.append(".")
+
 import numpy as np
+import pytest
 
 import mindspore as ms
 from mindspore import Tensor
-from mindcv.scheduler import create_scheduler
-from mindcv.scheduler import dynamic_lr
+
+from mindcv.scheduler import create_scheduler, dynamic_lr
 
 
+# fmt: off
 def test_scheduler_dynamic():
     # constant_lr
     lrs_manually = [0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025,
@@ -91,3 +93,4 @@ def test_scheduler_dynamic():
                     0.00615582970243117]
     lrs_ms = dynamic_lr.cosine_annealing_warm_restarts_lr(5, 2, 0.0, eta_max=1.0, steps_per_epoch=2, epochs=15)
     assert np.allclose(lrs_ms, lrs_manually)
+# fmt: on

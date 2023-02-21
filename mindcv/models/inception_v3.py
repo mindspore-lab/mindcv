@@ -3,46 +3,48 @@ MindSpore implementation of `InceptionV3`.
 Refer to Rethinking the Inception Architecture for Computer Vision.
 """
 
-from typing import Union, Tuple
+from typing import Tuple, Union
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import Tensor, nn, ops
 
-from .utils import load_pretrained
-from .registry import register_model
 from .layers.pooling import GlobalAvgPooling
+from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
-    'InceptionV3',
-    'inception_v3'
+    "InceptionV3",
+    "inception_v3",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'conv1a', 'classifier': 'classifier',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "conv1a",
+        "classifier": "classifier",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'inception_v3': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/inception_v3/inception_v3_299.ckpt')
+    "inception_v3": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/inception_v3/inception_v3_299.ckpt")
 }
 
 
 class BasicConv2d(nn.Cell):
     """A block for conv bn and relu"""
 
-    def __init__(self,
-                 in_channels: int,
-                 out_channels: int,
-                 kernel_size: Union[int, Tuple] = 1,
-                 stride: int = 1,
-                 padding: int = 0,
-                 pad_mode: str = 'same'
-                 ) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: Union[int, Tuple] = 1,
+        stride: int = 1,
+        padding: int = 0,
+        pad_mode: str = "same",
+    ) -> None:
         super().__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
                               padding=padding, pad_mode=pad_mode)
@@ -57,10 +59,11 @@ class BasicConv2d(nn.Cell):
 
 
 class InceptionA(nn.Cell):
-    def __init__(self,
-                 in_channels: int,
-                 pool_features: int
-                 ) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        pool_features: int,
+    ) -> None:
         super().__init__()
         self.branch0 = BasicConv2d(in_channels, 64, kernel_size=1)
         self.branch1 = nn.SequentialCell([
@@ -74,7 +77,7 @@ class InceptionA(nn.Cell):
 
         ])
         self.branch_pool = nn.SequentialCell([
-            nn.AvgPool2d(kernel_size=3, pad_mode='same'),
+            nn.AvgPool2d(kernel_size=3, pad_mode="same"),
             BasicConv2d(in_channels, pool_features, kernel_size=1)
         ])
 
@@ -94,7 +97,7 @@ class InceptionB(nn.Cell):
         self.branch1 = nn.SequentialCell([
             BasicConv2d(in_channels, 64, kernel_size=1),
             BasicConv2d(64, 96, kernel_size=3),
-            BasicConv2d(96, 96, kernel_size=3, stride=2, pad_mode='valid')
+            BasicConv2d(96, 96, kernel_size=3, stride=2, pad_mode="valid")
 
         ])
         self.branch_pool = nn.MaxPool2d(kernel_size=3, stride=2)
@@ -108,10 +111,11 @@ class InceptionB(nn.Cell):
 
 
 class InceptionC(nn.Cell):
-    def __init__(self,
-                 in_channels: int,
-                 channels_7x7: int
-                 ) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        channels_7x7: int,
+    ) -> None:
         super().__init__()
         self.branch0 = BasicConv2d(in_channels, 192, kernel_size=1)
         self.branch1 = nn.SequentialCell([
@@ -127,7 +131,7 @@ class InceptionC(nn.Cell):
             BasicConv2d(channels_7x7, 192, kernel_size=(1, 7))
         ])
         self.branch_pool = nn.SequentialCell([
-            nn.AvgPool2d(kernel_size=3, pad_mode='same'),
+            nn.AvgPool2d(kernel_size=3, pad_mode="same"),
             BasicConv2d(in_channels, 192, kernel_size=1)
         ])
 
@@ -145,13 +149,13 @@ class InceptionD(nn.Cell):
         super().__init__()
         self.branch0 = nn.SequentialCell([
             BasicConv2d(in_channels, 192, kernel_size=1),
-            BasicConv2d(192, 320, kernel_size=3, stride=2, pad_mode='valid')
+            BasicConv2d(192, 320, kernel_size=3, stride=2, pad_mode="valid")
         ])
         self.branch1 = nn.SequentialCell([
             BasicConv2d(in_channels, 192, kernel_size=1),
             BasicConv2d(192, 192, kernel_size=(1, 7)),  # check
             BasicConv2d(192, 192, kernel_size=(7, 1)),
-            BasicConv2d(192, 192, kernel_size=3, stride=2, pad_mode='valid')
+            BasicConv2d(192, 192, kernel_size=3, stride=2, pad_mode="valid")
         ])
         self.branch_pool = nn.MaxPool2d(kernel_size=3, stride=2)
 
@@ -177,7 +181,7 @@ class InceptionE(nn.Cell):
         self.branch2a = BasicConv2d(384, 384, kernel_size=(1, 3))
         self.branch2b = BasicConv2d(384, 384, kernel_size=(3, 1))
         self.branch_pool = nn.SequentialCell([
-            nn.AvgPool2d(kernel_size=3, pad_mode='same'),
+            nn.AvgPool2d(kernel_size=3, pad_mode="same"),
             BasicConv2d(in_channels, 192, kernel_size=1)
         ])
 
@@ -195,14 +199,15 @@ class InceptionE(nn.Cell):
 class InceptionAux(nn.Cell):
     """Inception module for the aux classifier head"""
 
-    def __init__(self,
-                 in_channels: int,
-                 num_classes: int
-                 ) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        num_classes: int,
+    ) -> None:
         super().__init__()
-        self.avg_pool = nn.AvgPool2d(5, stride=3, pad_mode='valid')
+        self.avg_pool = nn.AvgPool2d(5, stride=3, pad_mode="valid")
         self.conv0 = BasicConv2d(in_channels, 128, kernel_size=1)
-        self.conv1 = BasicConv2d(128, 768, kernel_size=5, pad_mode='valid')
+        self.conv1 = BasicConv2d(128, 768, kernel_size=5, pad_mode="valid")
         self.flatten = nn.Flatten()
         self.fc = nn.Dense(in_channels, num_classes)
 
@@ -230,19 +235,21 @@ class InceptionV3(nn.Cell):
         drop_rate: dropout rate of the layer before main classifier. Default: 0.2.
     """
 
-    def __init__(self,
-                 num_classes: int = 1000,
-                 aux_logits: bool = True,
-                 in_channels: int = 3,
-                 drop_rate: float = 0.2) -> None:
+    def __init__(
+        self,
+        num_classes: int = 1000,
+        aux_logits: bool = True,
+        in_channels: int = 3,
+        drop_rate: float = 0.2,
+    ) -> None:
         super().__init__()
         self.aux_logits = aux_logits
-        self.conv1a = BasicConv2d(in_channels, 32, kernel_size=3, stride=2, pad_mode='valid')
-        self.conv2a = BasicConv2d(32, 32, kernel_size=3, stride=1, pad_mode='valid')
+        self.conv1a = BasicConv2d(in_channels, 32, kernel_size=3, stride=2, pad_mode="valid")
+        self.conv2a = BasicConv2d(32, 32, kernel_size=3, stride=1, pad_mode="valid")
         self.conv2b = BasicConv2d(32, 64, kernel_size=3, stride=1)
         self.maxpool1 = nn.MaxPool2d(kernel_size=3, stride=2)
         self.conv3b = BasicConv2d(64, 80, kernel_size=1)
-        self.conv4a = BasicConv2d(80, 192, kernel_size=3, pad_mode='valid')
+        self.conv4a = BasicConv2d(80, 192, kernel_size=3, pad_mode="valid")
         self.maxpool2 = nn.MaxPool2d(kernel_size=3, stride=2)
         self.inception5b = InceptionA(192, pool_features=32)
         self.inception5c = InceptionA(256, pool_features=64)
@@ -320,8 +327,8 @@ class InceptionV3(nn.Cell):
 @register_model
 def inception_v3(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> InceptionV3:
     """Get InceptionV3 model.
-     Refer to the base class `models.InceptionV3` for more details."""
-    default_cfg = default_cfgs['inception_v3']
+    Refer to the base class `models.InceptionV3` for more details."""
+    default_cfg = default_cfgs["inception_v3"]
     model = InceptionV3(num_classes=num_classes, aux_logits=True, in_channels=in_channels, **kwargs)
 
     if pretrained:

@@ -3,49 +3,52 @@ MindSpore implementation of `SqueezeNet`.
 Refer to SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size.
 """
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import Tensor, nn, ops
 
 from .layers.pooling import GlobalAvgPooling
-from .utils import load_pretrained
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
-    'SqueezeNet',
-    'squeezenet1_0',
-    'squeezenet1_1'
+    "SqueezeNet",
+    "squeezenet1_0",
+    "squeezenet1_1",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'features.0', 'classifier': 'classifier.1',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "features.0",
+        "classifier": "classifier.1",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'squeezenet_1.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.0_224.ckpt'),
-    'squeezenet_1.1': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.1_224.ckpt'),
+    "squeezenet_1.0": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.0_224.ckpt"),
+    "squeezenet_1.1": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.1_224.ckpt"),
 }
 
 
 class Fire(nn.Cell):
     """define the basic block of squeezenet"""
-    def __init__(self,
-                 in_channels: int,
-                 squeeze_channels: int,
-                 expand1x1_channels: int,
-                 expand3x3_channels: int
-                 ) -> None:
+
+    def __init__(
+        self,
+        in_channels: int,
+        squeeze_channels: int,
+        expand1x1_channels: int,
+        expand3x3_channels: int,
+    ) -> None:
         super().__init__()
         self.squeeze = nn.Conv2d(in_channels, squeeze_channels, kernel_size=1, has_bias=True)
         self.squeeze_activation = nn.ReLU()
         self.expand1x1 = nn.Conv2d(squeeze_channels, expand1x1_channels, kernel_size=1, has_bias=True)
         self.expand1x1_activation = nn.ReLU()
-        self.expand3x3 = nn.Conv2d(squeeze_channels, expand3x3_channels, kernel_size=3, pad_mode='same', has_bias=True)
+        self.expand3x3 = nn.Conv2d(squeeze_channels, expand3x3_channels, kernel_size=3, pad_mode="same", has_bias=True)
         self.expand3x3_activation = nn.ReLU()
 
     def construct(self, x: Tensor) -> Tensor:
@@ -69,16 +72,17 @@ class SqueezeNet(nn.Cell):
         in_channels: number the channels of the input. Default: 3.
     """
 
-    def __init__(self,
-                 version: str = '1_0',
-                 num_classes: int = 1000,
-                 drop_rate: float = 0.5,
-                 in_channels: int = 3
-                 ) -> None:
+    def __init__(
+        self,
+        version: str = "1_0",
+        num_classes: int = 1000,
+        drop_rate: float = 0.5,
+        in_channels: int = 3,
+    ) -> None:
         super().__init__()
-        if version == '1_0':
+        if version == "1_0":
             self.features = nn.SequentialCell([
-                nn.Conv2d(in_channels, 96, kernel_size=7, stride=2, pad_mode='valid', has_bias=True),
+                nn.Conv2d(in_channels, 96, kernel_size=7, stride=2, pad_mode="valid", has_bias=True),
                 nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2),
                 Fire(96, 16, 64, 64),
@@ -92,9 +96,9 @@ class SqueezeNet(nn.Cell):
                 nn.MaxPool2d(kernel_size=3, stride=2),
                 Fire(512, 64, 256, 256),
             ])
-        elif version == '1_1':
+        elif version == "1_1":
             self.features = nn.SequentialCell([
-                nn.Conv2d(in_channels, 64, kernel_size=3, stride=2, padding=1, pad_mode='pad', has_bias=True),
+                nn.Conv2d(in_channels, 64, kernel_size=3, stride=2, padding=1, pad_mode="pad", has_bias=True),
                 nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2),
                 Fire(64, 16, 64, 64),
@@ -129,7 +133,7 @@ class SqueezeNet(nn.Cell):
                 else:
                     cell.weight.set_data(init.initializer(init.HeUniform(), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+                    cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)
@@ -148,10 +152,10 @@ class SqueezeNet(nn.Cell):
 @register_model
 def squeezenet1_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> SqueezeNet:
     """Get SqueezeNet model of version 1.0.
-     Refer to the base class `models.SqueezeNet` for more details.
-     """
-    default_cfg = default_cfgs['squeezenet_1.0']
-    model = SqueezeNet(version='1_0', num_classes=num_classes, in_channels=in_channels, **kwargs)
+    Refer to the base class `models.SqueezeNet` for more details.
+    """
+    default_cfg = default_cfgs["squeezenet_1.0"]
+    model = SqueezeNet(version="1_0", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -162,10 +166,10 @@ def squeezenet1_0(pretrained: bool = False, num_classes: int = 1000, in_channels
 @register_model
 def squeezenet1_1(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> SqueezeNet:
     """Get SqueezeNet model of version 1.1.
-     Refer to the base class `models.SqueezeNet` for more details.
-     """
-    default_cfg = default_cfgs['squeezenet_1.1']
-    model = SqueezeNet(version='1_1', num_classes=num_classes, in_channels=in_channels, **kwargs)
+    Refer to the base class `models.SqueezeNet` for more details.
+    """
+    default_cfg = default_cfgs["squeezenet_1.1"]
+    model = SqueezeNet(version="1_1", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)

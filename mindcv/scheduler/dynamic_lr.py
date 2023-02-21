@@ -82,7 +82,7 @@ def exponential_lr(gamma, *, lr, steps_per_epoch, epochs):
     lrs = []
     for i in range(steps):
         epoch_idx = math.floor(i / steps_per_epoch)
-        lrs.append(lr * gamma ** epoch_idx)
+        lrs.append(lr * gamma**epoch_idx)
     return lrs
 
 
@@ -91,7 +91,7 @@ def exponential_refined_lr(gamma, *, lr, steps_per_epoch, epochs):
     lrs = []
     for i in range(steps):
         epoch_idx = i / steps_per_epoch
-        lrs.append(lr * gamma ** epoch_idx)
+        lrs.append(lr * gamma**epoch_idx)
     return lrs
 
 
@@ -115,12 +115,12 @@ def multi_step_lr(milestones, gamma, *, lr, steps_per_epoch, epochs):
 
 
 def cosine_decay_lr(decay_epochs, eta_min, *, eta_max, steps_per_epoch, epochs, num_cycles=1, cycle_decay=1.0):
-    ''' update every epoch'''
+    """update every epoch"""
     tot_steps = steps_per_epoch * epochs
     lrs = []
-    
+
     for c in range(num_cycles):
-        lr_max = eta_max * (cycle_decay ** c)
+        lr_max = eta_max * (cycle_decay**c)
         delta = 0.5 * (lr_max - eta_min)
         for i in range(steps_per_epoch * decay_epochs):
             t_cur = math.floor(i / steps_per_epoch)
@@ -139,12 +139,12 @@ def cosine_decay_lr(decay_epochs, eta_min, *, eta_max, steps_per_epoch, epochs, 
 
 
 def cosine_decay_refined_lr(decay_epochs, eta_min, *, eta_max, steps_per_epoch, epochs, num_cycles=1, cycle_decay=1.0):
-    ''' update every step '''
+    """update every step"""
     tot_steps = steps_per_epoch * epochs
     lrs = []
 
     for c in range(num_cycles):
-        lr_max = eta_max * (cycle_decay ** c)
+        lr_max = eta_max * (cycle_decay**c)
         delta = 0.5 * (lr_max - eta_min)
         for i in range(steps_per_epoch * decay_epochs):
             t_cur = i / steps_per_epoch
@@ -172,6 +172,7 @@ def cosine_annealing_lr(t_max, eta_min, *, eta_max, steps_per_epoch, epochs):
     return lrs
 
 
+# fmt: off
 def cosine_annealing_warm_restarts_lr(te, tm, eta_min, *, eta_max, steps_per_epoch, epochs):
     delta = 0.5 * (eta_max - eta_min)
     tt = 0
@@ -190,7 +191,7 @@ def cosine_annealing_warm_restarts_lr(te, tm, eta_min, *, eta_max, steps_per_epo
     return lrs
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Demonstrate how these schedulers work by printing & visualizing the returned list.
     import matplotlib.pyplot as plt
     table = (
@@ -232,3 +233,4 @@ if __name__ == '__main__':
     plt.legend(["cosine_annealing_lr", "cosine_annealing_warm_restarts_lr"], loc="best")
     plt.title("cosine_annealing_lr vs. cosine_annealing_warm_restarts_lr")
     plt.show()
+# fmt: on
