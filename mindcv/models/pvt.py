@@ -3,6 +3,7 @@ MindSpore implementation of `PVT`.
 Refer to PVT: Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions
 """
 import math
+from functools import partial
 from typing import Optional
 
 import mindspore
@@ -10,58 +11,60 @@ import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore import Tensor
 from mindspore.common import initializer as weight_init
-from functools import partial
 
 from .layers.drop_path import DropPath
-from .layers.mlp import Mlp
 from .layers.identity import Identity
-from .utils import load_pretrained
+from .layers.mlp import Mlp
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
-    'PyramidVisionTransformer',
-    'pvt_tiny',
-    'pvt_small',
-    'pvt_medium',
-    'pvt_large',
+    "PyramidVisionTransformer",
+    "pvt_tiny",
+    "pvt_small",
+    "pvt_medium",
+    "pvt_large",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'patch_embed1.proj', 'classifier': 'head',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "patch_embed1.proj",
+        "classifier": "head",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'pvt_tiny': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_tiny_224.ckpt'),
-    'pvt_small': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_small_224.ckpt'),
-    'pvt_medium': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_medium_224.ckpt'),
-    'pvt_large': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_large_224.ckpt'),
-
+    "pvt_tiny": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_tiny_224.ckpt"),
+    "pvt_small": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_small_224.ckpt"),
+    "pvt_medium": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_medium_224.ckpt"),
+    "pvt_large": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_large_224.ckpt"),
 }
 
 
 class Attention(nn.Cell):
     """spatial-reduction attention (SRA)"""
-    def __init__(self,
-                 dim: int,
-                 num_heads: int = 8,
-                 qkv_bias: bool = False,
-                 qk_scale: Optional[float] = None,
-                 attn_drop: float = 0.,
-                 proj_drop: float = 0.,
-                 sr_ratio: int = 1):
+
+    def __init__(
+        self,
+        dim: int,
+        num_heads: int = 8,
+        qkv_bias: bool = False,
+        qk_scale: Optional[float] = None,
+        attn_drop: float = 0.0,
+        proj_drop: float = 0.0,
+        sr_ratio: int = 1,
+    ):
         super(Attention, self).__init__()
         assert dim % num_heads == 0, f"dim {dim} should be divided by num_heads {num_heads}."
 
         self.dim = dim
         self.num_heads = num_heads
         head_dim = dim // num_heads
-        self.scale = qk_scale or head_dim ** -0.5
+        self.scale = qk_scale or head_dim**-0.5
 
         self.q = nn.Dense(dim, dim, has_bias=qkv_bias)
         self.kv = nn.Dense(dim, dim * 2, has_bias=qkv_bias)
@@ -85,7 +88,6 @@ class Attention(nn.Cell):
         q = self.reshape(q, (B, N, self.num_heads, C // self.num_heads))
         q = self.transpose(q, (0, 2, 1, 3))
         if self.sr_ratio > 1:
-
             x_ = self.reshape(self.transpose(x, (0, 2, 1)), (B, C, H, W))
 
             x_ = self.transpose(self.reshape(self.sr(x_), (B, C, -1)), (0, 2, 1))
@@ -118,7 +120,7 @@ class Block(nn.Cell):
             num_heads=num_heads, qkv_bias=qkv_bias, qk_scale=qk_scale,
             attn_drop=attn_drop, proj_drop=drop, sr_ratio=sr_ratio)
         # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
-        self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
+        self.drop_path = DropPath(drop_path) if drop_path > 0.0 else Identity()
         self.norm2 = norm_layer([dim])
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
@@ -133,7 +135,7 @@ class Block(nn.Cell):
 
 
 class PatchEmbed(nn.Cell):
-    """ Image to Patch Embedding"""
+    """Image to Patch Embedding"""
 
     def __init__(self, img_size=224, patch_size=16, in_chans=3, embed_dim=768):
         super().__init__()
@@ -166,29 +168,30 @@ class PatchEmbed(nn.Cell):
 
 class PyramidVisionTransformer(nn.Cell):
     r"""Pyramid Vision Transformer model class, based on
-        `"Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions" <https://arxiv.org/abs/2102.12122>`_
+    `"Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions" <https://arxiv.org/abs/2102.12122>`_
 
-        Args:
-            img_size(int) : size of a input image.
-            patch_size (int) : size of a single image patch.
-            in_chans (int) : number the channels of the input. Default: 3.
-            num_classes (int) : number of classification classes. Default: 1000.
-            embed_dims (list) : how many hidden dim in each PatchEmbed.
-            num_heads (list) : number of attention head in each stage.
-            mlp_ratios (list): ratios of MLP hidden dims in each stage.
-            qkv_bias(bool) : use bias in attention.
-            qk_scale(float) : Scale multiplied by qk in attention(if not none), otherwise head_dim ** -0.5.
-            drop_rate(float) : The drop rate for each block. Default: 0.0.
-            attn_drop_rate(float) : The drop rate for attention. Default: 0.0.
-            drop_path_rate(float) : The drop rate for drop path. Default: 0.0.
-            norm_layer(nn.Cell) : Norm layer that will be used in blocks. Default: nn.LayerNorm.
-            depths (list) : number of Blocks.
-            sr_ratios(list) : stride and kernel size of each attention.
-            num_stages(int) : number of stage. Default: 4.
-        """
+    Args:
+        img_size(int) : size of a input image.
+        patch_size (int) : size of a single image patch.
+        in_chans (int) : number the channels of the input. Default: 3.
+        num_classes (int) : number of classification classes. Default: 1000.
+        embed_dims (list) : how many hidden dim in each PatchEmbed.
+        num_heads (list) : number of attention head in each stage.
+        mlp_ratios (list): ratios of MLP hidden dims in each stage.
+        qkv_bias(bool) : use bias in attention.
+        qk_scale(float) : Scale multiplied by qk in attention(if not none), otherwise head_dim ** -0.5.
+        drop_rate(float) : The drop rate for each block. Default: 0.0.
+        attn_drop_rate(float) : The drop rate for attention. Default: 0.0.
+        drop_path_rate(float) : The drop rate for drop path. Default: 0.0.
+        norm_layer(nn.Cell) : Norm layer that will be used in blocks. Default: nn.LayerNorm.
+        depths (list) : number of Blocks.
+        sr_ratios(list) : stride and kernel size of each attention.
+        num_stages(int) : number of stage. Default: 4.
+    """
+
     def __init__(self, img_size=224, patch_size=4, in_chans=3, num_classes=1000, embed_dims=[64, 128, 320, 512],
-                 num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True, qk_scale=None, drop_rate=0.,
-                 attn_drop_rate=0., drop_path_rate=0., norm_layer=nn.LayerNorm,
+                 num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True, qk_scale=None, drop_rate=0.0,
+                 attn_drop_rate=0.0, drop_path_rate=0.0, norm_layer=nn.LayerNorm,
                  depths=[2, 2, 2, 2], sr_ratios=[8, 4, 2, 1], num_stages=4):
         super(PyramidVisionTransformer, self).__init__()
         self.num_classes = num_classes
@@ -259,38 +262,27 @@ class PyramidVisionTransformer(nn.Cell):
         self._initialize_weights()
 
     def _initialize_weights(self):
-
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Dense):
                 cell.weight.set_data(weight_init.initializer(weight_init.TruncatedNormal(sigma=0.02),
-                                                             cell.weight.shape,
-                                                             cell.weight.dtype))
+                                                             cell.weight.shape, cell.weight.dtype))
                 if isinstance(cell, nn.Dense) and cell.bias is not None:
-                    cell.bias.set_data(weight_init.initializer(weight_init.Zero(),
-                                                               cell.bias.shape,
-                                                               cell.bias.dtype))
+                    cell.bias.set_data(weight_init.initializer(weight_init.Zero(), cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, nn.LayerNorm):
-                cell.gamma.set_data(weight_init.initializer(weight_init.One(),
-                                                            cell.gamma.shape,
-                                                            cell.gamma.dtype))
-                cell.beta.set_data(weight_init.initializer(weight_init.Zero(),
-                                                           cell.beta.shape,
-                                                           cell.beta.dtype))
+                cell.gamma.set_data(weight_init.initializer(weight_init.One(), cell.gamma.shape, cell.gamma.dtype))
+                cell.beta.set_data(weight_init.initializer(weight_init.Zero(), cell.beta.shape, cell.beta.dtype))
             elif isinstance(cell, nn.Conv2d):
                 fan_out = cell.kernel_size[0] * cell.kernel_size[1] * cell.out_channels
                 fan_out //= cell.group
                 cell.weight.set_data(weight_init.initializer(weight_init.Normal(sigma=math.sqrt(2.0 / fan_out)),
-                                                             cell.weight.shape,
-                                                             cell.weight.dtype))
+                                                             cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(weight_init.initializer(weight_init.Zero(),
-                                                               cell.bias.shape,
-                                                               cell.bias.dtype))
+                    cell.bias.set_data(weight_init.initializer(weight_init.Zero(), cell.bias.shape, cell.bias.dtype))
 
     def get_classifier(self):
         return self.head
 
-    def reset_classifier(self, num_classes, global_pool=''):
+    def reset_classifier(self, num_classes, global_pool=""):
         self.num_classes = num_classes
         self.head = nn.Dense(self.embed_dim, num_classes) if num_classes > 0 else Identity()
 
@@ -348,7 +340,7 @@ class PyramidVisionTransformer(nn.Cell):
 
         return x[:, 0]
 
-    def forward_head(self , x: Tensor)->Tensor:
+    def forward_head(self, x: Tensor) -> Tensor:
         return self.head(x)
 
     def construct(self, x):
@@ -359,7 +351,9 @@ class PyramidVisionTransformer(nn.Cell):
 
 
 @register_model
-def pvt_tiny(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PyramidVisionTransformer:
+def pvt_tiny(
+    pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
+) -> PyramidVisionTransformer:
     """Get PVT tiny model
     Refer to the base class "models.PVT" for more details.
     """
@@ -377,7 +371,9 @@ def pvt_tiny(pretrained: bool = False, num_classes: int = 1000, in_channels: int
 
 
 @register_model
-def pvt_small(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PyramidVisionTransformer:
+def pvt_small(
+    pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
+) -> PyramidVisionTransformer:
     """Get PVT small model
     Refer to the base class "models.PVT" for more details.
     """
@@ -395,7 +391,9 @@ def pvt_small(pretrained: bool = False, num_classes: int = 1000, in_channels: in
 
 
 @register_model
-def pvt_medium(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PyramidVisionTransformer:
+def pvt_medium(
+    pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
+) -> PyramidVisionTransformer:
     """Get PVT medium model
     Refer to the base class "models.PVT" for more details.
     """
@@ -413,7 +411,9 @@ def pvt_medium(pretrained: bool = False, num_classes: int = 1000, in_channels: i
 
 
 @register_model
-def pvt_large(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PyramidVisionTransformer:
+def pvt_large(
+    pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
+) -> PyramidVisionTransformer:
     """Get PVT large model
     Refer to the base class "models.PVT" for more details.
     """
@@ -428,8 +428,3 @@ def pvt_large(pretrained: bool = False, num_classes: int = 1000, in_channels: in
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
     return model
-
-
-
-
-

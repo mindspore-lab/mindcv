@@ -4,12 +4,18 @@ import pathlib
 FILE_TYPE_ALIASES = {
     ".tbz": (".tar", ".bz2"),
     ".tbz2": (".tar", ".bz2"),
-    ".tgz": (".tar", ".gz")
+    ".tgz": (".tar", ".gz"),
 }
 
-ARCHIVE_TYPE_SUFFIX = [".tar", ".zip"]
+ARCHIVE_TYPE_SUFFIX = [
+    ".tar",
+    ".zip",
+]
 
-COMPRESS_TYPE_SUFFIX = [".bz2", ".gz"]
+COMPRESS_TYPE_SUFFIX = [
+    ".bz2",
+    ".gz",
+]
 
 
 def detect_file_type(filename: str):  # pylint: disable=inconsistent-return-statements

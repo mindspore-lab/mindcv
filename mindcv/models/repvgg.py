@@ -4,33 +4,34 @@ Refer to RepVGG: Making VGG_style ConvNets Great Again
 """
 
 import copy
+
 import numpy as np
 
-from mindspore import nn, ops, Tensor, save_checkpoint
 import mindspore.common.initializer as init
+from mindspore import Tensor, nn, ops, save_checkpoint
 
-from .layers import Identity, SqueezeExcite, GlobalAvgPooling
-from .utils import load_pretrained
+from .layers import GlobalAvgPooling, Identity, SqueezeExcite
 from .registry import register_model
-
+from .utils import load_pretrained
 
 __all__ = [
-    'RepVGG',
-    'repvgg'
+    "RepVGG",
+    "repvgg",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'stage0.rbr_dense.0', 'classifier': 'linear',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "stage0.rbr_dense.0",
+        "classifier": "linear",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'RepVGG-A0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/repvgg/RepVGG_A0_224.ckpt'),
+    "RepVGG-A0": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repvgg/RepVGG_A0_224.ckpt"),
 }
 
 
@@ -49,7 +50,7 @@ class RepVGGBlock(nn.Cell):
     """Basic Block of RepVGG"""
     def __init__(self, in_channels: int, out_channels: int, kernel_size: int,
                  stride: int = 1, padding: int = 0, dilation: int = 1,
-                 group: int = 1, padding_mode: str = 'zeros',
+                 group: int = 1, padding_mode: str = "zeros",
                  deploy: bool = False, use_se: bool = False) -> None:
         super().__init__()
         self.deploy = deploy
@@ -107,11 +108,9 @@ class RepVGGBlock(nn.Cell):
               ((self.rbr_1x1.bn.moving_variance + self.rbr_1x1.bn.eps).sqrt()))
         t1 = ops.reshape(t1, (-1, 1, 1, 1))
 
-        l2_loss_circle = ops.reduce_sum(
-            k3 ** 2) - ops.reduce_sum(k3[:, :, 1:2, 1:2] ** 2)
+        l2_loss_circle = ops.reduce_sum(k3**2) - ops.reduce_sum(k3[:, :, 1:2, 1:2] ** 2)
         eq_kernel = k3[:, :, 1:2, 1:2] * t3 + k1 * t1
-        l2_loss_eq_kernel = ops.reduce_sum(
-            eq_kernel ** 2 / (t3 ** 2 + t1 ** 2))
+        l2_loss_eq_kernel = ops.reduce_sum(eq_kernel**2 / (t3**2 + t1**2))
         return l2_loss_eq_kernel + l2_loss_circle
 
     #   This func derives the equivalent kernel and bias in a DIFFERENTIABLE way.
@@ -141,14 +140,12 @@ class RepVGGBlock(nn.Cell):
             eps = branch.bn.eps
         else:
             assert isinstance(branch, (nn.BatchNorm2d, nn.SyncBatchNorm))
-            if not hasattr(self, 'id_tensor'):
+            if not hasattr(self, "id_tensor"):
                 input_dim = self.in_channels // self.group
-                kernel_value = np.zeros(
-                    (self.in_channels, input_dim, 3, 3), dtype=np.float32)
+                kernel_value = np.zeros((self.in_channels, input_dim, 3, 3), dtype=np.float32)
                 for i in range(self.in_channels):
                     kernel_value[i, i % input_dim, 1, 1] = 1
-                self.id_tensor = Tensor(
-                    kernel_value, dtype=branch.weight.dtype)
+                self.id_tensor = Tensor(kernel_value, dtype=branch.weight.dtype)
             kernel = self.id_tensor
             moving_mean = branch.moving_mean
             moving_variance = branch.moving_variance
@@ -173,12 +170,12 @@ class RepVGGBlock(nn.Cell):
         self.rbr_reparam.bias.data = bias
         for para in self.parameters():
             para.detach_()
-        self.__delattr__('rbr_dense')
-        self.__delattr__('rbr_1x1')
-        if hasattr(self, 'rbr_identity'):
-            self.__delattr__('rbr_identity')
-        if hasattr(self, 'id_tensor'):
-            self.__delattr__('id_tensor')
+        self.__delattr__("rbr_dense")
+        self.__delattr__("rbr_1x1")
+        if hasattr(self, "rbr_identity"):
+            self.__delattr__("rbr_identity")
+        if hasattr(self, "id_tensor"):
+            self.__delattr__("id_tensor")
         self.deploy = True
 
 
@@ -243,12 +240,9 @@ class RepVGG(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, (nn.Dense, nn.Conv2d)):
                 cell.weight.set_data(init.initializer(init.TruncatedNormal(sigma=0.02),
-                                                      cell.weight.shape,
-                                                      cell.weight.dtype))
+                                                      cell.weight.shape, cell.weight.dtype))
                 if isinstance(cell, nn.Dense) and cell.bias is not None:
-                    cell.bias.set_data(init.initializer(init.Zero(),
-                                                        cell.bias.shape,
-                                                        cell.bias.dtype))
+                    cell.bias.set_data(init.initializer(init.Zero(), cell.bias.shape, cell.bias.dtype))
 
     def construct(self, x):
         x = self.stage0(x)
@@ -264,14 +258,13 @@ class RepVGG(nn.Cell):
 @register_model
 def repvgg(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> RepVGG:
     """Get RepVGG model with num_blocks=[2, 4, 14, 1], width_multiplier=[0.75, 0.75, 0.75, 2.5].
-     Refer to the base class `models.RepVGG` for more details.
-     """
-    default_cfg = default_cfgs['RepVGG-A0']
+    Refer to the base class `models.RepVGG` for more details.
+    """
+    default_cfg = default_cfgs["RepVGG-A0"]
     model = RepVGG(num_blocks=[2, 4, 14, 1], num_classes=num_classes, in_channels=in_channels,
                    width_multiplier=[0.75, 0.75, 0.75, 2.5], override_group_map=None, deploy=False, **kwargs)
     if pretrained:
-        load_pretrained(model, default_cfg,
-                        num_classes=num_classes, in_channels=in_channels)
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
     return model
 
@@ -281,7 +274,7 @@ def repvgg_model_convert(model: nn.Cell, save_path=None, do_copy=True):
     if do_copy:
         model = copy.deepcopy(model)
     for module in model.modules():
-        if hasattr(module, 'switch_to_deploy'):
+        if hasattr(module, "switch_to_deploy"):
             module.switch_to_deploy()
     if save_path is not None:
         save_checkpoint(model.parameters_and_names(), save_path)

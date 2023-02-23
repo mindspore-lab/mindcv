@@ -1,17 +1,18 @@
 import sys
-sys.path.append('.')
 
+sys.path.append(".")
+
+import numpy as np
 import pytest
 
-from mindspore.communication import init, get_rank, get_group_size
-from mindspore import Tensor
 import mindspore as ms
 import mindspore.nn as nn
-from mindspore.nn import TrainOneStepCell, WithLossCell
+from mindspore import Tensor
 from mindspore.common.initializer import Normal
+from mindspore.communication import get_group_size, get_rank, init
+from mindspore.nn import TrainOneStepCell, WithLossCell
 
 from mindcv.optim import create_optimizer
-import numpy as np
 
 
 class SimpleCNN(nn.Cell):
@@ -19,8 +20,8 @@ class SimpleCNN(nn.Cell):
         super(SimpleCNN, self).__init__()
         self.include_top = include_top
 
-        self.conv1 = nn.Conv2d(in_channels, 6, 5, pad_mode='valid')
-        self.conv2 = nn.Conv2d(6, 16, 5, pad_mode='valid')
+        self.conv1 = nn.Conv2d(in_channels, 6, 5, pad_mode="valid")
+        self.conv2 = nn.Conv2d(6, 16, 5, pad_mode="valid")
         self.relu = nn.ReLU()
         self.max_pool2d = nn.MaxPool2d(kernel_size=2, stride=2)
 
@@ -41,17 +42,22 @@ class SimpleCNN(nn.Cell):
         return x
 
 
-@pytest.mark.parametrize('opt', ['sgd', 'momentum'])
-@pytest.mark.parametrize('nesterov', [True, False])
-@pytest.mark.parametrize('filter_bias_and_bn', [True, False])
+@pytest.mark.parametrize("opt", ["sgd", "momentum"])
+@pytest.mark.parametrize("nesterov", [True, False])
+@pytest.mark.parametrize("filter_bias_and_bn", [True, False])
 def test_sgd_optimizer(opt, nesterov, filter_bias_and_bn):
-    
     network = SimpleCNN(in_channels=1, num_classes=10)
-    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
 
-    net_opt = create_optimizer(network.trainable_params(), opt, lr=0.01,
-                               weight_decay=1e-5, momentum=0.9, nesterov=nesterov,
-                               filter_bias_and_bn=filter_bias_and_bn)
+    net_opt = create_optimizer(
+        network.trainable_params(),
+        opt,
+        lr=0.01,
+        weight_decay=1e-5,
+        momentum=0.9,
+        nesterov=nesterov,
+        filter_bias_and_bn=filter_bias_and_bn,
+    )
 
     bs = 8
     input_data = Tensor(np.ones([bs, 1, 32, 32]).astype(np.float32) * 0.01)
@@ -67,16 +73,15 @@ def test_sgd_optimizer(opt, nesterov, filter_bias_and_bn):
         cur_loss = train_network(input_data, label)
     print(f"{opt}, begin loss: {begin_loss}, end loss:  {cur_loss}")
 
-    # check output correctness 
-    assert cur_loss < begin_loss, 'Loss does NOT decrease' 
+    # check output correctness
+    assert cur_loss < begin_loss, "Loss does NOT decrease"
 
 
-@pytest.mark.parametrize('bs', [1, 2, 4, 8, 16])
-@pytest.mark.parametrize('opt', ['adam', 'adamW', 'rmsprop', 'adagrad'])
+@pytest.mark.parametrize("bs", [1, 2, 4, 8, 16])
+@pytest.mark.parametrize("opt", ["adam", "adamW", "rmsprop", "adagrad"])
 def test_bs_adam_optimizer(opt, bs):
-     
     network = SimpleCNN(num_classes=10)
-    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
 
     net_opt = create_optimizer(network.trainable_params(), opt, lr=0.01, weight_decay=1e-5)
 
@@ -95,19 +100,20 @@ def test_bs_adam_optimizer(opt, bs):
 
     print(f"{opt}, begin loss: {begin_loss}, end loss:  {cur_loss}")
 
-    # check output correctness 
-    assert cur_loss < begin_loss, 'Loss does NOT decrease'
+    # check output correctness
+    assert cur_loss < begin_loss, "Loss does NOT decrease"
 
 
-@pytest.mark.parametrize('loss_scale', [0.1, 0.2, 0.3, 0.5, 0.9, 1.0])
-@pytest.mark.parametrize('weight_decay', [0.00001, 0.0001, 0.001, 0.005, 0.01, 0.05])
-@pytest.mark.parametrize('lr', [0.0001, 0.001, 0.005, 0.05, 0.1, 0.2])
+@pytest.mark.parametrize("loss_scale", [0.1, 0.2, 0.3, 0.5, 0.9, 1.0])
+@pytest.mark.parametrize("weight_decay", [0.00001, 0.0001, 0.001, 0.005, 0.01, 0.05])
+@pytest.mark.parametrize("lr", [0.0001, 0.001, 0.005, 0.05, 0.1, 0.2])
 def test_lr_weight_decay_loss_scale_optimizer(lr, weight_decay, loss_scale):
     network = SimpleCNN(num_classes=10)
-    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
 
-    net_opt = create_optimizer(network.trainable_params(), 'adamW', lr=lr, weight_decay=weight_decay,
-                               loss_scale=loss_scale)
+    net_opt = create_optimizer(
+        network.trainable_params(), "adamW", lr=lr, weight_decay=weight_decay, loss_scale=loss_scale
+    )
 
     bs = 8
     input_data = Tensor(np.ones([bs, 1, 32, 32]).astype(np.float32) * 0.01)
@@ -125,16 +131,17 @@ def test_lr_weight_decay_loss_scale_optimizer(lr, weight_decay, loss_scale):
     print(f"{lr}, {weight_decay}, {loss_scale}, begin loss: {begin_loss}, end loss:  {cur_loss}")
 
     # check output correctness
-    assert cur_loss < begin_loss, 'Loss does NOT decrease'
+    assert cur_loss < begin_loss, "Loss does NOT decrease"
 
 
-@pytest.mark.parametrize('momentum', [0.1, 0.2, 0.5, 0.9, 0.99])
+@pytest.mark.parametrize("momentum", [0.1, 0.2, 0.5, 0.9, 0.99])
 def test_momentum_optimizer(momentum):
     network = SimpleCNN(in_channels=1, num_classes=10)
-    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
 
-    net_opt = create_optimizer(network.trainable_params(), 'momentum', lr=0.01, weight_decay=1e-5, momentum=momentum,
-                               nesterov=False)
+    net_opt = create_optimizer(
+        network.trainable_params(), "momentum", lr=0.01, weight_decay=1e-5, momentum=momentum, nesterov=False
+    )
 
     bs = 8
     input_data = Tensor(np.ones([bs, 1, 32, 32]).astype(np.float32) * 0.01)
@@ -151,19 +158,22 @@ def test_momentum_optimizer(momentum):
     print(f"{momentum}, begin loss: {begin_loss}, end loss:  {cur_loss}")
 
     # check output correctness
-    assert cur_loss < begin_loss, 'Loss does NOT decrease'
+    assert cur_loss < begin_loss, "Loss does NOT decrease"
 
 
 def test_param_lr_001_filter_bias_and_bn_optimizer():
     network = SimpleCNN(in_channels=1, num_classes=10)
-    conv_params = list(filter(lambda x: 'conv' in x.name, network.trainable_params()))
-    no_conv_params = list(filter(lambda x: 'conv' not in x.name, network.trainable_params()))
-    group_params = [{'params': conv_params, 'weight_decay': 0.01, 'grad_centralization': True},
-                    {'params': no_conv_params, 'lr': 0.01},
-                    {'order_params': network.trainable_params()}]
-    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-    net_opt = create_optimizer(group_params, 'adamW', lr=0.01, weight_decay=1e-5, momentum=0.9,
-                               nesterov=False, filter_bias_and_bn=False)
+    conv_params = list(filter(lambda x: "conv" in x.name, network.trainable_params()))
+    no_conv_params = list(filter(lambda x: "conv" not in x.name, network.trainable_params()))
+    group_params = [
+        {"params": conv_params, "weight_decay": 0.01, "grad_centralization": True},
+        {"params": no_conv_params, "lr": 0.01},
+        {"order_params": network.trainable_params()},
+    ]
+    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+    net_opt = create_optimizer(
+        group_params, "adamW", lr=0.01, weight_decay=1e-5, momentum=0.9, nesterov=False, filter_bias_and_bn=False
+    )
 
     bs = 8
     input_data = Tensor(np.ones([bs, 1, 32, 32]).astype(np.float32) * 0.01)
@@ -180,19 +190,22 @@ def test_param_lr_001_filter_bias_and_bn_optimizer():
     print(f" begin loss: {begin_loss}, end loss:  {cur_loss}")
 
     # check output correctness
-    assert cur_loss < begin_loss, 'Loss does NOT decrease'
+    assert cur_loss < begin_loss, "Loss does NOT decrease"
 
 
 def test_param_lr_0001_filter_bias_and_bn_optimizer():
     network = SimpleCNN(in_channels=1, num_classes=10)
-    conv_params = list(filter(lambda x: 'conv' in x.name, network.trainable_params()))
-    no_conv_params = list(filter(lambda x: 'conv' not in x.name, network.trainable_params()))
-    group_params = [{'params': conv_params, 'weight_decay': 0.01, 'grad_centralization': True},
-                    {'params': no_conv_params, 'lr': 0.001},
-                    {'order_params': network.trainable_params()}]
-    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-    net_opt = create_optimizer(group_params, 'adamW', lr=0.01, weight_decay=1e-5, momentum=0.9,
-                               nesterov=False, filter_bias_and_bn=False)
+    conv_params = list(filter(lambda x: "conv" in x.name, network.trainable_params()))
+    no_conv_params = list(filter(lambda x: "conv" not in x.name, network.trainable_params()))
+    group_params = [
+        {"params": conv_params, "weight_decay": 0.01, "grad_centralization": True},
+        {"params": no_conv_params, "lr": 0.001},
+        {"order_params": network.trainable_params()},
+    ]
+    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+    net_opt = create_optimizer(
+        group_params, "adamW", lr=0.01, weight_decay=1e-5, momentum=0.9, nesterov=False, filter_bias_and_bn=False
+    )
 
     bs = 8
     input_data = Tensor(np.ones([bs, 1, 32, 32]).astype(np.float32) * 0.01)
@@ -209,17 +222,24 @@ def test_param_lr_0001_filter_bias_and_bn_optimizer():
     print(f" begin loss: {begin_loss}, end loss:  {cur_loss}")
 
     # check output correctness
-    assert cur_loss < begin_loss, 'Loss does NOT decrease'
+    assert cur_loss < begin_loss, "Loss does NOT decrease"
 
 
-@pytest.mark.parametrize('momentum', [-0.1, -1.0, -2])
+@pytest.mark.parametrize("momentum", [-0.1, -1.0, -2])
 def test_wrong_momentum_optimizer(momentum):
     with pytest.raises((RuntimeError, TypeError, ValueError)):
         network = SimpleCNN(in_channels=1, num_classes=10)
-        net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-        net_opt = create_optimizer(network.trainable_params(), 'momentum', lr=0.01,
-                                   weight_decay=0.0001, momentum=momentum, loss_scale=1.0,
-                                   nesterov=False, filter_bias_and_bn=True)
+        net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+        net_opt = create_optimizer(
+            network.trainable_params(),
+            "momentum",
+            lr=0.01,
+            weight_decay=0.0001,
+            momentum=momentum,
+            loss_scale=1.0,
+            nesterov=False,
+            filter_bias_and_bn=True,
+        )
 
         bs = 8
         input_data = Tensor(np.ones([bs, 1, 32, 32]).astype(np.float32) * 0.01)
@@ -236,17 +256,24 @@ def test_wrong_momentum_optimizer(momentum):
         print(f"{momentum}, begin loss: {begin_loss}, end loss:  {cur_loss}")
 
         # check output correctness
-        assert cur_loss < begin_loss, 'Loss does NOT decrease'
+        assert cur_loss < begin_loss, "Loss does NOT decrease"
 
 
-@pytest.mark.parametrize('loss_scale', [-0.1, -1.0])
+@pytest.mark.parametrize("loss_scale", [-0.1, -1.0])
 def test_wrong_loss_scale_optimizer(loss_scale):
     with pytest.raises((RuntimeError, TypeError, ValueError)):
         network = SimpleCNN(in_channels=1, num_classes=10)
-        net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-        net_opt = create_optimizer(network.trainable_params(), 'momentum', lr=0.01,
-                                   weight_decay=0.0001, momentum=0.9, loss_scale=loss_scale,
-                                   nesterov=False, filter_bias_and_bn=True)
+        net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+        net_opt = create_optimizer(
+            network.trainable_params(),
+            "momentum",
+            lr=0.01,
+            weight_decay=0.0001,
+            momentum=0.9,
+            loss_scale=loss_scale,
+            nesterov=False,
+            filter_bias_and_bn=True,
+        )
 
         bs = 8
         input_data = Tensor(np.ones([bs, 1, 32, 32]).astype(np.float32) * 0.01)
@@ -267,14 +294,21 @@ def test_wrong_loss_scale_optimizer(loss_scale):
             raise ValueError
 
 
-@pytest.mark.parametrize('weight_decay', [-0.1, -1.0])
+@pytest.mark.parametrize("weight_decay", [-0.1, -1.0])
 def test_wrong_weight_decay_optimizer(weight_decay):
     with pytest.raises((RuntimeError, TypeError, ValueError)):
         network = SimpleCNN(in_channels=1, num_classes=10)
-        net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-        net_opt = create_optimizer(network.trainable_params(), 'adamW', lr=0.01,
-                                   weight_decay=weight_decay, momentum=0.9, loss_scale=1.0,
-                                   nesterov=False, filter_bias_and_bn=True)
+        net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+        net_opt = create_optimizer(
+            network.trainable_params(),
+            "adamW",
+            lr=0.01,
+            weight_decay=weight_decay,
+            momentum=0.9,
+            loss_scale=1.0,
+            nesterov=False,
+            filter_bias_and_bn=True,
+        )
 
         bs = 8
         input_data = Tensor(np.ones([bs, 1, 32, 32]).astype(np.float32) * 0.01)
@@ -291,17 +325,24 @@ def test_wrong_weight_decay_optimizer(weight_decay):
         print(f"{weight_decay}, begin loss: {begin_loss}, end loss:  {cur_loss}")
 
         # check output correctness
-        assert cur_loss < begin_loss, 'Loss does NOT decrease'
+        assert cur_loss < begin_loss, "Loss does NOT decrease"
 
 
-@pytest.mark.parametrize('lr', [-1.0, -0.1])
+@pytest.mark.parametrize("lr", [-1.0, -0.1])
 def test_wrong_lr_optimizer(lr):
     with pytest.raises((RuntimeError, TypeError, ValueError)):
         network = SimpleCNN(in_channels=1, num_classes=10)
-        net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-        net_opt = create_optimizer(network.trainable_params(), 'adamW', lr=lr,
-                                   weight_decay=1e-5, momentum=0.9, loss_scale=1.0,
-                                   nesterov=False, filter_bias_and_bn=True)
+        net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+        net_opt = create_optimizer(
+            network.trainable_params(),
+            "adamW",
+            lr=lr,
+            weight_decay=1e-5,
+            momentum=0.9,
+            loss_scale=1.0,
+            nesterov=False,
+            filter_bias_and_bn=True,
+        )
 
         bs = 8
         input_data = Tensor(np.ones([bs, 1, 32, 32]).astype(np.float32) * 0.01)
@@ -318,19 +359,22 @@ def test_wrong_lr_optimizer(lr):
         print(f"{lr}, begin loss: {begin_loss}, end loss:  {cur_loss}")
 
         # check output correctness
-        assert cur_loss < begin_loss, 'Loss does NOT decrease'
+        assert cur_loss < begin_loss, "Loss does NOT decrease"
 
 
 def test_param_lr_01_filter_bias_and_bn_optimizer():
     network = SimpleCNN(in_channels=1, num_classes=10)
-    conv_params = list(filter(lambda x: 'conv' in x.name, network.trainable_params()))
-    no_conv_params = list(filter(lambda x: 'conv' not in x.name, network.trainable_params()))
-    group_params = [{'params': conv_params, 'weight_decay': 0.01, 'grad_centralization': True},
-                    {'params': no_conv_params, 'lr': 0.1},
-                    {'order_params': network.trainable_params()}]
-    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-    net_opt = create_optimizer(group_params, 'momentum', lr=0.01, weight_decay=1e-5, momentum=0.9,
-                               nesterov=False, filter_bias_and_bn=False)
+    conv_params = list(filter(lambda x: "conv" in x.name, network.trainable_params()))
+    no_conv_params = list(filter(lambda x: "conv" not in x.name, network.trainable_params()))
+    group_params = [
+        {"params": conv_params, "weight_decay": 0.01, "grad_centralization": True},
+        {"params": no_conv_params, "lr": 0.1},
+        {"order_params": network.trainable_params()},
+    ]
+    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+    net_opt = create_optimizer(
+        group_params, "momentum", lr=0.01, weight_decay=1e-5, momentum=0.9, nesterov=False, filter_bias_and_bn=False
+    )
 
     bs = 8
     input_data = Tensor(np.ones([bs, 1, 32, 32]).astype(np.float32) * 0.01)
@@ -347,17 +391,24 @@ def test_param_lr_01_filter_bias_and_bn_optimizer():
     print(f" begin loss: {begin_loss}, end loss:  {cur_loss}")
 
     # check output correctness
-    assert cur_loss < begin_loss, 'Loss does NOT decrease'
+    assert cur_loss < begin_loss, "Loss does NOT decrease"
 
 
-@pytest.mark.parametrize('opt', ['test', 'bdam', 'mindspore'])
+@pytest.mark.parametrize("opt", ["test", "bdam", "mindspore"])
 def test_wrong_opt_optimizer(opt):
     with pytest.raises((RuntimeError, TypeError, ValueError)):
         network = SimpleCNN(in_channels=1, num_classes=10)
-        net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-        net_opt = create_optimizer(network.trainable_params(), opt, lr=0.01,
-                                   weight_decay=1e-5, momentum=0.9, loss_scale=1.0,
-                                   nesterov=False, filter_bias_and_bn=True)
+        net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+        net_opt = create_optimizer(
+            network.trainable_params(),
+            opt,
+            lr=0.01,
+            weight_decay=1e-5,
+            momentum=0.9,
+            loss_scale=1.0,
+            nesterov=False,
+            filter_bias_and_bn=True,
+        )
 
         bs = 8
         input_data = Tensor(np.ones([bs, 1, 32, 32]).astype(np.float32) * 0.01)
@@ -374,22 +425,31 @@ def test_wrong_opt_optimizer(opt):
         print(f"{opt}, begin loss: {begin_loss}, end loss:  {cur_loss}")
 
         # check output correctness
-        assert cur_loss < begin_loss, 'Loss does NOT decrease'
+        assert cur_loss < begin_loss, "Loss does NOT decrease"
 
 
 def test_wrong_params_more_optimizer():
     with pytest.raises((RuntimeError, TypeError, ValueError)):
         network = SimpleCNN(in_channels=1, num_classes=10)
-        conv_params = list(filter(lambda x: 'conv' in x.name, network.trainable_params()))
-        conv_params.append('test')
-        no_conv_params = list(filter(lambda x: 'conv' not in x.name, network.trainable_params()))
-        group_params = [{'params': conv_params, 'weight_decay': 0.01, 'grad_centralization': True},
-                        {'params': no_conv_params, 'lr': 0.0},
-                        {'order_params': network.trainable_params()}]
-        net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-        net_opt = create_optimizer(group_params, 'momentum', lr=0.01,
-                                   weight_decay=1e-5, momentum=0.9, loss_scale=1.0,
-                                   nesterov=False, filter_bias_and_bn=False)
+        conv_params = list(filter(lambda x: "conv" in x.name, network.trainable_params()))
+        conv_params.append("test")
+        no_conv_params = list(filter(lambda x: "conv" not in x.name, network.trainable_params()))
+        group_params = [
+            {"params": conv_params, "weight_decay": 0.01, "grad_centralization": True},
+            {"params": no_conv_params, "lr": 0.0},
+            {"order_params": network.trainable_params()},
+        ]
+        net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+        net_opt = create_optimizer(
+            group_params,
+            "momentum",
+            lr=0.01,
+            weight_decay=1e-5,
+            momentum=0.9,
+            loss_scale=1.0,
+            nesterov=False,
+            filter_bias_and_bn=False,
+        )
 
         bs = 8
         input_data = Tensor(np.ones([bs, 1, 32, 32]).astype(np.float32) * 0.01)
@@ -406,21 +466,30 @@ def test_wrong_params_more_optimizer():
         print(f" begin loss: {begin_loss}, end loss:  {cur_loss}")
 
         # check output correctness
-        assert cur_loss < begin_loss, 'Loss does NOT decrease'
+        assert cur_loss < begin_loss, "Loss does NOT decrease"
 
 
 def test_wrong_params_input_optimizer():
     with pytest.raises((RuntimeError, TypeError, ValueError)):
         network = SimpleCNN(in_channels=1, num_classes=10)
         conv_params = [1, 2, 3, 4]
-        no_conv_params = list(filter(lambda x: 'conv' not in x.name, network.trainable_params()))
-        group_params = [{'params': conv_params, 'weight_decay': 0.01, 'grad_centralization': True},
-                        {'params': no_conv_params, 'lr': 0.0},
-                        {'order_params': network.trainable_params()}]
-        net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-        net_opt = create_optimizer(group_params, 'momentum', lr=0.01,
-                                   weight_decay=1e-5, momentum=0.9, loss_scale=1.0,
-                                   nesterov=False, filter_bias_and_bn=False)
+        no_conv_params = list(filter(lambda x: "conv" not in x.name, network.trainable_params()))
+        group_params = [
+            {"params": conv_params, "weight_decay": 0.01, "grad_centralization": True},
+            {"params": no_conv_params, "lr": 0.0},
+            {"order_params": network.trainable_params()},
+        ]
+        net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+        net_opt = create_optimizer(
+            group_params,
+            "momentum",
+            lr=0.01,
+            weight_decay=1e-5,
+            momentum=0.9,
+            loss_scale=1.0,
+            nesterov=False,
+            filter_bias_and_bn=False,
+        )
 
         bs = 8
         input_data = Tensor(np.ones([bs, 1, 32, 32]).astype(np.float32) * 0.01)
@@ -437,21 +506,30 @@ def test_wrong_params_input_optimizer():
         print(f" begin loss: {begin_loss}, end loss:  {cur_loss}")
 
         # check output correctness
-        assert cur_loss < begin_loss, 'Loss does NOT decrease'
+        assert cur_loss < begin_loss, "Loss does NOT decrease"
 
 
-@pytest.mark.parametrize("mode", [ms.GRAPH_MODE, ms.PYNATIVE_MODE, ])
+@pytest.mark.parametrize(
+    "mode",
+    [
+        ms.GRAPH_MODE,
+        ms.PYNATIVE_MODE,
+    ],
+)
 def test_mode_mult_single_optimizer(mode):
     ms.set_context(mode=mode)
     network = SimpleCNN(in_channels=1, num_classes=10)
-    conv_params = list(filter(lambda x: 'conv' in x.name, network.trainable_params()))
-    no_conv_params = list(filter(lambda x: 'conv' not in x.name, network.trainable_params()))
-    group_params = [{'params': conv_params, 'weight_decay': 0.01, 'grad_centralization': True},
-                    {'params': no_conv_params, 'lr': 0.1},
-                    {'order_params': network.trainable_params()}]
-    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-    net_opt = create_optimizer(group_params, 'momentum', lr=0.01, weight_decay=1e-5, momentum=0.9,
-                               nesterov=False, filter_bias_and_bn=False)
+    conv_params = list(filter(lambda x: "conv" in x.name, network.trainable_params()))
+    no_conv_params = list(filter(lambda x: "conv" not in x.name, network.trainable_params()))
+    group_params = [
+        {"params": conv_params, "weight_decay": 0.01, "grad_centralization": True},
+        {"params": no_conv_params, "lr": 0.1},
+        {"order_params": network.trainable_params()},
+    ]
+    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+    net_opt = create_optimizer(
+        group_params, "momentum", lr=0.01, weight_decay=1e-5, momentum=0.9, nesterov=False, filter_bias_and_bn=False
+    )
 
     bs = 8
     input_data = Tensor(np.ones([bs, 1, 32, 32]).astype(np.float32) * 0.01)
@@ -468,4 +546,4 @@ def test_mode_mult_single_optimizer(mode):
     print(f" begin loss: {begin_loss}, end loss:  {cur_loss}")
 
     # check output correctness
-    assert cur_loss < begin_loss, 'Loss does NOT decrease'
+    assert cur_loss < begin_loss, "Loss does NOT decrease"

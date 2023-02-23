@@ -1,28 +1,31 @@
-import sys
-sys.path.append('.')
-
-from mindcv.utils.download import DownLoad
 import os
+import sys
+
+sys.path.append(".")
+
 import matplotlib.pyplot as plt
 import numpy as np
-from mindcv.models import create_model
+
+from mindspore import LossMonitor, Model, TimeMonitor  # , CheckpointConfig, ModelCheckpoint
 
 from mindcv.loss import create_loss
+from mindcv.models import create_model
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
-from mindspore import Model, LossMonitor, TimeMonitor #, CheckpointConfig, ModelCheckpoint
-
+from mindcv.utils.download import DownLoad
 
 freeze_backbone = False
 visualize = False
 
-dataset_url = "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/intermediate/Canidae_data.zip"
+dataset_url = (
+    "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/intermediate/Canidae_data.zip"
+)
 root_dir = "./"
 
-if not os.path.exists(os.path.join(root_dir, 'data/Canidae')):
+if not os.path.exists(os.path.join(root_dir, "data/Canidae")):
     DownLoad().download_and_extract_archive(dataset_url, root_dir)
 
-from mindcv.data import create_dataset, create_transforms, create_loader
+from mindcv.data import create_dataset, create_loader, create_transforms
 
 num_workers = 8
 
@@ -30,35 +33,35 @@ num_workers = 8
 data_dir = "./data/Canidae/"
 
 # 加载自定义数据集
-dataset_train = create_dataset(root=data_dir, split='train', num_parallel_workers=num_workers)
-dataset_val = create_dataset(root=data_dir, split='val', num_parallel_workers=num_workers)
+dataset_train = create_dataset(root=data_dir, split="train", num_parallel_workers=num_workers)
+dataset_val = create_dataset(root=data_dir, split="val", num_parallel_workers=num_workers)
 
 # 定义和获取数据处理及增强操作
-trans_train = create_transforms(dataset_name='ImageNet', is_training=True)
-trans_val = create_transforms(dataset_name='ImageNet',is_training=False)
+trans_train = create_transforms(dataset_name="ImageNet", is_training=True)
+trans_val = create_transforms(dataset_name="ImageNet", is_training=False)
 
 loader_train = create_loader(
-        dataset=dataset_train,
-        batch_size=16,
-        is_training=True,
-        num_classes=2,
-        transform=trans_train,
-        num_parallel_workers=num_workers,
-    )
+    dataset=dataset_train,
+    batch_size=16,
+    is_training=True,
+    num_classes=2,
+    transform=trans_train,
+    num_parallel_workers=num_workers,
+)
 
 
 loader_val = create_loader(
-        dataset=dataset_val,
-        batch_size=5,
-        is_training=True,
-        num_classes=2,
-        transform=trans_val,
-        num_parallel_workers=num_workers,
-    )
+    dataset=dataset_val,
+    batch_size=5,
+    is_training=True,
+    num_classes=2,
+    transform=trans_val,
+    num_parallel_workers=num_workers,
+)
 
-images, labels= next(loader_train.create_tuple_iterator())
-#images = data["image"]
-#labels = data["label"]
+images, labels = next(loader_train.create_tuple_iterator())
+# images = data["image"]
+# labels = data["label"]
 
 print("Tensor of image", images.shape)
 print("Labels:", labels)
@@ -86,13 +89,13 @@ if visualize:
 
     plt.show()
 
-network = create_model(model_name='densenet121', num_classes=2, pretrained=True)
+network = create_model(model_name="densenet121", num_classes=2, pretrained=True)
 
 
 # 定义优化器和损失函数
 lr = 1e-3 if freeze_backbone else 1e-4
-opt = create_optimizer(network.trainable_params(), opt='adam', lr=lr)
-loss = create_loss(name='CE')
+opt = create_optimizer(network.trainable_params(), opt="adam", lr=lr)
+loss = create_loss(name="CE")
 
 if freeze_backbone:
     # freeze backbone
@@ -102,9 +105,9 @@ if freeze_backbone:
 
 
 # 实例化模型
-model = Model(network, loss_fn=loss, optimizer=opt, metrics={'accuracy'})
-print('Training...')
+model = Model(network, loss_fn=loss, optimizer=opt, metrics={"accuracy"})
+print("Training...")
 model.train(10, loader_train, callbacks=[LossMonitor(5), TimeMonitor(5)], dataset_sink_mode=False)
-print('Evaluating...')
+print("Evaluating...")
 res = model.eval(loader_val)
 print(res)

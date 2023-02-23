@@ -5,20 +5,23 @@ from mindspore import nn
 
 
 class Conv2dNormActivation(nn.Cell):
-    """ Conv2d + BN + Act"""
-    def __init__(self,
-                 in_channels: int,
-                 out_channels: int,
-                 kernel_size: int = 3,
-                 stride: int = 1,
-                 pad_mode: str = "pad",
-                 padding: Optional[int] = None,
-                 dilation: int = 1,
-                 groups: int = 1,
-                 norm: Optional[nn.Cell] = nn.BatchNorm2d,
-                 activation: Optional[nn.Cell] = nn.ReLU,
-                 has_bias: Optional[bool] = None,
-                 **kwargs) -> None:
+    """Conv2d + BN + Act"""
+
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int = 3,
+        stride: int = 1,
+        pad_mode: str = "pad",
+        padding: Optional[int] = None,
+        dilation: int = 1,
+        groups: int = 1,
+        norm: Optional[nn.Cell] = nn.BatchNorm2d,
+        activation: Optional[nn.Cell] = nn.ReLU,
+        has_bias: Optional[bool] = None,
+        **kwargs
+    ) -> None:
         super().__init__()
 
         if pad_mode == "pad":
@@ -41,7 +44,8 @@ class Conv2dNormActivation(nn.Cell):
                 dilation=dilation,
                 group=groups,
                 has_bias=has_bias,
-                **kwargs)
+                **kwargs
+            )
         ]
 
         if norm:

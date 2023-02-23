@@ -3,46 +3,48 @@ MindSpore implementation of `InceptionV4`.
 Refer to Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning.
 """
 
-from typing import Union, Tuple
+from typing import Tuple, Union
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import Tensor, nn, ops
 
-from .utils import load_pretrained
-from .registry import register_model
 from .layers.pooling import GlobalAvgPooling
+from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
-    'InceptionV4',
-    'inception_v4'
+    "InceptionV4",
+    "inception_v4",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'features.0.conv2d_1a_3x3.conv', 'classifier': 'classifier',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "features.0.conv2d_1a_3x3.conv",
+        "classifier": "classifier",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'inception_v4': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/inception_v4/inception_v4_299.ckpt')
+    "inception_v4": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/inception_v4/inception_v4_299.ckpt")
 }
 
 
 class BasicConv2d(nn.Cell):
     """A block for conv bn and relu"""
 
-    def __init__(self,
-                 in_channels: int,
-                 out_channels: int,
-                 kernel_size: Union[int, Tuple] = 1,
-                 stride: int = 1,
-                 padding: int = 0,
-                 pad_mode: str = 'same'
-                 ) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: Union[int, Tuple] = 1,
+        stride: int = 1,
+        padding: int = 0,
+        pad_mode: str = "same",
+    ) -> None:
         super().__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
                               padding=padding, pad_mode=pad_mode)
@@ -58,28 +60,29 @@ class BasicConv2d(nn.Cell):
 
 class Stem(nn.Cell):
     """Inception V4 model blocks."""
+
     def __init__(self, in_channels: int) -> None:
         super().__init__()
-        self.conv2d_1a_3x3 = BasicConv2d(in_channels, 32, kernel_size=3, stride=2, pad_mode='valid')
-        self.conv2d_2a_3x3 = BasicConv2d(32, 32, kernel_size=3, stride=1, pad_mode='valid')
-        self.conv2d_2b_3x3 = BasicConv2d(32, 64, kernel_size=3, stride=1, pad_mode='pad', padding=1)
+        self.conv2d_1a_3x3 = BasicConv2d(in_channels, 32, kernel_size=3, stride=2, pad_mode="valid")
+        self.conv2d_2a_3x3 = BasicConv2d(32, 32, kernel_size=3, stride=1, pad_mode="valid")
+        self.conv2d_2b_3x3 = BasicConv2d(32, 64, kernel_size=3, stride=1, pad_mode="pad", padding=1)
 
         self.mixed_3a_branch_0 = nn.MaxPool2d(3, stride=2)
-        self.mixed_3a_branch_1 = BasicConv2d(64, 96, kernel_size=3, stride=2, pad_mode='valid')
+        self.mixed_3a_branch_1 = BasicConv2d(64, 96, kernel_size=3, stride=2, pad_mode="valid")
 
         self.mixed_4a_branch_0 = nn.SequentialCell([
             BasicConv2d(160, 64, kernel_size=1, stride=1),
-            BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode='valid')
+            BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode="valid")
         ])
 
         self.mixed_4a_branch_1 = nn.SequentialCell([
             BasicConv2d(160, 64, kernel_size=1, stride=1),
             BasicConv2d(64, 64, kernel_size=(1, 7), stride=1),
             BasicConv2d(64, 64, kernel_size=(7, 1), stride=1),
-            BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode='valid')
+            BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode="valid")
         ])
 
-        self.mixed_5a_branch_0 = BasicConv2d(192, 192, kernel_size=3, stride=2, pad_mode='valid')
+        self.mixed_5a_branch_0 = BasicConv2d(192, 192, kernel_size=3, stride=2, pad_mode="valid")
         self.mixed_5a_branch_1 = nn.MaxPool2d(3, stride=2)
 
     def construct(self, x: Tensor) -> Tensor:
@@ -103,20 +106,21 @@ class Stem(nn.Cell):
 
 class InceptionA(nn.Cell):
     """Inception V4 model basic architecture"""
+
     def __init__(self) -> None:
         super().__init__()
         self.branch_0 = BasicConv2d(384, 96, kernel_size=1, stride=1)
         self.branch_1 = nn.SequentialCell([
             BasicConv2d(384, 64, kernel_size=1, stride=1),
-            BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode='pad', padding=1)
+            BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode="pad", padding=1)
         ])
         self.branch_2 = nn.SequentialCell([
             BasicConv2d(384, 64, kernel_size=1, stride=1),
-            BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode='pad', padding=1),
-            BasicConv2d(96, 96, kernel_size=3, stride=1, pad_mode='pad', padding=1)
+            BasicConv2d(64, 96, kernel_size=3, stride=1, pad_mode="pad", padding=1),
+            BasicConv2d(96, 96, kernel_size=3, stride=1, pad_mode="pad", padding=1)
         ])
         self.branch_3 = nn.SequentialCell([
-            nn.AvgPool2d(kernel_size=3, stride=1, pad_mode='same'),
+            nn.AvgPool2d(kernel_size=3, stride=1, pad_mode="same"),
             BasicConv2d(384, 96, kernel_size=1, stride=1)
         ])
 
@@ -131,6 +135,7 @@ class InceptionA(nn.Cell):
 
 class InceptionB(nn.Cell):
     """Inception V4 model basic architecture"""
+
     def __init__(self) -> None:
         super().__init__()
         self.branch_0 = BasicConv2d(1024, 384, kernel_size=1, stride=1)
@@ -147,7 +152,7 @@ class InceptionB(nn.Cell):
             BasicConv2d(224, 256, kernel_size=(1, 7), stride=1)
         ])
         self.branch_3 = nn.SequentialCell([
-            nn.AvgPool2d(kernel_size=3, stride=1, pad_mode='same'),
+            nn.AvgPool2d(kernel_size=3, stride=1, pad_mode="same"),
             BasicConv2d(1024, 128, kernel_size=1, stride=1)
         ])
 
@@ -162,13 +167,14 @@ class InceptionB(nn.Cell):
 
 class ReductionA(nn.Cell):
     """Inception V4 model Residual Connections"""
+
     def __init__(self) -> None:
         super().__init__()
-        self.branch_0 = BasicConv2d(384, 384, kernel_size=3, stride=2, pad_mode='valid')
+        self.branch_0 = BasicConv2d(384, 384, kernel_size=3, stride=2, pad_mode="valid")
         self.branch_1 = nn.SequentialCell([
             BasicConv2d(384, 192, kernel_size=1, stride=1),
-            BasicConv2d(192, 224, kernel_size=3, stride=1, pad_mode='pad', padding=1),
-            BasicConv2d(224, 256, kernel_size=3, stride=2, pad_mode='valid'),
+            BasicConv2d(192, 224, kernel_size=3, stride=1, pad_mode="pad", padding=1),
+            BasicConv2d(224, 256, kernel_size=3, stride=2, pad_mode="valid"),
         ])
         self.branch_2 = nn.MaxPool2d(3, stride=2)
 
@@ -182,17 +188,18 @@ class ReductionA(nn.Cell):
 
 class ReductionB(nn.Cell):
     """Inception V4 model Residual Connections"""
+
     def __init__(self) -> None:
         super().__init__()
         self.branch_0 = nn.SequentialCell([
             BasicConv2d(1024, 192, kernel_size=1, stride=1),
-            BasicConv2d(192, 192, kernel_size=3, stride=2, pad_mode='valid'),
+            BasicConv2d(192, 192, kernel_size=3, stride=2, pad_mode="valid"),
         ])
         self.branch_1 = nn.SequentialCell([
             BasicConv2d(1024, 256, kernel_size=1, stride=1),
             BasicConv2d(256, 256, kernel_size=(1, 7), stride=1),
             BasicConv2d(256, 320, kernel_size=(7, 1), stride=1),
-            BasicConv2d(320, 320, kernel_size=3, stride=2, pad_mode='valid')
+            BasicConv2d(320, 320, kernel_size=3, stride=2, pad_mode="valid")
         ])
         self.branch_2 = nn.MaxPool2d(3, stride=2)
 
@@ -206,6 +213,7 @@ class ReductionB(nn.Cell):
 
 class InceptionC(nn.Cell):
     """Inception V4 model basic architecture"""
+
     def __init__(self) -> None:
         super().__init__()
         self.branch_0 = BasicConv2d(1536, 256, kernel_size=1, stride=1)
@@ -223,7 +231,7 @@ class InceptionC(nn.Cell):
         self.branch_2_2 = BasicConv2d(512, 256, kernel_size=(3, 1), stride=1)
 
         self.branch_3 = nn.SequentialCell([
-            nn.AvgPool2d(kernel_size=3, stride=1, pad_mode='same'),
+            nn.AvgPool2d(kernel_size=3, stride=1, pad_mode="same"),
             BasicConv2d(1536, 256, kernel_size=1, stride=1)
         ])
 
@@ -251,11 +259,12 @@ class InceptionV4(nn.Cell):
         drop_rate: dropout rate of the layer before main classifier. Default: 0.2.
     """
 
-    def __init__(self,
-                 num_classes: int = 1000,
-                 in_channels: int = 3,
-                 drop_rate: float = 0.2
-                 ) -> None:
+    def __init__(
+        self,
+        num_classes: int = 1000,
+        in_channels: int = 3,
+        drop_rate: float = 0.2,
+    ) -> None:
         super().__init__()
         blocks = [Stem(in_channels)]
         for _ in range(4):
@@ -300,8 +309,8 @@ class InceptionV4(nn.Cell):
 @register_model
 def inception_v4(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> InceptionV4:
     """Get InceptionV4 model.
-     Refer to the base class `models.InceptionV4` for more details."""
-    default_cfg = default_cfgs['inception_v4']
+    Refer to the base class `models.InceptionV4` for more details."""
+    default_cfg = default_cfgs["inception_v4"]
     model = InceptionV4(num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:

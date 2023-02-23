@@ -1,10 +1,14 @@
-'''checkpoint manager '''
+"""checkpoint manager """
 import os
 import stat
+
 import numpy as np
+
 import mindspore as ms
+from mindspore import Tensor
 from mindspore import log as logger
-from mindspore import ops, Tensor
+from mindspore import ops
+
 
 class CheckpointManager:
     """
@@ -35,7 +39,7 @@ class CheckpointManager:
         files = os.listdir(directory)
         for filename in files:
             if os.path.splitext(filename)[-1] == ".ckpt" and filename.startswith(prefix + "-"):
-                mid_name = filename[len(prefix):-5]
+                mid_name = filename[len(prefix) : -5]
                 flag = not (True in [char.isalpha() for char in mid_name])
                 if flag:
                     self._ckpoint_filelist.append(os.path.join(directory, filename))
@@ -59,7 +63,7 @@ class CheckpointManager:
     def keep_one_ckpoint_per_minutes(self, minutes, cur_time):
         """Only keep the latest one ckpt file per minutes, remove other files generated in [last_time, cur_time]."""
         del_list = []
-        oldest_file = ''
+        oldest_file = ""
         oldest_time = cur_time
         for ck_file in self._ckpoint_filelist:
             modify_time = os.path.getmtime(ck_file)
@@ -75,8 +79,8 @@ class CheckpointManager:
                 continue
             self.remove_ckpoint_file(mv_file)
 
-    def top_K_checkpoint(self, network, K=10, metric=None, save_path=''):
-        """ Save and return Top K checkpoint address and accuracy. """
+    def top_K_checkpoint(self, network, K=10, metric=None, save_path=""):
+        """Save and return Top K checkpoint address and accuracy."""
         last_file = self._ckpoint_filelist[-1] if self._ckpoint_filelist else None
         if type(metric) is not np.ndarray:
             metric = metric.asnumpy()
@@ -93,25 +97,26 @@ class CheckpointManager:
             self._ckpoint_filelist.append((save_path, float(metric)))
             self._ckpoint_filelist = sorted(self._ckpoint_filelist, key=lambda x: x[1], reverse=True)
 
-    def latest_K_checkpoint(self, network, K=10, save_path=''):
-        """ Save latest K checkpoint. """
+    def latest_K_checkpoint(self, network, K=10, save_path=""):
+        """Save latest K checkpoint."""
         if K and 0 < K <= self.ckpoint_num:
             self.remove_oldest_ckpoint_file()
         ms.save_checkpoint(network, save_path, async_save=True)
         self._ckpoint_filelist.append(save_path)
 
-    def save_ckpoint(self, network, num_ckpt=10, metric=None, save_path=''):
-        """ Save checkpoint according to different save strategy. """
+    def save_ckpoint(self, network, num_ckpt=10, metric=None, save_path=""):
+        """Save checkpoint according to different save strategy."""
         if self.ckpt_save_policy is None:
             ms.save_checkpoint(network, save_path, async_save=True)
-        elif self.ckpt_save_policy == 'top_k':
+        elif self.ckpt_save_policy == "top_k":
             if metric is None:
                 raise ValueError(f"The expected 'metric' is not None, but got: {metric}.")
             self.top_K_checkpoint(network, K=num_ckpt, metric=metric, save_path=save_path)
             return self._ckpoint_filelist
-        elif self.ckpt_save_policy == 'latest_k':
+        elif self.ckpt_save_policy == "latest_k":
             self.latest_K_checkpoint(network, K=num_ckpt, save_path=save_path)
             return self._ckpoint_filelist
         else:
-            raise ValueError(f"The expected 'ckpt_save_policy' is None, top_k or latest_k,"
-                             f"but got: {self.ckpt_save_policy}.")
+            raise ValueError(
+                f"The expected 'ckpt_save_policy' is None, top_k or latest_k, but got: {self.ckpt_save_policy}."
+            )

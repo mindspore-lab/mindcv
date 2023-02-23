@@ -5,84 +5,130 @@ Refer to MobileNetV2: Inverted Residuals and Linear Bottlenecks.
 
 import math
 
-from mindspore import nn, Tensor
 import mindspore.common.initializer as init
+from mindspore import Tensor, nn
 
 from .layers.pooling import GlobalAvgPooling
-from .utils import make_divisible, load_pretrained
 from .registry import register_model
+from .utils import load_pretrained, make_divisible
 
 __all__ = [
-    'MobileNetV2',
-    'mobilenet_v2_140_224',
-    'mobilenet_v2_130_224',
-    'mobilenet_v2_100_224',
-    'mobilenet_v2_100_192',
-    'mobilenet_v2_100_160',
-    'mobilenet_v2_100_128',
-    'mobilenet_v2_100_96',
-    'mobilenet_v2_075_224',
-    'mobilenet_v2_075_192',
-    'mobilenet_v2_075_160',
-    'mobilenet_v2_075_128',
-    'mobilenet_v2_075_96',
-    'mobilenet_v2_050_224',
-    'mobilenet_v2_050_192',
-    'mobilenet_v2_050_160',
-    'mobilenet_v2_050_128',
-    'mobilenet_v2_050_96',
-    'mobilenet_v2_035_224',
-    'mobilenet_v2_035_192',
-    'mobilenet_v2_035_160',
-    'mobilenet_v2_035_128',
-    'mobilenet_v2_035_96'
+    "MobileNetV2",
+    "mobilenet_v2_140_224",
+    "mobilenet_v2_130_224",
+    "mobilenet_v2_100_224",
+    "mobilenet_v2_100_192",
+    "mobilenet_v2_100_160",
+    "mobilenet_v2_100_128",
+    "mobilenet_v2_100_96",
+    "mobilenet_v2_075_224",
+    "mobilenet_v2_075_192",
+    "mobilenet_v2_075_160",
+    "mobilenet_v2_075_128",
+    "mobilenet_v2_075_96",
+    "mobilenet_v2_050_224",
+    "mobilenet_v2_050_192",
+    "mobilenet_v2_050_160",
+    "mobilenet_v2_050_128",
+    "mobilenet_v2_050_96",
+    "mobilenet_v2_035_224",
+    "mobilenet_v2_035_192",
+    "mobilenet_v2_035_160",
+    "mobilenet_v2_035_128",
+    "mobilenet_v2_035_96",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'features.0', 'classifier': 'classifier.1',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "features.0",
+        "classifier": "classifier.1",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'mobilenet_v2_1.4_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.4_224.ckpt'),
-    'mobilenet_v2_1.3_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.3_224.ckpt'),
-    'mobilenet_v2_1.0_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_224.ckpt'),
-    'mobilenet_v2_1.0_192': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_192.ckpt'),
-    'mobilenet_v2_1.0_160': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_160.ckpt'),
-    'mobilenet_v2_1.0_128': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_128.ckpt'),
-    'mobilenet_v2_1.0_96': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_96.ckpt'),
-    'mobilenet_v2_0.75_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_224.ckpt'),
-    'mobilenet_v2_0.75_192': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_192.ckpt'),
-    'mobilenet_v2_0.75_160': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_160.ckpt'),
-    'mobilenet_v2_0.75_128': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_128.ckpt'),
-    'mobilenet_v2_0.75_96': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_96.ckpt'),
-    'mobilenet_v2_0.5_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_224.ckpt'),
-    'mobilenet_v2_0.5_192': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_192.ckpt'),
-    'mobilenet_v2_0.5_160': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_160.ckpt'),
-    'mobilenet_v2_0.5_128': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_128.ckpt'),
-    'mobilenet_v2_0.5_96': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_96.ckpt'),
-    'mobilenet_v2_0.35_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_224.ckpt'),
-    'mobilenet_v2_0.35_192': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_192.ckpt'),
-    'mobilenet_v2_0.35_160': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_160.ckpt'),
-    'mobilenet_v2_0.35_128': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_128.ckpt'),
-    'mobilenet_v2_0.35_96': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_96.ckpt'),
+    "mobilenet_v2_1.4_224": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.4_224.ckpt"
+    ),
+    "mobilenet_v2_1.3_224": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.3_224.ckpt"
+    ),
+    "mobilenet_v2_1.0_224": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_224.ckpt"
+    ),
+    "mobilenet_v2_1.0_192": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_192.ckpt"
+    ),
+    "mobilenet_v2_1.0_160": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_160.ckpt"
+    ),
+    "mobilenet_v2_1.0_128": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_128.ckpt"
+    ),
+    "mobilenet_v2_1.0_96": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_96.ckpt"
+    ),
+    "mobilenet_v2_0.75_224": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_224.ckpt"
+    ),
+    "mobilenet_v2_0.75_192": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_192.ckpt"
+    ),
+    "mobilenet_v2_0.75_160": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_160.ckpt"
+    ),
+    "mobilenet_v2_0.75_128": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_128.ckpt"
+    ),
+    "mobilenet_v2_0.75_96": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_96.ckpt"
+    ),
+    "mobilenet_v2_0.5_224": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_224.ckpt"
+    ),
+    "mobilenet_v2_0.5_192": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_192.ckpt"
+    ),
+    "mobilenet_v2_0.5_160": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_160.ckpt"
+    ),
+    "mobilenet_v2_0.5_128": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_128.ckpt"
+    ),
+    "mobilenet_v2_0.5_96": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_96.ckpt"
+    ),
+    "mobilenet_v2_0.35_224": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_224.ckpt"
+    ),
+    "mobilenet_v2_0.35_192": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_192.ckpt"
+    ),
+    "mobilenet_v2_0.35_160": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_160.ckpt"
+    ),
+    "mobilenet_v2_0.35_128": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_128.ckpt"
+    ),
+    "mobilenet_v2_0.35_96": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_96.ckpt"
+    ),
 }
 
 
 class InvertedResidual(nn.Cell):
     """Inverted Residual Block of MobileNetV2"""
 
-    def __init__(self,
-                 in_channels: int,
-                 out_channels: int,
-                 stride: int,
-                 expand_ratio: int,
-                 ) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        stride: int,
+        expand_ratio: int,
+    ) -> None:
         super().__init__()
         assert stride in [1, 2]
         hidden_dim = round(in_channels * expand_ratio)
@@ -124,12 +170,13 @@ class MobileNetV2(nn.Cell):
         num_classes: number of classification classes. Default: 1000.
     """
 
-    def __init__(self,
-                 alpha: float = 1.0,
-                 round_nearest: int = 8,
-                 in_channels: int = 3,
-                 num_classes: int = 1000
-                 ) -> None:
+    def __init__(
+        self,
+        alpha: float = 1.0,
+        round_nearest: int = 8,
+        in_channels: int = 3,
+        num_classes: int = 1000,
+    ) -> None:
         super().__init__()
         input_channels = make_divisible(32 * alpha, round_nearest)
         # Setting of inverted residual blocks.
@@ -153,7 +200,7 @@ class MobileNetV2(nn.Cell):
         features = [
             nn.Conv2d(in_channels, input_channels, 3, 2, pad_mode="pad", padding=1, has_bias=False),
             nn.BatchNorm2d(input_channels),
-            nn.ReLU6()
+            nn.ReLU6(),
         ]
         # Building inverted residual blocks.
         for t, c, n, s in inverted_residual_setting:
@@ -166,14 +213,14 @@ class MobileNetV2(nn.Cell):
         features.extend([
             nn.Conv2d(input_channels, last_channels, 1, 1, pad_mode="pad", padding=0, has_bias=False),
             nn.BatchNorm2d(last_channels),
-            nn.ReLU6()
+            nn.ReLU6(),
         ])
         self.features = nn.SequentialCell(features)
 
         self.pool = GlobalAvgPooling()
         self.classifier = nn.SequentialCell([
             nn.Dropout(keep_prob=0.8),  # confirmed by paper authors
-            nn.Dense(last_channels, num_classes)
+            nn.Dense(last_channels, num_classes),
         ])
         self._initialize_weights()
 
@@ -186,15 +233,15 @@ class MobileNetV2(nn.Cell):
                     init.initializer(init.Normal(sigma=math.sqrt(2. / n), mean=0.0),
                                      cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+                    cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(init.initializer('ones', cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(init.initializer('zeros', cell.beta.shape, cell.beta.dtype))
+                cell.gamma.set_data(init.initializer("ones", cell.gamma.shape, cell.gamma.dtype))
+                cell.beta.set_data(init.initializer("zeros", cell.beta.shape, cell.beta.dtype))
             elif isinstance(cell, nn.Dense):
                 cell.weight.set_data(
                     init.initializer(init.Normal(sigma=0.01, mean=0.0), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+                    cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)
@@ -214,9 +261,9 @@ class MobileNetV2(nn.Cell):
 @register_model
 def mobilenet_v2_140_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 1.4 and input image size of 224.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_1.4_224']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_1.4_224"]
     model = MobileNetV2(alpha=1.4, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -228,9 +275,9 @@ def mobilenet_v2_140_224(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_130_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 1.3 and input image size of 224.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_1.3_224']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_1.3_224"]
     model = MobileNetV2(alpha=1.3, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -242,9 +289,9 @@ def mobilenet_v2_130_224(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_100_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model without width scaling and input image size of 224.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_1.0_224']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_1.0_224"]
     model = MobileNetV2(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -256,9 +303,9 @@ def mobilenet_v2_100_224(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_100_192(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model without width scaling and input image size of 192.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_1.0_192']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_1.0_192"]
     model = MobileNetV2(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -270,9 +317,9 @@ def mobilenet_v2_100_192(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_100_160(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model without width scaling and input image size of 160.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_1.0_160']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_1.0_160"]
     model = MobileNetV2(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -284,9 +331,9 @@ def mobilenet_v2_100_160(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_100_128(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model without width scaling and input image size of 128.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_1.0_128']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_1.0_128"]
     model = MobileNetV2(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -298,9 +345,9 @@ def mobilenet_v2_100_128(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_100_96(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model without width scaling and input image size of 96.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_1.0_96']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_1.0_96"]
     model = MobileNetV2(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -312,9 +359,9 @@ def mobilenet_v2_100_96(pretrained: bool = False, num_classes: int = 1000, in_ch
 @register_model
 def mobilenet_v2_075_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.75 and input image size of 224.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.75_224']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.75_224"]
     model = MobileNetV2(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -326,9 +373,9 @@ def mobilenet_v2_075_224(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_075_192(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.75 and input image size of 192.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.75_192']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.75_192"]
     model = MobileNetV2(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -340,9 +387,9 @@ def mobilenet_v2_075_192(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_075_160(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.75 and input image size of 160.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.75_160']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.75_160"]
     model = MobileNetV2(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -354,9 +401,9 @@ def mobilenet_v2_075_160(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_075_128(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.75 and input image size of 128.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.75_128']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.75_128"]
     model = MobileNetV2(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -368,9 +415,9 @@ def mobilenet_v2_075_128(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_075_96(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.75 and input image size of 96.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.75_96']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.75_96"]
     model = MobileNetV2(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -382,9 +429,9 @@ def mobilenet_v2_075_96(pretrained: bool = False, num_classes: int = 1000, in_ch
 @register_model
 def mobilenet_v2_050_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.5 and input image size of 224.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.5_224']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.5_224"]
     model = MobileNetV2(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -396,9 +443,9 @@ def mobilenet_v2_050_224(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_050_192(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.5 and input image size of 192.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.5_192']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.5_192"]
     model = MobileNetV2(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -410,9 +457,9 @@ def mobilenet_v2_050_192(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_050_160(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.5 and input image size of 160.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.5_160']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.5_160"]
     model = MobileNetV2(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -424,9 +471,9 @@ def mobilenet_v2_050_160(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_050_128(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.5 and input image size of 128.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.5_128']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.5_128"]
     model = MobileNetV2(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -438,9 +485,9 @@ def mobilenet_v2_050_128(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_050_96(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.5 and input image size of 96.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.5_96']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.5_96"]
     model = MobileNetV2(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -452,9 +499,9 @@ def mobilenet_v2_050_96(pretrained: bool = False, num_classes: int = 1000, in_ch
 @register_model
 def mobilenet_v2_035_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.35 and input image size of 224.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.35_224']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.35_224"]
     model = MobileNetV2(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -466,9 +513,9 @@ def mobilenet_v2_035_224(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_035_192(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.35 and input image size of 192.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.35_192']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.35_192"]
     model = MobileNetV2(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -480,9 +527,9 @@ def mobilenet_v2_035_192(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_035_160(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.35 and input image size of 160.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.35_160']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.35_160"]
     model = MobileNetV2(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -494,9 +541,9 @@ def mobilenet_v2_035_160(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_035_128(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.35 and input image size of 128.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.35_128']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.35_128"]
     model = MobileNetV2(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -508,9 +555,9 @@ def mobilenet_v2_035_128(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v2_035_96(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 0.35 and input image size of 96.
-     Refer to the base class `models.MobileNetV2` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v2_0.35_96']
+    Refer to the base class `models.MobileNetV2` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v2_0.35_96"]
     model = MobileNetV2(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:

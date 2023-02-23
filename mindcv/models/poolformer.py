@@ -3,43 +3,47 @@ MindSpore implementation of `poolformer`.
 Refer to PoolFormer: MetaFormer Is Actually What You Need for Vision.
 """
 
-import numpy as np
-from itertools import repeat
 import collections.abc
+from itertools import repeat
+
+import numpy as np
 
 import mindspore
-from mindspore import Tensor, nn, ops
 import mindspore.common.initializer as init
+from mindspore import Tensor, nn, ops
 
 from .layers import DropPath, Identity
 from .registry import register_model
 from .utils import load_pretrained
 
 __all__ = [
-    'PoolFormer',
-    'poolformer_s12',
-    'poolformer_s24',
-    'poolformer_s36',
-    'poolformer_m36',
-    'poolformer_m48'
+    "PoolFormer",
+    "poolformer_s12",
+    "poolformer_s24",
+    "poolformer_s36",
+    "poolformer_m36",
+    "poolformer_m48",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': '', 'classifier': '',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "",
+        "classifier": "",
+        **kwargs,
     }
 
 
 default_cfgs = dict(
-    poolformer_s12=_cfg(url='https://download.mindspore.cn/toolkits/mindcv/poolformer/poolformer_s12-5be5c4e4.ckpt', crop_pct=0.9),
-    poolformer_s24=_cfg(url='', crop_pct=0.9),
-    poolformer_s36=_cfg(url='', crop_pct=0.9),
-    poolformer_m36=_cfg(url='', crop_pct=0.95),
-    poolformer_m48=_cfg(url='', crop_pct=0.95),
+    poolformer_s12=_cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/poolformer/poolformer_s12-5be5c4e4.ckpt", crop_pct=0.9
+    ),
+    poolformer_s24=_cfg(url="", crop_pct=0.9),
+    poolformer_s36=_cfg(url="", crop_pct=0.9),
+    poolformer_m36=_cfg(url="", crop_pct=0.95),
+    poolformer_m48=_cfg(url="", crop_pct=0.95),
 )
 
 
@@ -56,11 +60,18 @@ to_2tuple = _ntuple(2)
 
 
 class ConvMlp(nn.Cell):
-    """ MLP using 1x1 convs that keeps spatial dims"""
+    """MLP using 1x1 convs that keeps spatial dims"""
 
     def __init__(
-            self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU,
-            norm_layer=None, bias=True, drop=0.):
+        self,
+        in_features,
+        hidden_features=None,
+        out_features=None,
+        act_layer=nn.GELU,
+        norm_layer=None,
+        bias=True,
+        drop=0.0,
+    ):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
@@ -93,7 +104,7 @@ class ConvMlp(nn.Cell):
 
 
 class PatchEmbed(nn.Cell):
-    """ Patch Embedding that is implemented by a layer of conv.
+    """Patch Embedding that is implemented by a layer of conv.
     Input: tensor in shape [B, C, H, W]
     Output: tensor in shape [B, C, H/stride, W/stride]"""
 
@@ -102,7 +113,7 @@ class PatchEmbed(nn.Cell):
         patch_size = to_2tuple(patch_size)
         stride = to_2tuple(stride)
         # padding = to_2tuple(padding)
-        self.proj = nn.Conv2d(in_chs, embed_dim, kernel_size=patch_size, stride=stride, padding=padding, pad_mode='pad',
+        self.proj = nn.Conv2d(in_chs, embed_dim, kernel_size=patch_size, stride=stride, padding=padding, pad_mode="pad",
                               has_bias=True)
         self.norm = norm_layer(embed_dim) if norm_layer else Identity()
 
@@ -115,7 +126,7 @@ class PatchEmbed(nn.Cell):
 class Pooling(nn.Cell):
     def __init__(self, pool_size=3):
         super().__init__()
-        self.pool = nn.AvgPool2d(pool_size, stride=1, pad_mode='same')
+        self.pool = nn.AvgPool2d(pool_size, stride=1, pad_mode="same")
 
     def construct(self, x):
         return self.pool(x) - x
@@ -125,14 +136,20 @@ class PoolFormerBlock(nn.Cell):
     """Implementation of one PoolFormer block."""
 
     def __init__(
-            self, dim, pool_size=3, mlp_ratio=4.,
-            act_layer=nn.GELU, norm_layer=nn.GroupNorm,
-            drop=0., drop_path=0., layer_scale_init_value=1e-5):
-
+        self,
+        dim,
+        pool_size=3,
+        mlp_ratio=4.0,
+        act_layer=nn.GELU,
+        norm_layer=nn.GroupNorm,
+        drop=0.0,
+        drop_path=0.0,
+        layer_scale_init_value=1e-5,
+    ):
         super().__init__()
         self.norm1 = norm_layer(1, dim)
         self.token_mixer = Pooling(pool_size=pool_size)
-        self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
+        self.drop_path = DropPath(drop_path) if drop_path > 0.0 else Identity()
         self.norm2 = norm_layer(1, dim)
         self.mlp = ConvMlp(dim, hidden_features=int(dim * mlp_ratio), act_layer=act_layer, drop=drop)
 
@@ -158,13 +175,18 @@ class PoolFormerBlock(nn.Cell):
 
 
 def basic_blocks(
-        dim, index, layers,
-        pool_size=3, mlp_ratio=4.,
-        act_layer=nn.GELU, norm_layer=nn.GroupNorm,
-        drop_rate=.0, drop_path_rate=0.,
-        layer_scale_init_value=1e-5,
+    dim,
+    index,
+    layers,
+    pool_size=3,
+    mlp_ratio=4.0,
+    act_layer=nn.GELU,
+    norm_layer=nn.GroupNorm,
+    drop_rate=0.0,
+    drop_path_rate=0.0,
+    layer_scale_init_value=1e-5,
 ):
-    """ generate PoolFormer blocks for a stage """
+    """generate PoolFormer blocks for a stage"""
     blocks = []
     for block_idx in range(layers[index]):
         block_dpr = drop_path_rate * (block_idx + sum(layers[:index])) / (sum(layers) - 1)
@@ -206,27 +228,28 @@ class PoolFormer(nn.Cell):
     """
 
     def __init__(
-            self,
-            layers,
-            embed_dims=(64, 128, 320, 512),
-            mlp_ratios=(4, 4, 4, 4),
-            downsamples=(True, True, True, True),
-            pool_size=3,
-            in_chans=3,
-            num_classes=1000,
-            global_pool='avg',
-            norm_layer=nn.GroupNorm,
-            act_layer=nn.GELU,
-            in_patch_size=7,
-            in_stride=4,
-            in_pad=2,
-            down_patch_size=3,
-            down_stride=2,
-            down_pad=1,
-            drop_rate=0., drop_path_rate=0.,
-            layer_scale_init_value=1e-5,
-            fork_feat=False):
-
+        self,
+        layers,
+        embed_dims=(64, 128, 320, 512),
+        mlp_ratios=(4, 4, 4, 4),
+        downsamples=(True, True, True, True),
+        pool_size=3,
+        in_chans=3,
+        num_classes=1000,
+        global_pool="avg",
+        norm_layer=nn.GroupNorm,
+        act_layer=nn.GELU,
+        in_patch_size=7,
+        in_stride=4,
+        in_pad=2,
+        down_patch_size=3,
+        down_stride=2,
+        down_pad=1,
+        drop_rate=0.0,
+        drop_path_rate=0.0,
+        layer_scale_init_value=1e-5,
+        fork_feat=False,
+    ):
         super().__init__()
 
         if not fork_feat:
@@ -300,8 +323,8 @@ class PoolFormer(nn.Cell):
 @register_model
 def poolformer_s12(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PoolFormer:
     """Get poolformer_s12 model.
-        Refer to the base class `models.PoolFormer` for more details."""
-    default_cfg = default_cfgs['poolformer_s12']
+    Refer to the base class `models.PoolFormer` for more details."""
+    default_cfg = default_cfgs["poolformer_s12"]
     model = PoolFormer(in_chans=in_channels, num_classes=num_classes, layers=(2, 2, 6, 2), **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -311,8 +334,8 @@ def poolformer_s12(pretrained: bool = False, num_classes: int = 1000, in_channel
 @register_model
 def poolformer_s24(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PoolFormer:
     """Get poolformer_s24 model.
-        Refer to the base class `models.PoolFormer` for more details."""
-    default_cfg = default_cfgs['poolformer_s24']
+    Refer to the base class `models.PoolFormer` for more details."""
+    default_cfg = default_cfgs["poolformer_s24"]
     model = PoolFormer(in_chans=in_channels, num_classes=num_classes, layers=(4, 4, 12, 4), **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -322,10 +345,11 @@ def poolformer_s24(pretrained: bool = False, num_classes: int = 1000, in_channel
 @register_model
 def poolformer_s36(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PoolFormer:
     """Get poolformer_s36 model.
-        Refer to the base class `models.PoolFormer` for more details."""
-    default_cfg = default_cfgs['poolformer_s36']
-    model = PoolFormer(in_chans=in_channels, num_classes=num_classes, layers=(6, 6, 18, 6), layer_scale_init_value=1e-6,
-                       **kwargs)
+    Refer to the base class `models.PoolFormer` for more details."""
+    default_cfg = default_cfgs["poolformer_s36"]
+    model = PoolFormer(
+        in_chans=in_channels, num_classes=num_classes, layers=(6, 6, 18, 6), layer_scale_init_value=1e-6, **kwargs
+    )
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
@@ -334,12 +358,18 @@ def poolformer_s36(pretrained: bool = False, num_classes: int = 1000, in_channel
 @register_model
 def poolformer_m36(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PoolFormer:
     """Get poolformer_m36 model.
-        Refer to the base class `models.PoolFormer` for more details."""
-    default_cfg = default_cfgs['poolformer_m36']
+    Refer to the base class `models.PoolFormer` for more details."""
+    default_cfg = default_cfgs["poolformer_m36"]
     layers = (6, 6, 18, 6)
     embed_dims = (96, 192, 384, 768)
-    model = PoolFormer(in_chans=in_channels, num_classes=num_classes,
-                       layers=layers, layer_scale_init_value=1e-6, embed_dims=embed_dims, **kwargs)
+    model = PoolFormer(
+        in_chans=in_channels,
+        num_classes=num_classes,
+        layers=layers,
+        layer_scale_init_value=1e-6,
+        embed_dims=embed_dims,
+        **kwargs
+    )
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
@@ -348,12 +378,18 @@ def poolformer_m36(pretrained: bool = False, num_classes: int = 1000, in_channel
 @register_model
 def poolformer_m48(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PoolFormer:
     """Get poolformer_m48 model.
-        Refer to the base class `models.PoolFormer` for more details."""
-    default_cfg = default_cfgs['poolformer_m48']
+    Refer to the base class `models.PoolFormer` for more details."""
+    default_cfg = default_cfgs["poolformer_m48"]
     layers = (8, 8, 24, 8)
     embed_dims = (96, 192, 384, 768)
-    model = PoolFormer(in_chans=in_channels, num_classes=num_classes,
-                       layers=layers, layer_scale_init_value=1e-6, embed_dims=embed_dims, **kwargs)
+    model = PoolFormer(
+        in_chans=in_channels,
+        num_classes=num_classes,
+        layers=layers,
+        layer_scale_init_value=1e-6,
+        embed_dims=embed_dims,
+        **kwargs
+    )
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model

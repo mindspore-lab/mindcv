@@ -3,38 +3,39 @@ MindSpore implementation of `VGGNet`.
 Refer to SqueezeNet: Very Deep Convolutional Networks for Large-Scale Image Recognition.
 """
 
-from typing import List, Dict, Union
 import math
+from typing import Dict, List, Union
 
-from mindspore import nn, Tensor
 import mindspore.common.initializer as init
+from mindspore import Tensor, nn
 
-from .utils import load_pretrained
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
-    'VGG',
-    'vgg11',
-    'vgg13',
-    'vgg16',
-    'vgg19'
+    "VGG",
+    "vgg11",
+    "vgg13",
+    "vgg16",
+    "vgg19",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'features.0', 'classifier': 'classifier.6',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "features.0",
+        "classifier": "classifier.6",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'vgg11': _cfg(url=''),
-    'vgg13': _cfg(url=''),
-    'vgg16': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/vgg/vgg16_224.ckpt'),
-    'vgg19': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/vgg/vgg19_224.ckpt')
+    "vgg11": _cfg(url=""),
+    "vgg13": _cfg(url=""),
+    "vgg16": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vgg/vgg16_224.ckpt"),
+    "vgg19": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vgg/vgg19_224.ckpt"),
 }
 
 
@@ -46,9 +47,11 @@ cfgs: Dict[str, List[Union[str, int]]] = {
 }
 
 
-def _make_layers(cfg: List[Union[str, int]],
-                 batch_norm: bool = False,
-                 in_channels: int = 3) -> nn.SequentialCell:
+def _make_layers(
+    cfg: List[Union[str, int]],
+    batch_norm: bool = False,
+    in_channels: int = 3,
+) -> nn.SequentialCell:
     """define the basic block of VGG"""
     layers = []
     for v in cfg:
@@ -77,12 +80,14 @@ class VGG(nn.Cell):
         drop_rate: dropout rate of the classifier. Default: 0.5.
     """
 
-    def __init__(self,
-                 model_name: str,
-                 batch_norm: bool = False,
-                 num_classes: int = 1000,
-                 in_channels: int = 3,
-                 drop_rate: float = 0.5) -> None:
+    def __init__(
+        self,
+        model_name: str,
+        batch_norm: bool = False,
+        num_classes: int = 1000,
+        in_channels: int = 3,
+        drop_rate: float = 0.5,
+    ) -> None:
         super().__init__()
         cfg = cfgs[model_name]
         self.features = _make_layers(cfg, batch_norm=batch_norm, in_channels=in_channels)
@@ -103,16 +108,16 @@ class VGG(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 cell.weight.set_data(
-                    init.initializer(init.HeNormal(math.sqrt(5), mode='fan_out', nonlinearity='relu'),
+                    init.initializer(init.HeNormal(math.sqrt(5), mode="fan_out", nonlinearity="relu"),
                                      cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(
-                        init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+                        init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, nn.Dense):
                 cell.weight.set_data(
                     init.initializer(init.Normal(0.01), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+                    cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)
@@ -132,10 +137,10 @@ class VGG(nn.Cell):
 @register_model
 def vgg11(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> VGG:
     """Get 11 layers VGG model.
-     Refer to the base class `models.VGG` for more details.
-     """
-    default_cfg = default_cfgs['vgg11']
-    model = VGG(model_name='vgg11', num_classes=num_classes, in_channels=in_channels, **kwargs)
+    Refer to the base class `models.VGG` for more details.
+    """
+    default_cfg = default_cfgs["vgg11"]
+    model = VGG(model_name="vgg11", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -146,10 +151,10 @@ def vgg11(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kw
 @register_model
 def vgg13(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> VGG:
     """Get 13 layers VGG model.
-     Refer to the base class `models.VGG` for more details.
-     """
-    default_cfg = default_cfgs['vgg13']
-    model = VGG(model_name='vgg13', num_classes=num_classes, in_channels=in_channels, **kwargs)
+    Refer to the base class `models.VGG` for more details.
+    """
+    default_cfg = default_cfgs["vgg13"]
+    model = VGG(model_name="vgg13", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -160,10 +165,10 @@ def vgg13(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kw
 @register_model
 def vgg16(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> VGG:
     """Get 16 layers VGG model.
-     Refer to the base class `models.VGG` for more details.
-     """
-    default_cfg = default_cfgs['vgg16']
-    model = VGG(model_name='vgg16', num_classes=num_classes, in_channels=in_channels, **kwargs)
+    Refer to the base class `models.VGG` for more details.
+    """
+    default_cfg = default_cfgs["vgg16"]
+    model = VGG(model_name="vgg16", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -174,10 +179,10 @@ def vgg16(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kw
 @register_model
 def vgg19(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> VGG:
     """Get 19 layers VGG model.
-     Refer to the base class `models.VGG` for more details.
-     """
-    default_cfg = default_cfgs['vgg19']
-    model = VGG(model_name='vgg19', num_classes=num_classes, in_channels=in_channels, **kwargs)
+    Refer to the base class `models.VGG` for more details.
+    """
+    default_cfg = default_cfgs["vgg19"]
+    model = VGG(model_name="vgg19", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)

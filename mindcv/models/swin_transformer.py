@@ -1,46 +1,49 @@
 """Define SwinTransformer model"""
-from typing import Optional, List, Tuple
+from typing import List, Optional, Tuple
+
 import numpy as np
 
-from mindspore import nn, ops, Tensor, Parameter, numpy
 import mindspore.common.initializer as init
+from mindspore import Parameter, Tensor
 from mindspore import dtype as mstype
+from mindspore import nn, numpy, ops
 
-from .utils import load_pretrained, _ntuple
-from .registry import register_model
 from .layers import DropPath, Identity
+from .registry import register_model
+from .utils import _ntuple, load_pretrained
 
 __all__ = [
-    'SwinTransformer',
-    'swin_tiny'
+    "SwinTransformer",
+    "swin_tiny",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': '', 'classifier': '',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "",
+        "classifier": "",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'swin_tiny': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/swin/swin_tiny_224.ckpt'),
+    "swin_tiny": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/swin/swin_tiny_224.ckpt"),
 }
 
 to_2tuple = _ntuple(2)
 
 
 class Mlp(nn.Cell):
-
-    def __init__(self,
-                 in_features: int,
-                 hidden_features: Optional[int] = None,
-                 out_features: Optional[int] = None,
-                 act_layer: Optional[nn.Cell] = nn.GELU,
-                 drop: float = 0.
-                 ) -> None:
+    def __init__(
+        self,
+        in_features: int,
+        hidden_features: Optional[int] = None,
+        out_features: Optional[int] = None,
+        act_layer: Optional[nn.Cell] = nn.GELU,
+        drop: float = 0.0,
+    ) -> None:
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
@@ -74,10 +77,10 @@ def window_partition(x, window_size: int):
 
 
 class WindowPartition(nn.Cell):
-    
-    def __init__(self,
-                 window_size: int
-                 ) -> None:
+    def __init__(
+        self,
+        window_size: int,
+    ) -> None:
         super(WindowPartition, self).__init__()
 
         self.window_size = window_size
@@ -94,19 +97,19 @@ class WindowPartition(nn.Cell):
         b, h, w, c = x.shape
         x = ops.reshape(x, (b, h // self.window_size, self.window_size, w // self.window_size, self.window_size, c))
         x = ops.transpose(x, (0, 1, 3, 2, 4, 5))
-        x = ops.reshape(x, (b * h * w // (self.window_size ** 2), self.window_size, self.window_size, c))
+        x = ops.reshape(x, (b * h * w // (self.window_size**2), self.window_size, self.window_size, c))
 
         return x
 
 
 class WindowReverse(nn.Cell):
-
-    def construct(self,
-                  windows: Tensor,
-                  window_size: int,
-                  h: int,
-                  w: int
-                  ) -> Tensor:
+    def construct(
+        self,
+        windows: Tensor,
+        window_size: int,
+        h: int,
+        w: int,
+    ) -> Tensor:
         """
         Args:
             windows: (num_windows*B, window_size, window_size, C)
@@ -125,11 +128,11 @@ class WindowReverse(nn.Cell):
 
 
 class RelativeBias(nn.Cell):
-
-    def __init__(self,
-                 window_size: int,
-                 num_heads: int
-                 ) -> None:
+    def __init__(
+        self,
+        window_size: int,
+        num_heads: int,
+    ) -> None:
         super().__init__()
         self.window_size = window_size
         # define a parameter table of relative position bias
@@ -161,7 +164,7 @@ class RelativeBias(nn.Cell):
 
 
 class WindowAttention(nn.Cell):
-    r""" Window based multi-head self attention (W-MSA) Cell with relative position bias.
+    r"""Window based multi-head self attention (W-MSA) Cell with relative position bias.
     It supports both of shifted and non-shifted window.
 
     Args:
@@ -174,16 +177,16 @@ class WindowAttention(nn.Cell):
         proj_drop (float, optional): Dropout ratio of output. Default: 0.0
     """
 
-    def __init__(self,
-                 dim: int,
-                 window_size: int,
-                 num_heads: int,
-                 qkv_bias: bool = True,
-                 qk_scale: Optional[float] = None,
-                 attn_drop: float = 0.,
-                 proj_drop: float = 0.
-                 ) -> None:
-
+    def __init__(
+        self,
+        dim: int,
+        window_size: int,
+        num_heads: int,
+        qkv_bias: bool = True,
+        qk_scale: Optional[float] = None,
+        attn_drop: float = 0.0,
+        proj_drop: float = 0.0,
+    ) -> None:
         super().__init__()
         if isinstance(dim, tuple) and len(dim) == 1:
             dim = dim[0]
@@ -191,7 +194,7 @@ class WindowAttention(nn.Cell):
         self.window_size = window_size  # Wh, Ww
         self.num_heads = num_heads
         head_dim = dim // num_heads
-        self.scale = Tensor(qk_scale or head_dim ** -0.5, mstype.float32)
+        self.scale = Tensor(qk_scale or head_dim**-0.5, mstype.float32)
         self.relative_bias = RelativeBias(self.window_size, num_heads)
 
         # get pair-wise relative position index for each token inside the window
@@ -236,11 +239,11 @@ class WindowAttention(nn.Cell):
         return x
 
     def extra_repr(self) -> str:
-        return f'dim={self.dim}, window_size={self.window_size}, num_heads={self.num_heads}'
+        return f"dim={self.dim}, window_size={self.window_size}, num_heads={self.num_heads}"
 
 
 class SwinTransformerBlock(nn.Cell):
-    """ Swin Transformer Block.
+    """Swin Transformer Block.
 
     Args:
         dim (int): Number of input channels.
@@ -258,21 +261,22 @@ class SwinTransformerBlock(nn.Cell):
         norm_layer (nn.Cell, optional): Normalization layer.  Default: nn.LayerNorm
     """
 
-    def __init__(self,
-                 dim: int,
-                 input_resolution: Tuple[int],
-                 num_heads: int,
-                 window_size: int = 7,
-                 shift_size: int = 0,
-                 mlp_ratio: float = 4.,
-                 qkv_bias: bool = True,
-                 qk_scale: Optional[float] = None,
-                 drop: float = 0.,
-                 attn_drop: float = 0.,
-                 drop_path: float = 0.,
-                 act_layer: Optional[nn.Cell] = nn.GELU,
-                 norm_layer: Optional[nn.Cell] = nn.LayerNorm
-                 ) -> None:
+    def __init__(
+        self,
+        dim: int,
+        input_resolution: Tuple[int],
+        num_heads: int,
+        window_size: int = 7,
+        shift_size: int = 0,
+        mlp_ratio: float = 4.0,
+        qkv_bias: bool = True,
+        qk_scale: Optional[float] = None,
+        drop: float = 0.0,
+        attn_drop: float = 0.0,
+        drop_path: float = 0.0,
+        act_layer: Optional[nn.Cell] = nn.GELU,
+        norm_layer: Optional[nn.Cell] = nn.LayerNorm,
+    ) -> None:
         super(SwinTransformerBlock, self).__init__()
         self.dim = dim
         self.input_resolution = input_resolution
@@ -293,7 +297,7 @@ class SwinTransformerBlock(nn.Cell):
             dim, window_size=to_2tuple(self.window_size), num_heads=num_heads,
             qkv_bias=qkv_bias, qk_scale=qk_scale, attn_drop=attn_drop, proj_drop=drop)
 
-        self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
+        self.drop_path = DropPath(drop_path) if drop_path > 0.0 else Identity()
         self.norm2 = norm_layer(dim, epsilon=1e-5)
         mlp_hidden_dim = int((dim[0] if isinstance(dim, tuple) else dim) * mlp_ratio)
         self.mlp = Mlp(in_features=dim[0] if isinstance(dim, tuple) else dim, hidden_features=mlp_hidden_dim,
@@ -320,7 +324,7 @@ class SwinTransformerBlock(nn.Cell):
             # [64, 49, 49] ==> [1, 64, 1, 49, 49]
             attn_mask = np.expand_dims(attn_mask, axis=1)
             attn_mask = np.expand_dims(attn_mask, axis=0)
-            attn_mask = Tensor(np.where(attn_mask == 0, 0., -100.), dtype=mstype.float32)
+            attn_mask = Tensor(np.where(attn_mask == 0, 0.0, -100.0), dtype=mstype.float32)
             self.attn_mask = Parameter(attn_mask, requires_grad=False)
             self.roll_pos = Roll(self.shift_size)
             self.roll_neg = Roll(-self.shift_size)
@@ -331,7 +335,6 @@ class SwinTransformerBlock(nn.Cell):
         self.window_reverse = WindowReverse()
 
     def construct(self, x: Tensor) -> Tensor:
-
         h, w = self.input_resolution
         b, _, c = x.shape
 
@@ -379,11 +382,11 @@ class SwinTransformerBlock(nn.Cell):
 
 
 class Roll(nn.Cell):
-
-    def __init__(self,
-                 shift_size: int,
-                 shift_axis: Tuple[int] = (1, 2)
-                 ) -> None:
+    def __init__(
+        self,
+        shift_size: int,
+        shift_axis: Tuple[int] = (1, 2),
+    ) -> None:
         super().__init__()
         self.shift_size = to_2tuple(shift_size)
         self.shift_axis = shift_axis
@@ -394,7 +397,7 @@ class Roll(nn.Cell):
 
 
 class PatchMerging(nn.Cell):
-    """ Patch Merging Layer.
+    """Patch Merging Layer.
 
     Args:
         input_resolution (tuple[int]): Resolution of input feature.
@@ -402,11 +405,12 @@ class PatchMerging(nn.Cell):
         norm_layer (nn.Module, optional): Normalization layer.  Default: nn.LayerNorm
     """
 
-    def __init__(self,
-                 input_resolution: Tuple[int],
-                 dim: int,
-                 norm_layer: Optional[nn.Cell] = nn.LayerNorm
-                 ) -> None:
+    def __init__(
+        self,
+        input_resolution: Tuple[int],
+        dim: int,
+        norm_layer: Optional[nn.Cell] = nn.LayerNorm,
+    ) -> None:
         super().__init__()
         self.input_resolution = input_resolution
         self.dim = dim[0] if isinstance(dim, tuple) and len(dim) == 1 else dim
@@ -437,7 +441,7 @@ class PatchMerging(nn.Cell):
 
 
 class BasicLayer(nn.Cell):
-    """ A basic Swin Transformer layer for one stage.
+    """A basic Swin Transformer layer for one stage.
 
     Args:
         dim (int): Number of input channels.
@@ -455,22 +459,22 @@ class BasicLayer(nn.Cell):
         downsample (nn.Cell | None, optional): Downsample layer at the end of the layer. Default: None
     """
 
-    def __init__(self,
-                 dim: int,
-                 input_resolution: Tuple[int],
-                 depth: int,
-                 num_heads: int,
-                 window_size: int,
-                 mlp_ratio: float = 4.,
-                 qkv_bias: bool = True,
-                 qk_scale: Optional[float] = None,
-                 drop: float = 0.,
-                 attn_drop: float = 0.,
-                 drop_path: Optional[float] = 0.,
-                 norm_layer: Optional[nn.Cell] = nn.LayerNorm,
-                 downsample: Optional[nn.Cell] = None
-                 ) -> None:
-
+    def __init__(
+        self,
+        dim: int,
+        input_resolution: Tuple[int],
+        depth: int,
+        num_heads: int,
+        window_size: int,
+        mlp_ratio: float = 4.0,
+        qkv_bias: bool = True,
+        qk_scale: Optional[float] = None,
+        drop: float = 0.0,
+        attn_drop: float = 0.0,
+        drop_path: Optional[float] = 0.0,
+        norm_layer: Optional[nn.Cell] = nn.LayerNorm,
+        downsample: Optional[nn.Cell] = None,
+    ) -> None:
         super().__init__()
         self.dim = dim
         self.input_resolution = input_resolution
@@ -495,7 +499,6 @@ class BasicLayer(nn.Cell):
             self.downsample = None
 
     def construct(self, x: Tensor) -> Tensor:
-
         for blk in self.blocks:
             x = blk(x)
         if self.downsample is not None:
@@ -507,7 +510,7 @@ class BasicLayer(nn.Cell):
 
 
 class PatchEmbed(nn.Cell):
-    """ Image to Patch Embedding
+    """Image to Patch Embedding
 
     Args:
         image_size (int): Image size.  Default: 224.
@@ -517,13 +520,14 @@ class PatchEmbed(nn.Cell):
         norm_layer (nn.Cell, optional): Normalization layer. Default: None
     """
 
-    def __init__(self,
-                 image_size: int = 224,
-                 patch_size: int = 4,
-                 in_chans: int = 3,
-                 embed_dim: int = 96,
-                 norm_layer: Optional[nn.Cell] = None
-                 ) -> None:
+    def __init__(
+        self,
+        image_size: int = 224,
+        patch_size: int = 4,
+        in_chans: int = 3,
+        embed_dim: int = 96,
+        norm_layer: Optional[nn.Cell] = None,
+    ) -> None:
         super().__init__()
         image_size = to_2tuple(image_size)
         patch_size = to_2tuple(patch_size)
@@ -537,7 +541,7 @@ class PatchEmbed(nn.Cell):
         self.embed_dim = embed_dim
 
         self.proj = nn.Conv2d(in_channels=in_chans, out_channels=embed_dim, kernel_size=patch_size, stride=patch_size,
-                              pad_mode='pad', has_bias=True, weight_init="TruncatedNormal")
+                              pad_mode="pad", has_bias=True, weight_init="TruncatedNormal")
 
         if norm_layer is not None:
             if isinstance(embed_dim, int):
@@ -547,7 +551,6 @@ class PatchEmbed(nn.Cell):
             self.norm = None
 
     def construct(self, x: Tensor) -> Tensor:
-
         b = x.shape[0]
         # FIXME look at relaxing size constraints
         x = ops.reshape(self.proj(x), (b, self.embed_dim, -1))  # b Ph*Pw c
@@ -582,24 +585,26 @@ class SwinTransformer(nn.Cell):
         patch_norm (bool): If True, add normalization after patch embedding. Default: True
     """
 
-    def __init__(self,
-                 image_size: int = 224,
-                 patch_size: int = 4,
-                 in_chans: int = 3,
-                 num_classes: int = 1000,
-                 embed_dim: int = 96,
-                 depths: Optional[List[int]] = None,
-                 num_heads: Optional[List[int]] = None,
-                 window_size: int = 7,
-                 mlp_ratio: float = 4.,
-                 qkv_bias: bool = True,
-                 qk_scale: Optional[int] = None,
-                 drop_rate: float = 0.,
-                 attn_drop_rate: float = 0.,
-                 drop_path_rate: float = 0.1,
-                 norm_layer: Optional[nn.Cell] = nn.LayerNorm,
-                 ape: bool = False,
-                 patch_norm: bool = True) -> None:
+    def __init__(
+        self,
+        image_size: int = 224,
+        patch_size: int = 4,
+        in_chans: int = 3,
+        num_classes: int = 1000,
+        embed_dim: int = 96,
+        depths: Optional[List[int]] = None,
+        num_heads: Optional[List[int]] = None,
+        window_size: int = 7,
+        mlp_ratio: float = 4.0,
+        qkv_bias: bool = True,
+        qk_scale: Optional[int] = None,
+        drop_rate: float = 0.0,
+        attn_drop_rate: float = 0.0,
+        drop_path_rate: float = 0.1,
+        norm_layer: Optional[nn.Cell] = nn.LayerNorm,
+        ape: bool = False,
+        patch_norm: bool = True,
+    ) -> None:
         super().__init__()
 
         self.num_classes = num_classes
@@ -654,25 +659,18 @@ class SwinTransformer(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Dense):
                 cell.weight.set_data(init.initializer(init.TruncatedNormal(sigma=0.02),
-                                                      cell.weight.shape,
-                                                      cell.weight.dtype))
+                                                      cell.weight.shape, cell.weight.dtype))
                 if isinstance(cell, nn.Dense) and cell.bias is not None:
-                    cell.bias.set_data(init.initializer(init.Zero(),
-                                                        cell.bias.shape,
-                                                        cell.bias.dtype))
+                    cell.bias.set_data(init.initializer(init.Zero(), cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, nn.LayerNorm):
-                cell.gamma.set_data(init.initializer(init.One(),
-                                                     cell.gamma.shape,
-                                                     cell.gamma.dtype))
-                cell.beta.set_data(init.initializer(init.Zero(),
-                                                    cell.beta.shape,
-                                                    cell.beta.dtype))
+                cell.gamma.set_data(init.initializer(init.One(), cell.gamma.shape, cell.gamma.dtype))
+                cell.beta.set_data(init.initializer(init.Zero(), cell.beta.shape, cell.beta.dtype))
 
     def no_weight_decay(self) -> None:
-        return {'absolute_pos_embed'}
+        return {"absolute_pos_embed"}
 
     def no_weight_decay_keywords(self) -> None:
-        return {'relative_position_bias_table'}
+        return {"relative_position_bias_table"}
 
     def forward_head(self, x: Tensor) -> Tensor:
         x = self.classifier(x)
@@ -700,7 +698,7 @@ def swin_tiny(pretrained: bool = False, num_classes: int = 1000, in_channels=3, 
     """Get SwinTransformer tiny model.
     Refer to the base class 'models.SwinTransformer' for more details.
     """
-    default_cfg = default_cfgs['swin_tiny']
+    default_cfg = default_cfgs["swin_tiny"]
     model = SwinTransformer(image_size=224, patch_size=4, in_chans=in_channels, num_classes=num_classes,
                             embed_dim=96, depths=[2, 2, 6, 2], num_heads=[3, 6, 12, 24], window_size=7,
                             mlp_ratio=4., qkv_bias=True, qk_scale=None,

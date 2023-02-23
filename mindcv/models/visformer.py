@@ -4,38 +4,41 @@ Refer to: Visformer: The Vision-friendly Transformer
 """
 
 from typing import List
+
 import numpy as np
 
 import mindspore
-from mindspore import nn, ops, Tensor
-from mindspore.common.initializer import initializer, HeNormal, Constant, TruncatedNormal
+from mindspore import Tensor, nn, ops
+from mindspore.common.initializer import Constant, HeNormal, TruncatedNormal, initializer
 
-from .utils import load_pretrained, _ntuple
-from .layers import Identity, GlobalAvgPooling, DropPath
+from .layers import DropPath, GlobalAvgPooling, Identity
 from .registry import register_model
+from .utils import _ntuple, load_pretrained
 
 __all__ = [
-    'visformer_tiny',
-    'visformer_small',
-    'visformer_tiny_v2',
-    'visformer_small_v2'
+    "Visformer",
+    "visformer_tiny",
+    "visformer_small",
+    "visformer_tiny_v2",
+    "visformer_small_v2",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': '', 'classifier': '',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "",
+        "classifier": "",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'visformer_small': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small.ckpt'),
-    'visformer_tiny': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny.ckpt'),
-    'visformer_tiny_v2': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny_v2.ckpt'),
-    'visformer_small_v2': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small_v2.ckpt')
+    "visformer_small": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small.ckpt"),
+    "visformer_tiny": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny.ckpt"),
+    "visformer_tiny_v2": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny_v2.ckpt"),
+    "visformer_small_v2": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small_v2.ckpt"),
 }
 
 to_2tuple = _ntuple(2)
@@ -44,13 +47,16 @@ to_2tuple = _ntuple(2)
 class Mlp(nn.Cell):
     """MLP layer"""
 
-    def __init__(self, in_features: int,
-                 hidden_features: int = None,
-                 out_features: int = None,
-                 act_layer: nn.Cell = nn.GELU,
-                 drop: float = 0.,
-                 group: int = 8,
-                 spatial_conv: bool = False) -> None:
+    def __init__(
+        self,
+        in_features: int,
+        hidden_features: int = None,
+        out_features: int = None,
+        act_layer: nn.Cell = nn.GELU,
+        drop: float = 0.0,
+        group: int = 8,
+        spatial_conv: bool = False,
+    ) -> None:
         super(Mlp, self).__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
@@ -65,12 +71,12 @@ class Mlp(nn.Cell):
         self.hidden_features = hidden_features
         self.group = group
         self.drop = nn.Dropout(1 - drop)
-        self.conv1 = nn.Conv2d(in_features, hidden_features, 1, 1, pad_mode='pad', padding=0)
+        self.conv1 = nn.Conv2d(in_features, hidden_features, 1, 1, pad_mode="pad", padding=0)
         self.act1 = act_layer()
         if self.spatial_conv:
-            self.conv2 = nn.Conv2d(hidden_features, hidden_features, 3, 1, pad_mode='pad', padding=1, group=self.group)
+            self.conv2 = nn.Conv2d(hidden_features, hidden_features, 3, 1, pad_mode="pad", padding=1, group=self.group)
             self.act2 = act_layer()
-        self.conv3 = nn.Conv2d(hidden_features, out_features, 1, 1, pad_mode='pad', padding=0)
+        self.conv3 = nn.Conv2d(hidden_features, out_features, 1, 1, pad_mode="pad", padding=0)
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.conv1(x)
@@ -89,14 +95,16 @@ class Mlp(nn.Cell):
 class Attention(nn.Cell):
     """Attention layer"""
 
-    def __init__(self,
-                 dim: int,
-                 num_heads: int = 8,
-                 head_dim_ratio: float = 1.,
-                 qkv_bias: bool = False,
-                 qk_scale: float = None,
-                 attn_drop: float = 0.,
-                 proj_drop: float = 0.) -> None:
+    def __init__(
+        self,
+        dim: int,
+        num_heads: int = 8,
+        head_dim_ratio: float = 1.0,
+        qkv_bias: bool = False,
+        qk_scale: float = None,
+        attn_drop: float = 0.0,
+        proj_drop: float = 0.0,
+    ) -> None:
         super(Attention, self).__init__()
         self.dim = dim
         self.num_heads = num_heads
@@ -104,11 +112,11 @@ class Attention(nn.Cell):
         self.head_dim = head_dim
 
         qk_scale_factor = qk_scale if qk_scale is not None else -0.25
-        self.scale = head_dim ** qk_scale_factor
+        self.scale = head_dim**qk_scale_factor
 
-        self.qkv = nn.Conv2d(dim, head_dim * num_heads * 3, 1, 1, pad_mode='pad', padding=0, has_bias=qkv_bias)
+        self.qkv = nn.Conv2d(dim, head_dim * num_heads * 3, 1, 1, pad_mode="pad", padding=0, has_bias=qkv_bias)
         self.attn_drop = nn.Dropout(1 - attn_drop)
-        self.proj = nn.Conv2d(self.head_dim * self.num_heads, dim, 1, 1, pad_mode='pad', padding=0)
+        self.proj = nn.Conv2d(self.head_dim * self.num_heads, dim, 1, 1, pad_mode="pad", padding=0)
         self.proj_drop = nn.Dropout(1 - proj_drop)
 
     def construct(self, x: Tensor) -> Tensor:
@@ -132,24 +140,26 @@ class Attention(nn.Cell):
 class Block(nn.Cell):
     """visformer basic block"""
 
-    def __init__(self,
-                 dim: int,
-                 num_heads: int,
-                 head_dim_ratio: float = 1.,
-                 mlp_ratio: float = 4.,
-                 qkv_bias: bool = False,
-                 qk_scale: float = None,
-                 drop: float = 0.,
-                 attn_drop: float = 0.,
-                 drop_path: float = 0.,
-                 act_layer: nn.Cell = nn.GELU,
-                 group: int = 8,
-                 attn_disabled: bool = False,
-                 spatial_conv: bool = False) -> None:
+    def __init__(
+        self,
+        dim: int,
+        num_heads: int,
+        head_dim_ratio: float = 1.0,
+        mlp_ratio: float = 4.0,
+        qkv_bias: bool = False,
+        qk_scale: float = None,
+        drop: float = 0.0,
+        attn_drop: float = 0.0,
+        drop_path: float = 0.0,
+        act_layer: nn.Cell = nn.GELU,
+        group: int = 8,
+        attn_disabled: bool = False,
+        spatial_conv: bool = False,
+    ) -> None:
         super(Block, self).__init__()
         self.attn_disabled = attn_disabled
         self.spatial_conv = spatial_conv
-        self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
+        self.drop_path = DropPath(drop_path) if drop_path > 0.0 else Identity()
         if not attn_disabled:
             self.norm1 = nn.BatchNorm2d(dim)
             self.attn = Attention(dim, num_heads=num_heads, head_dim_ratio=head_dim_ratio, qkv_bias=qkv_bias,
@@ -168,12 +178,13 @@ class Block(nn.Cell):
 
 
 class PatchEmbed(nn.Cell):
-
-    def __init__(self,
-                 img_size: int = 224,
-                 patch_size: int = 16,
-                 in_chans: int = 3,
-                 embed_dim: int = 768) -> None:
+    def __init__(
+        self,
+        img_size: int = 224,
+        patch_size: int = 16,
+        in_chans: int = 3,
+        embed_dim: int = 768,
+    ) -> None:
         super(PatchEmbed, self).__init__()
         img_size = to_2tuple(img_size)
         patch_size = to_2tuple(patch_size)
@@ -182,7 +193,7 @@ class PatchEmbed(nn.Cell):
         self.img_size = img_size
         self.patch_size = patch_size
         self.num_patches = num_patches
-        self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size, pad_mode='pad', padding=0,
+        self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size, pad_mode="pad", padding=0,
                               has_bias=True)
         self.norm = nn.BatchNorm2d(embed_dim)
 
@@ -218,26 +229,27 @@ class Visformer(nn.Cell):
         conv_init : if true will init convolution weights else not. Default: False.
     """
 
-    def __init__(self,
-                 img_size: int = 224,
-                 init_channels: int = 32,
-                 num_classes: int = 1000,
-                 embed_dim: int = 384,
-                 depth: List[int] = None,
-                 num_heads: List[int] = None,
-                 mlp_ratio: float = 4.,
-                 qkv_bias: bool = False,
-                 qk_scale: float = None,
-                 drop_rate: float = 0.,
-                 attn_drop_rate: float = 0.,
-                 drop_path_rate: float = 0.1,
-                 attn_stage: str = '1111',
-                 pos_embed: bool = True,
-                 spatial_conv: str = '1111',
-                 group: int = 8,
-                 pool: bool = True,
-                 conv_init: bool = False) -> None:
-
+    def __init__(
+        self,
+        img_size: int = 224,
+        init_channels: int = 32,
+        num_classes: int = 1000,
+        embed_dim: int = 384,
+        depth: List[int] = None,
+        num_heads: List[int] = None,
+        mlp_ratio: float = 4.0,
+        qkv_bias: bool = False,
+        qk_scale: float = None,
+        drop_rate: float = 0.0,
+        attn_drop_rate: float = 0.0,
+        drop_path_rate: float = 0.1,
+        attn_stage: str = "1111",
+        pos_embed: bool = True,
+        spatial_conv: str = "1111",
+        group: int = 8,
+        pool: bool = True,
+        conv_init: bool = False,
+    ) -> None:
         super(Visformer, self).__init__()
         self.num_classes = num_classes
         self.num_features = self.embed_dim = embed_dim
@@ -254,7 +266,7 @@ class Visformer(nn.Cell):
         dpr = np.linspace(0, drop_path_rate, sum(depth)).tolist()
 
         self.stem = nn.SequentialCell([
-            nn.Conv2d(3, self.init_channels, 7, 2, pad_mode='pad', padding=3),
+            nn.Conv2d(3, self.init_channels, 7, 2, pad_mode="pad", padding=3),
             nn.BatchNorm2d(self.init_channels),
             nn.ReLU()
         ])
@@ -272,7 +284,7 @@ class Visformer(nn.Cell):
             self.stage0 = nn.CellList([
                 Block(dim=embed_dim // 4, num_heads=num_heads[0], head_dim_ratio=0.25, mlp_ratio=mlp_ratio,
                       qkv_bias=qkv_bias, qk_scale=qk_scale, drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i],
-                      group=group, attn_disabled=(attn_stage[0] == '0'), spatial_conv=(spatial_conv[0] == '1'))
+                      group=group, attn_disabled=(attn_stage[0] == "0"), spatial_conv=(spatial_conv[0] == "1"))
                 for i in range(depth[0])
             ])
 
@@ -293,7 +305,7 @@ class Visformer(nn.Cell):
             Block(
                 dim=embed_dim // 2, num_heads=num_heads[1], head_dim_ratio=0.5, mlp_ratio=mlp_ratio,
                 qkv_bias=qkv_bias, qk_scale=qk_scale, drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i],
-                group=group, attn_disabled=(attn_stage[1] == '0'), spatial_conv=(spatial_conv[1] == '1')
+                group=group, attn_disabled=(attn_stage[1] == "0"), spatial_conv=(spatial_conv[1] == "1")
             )
             for i in range(sum(depth[:1]), sum(depth[:2]))
         ])
@@ -307,7 +319,7 @@ class Visformer(nn.Cell):
             Block(
                 dim=embed_dim, num_heads=num_heads[2], head_dim_ratio=1.0, mlp_ratio=mlp_ratio,
                 qkv_bias=qkv_bias, qk_scale=qk_scale, drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i],
-                group=group, attn_disabled=(attn_stage[2] == '0'), spatial_conv=(spatial_conv[2] == '1')
+                group=group, attn_disabled=(attn_stage[2] == "0"), spatial_conv=(spatial_conv[2] == "1")
             )
             for i in range(sum(depth[:2]), sum(depth[:3]))
         ])
@@ -321,7 +333,7 @@ class Visformer(nn.Cell):
             Block(
                 dim=embed_dim * 2, num_heads=num_heads[3], head_dim_ratio=1.0, mlp_ratio=mlp_ratio,
                 qkv_bias=qkv_bias, qk_scale=qk_scale, drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i],
-                group=group, attn_disabled=(attn_stage[3] == '0'), spatial_conv=(spatial_conv[3] == '1')
+                group=group, attn_disabled=(attn_stage[3] == "0"), spatial_conv=(spatial_conv[3] == "1")
             )
             for i in range(sum(depth[:3]), sum(depth[:4]))
         ])
@@ -360,7 +372,7 @@ class Visformer(nn.Cell):
                 cell.gamma.set_data(initializer(Constant(1), cell.gamma.shape, cell.gamma.dtype))
             elif isinstance(cell, nn.Conv2d):
                 if self.conv_init:
-                    cell.weight.set_data(initializer(HeNormal(mode='fan_out', nonlinearity='relu'), cell.weight.shape,
+                    cell.weight.set_data(initializer(HeNormal(mode="fan_out", nonlinearity="relu"), cell.weight.shape,
                                                      cell.weight.dtype))
                 else:
                     cell.weight.set_data(initializer(TruncatedNormal(0.02), cell.weight.shape, cell.weight.dtype))
@@ -421,17 +433,14 @@ class Visformer(nn.Cell):
 
 
 @register_model
-def visformer_tiny(pretrained: bool = False,
-                   num_classes: int = 1000,
-                   in_channels: int = 3,
-                   **kwargs):
+def visformer_tiny(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs):
     """Get visformer tiny model.
     Refer to the base class 'models.visformer' for more details.
     """
-    default_cfg = default_cfgs['visformer_tiny']
+    default_cfg = default_cfgs["visformer_tiny"]
     model = Visformer(img_size=224, init_channels=16, num_classes=num_classes, embed_dim=192,
                       depth=[0, 7, 4, 4], num_heads=[3, 3, 3, 3], mlp_ratio=4., group=8,
-                      attn_stage='0011', spatial_conv='1100', drop_path_rate=0.03, conv_init=True, **kwargs)
+                      attn_stage="0011", spatial_conv="1100", drop_path_rate=0.03, conv_init=True, **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
@@ -439,51 +448,42 @@ def visformer_tiny(pretrained: bool = False,
 
 
 @register_model
-def visformer_tiny_v2(pretrained: bool = False,
-                      num_classes: int = 1000,
-                      in_channels: int = 3,
-                      **kwargs):
+def visformer_tiny_v2(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs):
     """Get visformer tiny2 model.
     Refer to the base class 'models.visformer' for more details.
     """
-    default_cfg = default_cfgs['visformer_tiny_v2']
+    default_cfg = default_cfgs["visformer_tiny_v2"]
     model = Visformer(img_size=224, init_channels=24, num_classes=num_classes, embed_dim=192,
                       depth=[1, 4, 6, 3], num_heads=[1, 3, 6, 12], mlp_ratio=4., qk_scale=-0.5, group=8,
-                      attn_stage='0011', spatial_conv='1100', drop_path_rate=0.03, conv_init=True, **kwargs)
+                      attn_stage="0011", spatial_conv="1100", drop_path_rate=0.03, conv_init=True, **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
 
 
 @register_model
-def visformer_small(pretrained: bool = False,
-                    num_classes: int = 1000,
-                    in_channels: int = 3,
-                    **kwargs):
+def visformer_small(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs):
     """Get visformer small model.
     Refer to the base class 'models.visformer' for more details.
     """
-    default_cfg = default_cfgs['visformer_small']
+    default_cfg = default_cfgs["visformer_small"]
     model = Visformer(img_size=224, init_channels=32, num_classes=num_classes, embed_dim=384,
                       depth=[0, 7, 4, 4], num_heads=[6, 6, 6, 6], mlp_ratio=4., group=8,
-                      attn_stage='0011', spatial_conv='1100', conv_init=True, **kwargs)
+                      attn_stage="0011", spatial_conv="1100", conv_init=True, **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
 
 
 @register_model
-def visformer_small_v2(pretrained: bool = False,
-                       num_classes: int = 1000,
-                       in_channels: int = 3,
-                       **kwargs):
+def visformer_small_v2(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs):
     """Get visformer small2 model.
     Refer to the base class 'models.visformer' for more details.
     """
-    default_cfg = default_cfgs['visformer_small_v2']
+    default_cfg = default_cfgs["visformer_small_v2"]
     model = Visformer(img_size=224, init_channels=32, num_classes=num_classes, embed_dim=256,
                       depth=[1, 10, 14, 3], num_heads=[2, 4, 8, 16], mlp_ratio=4., qk_scale=-0.5,
-                      group=8, attn_stage='0011', spatial_conv='1100', conv_init=True, **kwargs)
+                      group=8, attn_stage="0011", spatial_conv="1100", conv_init=True, **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model

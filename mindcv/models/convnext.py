@@ -3,53 +3,57 @@ MindSpore implementation of `ConvNeXt`.
 Refer to: A ConvNet for the 2020s
 """
 from typing import List, Tuple
+
 import numpy as np
 
-from mindspore import nn, ops, Parameter, Tensor
-from mindspore import dtype as mstype
 import mindspore.common.initializer as init
+from mindspore import Parameter, Tensor
+from mindspore import dtype as mstype
+from mindspore import nn, ops
 
-from .utils import load_pretrained
-from .registry import register_model
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
+from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
-    'ConvNeXt',
-    'convnext_tiny',
-    'convnext_small',
-    'convnext_base',
-    'convnext_large',
-    'convnext_xlarge'
+    "ConvNeXt",
+    "convnext_tiny",
+    "convnext_small",
+    "convnext_base",
+    "convnext_large",
+    "convnext_xlarge",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'feature.0.0', 'classifier': 'classifier',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "feature.0.0",
+        "classifier": "classifier",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'convnext_tiny': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_tiny_224.ckpt'),
-    'convnext_small': _cfg(url=''),
-    'convnext_base': _cfg(url=''),
-    'convnext_large': _cfg(url=''),
-    'convnext_xlarge': _cfg(url=''),
+    "convnext_tiny": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_tiny_224.ckpt"),
+    "convnext_small": _cfg(url=""),
+    "convnext_base": _cfg(url=""),
+    "convnext_large": _cfg(url=""),
+    "convnext_xlarge": _cfg(url=""),
 }
 
 
 class ConvNextLayerNorm(nn.LayerNorm):
-    r""" LayerNorm for channels_first tensors with 2d spatial dimensions (ie N, C, H, W).
-    """
-    def __init__(self,
-                 normalized_shape: Tuple[int],
-                 epsilon: float,
-                 norm_axis: int = -1
-                 ) -> None:
+    r"""LayerNorm for channels_first tensors with 2d spatial dimensions (ie N, C, H, W)."""
+
+    def __init__(
+        self,
+        normalized_shape: Tuple[int],
+        epsilon: float,
+        norm_axis: int = -1,
+    ) -> None:
         super().__init__(normalized_shape=normalized_shape, epsilon=epsilon)
         assert norm_axis in (-1, 1), "ConvNextLayerNorm's norm_axis must be 1 or -1."
         self.norm_axis = norm_axis
@@ -65,7 +69,7 @@ class ConvNextLayerNorm(nn.LayerNorm):
 
 
 class Block(nn.Cell):
-    """ ConvNeXt Block
+    """ConvNeXt Block
     There are two equivalent implementations:
       (1) DwConv -> LayerNorm (channels_first) -> 1x1 Conv -> GELU -> 1x1 Conv; all in (N, C, H, W)
       (2) DwConv -> Permute to (N, H, W, C); LayerNorm (channels_last) -> Linear -> GELU -> Linear; Permute back
@@ -77,11 +81,13 @@ class Block(nn.Cell):
         drop_path (float): Stochastic depth rate. Default: 0.0
         layer_scale_init_value (float): Init value for Layer Scale. Default: 1e-6.
     """
-    def __init__(self,
-                 dim: int,
-                 drop_path: float = 0.,
-                 layer_scale_init_value: float = 1e-6
-                 ) -> None:
+
+    def __init__(
+        self,
+        dim: int,
+        drop_path: float = 0.0,
+        layer_scale_init_value: float = 1e-6,
+    ) -> None:
         super().__init__()
         self.dwconv = nn.Conv2d(dim, dim, kernel_size=7, group=dim, has_bias=True)  # depthwise conv
         self.norm = ConvNextLayerNorm((dim,), epsilon=1e-6)
@@ -90,7 +96,7 @@ class Block(nn.Cell):
         self.pwconv2 = nn.Dense(4 * dim, dim)
         self.gamma_ = Parameter(Tensor(layer_scale_init_value * np.ones((dim)), dtype=mstype.float32),
                                 requires_grad=True) if layer_scale_init_value > 0 else None
-        self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
+        self.drop_path = DropPath(drop_path) if drop_path > 0.0 else Identity()
 
     def construct(self, x: Tensor) -> Tensor:
         downsample = x
@@ -119,20 +125,23 @@ class ConvNeXt(nn.Cell):
         layer_scale_init_value (float) : the parameter of init for the classifier default : 1e-6.
         head_init_scale (float) : the parameter of init for the head default : 1.
     """
-    def __init__(self,
-                 in_channels: int,
-                 num_classes: int,
-                 depths: List[int],
-                 dims: List[int],
-                 drop_path_rate: float = 0.,
-                 layer_scale_init_value: float = 1e-6,
-                 head_init_scale: float = 1.):
+
+    def __init__(
+        self,
+        in_channels: int,
+        num_classes: int,
+        depths: List[int],
+        dims: List[int],
+        drop_path_rate: float = 0.0,
+        layer_scale_init_value: float = 1e-6,
+        head_init_scale: float = 1.0,
+    ):
         super().__init__()
 
         self.downsample_layers = nn.CellList()  # stem and 3 intermediate down_sampling conv layers
         stem = nn.SequentialCell(
             nn.Conv2d(in_channels, dims[0], kernel_size=4, stride=4, has_bias=True),
-            ConvNextLayerNorm((dims[0],), epsilon=1e-6, norm_axis=1)
+            ConvNextLayerNorm((dims[0],), epsilon=1e-6, norm_axis=1),
         )
         self.downsample_layers.append(stem)
         for i in range(3):
@@ -173,13 +182,11 @@ class ConvNeXt(nn.Cell):
         """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
             if isinstance(cell, (nn.Dense, nn.Conv2d)):
-                cell.weight.set_data(init.initializer(init.TruncatedNormal(sigma=0.02),
-                                                      cell.weight.shape,
-                                                      cell.weight.dtype))
+                cell.weight.set_data(
+                    init.initializer(init.TruncatedNormal(sigma=0.02), cell.weight.shape, cell.weight.dtype)
+                )
                 if isinstance(cell, nn.Dense) and cell.bias is not None:
-                    cell.bias.set_data(init.initializer(init.Zero(),
-                                                        cell.bias.shape,
-                                                        cell.bias.dtype))
+                    cell.bias.set_data(init.initializer(init.Zero(), cell.bias.shape, cell.bias.dtype))
         self.classifier.weight.set_data(self.classifier.weight * self.head_init_scale)
         self.classifier.bias.set_data(self.classifier.bias * self.head_init_scale)
 
@@ -202,10 +209,10 @@ def convnext_tiny(pretrained: bool = False, num_classes: int = 1000, in_channels
     """Get ConvNeXt tiny model.
     Refer to the base class 'models.ConvNeXt' for more details.
     """
-    default_cfg = default_cfgs['convnext_tiny']
-    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 9, 3],
-                     dims=[96, 192, 384, 768],
-                     **kwargs)
+    default_cfg = default_cfgs["convnext_tiny"]
+    model = ConvNeXt(
+        in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 9, 3], dims=[96, 192, 384, 768], **kwargs
+    )
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -218,10 +225,10 @@ def convnext_small(pretrained: bool = False, num_classes: int = 1000, in_channel
     """Get ConvNeXt small model.
     Refer to the base class 'models.ConvNeXt' for more details.
     """
-    default_cfg = default_cfgs['convnext_small']
-    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
-                     dims=[96, 192, 384, 768],
-                     **kwargs)
+    default_cfg = default_cfgs["convnext_small"]
+    model = ConvNeXt(
+        in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3], dims=[96, 192, 384, 768], **kwargs
+    )
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -234,10 +241,10 @@ def convnext_base(pretrained: bool = False, num_classes: int = 1000, in_channels
     """Get ConvNeXt base model.
     Refer to the base class 'models.ConvNeXt' for more details.
     """
-    default_cfg = default_cfgs['convnext_base']
-    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
-                     dims=[128, 256, 512, 1024],
-                     **kwargs)
+    default_cfg = default_cfgs["convnext_base"]
+    model = ConvNeXt(
+        in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3], dims=[128, 256, 512, 1024], **kwargs
+    )
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -250,10 +257,10 @@ def convnext_large(pretrained: bool = False, num_classes: int = 1000, in_channel
     """Get ConvNeXt large model.
     Refer to the base class 'models.ConvNeXt' for more details.
     """
-    default_cfg = default_cfgs['convnext_large']
-    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
-                     dims=[192, 384, 768, 1536],
-                     **kwargs)
+    default_cfg = default_cfgs["convnext_large"]
+    model = ConvNeXt(
+        in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3], dims=[192, 384, 768, 1536], **kwargs
+    )
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -266,10 +273,10 @@ def convnext_xlarge(pretrained: bool = False, num_classes: int = 1000, in_channe
     """Get ConvNeXt xlarge model.
     Refer to the base class 'models.ConvNeXt' for more details.
     """
-    default_cfg = default_cfgs['convnext_xlarge']
-    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
-                     dims=[256, 512, 1024, 2048],
-                     **kwargs)
+    default_cfg = default_cfgs["convnext_xlarge"]
+    model = ConvNeXt(
+        in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3], dims=[256, 512, 1024, 2048], **kwargs
+    )
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)

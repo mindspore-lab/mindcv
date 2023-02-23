@@ -25,12 +25,13 @@ CutMix: https://github.com/clovaai/CutMix-PyTorch
 Hacked together by / Copyright 2020 Ross Wightman
 """
 import numpy as np
+
 from mindspore import Tensor
 from mindspore import dtype as mstype
 from mindspore import ops as P
 
 
-def one_hot(x, num_classes, on_value=1., off_value=0.):
+def one_hot(x, num_classes, on_value=1.0, off_value=0.0):
     """one hot to label"""
     x = x.reshape(-1)
     x = np.eye(num_classes)[x]
@@ -38,21 +39,21 @@ def one_hot(x, num_classes, on_value=1., off_value=0.):
     return x
 
 
-def mixup_target(target, num_classes, lam=1., smoothing=0.0, is_onehot_label=False):
+def mixup_target(target, num_classes, lam=1.0, smoothing=0.0, is_onehot_label=False):
     """mixup_target"""
     if not is_onehot_label:
         off_value = smoothing / num_classes
-        on_value = 1. - smoothing + off_value
+        on_value = 1.0 - smoothing + off_value
         y1 = one_hot(target, num_classes, on_value=on_value, off_value=off_value)
         y2 = one_hot(np.flip(target, axis=0), num_classes, on_value=on_value, off_value=off_value)
     else:
         y1 = target
         y2 = np.flip(target)
-    return y1 * lam + y2 * (1. - lam)
+    return y1 * lam + y2 * (1.0 - lam)
 
 
-def rand_bbox(img_shape, lam, margin=0., count=None):
-    """ Standard CutMix bounding-box
+def rand_bbox(img_shape, lam, margin=0.0, count=None):
+    """Standard CutMix bounding-box
     Generates a random square bbox based on lambda value. This impl includes
     support for enforcing a border margin as percent of bbox dimensions.
 
@@ -76,7 +77,7 @@ def rand_bbox(img_shape, lam, margin=0., count=None):
 
 
 def rand_bbox_minmax(img_shape, minmax, count=None):
-    """ Min-Max CutMix bounding-box
+    """Min-Max CutMix bounding-box
     Inspired by Darknet cutmix impl, generates a random rectangular bbox
     based on min/max percent values applied to each dimension of the input image.
 
@@ -99,20 +100,19 @@ def rand_bbox_minmax(img_shape, minmax, count=None):
 
 
 def cutmix_bbox_and_lam(img_shape, lam, ratio_minmax=None, correct_lam=True, count=None):
-    """ Generate bbox and apply lambda correction.
-    """
+    """Generate bbox and apply lambda correction."""
     if ratio_minmax is not None:
         yl, yu, xl, xu = rand_bbox_minmax(img_shape, ratio_minmax, count=count)
     else:
         yl, yu, xl, xu = rand_bbox(img_shape, lam, count=count)
     if correct_lam or ratio_minmax is not None:
         bbox_area = (yu - yl) * (xu - xl)
-        lam = 1. - bbox_area / float(img_shape[-2] * img_shape[-1])
+        lam = 1.0 - bbox_area / float(img_shape[-2] * img_shape[-1])
     return (yl, yu, xl, xu), lam
 
 
 class Mixup:
-    """ Mixup/Cutmix that applies different params to each element or whole batch
+    """Mixup/Cutmix that applies different params to each element or whole batch
 
     Args:
         mixup_alpha (float): mixup alpha value, mixup is active if > 0.
@@ -124,11 +124,22 @@ class Mixup:
         correct_lam (bool): apply lambda correction when cutmix bbox clipped by image borders
         label_smoothing (float): apply label smoothing to the mixed target tensor
         num_classes (int): number of classes for target
-        is_onehot_label (bool): indicate wheter the input label is onehot format. 
+        is_onehot_label (bool): indicate wheter the input label is onehot format.
     """
 
-    def __init__(self, mixup_alpha=1., cutmix_alpha=0., cutmix_minmax=None, prob=1.0, switch_prob=0.5,
-                 mode='batch', correct_lam=True, label_smoothing=0.1, num_classes=1000, is_onehot_label=False):
+    def __init__(
+        self,
+        mixup_alpha=1.0,
+        cutmix_alpha=0.0,
+        cutmix_minmax=None,
+        prob=1.0,
+        switch_prob=0.5,
+        mode="batch",
+        correct_lam=True,
+        label_smoothing=0.1,
+        num_classes=1000,
+        is_onehot_label=False,
+    ):
         self.mixup_alpha = mixup_alpha
         self.cutmix_alpha = cutmix_alpha
         self.cutmix_minmax = cutmix_minmax
@@ -142,23 +153,24 @@ class Mixup:
         self.num_classes = num_classes
         self.mode = mode
         self.correct_lam = correct_lam  # correct lambda based on clipped area for cutmix
-        self.mixup_enabled = True  # set to false to disable mixing (intended tp be set by train loop)
-        self.is_onehot_label = is_onehot_label # 
+        self.mixup_enabled = True  # set false to disable mixing (intended tp be set by train loop)
+        self.is_onehot_label = is_onehot_label
 
     def _params_per_elem(self, batch_size):
         """_params_per_elem"""
         lam = np.ones(batch_size, dtype=np.float32)
         use_cutmix = np.zeros(batch_size, dtype=np.bool)
         if self.mixup_enabled:
-            if self.mixup_alpha > 0. and self.cutmix_alpha > 0.:
+            if self.mixup_alpha > 0.0 and self.cutmix_alpha > 0.0:
                 use_cutmix = np.random.rand(batch_size) < self.switch_prob
                 lam_mix = np.where(
                     use_cutmix,
                     np.random.beta(self.cutmix_alpha, self.cutmix_alpha, size=batch_size),
-                    np.random.beta(self.mixup_alpha, self.mixup_alpha, size=batch_size))
-            elif self.mixup_alpha > 0.:
+                    np.random.beta(self.mixup_alpha, self.mixup_alpha, size=batch_size),
+                )
+            elif self.mixup_alpha > 0.0:
                 lam_mix = np.random.beta(self.mixup_alpha, self.mixup_alpha, size=batch_size)
-            elif self.cutmix_alpha > 0.:
+            elif self.cutmix_alpha > 0.0:
                 use_cutmix = np.ones(batch_size, dtype=np.bool)
                 lam_mix = np.random.beta(self.cutmix_alpha, self.cutmix_alpha, size=batch_size)
             else:
@@ -168,16 +180,19 @@ class Mixup:
 
     def _params_per_batch(self):
         """_params_per_batch"""
-        lam = 1.
+        lam = 1.0
         use_cutmix = False
         if self.mixup_enabled and np.random.rand() < self.mix_prob:
-            if self.mixup_alpha > 0. and self.cutmix_alpha > 0.:
+            if self.mixup_alpha > 0.0 and self.cutmix_alpha > 0.0:
                 use_cutmix = np.random.rand() < self.switch_prob
-                lam_mix = np.random.beta(self.cutmix_alpha, self.cutmix_alpha) if use_cutmix else \
-                    np.random.beta(self.mixup_alpha, self.mixup_alpha)
-            elif self.mixup_alpha > 0.:
+                lam_mix = (
+                    np.random.beta(self.cutmix_alpha, self.cutmix_alpha)
+                    if use_cutmix
+                    else np.random.beta(self.mixup_alpha, self.mixup_alpha)
+                )
+            elif self.mixup_alpha > 0.0:
                 lam_mix = np.random.beta(self.mixup_alpha, self.mixup_alpha)
-            elif self.cutmix_alpha > 0.:
+            elif self.cutmix_alpha > 0.0:
                 use_cutmix = True
                 lam_mix = np.random.beta(self.cutmix_alpha, self.cutmix_alpha)
             else:
@@ -193,10 +208,11 @@ class Mixup:
         for i in range(batch_size):
             j = batch_size - i - 1
             lam = lam_batch[i]
-            if lam != 1.:
+            if lam != 1.0:
                 if use_cutmix[i]:
                     (yl, yh, xl, xh), lam = cutmix_bbox_and_lam(
-                        x[i].shape, lam, ratio_minmax=self.cutmix_minmax, correct_lam=self.correct_lam)
+                        x[i].shape, lam, ratio_minmax=self.cutmix_minmax, correct_lam=self.correct_lam
+                    )
                     x[i][:, yl:yh, xl:xh] = x_orig[j][:, yl:yh, xl:xh]
                     lam_batch[i] = lam
                 else:
@@ -211,10 +227,11 @@ class Mixup:
         for i in range(batch_size // 2):
             j = batch_size - i - 1
             lam = lam_batch[i]
-            if lam != 1.:
+            if lam != 1.0:
                 if use_cutmix[i]:
                     (yl, yh, xl, xh), lam = cutmix_bbox_and_lam(
-                        x[i].shape, lam, ratio_minmax=self.cutmix_minmax, correct_lam=self.correct_lam)
+                        x[i].shape, lam, ratio_minmax=self.cutmix_minmax, correct_lam=self.correct_lam
+                    )
                     x[i][:, yl:yh, xl:xh] = x_orig[j][:, yl:yh, xl:xh]
                     x[j][:, yl:yh, xl:xh] = x_orig[i][:, yl:yh, xl:xh]
                     lam_batch[i] = lam
@@ -227,14 +244,15 @@ class Mixup:
     def _mix_batch(self, x):
         """_mix_batch"""
         lam, use_cutmix = self._params_per_batch()
-        if lam == 1.:
-            return 1.
+        if lam == 1.0:
+            return 1.0
         if use_cutmix:
             (yl, yh, xl, xh), lam = cutmix_bbox_and_lam(
-                x.shape, lam, ratio_minmax=self.cutmix_minmax, correct_lam=self.correct_lam)
+                x.shape, lam, ratio_minmax=self.cutmix_minmax, correct_lam=self.correct_lam
+            )
             x[:, :, yl:yh, xl:xh] = np.flip(x, axis=0)[:, :, yl:yh, xl:xh]
         else:
-            x_flipped = np.flip(x, axis=0) * (1. - lam)
+            x_flipped = np.flip(x, axis=0) * (1.0 - lam)
             x *= lam
             x += x_flipped
         return lam
@@ -242,10 +260,10 @@ class Mixup:
     def __call__(self, x, target):
         """Mixup apply"""
         # the same to image, label
-        assert len(x) % 2 == 0, 'Batch size should be even when using this'
-        if self.mode == 'elem':
+        assert len(x) % 2 == 0, "Batch size should be even when using this"
+        if self.mode == "elem":
             lam = self._mix_elem(x)
-        elif self.mode == 'pair':
+        elif self.mode == "pair":
             lam = self._mix_pair(x)
         else:
             lam = self._mix_batch(x)

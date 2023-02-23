@@ -5,49 +5,59 @@ Refer to ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Desi
 
 from typing import Tuple
 
-from mindspore import nn, ops, Tensor
 import mindspore.common.initializer as init
+from mindspore import Tensor, nn, ops
 
 from .layers.pooling import GlobalAvgPooling
-from .utils import load_pretrained
 from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
     "ShuffleNetV2",
     "shufflenet_v2_x0_5",
     "shufflenet_v2_x1_0",
     "shufflenet_v2_x1_5",
-    "shufflenet_v2_x2_0"
+    "shufflenet_v2_x2_0",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'first_conv.0', 'classifier': 'classifier',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "first_conv.0",
+        "classifier": "classifier",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'shufflenet_v2_0.5': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x0_5-Ascend.ckpt'),
-    'shufflenet_v2_1.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_0-Ascend.ckpt'),
-    'shufflenet_v2_1.5': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_5-Ascend.ckpt'),
-    'shufflenet_v2_2.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x2_0-Ascend.ckpt'),
-
+    "shufflenet_v2_0.5": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x0_5-Ascend.ckpt"
+    ),
+    "shufflenet_v2_1.0": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_0-Ascend.ckpt"
+    ),
+    "shufflenet_v2_1.5": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_5-Ascend.ckpt"
+    ),
+    "shufflenet_v2_2.0": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x2_0-Ascend.ckpt"
+    ),
 }
 
 
 class ShuffleV2Block(nn.Cell):
     """define the basic block of ShuffleV2"""
 
-    def __init__(self,
-                 in_channels: int,
-                 out_channels: int,
-                 mid_channels: int,
-                 kernel_size: int,
-                 stride: int) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        mid_channels: int,
+        kernel_size: int,
+        stride: int,
+    ) -> None:
         super().__init__()
         assert stride in [1, 2]
         self.stride = stride
@@ -60,7 +70,7 @@ class ShuffleV2Block(nn.Cell):
             nn.ReLU(),
             # dw
             nn.Conv2d(mid_channels, mid_channels, kernel_size=kernel_size, stride=stride,
-                      pad_mode='pad', padding=pad, group=mid_channels),
+                      pad_mode="pad", padding=pad, group=mid_channels),
             nn.BatchNorm2d(mid_channels),
             # pw-linear
             nn.Conv2d(mid_channels, out_channels, kernel_size=1, stride=1),
@@ -73,7 +83,7 @@ class ShuffleV2Block(nn.Cell):
             branch_proj = [
                 # dw
                 nn.Conv2d(in_channels, in_channels, kernel_size=kernel_size, stride=stride,
-                          pad_mode='pad', padding=pad, group=in_channels),
+                          pad_mode="pad", padding=pad, group=in_channels),
                 nn.BatchNorm2d(in_channels),
                 # pw-linear
                 nn.Conv2d(in_channels, in_channels, kernel_size=1, stride=1),
@@ -114,21 +124,23 @@ class ShuffleNetV2(nn.Cell):
         model_size: scale factor which controls the number of channels. Default: '1.5x'.
     """
 
-    def __init__(self,
-                 num_classes: int = 1000,
-                 in_channels: int = 3,
-                 model_size: str = '1.5x'):
+    def __init__(
+        self,
+        num_classes: int = 1000,
+        in_channels: int = 3,
+        model_size: str = "1.5x",
+    ):
         super().__init__()
 
         self.stage_repeats = [4, 8, 4]
         self.model_size = model_size
-        if model_size == '0.5x':
+        if model_size == "0.5x":
             self.stage_out_channels = [-1, 24, 48, 96, 192, 1024]
-        elif model_size == '1.0x':
+        elif model_size == "1.0x":
             self.stage_out_channels = [-1, 24, 116, 232, 464, 1024]
-        elif model_size == '1.5x':
+        elif model_size == "1.5x":
             self.stage_out_channels = [-1, 24, 176, 352, 704, 1024]
-        elif model_size == '2.0x':
+        elif model_size == "2.0x":
             self.stage_out_channels = [-1, 24, 244, 488, 976, 2048]
         else:
             raise NotImplementedError
@@ -137,11 +149,11 @@ class ShuffleNetV2(nn.Cell):
         input_channel = self.stage_out_channels[1]
         self.first_conv = nn.SequentialCell([
             nn.Conv2d(in_channels, input_channel, kernel_size=3, stride=2,
-                      pad_mode='pad', padding=1),
+                      pad_mode="pad", padding=1),
             nn.BatchNorm2d(input_channel),
             nn.ReLU(),
         ])
-        self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='same')
+        self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")
 
         self.features = []
         for idxstage, numrepeat in enumerate(self.stage_repeats):
@@ -170,7 +182,7 @@ class ShuffleNetV2(nn.Cell):
         """Initialize weights for cells."""
         for name, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
-                if 'first' in name:
+                if "first" in name:
                     cell.weight.set_data(
                         init.initializer(init.Normal(0.01, 0), cell.weight.shape, cell.weight.dtype))
                 else:
@@ -179,13 +191,13 @@ class ShuffleNetV2(nn.Cell):
                                          cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(
-                        init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+                        init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, nn.Dense):
                 cell.weight.set_data(
                     init.initializer(init.Normal(0.01, 0), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(
-                        init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+                        init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.first_conv(x)
@@ -208,10 +220,10 @@ class ShuffleNetV2(nn.Cell):
 @register_model
 def shufflenet_v2_x0_5(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV2:
     """Get ShuffleNetV2 model with width scaled by 0.5.
-     Refer to the base class `models.ShuffleNetV2` for more details.
-     """
-    default_cfg = default_cfgs['shufflenet_v2_0.5']
-    model = ShuffleNetV2(model_size='0.5x', num_classes=num_classes, in_channels=in_channels, **kwargs)
+    Refer to the base class `models.ShuffleNetV2` for more details.
+    """
+    default_cfg = default_cfgs["shufflenet_v2_0.5"]
+    model = ShuffleNetV2(model_size="0.5x", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -222,10 +234,10 @@ def shufflenet_v2_x0_5(pretrained: bool = False, num_classes: int = 1000, in_cha
 @register_model
 def shufflenet_v2_x1_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV2:
     """Get ShuffleNetV2 model with width scaled by 1.0.
-     Refer to the base class `models.ShuffleNetV2` for more details.
-     """
-    default_cfg = default_cfgs['shufflenet_v2_1.0']
-    model = ShuffleNetV2(model_size='1.0x', num_classes=num_classes, in_channels=in_channels, **kwargs)
+    Refer to the base class `models.ShuffleNetV2` for more details.
+    """
+    default_cfg = default_cfgs["shufflenet_v2_1.0"]
+    model = ShuffleNetV2(model_size="1.0x", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -236,10 +248,10 @@ def shufflenet_v2_x1_0(pretrained: bool = False, num_classes: int = 1000, in_cha
 @register_model
 def shufflenet_v2_x1_5(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV2:
     """Get ShuffleNetV2 model with width scaled by 1.5.
-     Refer to the base class `models.ShuffleNetV2` for more details.
-     """
-    default_cfg = default_cfgs['shufflenet_v2_1.5']
-    model = ShuffleNetV2(model_size='1.5x', num_classes=num_classes, in_channels=in_channels, **kwargs)
+    Refer to the base class `models.ShuffleNetV2` for more details.
+    """
+    default_cfg = default_cfgs["shufflenet_v2_1.5"]
+    model = ShuffleNetV2(model_size="1.5x", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -250,10 +262,10 @@ def shufflenet_v2_x1_5(pretrained: bool = False, num_classes: int = 1000, in_cha
 @register_model
 def shufflenet_v2_x2_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ShuffleNetV2:
     """Get ShuffleNetV2 model with width scaled by 2.0.
-     Refer to the base class `models.ShuffleNetV2` for more details.
-     """
-    default_cfg = default_cfgs['shufflenet_v2_2.0']
-    model = ShuffleNetV2(model_size='2.0x', num_classes=num_classes, in_channels=in_channels, **kwargs)
+    Refer to the base class `models.ShuffleNetV2` for more details.
+    """
+    default_cfg = default_cfgs["shufflenet_v2_2.0"]
+    model = ShuffleNetV2(model_size="2.0x", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)

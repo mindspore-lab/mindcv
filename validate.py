@@ -2,12 +2,13 @@ import mindspore as ms
 import mindspore.nn as nn
 from mindspore import Model
 
-from mindcv.models import create_model
-from mindcv.data import create_dataset, create_transforms, create_loader
+from mindcv.data import create_dataset, create_loader, create_transforms
 from mindcv.loss import create_loss
-from config import parse_args
-from mindcv.utils.utils import check_batch_size
+from mindcv.models import create_model
 from mindcv.utils.callbacks import ValCallback
+from mindcv.utils.utils import check_batch_size
+
+from config import parse_args  # isort: skip
 
 
 def validate(args):
@@ -19,8 +20,8 @@ def validate(args):
         root=args.data_dir,
         split=args.val_split,
         num_parallel_workers=args.num_parallel_workers,
-        download=args.dataset_download)
-
+        download=args.dataset_download,
+    )
 
     # create transform
     transform_list = create_transforms(
@@ -30,15 +31,15 @@ def validate(args):
         crop_pct=args.crop_pct,
         interpolation=args.interpolation,
         mean=args.mean,
-        std=args.std
+        std=args.std,
     )
-    
+
     # read num clases
-    num_classes = dataset_eval.num_classes() if args.num_classes==None else args.num_classes
-    
+    num_classes = dataset_eval.num_classes() if args.num_classes == None else args.num_classes
+
     # check batch size
     batch_size = check_batch_size(dataset_eval.get_dataset_size(), args.batch_size)
-        
+
     # load dataset
     loader_eval = create_loader(
         dataset=dataset_eval,
@@ -50,34 +51,41 @@ def validate(args):
     )
 
     # create model
-    network = create_model(model_name=args.model,
-                           num_classes=num_classes,
-                           drop_rate=args.drop_rate,
-                           drop_path_rate=args.drop_path_rate,
-                           pretrained=args.pretrained,
-                           checkpoint_path=args.ckpt_path,
-                           use_ema=args.use_ema)
+    network = create_model(
+        model_name=args.model,
+        num_classes=num_classes,
+        drop_rate=args.drop_rate,
+        drop_path_rate=args.drop_path_rate,
+        pretrained=args.pretrained,
+        checkpoint_path=args.ckpt_path,
+        use_ema=args.use_ema,
+    )
     network.set_train(False)
 
     # create loss
-    loss = create_loss(name=args.loss, 
-                       reduction=args.reduction, 
-                       label_smoothing=args.label_smoothing, 
-                       aux_factor=args.aux_factor) 
+    loss = create_loss(
+        name=args.loss,
+        reduction=args.reduction,
+        label_smoothing=args.label_smoothing,
+        aux_factor=args.aux_factor,
+    )
 
     # Define eval metrics.
     if num_classes >= 5:
-        eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy(),
-                        'Top_5_Accuracy': nn.Top5CategoricalAccuracy(),
-                        'loss': nn.metrics.Loss()
-                        }
+        eval_metrics = {
+            "Top_1_Accuracy": nn.Top1CategoricalAccuracy(),
+            "Top_5_Accuracy": nn.Top5CategoricalAccuracy(),
+            "loss": nn.metrics.Loss(),
+        }
     else:
-        eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy(), 
-                        'loss': nn.metrics.Loss()}
+        eval_metrics = {
+            "Top_1_Accuracy": nn.Top1CategoricalAccuracy(),
+            "loss": nn.metrics.Loss(),
+        }
 
     # init model
     model = Model(network, loss_fn=loss, metrics=eval_metrics)
-    
+
     # log
     num_batches = loader_eval.get_dataset_size()
     print(f"Model: {args.model}")
@@ -85,12 +93,10 @@ def validate(args):
     print(f"Start validating...")
 
     # validate
-    result = model.eval(loader_eval, 
-            dataset_sink_mode=False,
-            callbacks=[ValCallback(args.log_interval)])
+    result = model.eval(loader_eval, dataset_sink_mode=False, callbacks=[ValCallback(args.log_interval)])
     print(result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args = parse_args()
     validate(args)

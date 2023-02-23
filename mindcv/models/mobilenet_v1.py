@@ -3,37 +3,45 @@ MindSpore implementation of `MobileNetV1`.
 Refer to MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications.
 """
 
-from mindspore import nn, Tensor
 import mindspore.common.initializer as init
+from mindspore import Tensor, nn
 
-from .utils import load_pretrained
-from .registry import register_model
 from .layers.pooling import GlobalAvgPooling
+from .registry import register_model
+from .utils import load_pretrained
 
 __all__ = [
-    'MobileNetV1',
-    'mobilenet_v1_025_224',
-    'mobilenet_v1_050_224',
-    'mobilenet_v1_075_224',
-    'mobilenet_v1_100_224',
+    "MobileNetV1",
+    "mobilenet_v1_025_224",
+    "mobilenet_v1_050_224",
+    "mobilenet_v1_075_224",
+    "mobilenet_v1_100_224",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1001,
-        'first_conv': 'features.0', 'classifier': 'classifier',
-        **kwargs
+        "url": url,
+        "num_classes": 1001,
+        "first_conv": "features.0",
+        "classifier": "classifier",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'mobilenet_v1_0.25_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025_224-200_2502.ckpt'),
-    'mobilenet_v1_0.5_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_050_224-200_2502.ckpt'),
-    'mobilenet_v1_0.75_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_075_224-200_2502.ckpt'),
-    'mobilenet_v1_1.0_224': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_100_224-200_2502.ckpt'),
-
+    "mobilenet_v1_0.25_224": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025_224-200_2502.ckpt"
+    ),
+    "mobilenet_v1_0.5_224": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_050_224-200_2502.ckpt"
+    ),
+    "mobilenet_v1_0.75_224": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_075_224-200_2502.ckpt"
+    ),
+    "mobilenet_v1_1.0_224": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_100_224-200_2502.ckpt"
+    ),
 }
 
 
@@ -60,10 +68,12 @@ class MobileNetV1(nn.Cell):
         num_classes: number of classification classes. Default: 1000.
     """
 
-    def __init__(self,
-                 alpha: float = 1.,
-                 in_channels: int = 3,
-                 num_classes: int = 1000) -> None:
+    def __init__(
+        self,
+        alpha: float = 1.0,
+        in_channels: int = 3,
+        num_classes: int = 1000,
+    ) -> None:
         super().__init__()
         input_channels = int(32 * alpha)
         # Setting of depth-wise separable conv
@@ -89,7 +99,7 @@ class MobileNetV1(nn.Cell):
         features = [
             nn.Conv2d(in_channels, input_channels, 3, 2, pad_mode="pad", padding=1, has_bias=False),
             nn.BatchNorm2d(input_channels),
-            nn.ReLU()
+            nn.ReLU(),
         ]
         for c, s in block_setting:
             output_channel = int(c * alpha)
@@ -105,13 +115,9 @@ class MobileNetV1(nn.Cell):
         """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
-                cell.weight.set_data(init.initializer(init.XavierUniform(),
-                                                             cell.weight.shape,
-                                                             cell.weight.dtype))
+                cell.weight.set_data(init.initializer(init.XavierUniform(), cell.weight.shape, cell.weight.dtype))
             if isinstance(cell, nn.Dense):
-                cell.weight.set_data(init.initializer(init.TruncatedNormal(),
-                                                             cell.weight.shape,
-                                                             cell.weight.dtype))
+                cell.weight.set_data(init.initializer(init.TruncatedNormal(), cell.weight.shape, cell.weight.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)
@@ -131,9 +137,9 @@ class MobileNetV1(nn.Cell):
 @register_model
 def mobilenet_v1_025_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
     """Get MobileNetV1 model with width scaled by 0.25.
-     Refer to the base class `models.MobileNetV1` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v1_0.25_224']
+    Refer to the base class `models.MobileNetV1` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v1_0.25_224"]
     model = MobileNetV1(alpha=0.25, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
@@ -145,9 +151,9 @@ def mobilenet_v1_025_224(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v1_050_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
     """Get MobileNetV1 model with width scaled by 0.5.
-     Refer to the base class `models.MobileNetV1` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v1_0.5_224']
+    Refer to the base class `models.MobileNetV1` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v1_0.5_224"]
     model = MobileNetV1(alpha=0.5, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
@@ -159,9 +165,9 @@ def mobilenet_v1_050_224(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v1_075_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
     """Get MobileNetV1 model with width scaled by 0.75.
-     Refer to the base class `models.MobileNetV1` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v1_0.75_224']
+    Refer to the base class `models.MobileNetV1` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v1_0.75_224"]
     model = MobileNetV1(alpha=0.75, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
@@ -173,9 +179,9 @@ def mobilenet_v1_075_224(pretrained: bool = False, num_classes: int = 1000, in_c
 @register_model
 def mobilenet_v1_100_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
     """Get MobileNetV1 model without width scaling.
-     Refer to the base class `models.MobileNetV1` for more details.
-     """
-    default_cfg = default_cfgs['mobilenet_v1_1.0_224']
+    Refer to the base class `models.MobileNetV1` for more details.
+    """
+    default_cfg = default_cfgs["mobilenet_v1_1.0_224"]
     model = MobileNetV1(alpha=1.0, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:

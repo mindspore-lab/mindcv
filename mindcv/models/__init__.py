@@ -1,9 +1,46 @@
 """models init"""
-from . import layers, convnext, densenet, dpn, efficientnet, ghostnet, googlenet, inception_v3, inception_v4, mnasnet,\
-    mobilenet_v1, mobilenet_v2, mobilenet_v3, model_factory, nasnet, pnasnet, registry, regnet, repvgg, res2net, resnet,\
-    rexnet, shufflenetv1, shufflenetv2, sknet, squeezenet, swin_transformer, vgg, xception, convit, vit, bit, pvt, pvtv2,\
-    visformer, repmlp, poolformer, edgenext, hrnet, senet
-
+from . import (
+    bit,
+    convit,
+    convnext,
+    densenet,
+    dpn,
+    edgenext,
+    efficientnet,
+    ghostnet,
+    googlenet,
+    hrnet,
+    inception_v3,
+    inception_v4,
+    layers,
+    mnasnet,
+    mobilenet_v1,
+    mobilenet_v2,
+    mobilenet_v3,
+    model_factory,
+    nasnet,
+    pnasnet,
+    poolformer,
+    pvt,
+    pvtv2,
+    registry,
+    regnet,
+    repmlp,
+    repvgg,
+    res2net,
+    resnet,
+    rexnet,
+    senet,
+    shufflenetv1,
+    shufflenetv2,
+    sknet,
+    squeezenet,
+    swin_transformer,
+    vgg,
+    visformer,
+    vit,
+    xception,
+)
 
 __all__ = []
 __all__.extend(layers.__all__)
@@ -47,46 +84,46 @@ __all__.extend(edgenext.__all__)
 __all__.extend(hrnet.__all__)
 __all__.extend(senet.__all__)
 
-#fixme: since googlenet is used as both the file and function name, we need to import * after __all__
+# fixme: since googlenet is used as both the file and function name, we need to import * after __all__
 
+from .bit import *
+from .convit import *
+from .convnext import *
 from .densenet import *
+from .dpn import *
+from .edgenext import *
+from .efficientnet import *
+from .ghostnet import *
 from .googlenet import *
+from .hrnet import *
 from .inception_v3 import *
 from .inception_v4 import *
+from .layers import *
+from .mnasnet import *
 from .mobilenet_v1 import *
 from .mobilenet_v2 import *
 from .mobilenet_v3 import *
-from .xception import *
 from .model_factory import *
-from .registry import *
-from .regnet import *
-from .resnet import *
-from .rexnet import *
-from .shufflenetv1 import *
-from .shufflenetv2 import *
-from .squeezenet import *
-from .mnasnet import *
-from .sknet import *
-from .res2net import *
-from .utils import *
-from .vgg import *
-from .layers import *
 from .nasnet import *
 from .pnasnet import *
-from .convnext import *
-from .dpn import *
-from .efficientnet import *
-from .ghostnet import *
-from .repvgg import *
-from .swin_transformer import *
-from .convit import *
-from .vit import *
 from .poolformer import *
-from .repmlp import *
 from .pvt import *
 from .pvtv2 import *
-from .bit import *
-from .visformer import *
-from .edgenext import *
-from .hrnet import *
+from .registry import *
+from .regnet import *
+from .repmlp import *
+from .repvgg import *
+from .res2net import *
+from .resnet import *
+from .rexnet import *
 from .senet import *
+from .shufflenetv1 import *
+from .shufflenetv2 import *
+from .sknet import *
+from .squeezenet import *
+from .swin_transformer import *
+from .utils import *
+from .vgg import *
+from .visformer import *
+from .vit import *
+from .xception import *

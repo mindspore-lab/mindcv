@@ -5,13 +5,15 @@ Example:
 """
 
 from tqdm import tqdm
+
 import mindspore as ms
 from mindspore import ops
 
-from mindcv.models import create_model
-from mindcv.data import create_dataset, create_transforms, create_loader
+from mindcv.data import create_dataset, create_loader, create_transforms
 from mindcv.loss import create_loss
-from config import parse_args
+from mindcv.models import create_model
+
+from config import parse_args  # isort: skip
 
 
 def validate(model, dataset, loss_fn):
@@ -42,7 +44,8 @@ def main():
         root=args.data_dir,
         split=args.val_split,
         num_parallel_workers=args.num_parallel_workers,
-        download=args.dataset_download)
+        download=args.dataset_download,
+    )
 
     # create transform
     transform_list = create_transforms(
@@ -52,7 +55,7 @@ def main():
         crop_pct=args.crop_pct,
         interpolation=args.interpolation,
         mean=args.mean,
-        std=args.std
+        std=args.std,
     )
 
     # load dataset
@@ -65,22 +68,26 @@ def main():
         num_parallel_workers=args.num_parallel_workers,
     )
 
-    num_classes = dataset_eval.num_classes() if args.num_classes==None else args.num_classes
+    num_classes = dataset_eval.num_classes() if args.num_classes == None else args.num_classes
 
     # create model
-    network = create_model(model_name=args.model,
-                           num_classes=num_classes,
-                           drop_rate=args.drop_rate,
-                           drop_path_rate=args.drop_path_rate,
-                           pretrained=args.pretrained,
-                           checkpoint_path=args.ckpt_path)
+    network = create_model(
+        model_name=args.model,
+        num_classes=num_classes,
+        drop_rate=args.drop_rate,
+        drop_path_rate=args.drop_path_rate,
+        pretrained=args.pretrained,
+        checkpoint_path=args.ckpt_path,
+    )
     network.set_train(False)
 
     # create loss
-    loss = create_loss(name=args.loss,
-                       reduction=args.reduction,
-                       label_smoothing=args.label_smoothing,
-                       aux_factor=args.aux_factor)
+    loss = create_loss(
+        name=args.loss,
+        reduction=args.reduction,
+        label_smoothing=args.label_smoothing,
+        aux_factor=args.aux_factor,
+    )
 
     # validate
     print("Testing...")
@@ -88,5 +95,5 @@ def main():
     print(f"Acc@1: {test_acc1:.4%}, Acc@5: {test_acc5:.4%}, Avg loss: {test_loss:.4f}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

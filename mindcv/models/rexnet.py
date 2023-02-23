@@ -6,56 +6,62 @@ import math
 from math import ceil
 from typing import Any
 
+import numpy as np
+
 import mindspore.common.initializer as init
 import mindspore.nn as nn
-import numpy as np
 
 from .layers import Conv2dNormActivation, DropPath, GlobalAvgPooling, SqueezeExcite
 from .registry import register_model
 from .utils import load_pretrained, make_divisible
 
 __all__ = [
-    'rexnet_x09',
-    'rexnet_x10',
-    'rexnet_x13',
-    'rexnet_x15',
-    'rexnet_x20'
+    "ReXNetV1",
+    "rexnet_x09",
+    "rexnet_x10",
+    "rexnet_x13",
+    "rexnet_x15",
+    "rexnet_x20",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'input_size': (3, 224, 224),
-        'first_conv': '', 'classifier': '',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "input_size": (3, 224, 224),
+        "first_conv": "",
+        "classifier": "",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'rexnet_x09': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet0.9_acc77.07_bs64_8p.ckpt'),
-    'rexnet_x10': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet1.0_acc77.4_bs64_8p.ckpt'),
-    'rexnet_x13': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet1.3_acc79.06_bs64_8p.ckpt'),
-    'rexnet_x15': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet1.5_acc79.94_bs64_8p.ckpt'),
-    'rexnet_x20': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet2.0_acc80.6_bs64_8p.ckpt')
+    "rexnet_x09": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet0.9_acc77.07_bs64_8p.ckpt"),
+    "rexnet_x10": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet1.0_acc77.4_bs64_8p.ckpt"),
+    "rexnet_x13": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet1.3_acc79.06_bs64_8p.ckpt"),
+    "rexnet_x15": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet1.5_acc79.94_bs64_8p.ckpt"),
+    "rexnet_x20": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet2.0_acc80.6_bs64_8p.ckpt"),
 }
 
 
 class LinearBottleneck(nn.Cell):
-    '''LinearBottleneck'''
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 exp_ratio,
-                 stride,
-                 use_se=True,
-                 se_ratio=1/12,
-                 ch_div=1,
-                 act_layer=nn.SiLU,
-                 dw_act_layer=nn.ReLU6,
-                 drop_path=None,
-                 **kwargs):
+    """LinearBottleneck"""
+
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        exp_ratio,
+        stride,
+        use_se=True,
+        se_ratio=1 / 12,
+        ch_div=1,
+        act_layer=nn.SiLU,
+        dw_act_layer=nn.ReLU6,
+        drop_path=None,
+        **kwargs,
+    ):
         super(LinearBottleneck, self).__init__(**kwargs)
         self.use_shortcut = stride == 1 and in_channels <= out_channels
         self.in_channels = in_channels
@@ -69,7 +75,7 @@ class LinearBottleneck(nn.Cell):
             self.conv_exp = None
 
         self.conv_dw = Conv2dNormActivation(dw_channels, dw_channels, 3, stride, padding=1,
-                                        groups=dw_channels, activation=None)
+                                            groups=dw_channels, activation=None)
 
         if use_se:
             self.se = SqueezeExcite(dw_channels,
@@ -105,7 +111,7 @@ class ReXNetV1(nn.Cell):
     Args:
         in_channels (int): number of the input channels. Default: 3.
         fi_channels (int): number of the final channels. Default: 180.
-        initial_channels (int): initialize inplanes. Default: 16. 
+        initial_channels (int): initialize inplanes. Default: 16.
         width_mult (float): The ratio of the channel. Default: 1.0.
         depth_mult (float): The ratio of num_layers. Default: 1.0.
         num_classes (int) : number of classification classes. Default: 1000.
@@ -118,21 +124,23 @@ class ReXNetV1(nn.Cell):
         cls_useconv (bool): use conv in classification. Default: False.
     """
 
-    def __init__(self,
-                 in_channels=3,
-                 fi_channels=180,
-                 initial_channels = 16,
-                 width_mult=1.0,
-                 depth_mult=1.0,
-                 num_classes=1000,
-                 use_se=True,
-                 se_ratio=1/12,
-                 drop_rate=0.2,
-                 drop_path_rate=0.,
-                 ch_div=1,
-                 act_layer=nn.SiLU,
-                 dw_act_layer=nn.ReLU6,
-                 cls_useconv=False):
+    def __init__(
+        self,
+        in_channels=3,
+        fi_channels=180,
+        initial_channels=16,
+        width_mult=1.0,
+        depth_mult=1.0,
+        num_classes=1000,
+        use_se=True,
+        se_ratio=1 / 12,
+        drop_rate=0.2,
+        drop_path_rate=0.0,
+        ch_div=1,
+        act_layer=nn.SiLU,
+        dw_act_layer=nn.ReLU6,
+        cls_useconv=False,
+    ):
         super(ReXNetV1, self).__init__()
 
         layers = [1, 2, 2, 3, 3, 5]
@@ -173,13 +181,11 @@ class ReXNetV1(nn.Cell):
         curr_stride = 2
         features = []
         num_blocks = len(in_channels_group)
-        for block_idx, (in_c, out_c, exp_ratio, stride, use_se) in enumerate(zip(in_channels_group,
-                                                                         out_channels_group,
-                                                                         exp_ratios,
-                                                                         strides,
-                                                                         use_ses)):
+        for block_idx, (in_c, out_c, exp_ratio, stride, use_se) in enumerate(
+            zip(in_channels_group, out_channels_group, exp_ratios, strides, use_ses)
+        ):
             if stride > 1:
-                fname = 'stem' if block_idx == 0 else f'features.{block_idx - 1}'
+                fname = "stem" if block_idx == 0 else f"features.{block_idx - 1}"
                 feature_info += [dict(num_chs=feat_chs[-1], reduction=curr_stride, module=fname)]
                 curr_stride *= stride
             block_dpr = drop_path_rate * block_idx / (num_blocks - 1)  # stochastic depth linear decay rule
@@ -188,7 +194,7 @@ class ReXNetV1(nn.Cell):
                                              out_channels=out_c,
                                              exp_ratio=exp_ratio,
                                              stride=stride,
-                                             use_se=use_se, 
+                                             use_se=use_se,
                                              se_ratio=se_ratio,
                                              act_layer=act_layer,
                                              dw_act_layer=dw_act_layer,
@@ -218,11 +224,11 @@ class ReXNetV1(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, (nn.Conv2d, nn.Dense)):
                 cell.weight.set_data(
-                    init.initializer(init.HeUniform(math.sqrt(5), mode='fan_in', nonlinearity='relu'),
+                    init.initializer(init.HeUniform(math.sqrt(5), mode="fan_in", nonlinearity="relu"),
                                      cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(
-                        init.initializer(init.HeUniform(math.sqrt(5), mode='fan_in', nonlinearity='leaky_relu'),
+                        init.initializer(init.HeUniform(math.sqrt(5), mode="fan_in", nonlinearity="leaky_relu"),
                                          [1, cell.bias.shape[0]], cell.bias.dtype).reshape((-1)))
 
     def forward_features(self, x):
@@ -244,57 +250,59 @@ class ReXNetV1(nn.Cell):
         return x
 
 
-def _rexnet(arch: str,
-            width_mult: float,
-            in_channels: int,
-            num_classes: int,
-            pretrained: bool,
-            **kwargs: Any,
-            ) -> ReXNetV1:
-    """ReXNet architecture."""        
+def _rexnet(
+    arch: str,
+    width_mult: float,
+    in_channels: int,
+    num_classes: int,
+    pretrained: bool,
+    **kwargs: Any,
+) -> ReXNetV1:
+    """ReXNet architecture."""
     default_cfg = default_cfgs[arch]
     model = ReXNetV1(width_mult=width_mult, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
-    return model    
+    return model
+
 
 @register_model
 def rexnet_x09(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
     """Get ReXNet model with width multiplier of 0.9.
-     Refer to the base class `models.ReXNetV1` for more details.
-     """
+    Refer to the base class `models.ReXNetV1` for more details.
+    """
     return _rexnet("rexnet_x09", 0.9, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
 def rexnet_x10(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
     """Get ReXNet model with width multiplier of 1.0.
-     Refer to the base class `models.ReXNetV1` for more details.
-     """
+    Refer to the base class `models.ReXNetV1` for more details.
+    """
     return _rexnet("rexnet_x10", 1.0, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
 def rexnet_x13(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
     """Get ReXNet model with width multiplier of 1.3.
-     Refer to the base class `models.ReXNetV1` for more details.
-     """
+    Refer to the base class `models.ReXNetV1` for more details.
+    """
     return _rexnet("rexnet_x13", 1.3, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
 def rexnet_x15(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
     """Get ReXNet model with width multiplier of 1.5.
-     Refer to the base class `models.ReXNetV1` for more details.
-     """
+    Refer to the base class `models.ReXNetV1` for more details.
+    """
     return _rexnet("rexnet_x15", 1.5, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
 def rexnet_x20(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
     """Get ReXNet model with width multiplier of 2.0.
-     Refer to the base class `models.ReXNetV1` for more details.
-     """
+    Refer to the base class `models.ReXNetV1` for more details.
+    """
     return _rexnet("rexnet_x20", 2.0, in_channels, num_classes, pretrained, **kwargs)

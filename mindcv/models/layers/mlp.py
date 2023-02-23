@@ -1,17 +1,19 @@
 """ MLP module w/ dropout and configurable activation layer
 """
 from typing import Optional
-from mindspore import nn, Tensor
+
+from mindspore import Tensor, nn
+
 
 class Mlp(nn.Cell):
-
-    def __init__(self,
-                 in_features: int,
-                 hidden_features: Optional[int] = None,
-                 out_features: Optional[int] = None,
-                 act_layer: Optional[nn.Cell] = nn.GELU,
-                 drop: float = 0.
-                 ) -> None:
+    def __init__(
+        self,
+        in_features: int,
+        hidden_features: Optional[int] = None,
+        out_features: Optional[int] = None,
+        act_layer: Optional[nn.Cell] = nn.GELU,
+        drop: float = 0.0,
+    ) -> None:
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features

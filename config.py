@@ -1,20 +1,24 @@
-import os
-import yaml
-import logging
 import argparse
+import logging
+import os
+
+import yaml
 
 logger = logging.getLogger(__name__)
+
 
 def str2bool(v):
     if isinstance(v, bool):
         return v
-    if v.lower() in ('yes', 'true', '1'):
+    if v.lower() in ("yes", "true", "1"):
         return True
-    elif v.lower() in ('no', 'false', '0'):
+    elif v.lower() in ("no", "false", "0"):
         return False
     else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
+        raise argparse.ArgumentTypeError("Boolean value expected.")
 
+
+# fmt: off
 def create_parser():
     # The first arg parser parses out only the --config argument, this argument is used to
     # load a yaml file containing key-values that override the defaults for the main parser below
@@ -34,13 +38,16 @@ def create_parser():
     group.add_argument('--val_while_train', type=str2bool, nargs='?', const=True, default=False,
                        help='Verify accuracy while training (default=False)')
     group.add_argument('--val_interval', type=int, default=1,
-            help='Interval for validation while training (in epoch), Default: 1')
+                       help='Interval for validation while training (in epoch), Default: 1')
     group.add_argument('--log_interval', type=int, default=100,
-            help='Interval for print training log (in step), if None, log every epoch. Default: 100')
-    group.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=False, help='Load pretrained model (default=False)')
+                       help='Interval for print training log (in step), if None, log every epoch. Default: 100')
+    group.add_argument('--pretrained', type=str2bool, nargs='?', const=True, default=False,
+                       help='Load pretrained model (default=False)')
     group.add_argument('--ckpt_path', type=str, default='',
-                       help='Initialize model from this checkpoint. If resume training, specify the checkpoint path. (default='')')
-    group.add_argument('--resume_opt', type=str2bool, nargs='?', const=True, default=False, help='Resume optimizer state including LR (default=False)')
+                       help='Initialize model from this checkpoint. '
+                            'If resume training, specify the checkpoint path. (default="")')
+    group.add_argument('--resume_opt', type=str2bool, nargs='?', const=True, default=False,
+                       help='Resume optimizer state including LR (default=False)')
     group.add_argument('--seed', type=int, default=42,
                        help='Seed value for determining randomness in numpy, random, and mindspore')
 
@@ -65,7 +72,9 @@ def create_parser():
                        help='Determines whether or not to drop the last block whose data '
                             'row number is less than batch size (default=True)')
     group.add_argument('--aug_repeats', type=int, default=0,
-                       help='Number of dataset repeatition for repeated augmentation. If 0 or 1, repeated augmentation is diabled. Otherwise, repeated augmentation is enabled and the common choice is 3. (Default: 0)')
+                       help='Number of dataset repetition for repeated augmentation. '
+                            'If 0 or 1, repeated augmentation is disabled. '
+                            'Otherwise, repeated augmentation is enabled and the common choice is 3. (Default: 0)')
 
     # Augmentation parameters
     group = parser.add_argument_group('Augmentation parameters')
@@ -84,7 +93,9 @@ def create_parser():
     group.add_argument('--interpolation', type=str, default='bilinear',
                        help='Image interpolation mode for resize operator(default="bilinear")')
     group.add_argument('--auto_augment', type=str, default=None,
-            help='Auto augment policy config. If "randaug",apply RandAugment, "autoaug" for original AutoAugment, "autoaugr" for AutoAugment with increasing posterize, or None. If apply, recommend for imagenet: randaug-m7-mstd0.5 (defalt: None).'
+                       help='AutoAugment policy. "randaug" for RandAugment, "autoaug" for original AutoAugment, '
+                            '"autoaugr" for AutoAugment with increasing posterize. '
+                            'If apply, recommend for imagenet: randaug-m7-mstd0.5 (defalt: None).'
                             'Example: "randaug-m10-n2-w0-mstd0.5-mmax10-inc0", "autoaug-mstd0.5" or autoaugr-mstd0.5.')
     group.add_argument('--re_prob', type=float, default=0.,
                        help='Probability of performing erasing (default=0.)')
@@ -110,7 +121,8 @@ def create_parser():
     group.add_argument('--cutmix_prob', type=float, default=1.0,
                        help='probability of applying cutmix and/or mixup (default=0.)')
     group.add_argument('--mixup', type=float, default=0.,
-                       help='Hyperparameter of beta distribution of mixup. Recommended value is 0.2 for ImageNet. (default=0.)')
+                       help='Hyperparameter of beta distribution of mixup. '
+                            'Recommended value is 0.2 for ImageNet. (default=0.)')
 
     # Model parameters
     group = parser.add_argument_group('Model parameters')
@@ -122,7 +134,11 @@ def create_parser():
                        help='Drop rate (default=None)')
     group.add_argument('--drop_path_rate', type=float, default=None,
                        help='Drop path rate (default=None)')
-    group.add_argument('--amp_level', type=str, default='O0', help='Amp level - Auto Mixed Precision level for saving memory and acceleration. choice: O0 - all FP32, O1 - only cast ops in white-list to FP16, O2 - cast all ops except for blacklist to FP16, O3 - cast all ops to FP16.   (default="O0").')
+    group.add_argument('--amp_level', type=str, default='O0',
+                       help='Amp level - Auto Mixed Precision level for saving memory and acceleration. '
+                            'Choice: O0 - all FP32, O1 - only cast ops in white-list to FP16, '
+                            'O2 - cast all ops except for blacklist to FP16, '
+                            'O3 - cast all ops to FP16. (default="O0").')
     group.add_argument('--keep_checkpoint_max', type=int, default=10,
                        help='Max number of checkpoint files (default=10)')
     group.add_argument('--ckpt_save_dir', type=str, default="./ckpt",
@@ -141,7 +157,6 @@ def create_parser():
                        help='training with ema (default=False)')
     group.add_argument('--ema_decay', type=float, default=0.9999, help='ema decay')
 
-
     # Optimize parameters
     group = parser.add_argument_group('Optimizer parameters')
     group.add_argument('--opt', type=str, default='adam',
@@ -152,7 +167,6 @@ def create_parser():
                             'It must be at least 0.0 (default=0.9)')
     group.add_argument('--weight_decay', type=float, default=1e-6,
                        help='Weight decay (default=1e-6)')
-    #group.add_argument('--loss_scaler', type=str, default='static', help='Loss scaler, static or dynamic (default=static)')
     group.add_argument('--loss_scale', type=float, default=1.0,
                        help='Loss scale (default=1.0)')
     group.add_argument('--use_nesterov', type=str2bool, nargs='?', const=True, default=False,
@@ -166,7 +180,7 @@ def create_parser():
     group = parser.add_argument_group('Scheduler parameters')
     group.add_argument('--scheduler', type=str, default='cosine_decay',
                        choices=['constant', 'cosine_decay', 'exponential_decay', 'step_decay', 'multi_step_decay'],
-                       help='Type of scheduler (default="warmup_consine_decay")')
+                       help='Type of scheduler (default="cosine_decay")')
     group.add_argument('--lr', type=float, default=0.001,
                        help='learning rate (default=0.001)')
     group.add_argument('--min_lr', type=float, default=1e-6,
@@ -180,11 +194,14 @@ def create_parser():
     group.add_argument('--decay_rate', type=float, default=0.9,
                        help='LR decay rate if scheduler supports')
     group.add_argument('--multi_step_decay_milestones', type=list, default=[30, 60, 90],
-                       help='list of epoch milestones for lr decay, which is ONLY effective for the multi_step_decay scheduler. LR will be decay by decay_rate at the milestone epoch.')
+                       help='list of epoch milestones for lr decay, which is ONLY effective for '
+                            'the multi_step_decay scheduler. LR will be decay by decay_rate at the milestone epoch.')
     group.add_argument('--lr_epoch_stair', type=str2bool, nargs='?', const=True, default=False,
-                       help='If True, LR will be updated in the first step of each epoch and LRs are the same in the remaining steps in the epoch. Otherwise, learning rate is updated every  step dynamically. (default=False)')
+                       help='If True, LR will be updated in the first step of each epoch and '
+                            'LRs are the same in the remaining steps in the epoch. Otherwise, '
+                            'learning rate is updated every step dynamically. (default=False)')
     group.add_argument('--num_cycles', type=int, default=1,
-                       help='Num of cylces for cosine decay (default=1)')
+                       help='Num of cycles for cosine decay (default=1)')
     group.add_argument('--cycle_decay', type=float, default=1.0,
                        help='Decay rate of lr max in each cosine cycle')
 
@@ -205,19 +222,17 @@ def create_parser():
     group.add_argument('--enable_modelarts', type=str2bool, nargs='?', const=True, default=False,
                        help='Run on modelarts platform (default=False)')
     group.add_argument('--device_target', type=str, default='Ascend')
-    group.add_argument('--multi_data_url',
-                       help='path to multi dataset',
-                       default= '/cache/data/')
-    group.add_argument('--data_url',
-                       help='path to dataset',
-                       default= '/cache/data/')
-    group.add_argument('--ckpt_url', help='pre_train_model path in obs')
-    group.add_argument('--train_url',
-                       help='model folder to save/load',
-                       default= '/cache/output/')
-
+    group.add_argument('--multi_data_url', type=str, default='/cache/data/',
+                       help='path to multi dataset')
+    group.add_argument('--data_url', type=str, default='/cache/data/',
+                       help='path to dataset')
+    group.add_argument('--ckpt_url', type=str, default='/cache/output/',
+                       help='pre_train_model path in obs')
+    group.add_argument('--train_url', type=str, default='/cache/output/',
+                       help='model folder to save/load')
 
     return parser_config, parser
+# fmt: on
 
 
 def parse_args():
@@ -225,7 +240,7 @@ def parse_args():
     # Do we have a config file to parse?
     args_config, remaining = parser_config.parse_known_args()
     if args_config.config:
-        with open(args_config.config, 'r') as f:
+        with open(args_config.config, "r") as f:
             cfg = yaml.safe_load(f)
             parser.set_defaults(**cfg)
             parser.set_defaults(config=args_config.config)

@@ -6,19 +6,16 @@ Refer to ConViT: Improving Vision Transformers with Soft Convolutional Inductive
 import numpy as np
 
 import mindspore as ms
-import mindspore.nn as nn
-import mindspore.ops as ops
-from mindspore.ops import constexpr
-from mindspore import Parameter, Tensor
 import mindspore.common.initializer as init
+from mindspore import Parameter, Tensor, nn, ops
+from mindspore.ops import constexpr
 
-from .layers.identity import Identity
-from .layers.patch_embed import PatchEmbed
 from .layers.drop_path import DropPath
+from .layers.identity import Identity
 from .layers.mlp import Mlp
-from .utils import load_pretrained
+from .layers.patch_embed import PatchEmbed
 from .registry import register_model
-
+from .utils import load_pretrained
 
 __all__ = [
     "ConViT",
@@ -27,33 +24,34 @@ __all__ = [
     "convit_small",
     "convit_small_plus",
     "convit_base",
-    "convit_base_plus"
+    "convit_base_plus",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'input_size': (3, 224, 224),
-        'first_conv': 'patch_embed.proj', 'classifier': 'classifier',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "input_size": (3, 224, 224),
+        "first_conv": "patch_embed.proj",
+        "classifier": "classifier",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'convit_tiny': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny.ckpt'),
-    'convit_tiny_plus': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny_plus.ckpt'),
-    'convit_small': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/convit/convit_small.ckpt'),
-    'convit_small_plus': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/convit/convit_small_plus.ckpt'),
-    'convit_base': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/convit/convit_base.ckpt'),
-    'convit_base_plus': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/convit/convit_base_plus.ckpt')
+    "convit_tiny": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny.ckpt"),
+    "convit_tiny_plus": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny_plus.ckpt"),
+    "convit_small": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_small.ckpt"),
+    "convit_small_plus": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_small_plus.ckpt"),
+    "convit_base": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_base.ckpt"),
+    "convit_base_plus": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_base_plus.ckpt"),
 }
 
 
 @constexpr
 def get_rel_indices(num_patches: int = 196) -> Tensor:
-    img_size = int(num_patches**.5)
+    img_size = int(num_patches**0.5)
     rel_indices = ops.Zeros()((1, num_patches, num_patches, 3), ms.float32)
     ind = ms.numpy.arange(img_size).view(1, -1) - ms.numpy.arange(img_size).view(-1, 1)
     indx = ms.numpy.tile(ind, (img_size, img_size))
@@ -67,19 +65,20 @@ def get_rel_indices(num_patches: int = 196) -> Tensor:
 
 
 class GPSA(nn.Cell):
-
-    def __init__(self, 
-                 dim: int, 
-                 num_heads: int, 
-                 qkv_bias: bool = False, 
-                 attn_drop: float = 0., 
-                 proj_drop: float = 0.) -> None:
+    def __init__(
+        self,
+        dim: int,
+        num_heads: int,
+        qkv_bias: bool = False,
+        attn_drop: float = 0.0,
+        proj_drop: float = 0.0,
+    ) -> None:
         super().__init__()
 
         self.dim = dim
         self.num_heads = num_heads
         head_dim = dim // num_heads
-        self.scale = head_dim ** -0.5
+        self.scale = head_dim**-0.5
 
         self.q = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.k = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
@@ -117,28 +116,29 @@ class GPSA(nn.Cell):
         pos_score = self.softmax(pos_score)
         patch_score = self.batch_matmul(q, k)
         patch_score = ops.mul(patch_score, self.scale)
-        patch_score = self.softmax(patch_score)        
+        patch_score = self.softmax(patch_score)
 
         gating = ops.reshape(self.gating_param, (1, -1, 1, 1))
         gating = ops.Sigmoid()(gating)
-        attn = (1.-gating) * patch_score + gating * pos_score
+        attn = (1.0 - gating) * patch_score + gating * pos_score
         attn = self.attn_drop(attn)
         return attn
 
 
 class MHSA(nn.Cell):
-
-    def __init__(self, 
-                 dim: int, 
-                 num_heads: int, 
-                 qkv_bias: bool = False, 
-                 attn_drop: float = 0., 
-                 proj_drop: float = 0.) -> None:
+    def __init__(
+        self,
+        dim: int,
+        num_heads: int,
+        qkv_bias: bool = False,
+        attn_drop: float = 0.0,
+        proj_drop: float = 0.0,
+    ) -> None:
         super().__init__()
 
         self.num_heads = num_heads
         head_dim = dim // num_heads
-        self.scale = head_dim ** -0.5
+        self.scale = head_dim**-0.5
 
         self.q = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.k = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
@@ -173,16 +173,18 @@ class MHSA(nn.Cell):
 class Block(nn.Cell):
     """Basic module of ConViT"""
 
-    def __init__(self, 
-                 dim: int, 
-                 num_heads: int, 
-                 mlp_ratio: float, 
-                 qkv_bias: bool = False, 
-                 drop: float = 0., 
-                 attn_drop: float = 0.,
-                 drop_path: float = 0., 
-                 use_gpsa: bool = True, 
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        dim: int,
+        num_heads: int,
+        mlp_ratio: float,
+        qkv_bias: bool = False,
+        drop: float = 0.0,
+        attn_drop: float = 0.0,
+        drop_path: float = 0.0,
+        use_gpsa: bool = True,
+        **kwargs
+    ) -> None:
         super().__init__()
 
         self.norm1 = nn.LayerNorm((dim,))
@@ -190,12 +192,12 @@ class Block(nn.Cell):
             self.attn = GPSA(dim, num_heads=num_heads, qkv_bias=qkv_bias,
                              attn_drop=attn_drop, proj_drop=drop, **kwargs)
         else:
-            self.attn = MHSA(dim, num_heads=num_heads, qkv_bias=qkv_bias, 
+            self.attn = MHSA(dim, num_heads=num_heads, qkv_bias=qkv_bias,
                              attn_drop=attn_drop, proj_drop=drop, **kwargs)
-        self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
+        self.drop_path = DropPath(drop_path) if drop_path > 0.0 else Identity()
         self.norm2 = nn.LayerNorm((dim,))
         mlp_hidden_dim = int(dim * mlp_ratio)
-        self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer = nn.GELU, drop=drop)
+        self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=nn.GELU, drop=drop)
 
     def construct(self, x: Tensor) -> Tensor:
         x = x + self.drop_path(self.attn(self.norm1(x)))
@@ -227,22 +229,24 @@ class ConViT(nn.Cell):
         locality_strength（float）: the strength of locality. Default: 1.
     """
 
-    def __init__(self, 
-                 in_channels: int = 3,
-                 num_classes: int = 1000,
-                 image_size: int = 224,
-                 patch_size: int = 16,
-                 embed_dim: int = 48, 
-                 num_heads: int = 12, 
-                 drop_rate: float = 0., 
-                 drop_path_rate: float = 0.1, 
-                 depth: int = 12,
-                 mlp_ratio: float = 4., 
-                 qkv_bias: bool = False, 
-                 attn_drop_rate: float = 0.,
-                 local_up_to_layer: int = 10, 
-                 use_pos_embed: bool = True,
-                 locality_strength: float = 1.) -> None:
+    def __init__(
+        self,
+        in_channels: int = 3,
+        num_classes: int = 1000,
+        image_size: int = 224,
+        patch_size: int = 16,
+        embed_dim: int = 48,
+        num_heads: int = 12,
+        drop_rate: float = 0.0,
+        drop_path_rate: float = 0.1,
+        depth: int = 12,
+        mlp_ratio: float = 4.0,
+        qkv_bias: bool = False,
+        attn_drop_rate: float = 0.0,
+        local_up_to_layer: int = 10,
+        use_pos_embed: bool = True,
+        locality_strength: float = 1.0,
+    ) -> None:
         super().__init__()
 
         self.local_up_to_layer = local_up_to_layer
@@ -260,30 +264,30 @@ class ConViT(nn.Cell):
 
         if self.use_pos_embed:
             self.pos_embed = Parameter(ops.Zeros()((1, self.num_patches, embed_dim), ms.float32))
-            self.pos_embed.set_data(init.initializer(init.TruncatedNormal(sigma=.02), self.pos_embed.data.shape))
+            self.pos_embed.set_data(init.initializer(init.TruncatedNormal(sigma=0.02), self.pos_embed.data.shape))
 
         dpr = [x.item() for x in np.linspace(0, drop_path_rate, depth)]
         self.blocks = nn.CellList([
             Block(
-                dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, 
-                drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i], 
+                dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias,
+                drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i],
                 use_gpsa=True)
-            if i<local_up_to_layer else
+            if i < local_up_to_layer else
             Block(
-                dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, 
-                drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i], 
+                dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias,
+                drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i],
                 use_gpsa=False)
             for i in range(depth)])
         self.norm = nn.LayerNorm((embed_dim,))
-        
+
         self.classifier = nn.Dense(in_channels=embed_dim, out_channels=num_classes) if num_classes > 0 else Identity()
-        self.cls_token.set_data(init.initializer(init.TruncatedNormal(sigma=.02), self.cls_token.data.shape))
+        self.cls_token.set_data(init.initializer(init.TruncatedNormal(sigma=0.02), self.cls_token.data.shape))
         self._initialize_weights()
 
     def _initialize_weights(self) -> None:
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Dense):
-                cell.weight.set_data(init.initializer(init.TruncatedNormal(sigma=.02), cell.weight.data.shape))
+                cell.weight.set_data(init.initializer(init.TruncatedNormal(sigma=0.02), cell.weight.data.shape))
                 if cell.bias is not None:
                     cell.bias.set_data(init.initializer(init.Constant(0), cell.bias.shape))
             elif isinstance(cell, nn.LayerNorm):
@@ -293,15 +297,15 @@ class ConViT(nn.Cell):
         for i in range(self.local_up_to_layer):
             self.blocks[i].attn.v.weight.set_data(ops.eye(self.embed_dim, self.embed_dim, ms.float32), slice_shape=True)
             locality_distance = 1
-            kernel_size = int(self.num_heads**.5)
+            kernel_size = int(self.num_heads**0.5)
             center = (kernel_size - 1) / 2 if kernel_size % 2 == 0 else kernel_size // 2
             pos_weight_data = self.blocks[i].attn.pos_proj.weight.data
             for h1 in range(kernel_size):
                 for h2 in range(kernel_size):
-                    position = h1+kernel_size*h2
-                    pos_weight_data[position,2] = -1
-                    pos_weight_data[position,1] = 2*(h1-center)*locality_distance
-                    pos_weight_data[position,0] = 2*(h2-center)*locality_distance
+                    position = h1 + kernel_size * h2
+                    pos_weight_data[position, 2] = -1
+                    pos_weight_data[position, 1] = 2 * (h1 - center) * locality_distance
+                    pos_weight_data[position, 0] = 2 * (h2 - center) * locality_distance
             pos_weight_data = pos_weight_data * self.locality_strength
             self.blocks[i].attn.pos_proj.weight.set_data(pos_weight_data)
 
@@ -311,7 +315,7 @@ class ConViT(nn.Cell):
             x = x + self.pos_embed
         x = self.pos_drop(x)
         cls_tokens = ops.tile(self.cls_token, (x.shape[0], 1, 1))
-        for u,blk in enumerate(self.blocks):
+        for u, blk in enumerate(self.blocks):
             if u == self.local_up_to_layer:
                 x = ops.Cast()(x, cls_tokens.dtype)
                 x = ops.concat((cls_tokens, x), 1)
@@ -334,7 +338,7 @@ def convit_tiny(pretrained: bool = False, num_classes: int = 1000, in_channels: 
     """Get ConViT tiny model
     Refer to the base class "models.ConViT" for more details.
     """
-    default_cfg = default_cfgs['convit_tiny']
+    default_cfg = default_cfgs["convit_tiny"]
     model = ConViT(in_channels=in_channels, num_classes=num_classes,
                    num_heads=4, embed_dim=192, **kwargs)
 
@@ -349,7 +353,7 @@ def convit_tiny_plus(pretrained: bool = False, num_classes: int = 1000, in_chann
     """Get ConViT tiny+ model
     Refer to the base class "models.ConViT" for more details.
     """
-    default_cfg = default_cfgs['convit_tiny_plus']
+    default_cfg = default_cfgs["convit_tiny_plus"]
     model = ConViT(in_channels=in_channels, num_classes=num_classes,
                    num_heads=4, embed_dim=256, **kwargs)
 
@@ -364,7 +368,7 @@ def convit_small(pretrained: bool = False, num_classes: int = 1000, in_channels:
     """Get ConViT small model
     Refer to the base class "models.ConViT" for more details.
     """
-    default_cfg = default_cfgs['convit_small']
+    default_cfg = default_cfgs["convit_small"]
     model = ConViT(in_channels=in_channels, num_classes=num_classes,
                    num_heads=9, embed_dim=432, **kwargs)
 
@@ -379,7 +383,7 @@ def convit_small_plus(pretrained: bool = False, num_classes: int = 1000, in_chan
     """Get ConViT small+ model
     Refer to the base class "models.ConViT" for more details.
     """
-    default_cfg = default_cfgs['convit_small_plus']
+    default_cfg = default_cfgs["convit_small_plus"]
     model = ConViT(in_channels=in_channels, num_classes=num_classes,
                    num_heads=9, embed_dim=576, **kwargs)
 
@@ -394,7 +398,7 @@ def convit_base(pretrained: bool = False, num_classes: int = 1000, in_channels: 
     """Get ConViT base model
     Refer to the base class "models.ConViT" for more details.
     """
-    default_cfg = default_cfgs['convit_base']
+    default_cfg = default_cfgs["convit_base"]
     model = ConViT(in_channels=in_channels, num_classes=num_classes,
                    num_heads=16, embed_dim=768, **kwargs)
 
@@ -409,7 +413,7 @@ def convit_base_plus(pretrained: bool = False, num_classes: int = 1000, in_chann
     """Get ConViT base+ model
     Refer to the base class "models.ConViT" for more details.
     """
-    default_cfg = default_cfgs['convit_base_plus']
+    default_cfg = default_cfgs["convit_base_plus"]
     model = ConViT(in_channels=in_channels, num_classes=num_classes,
                    num_heads=16, embed_dim=1024, **kwargs)
 

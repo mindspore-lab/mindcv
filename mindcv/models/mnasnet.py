@@ -5,50 +5,51 @@ Refer to MnasNet: Platform-Aware Neural Architecture Search for Mobile.
 
 from typing import List
 
-from mindspore import nn, Tensor
 import mindspore.common.initializer as init
+from mindspore import Tensor, nn
 
 from .layers.pooling import GlobalAvgPooling
-from .utils import make_divisible, load_pretrained
 from .registry import register_model
+from .utils import load_pretrained, make_divisible
 
 __all__ = [
-    'Mnasnet',
-    'mnasnet0_5',
-    'mnasnet0_75',
-    'mnasnet1_0',
-    'mnasnet1_3',
-    'mnasnet1_4',
+    "Mnasnet",
+    "mnasnet0_5",
+    "mnasnet0_75",
+    "mnasnet1_0",
+    "mnasnet1_3",
+    "mnasnet1_4",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'features.0', 'classifier': 'classifier',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "features.0",
+        "classifier": "classifier",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'mnasnet0.5': _cfg(url=''),
-    'mnasnet0.75': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet0_75_ascend.ckpt'),
-    'mnasnet1.0': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet1_0_ascend.ckpt'),
-    'mnasnet1.3': _cfg(url=''),
-    'mnasnet1.4': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet1_4_ascend.ckpt'),
+    "mnasnet0.5": _cfg(url=""),
+    "mnasnet0.75": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet0_75_ascend.ckpt"),
+    "mnasnet1.0": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet1_0_ascend.ckpt"),
+    "mnasnet1.3": _cfg(url=""),
+    "mnasnet1.4": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet1_4_ascend.ckpt"),
 }
 
 
 class InvertedResidual(nn.Cell):
-
-    def __init__(self,
-                 in_channels: int,
-                 out_channels: int,
-                 stride: int,
-                 kernel_size: int,
-                 expand_ratio: int,
-                 ) -> None:
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        stride: int,
+        kernel_size: int,
+        expand_ratio: int,
+    ) -> None:
         super().__init__()
         assert stride in [1, 2]
 
@@ -61,13 +62,13 @@ class InvertedResidual(nn.Cell):
             nn.BatchNorm2d(hidden_dim, momentum=0.99, eps=1e-3),
             nn.ReLU(),
             # dw
-            nn.Conv2d(hidden_dim, hidden_dim, kernel_size=kernel_size, stride=stride, pad_mode='pad',
+            nn.Conv2d(hidden_dim, hidden_dim, kernel_size=kernel_size, stride=stride, pad_mode="pad",
                       padding=kernel_size // 2, group=hidden_dim),
             nn.BatchNorm2d(hidden_dim, momentum=0.99, eps=1e-3),
             nn.ReLU(),
             # pw-linear
             nn.Conv2d(hidden_dim, out_channels, kernel_size=1, stride=1),
-            nn.BatchNorm2d(out_channels, momentum=0.99, eps=1e-3)
+            nn.BatchNorm2d(out_channels, momentum=0.99, eps=1e-3),
         ])
 
     def construct(self, x: Tensor) -> Tensor:
@@ -87,12 +88,13 @@ class Mnasnet(nn.Cell):
         drop_rate: dropout rate of the layer before main classifier. Default: 0.2.
     """
 
-    def __init__(self,
-                 alpha: float,
-                 in_channels: int = 3,
-                 num_classes: int = 1000,
-                 drop_rate: float = 0.2
-                 ):
+    def __init__(
+        self,
+        alpha: float,
+        in_channels: int = 3,
+        num_classes: int = 1000,
+        drop_rate: float = 0.2,
+    ):
         super().__init__()
 
         inverted_residual_setting = [
@@ -109,15 +111,15 @@ class Mnasnet(nn.Cell):
         input_channels = make_divisible(16 * alpha, 8)
 
         features: List[nn.Cell] = [
-            nn.Conv2d(in_channels, mid_channels, kernel_size=3, stride=2, pad_mode='pad', padding=1),
+            nn.Conv2d(in_channels, mid_channels, kernel_size=3, stride=2, pad_mode="pad", padding=1),
             nn.BatchNorm2d(mid_channels, momentum=0.99, eps=1e-3),
             nn.ReLU(),
-            nn.Conv2d(mid_channels, mid_channels, kernel_size=3, stride=1, pad_mode='pad', padding=1,
+            nn.Conv2d(mid_channels, mid_channels, kernel_size=3, stride=1, pad_mode="pad", padding=1,
                       group=mid_channels),
             nn.BatchNorm2d(mid_channels, momentum=0.99, eps=1e-3),
             nn.ReLU(),
             nn.Conv2d(mid_channels, input_channels, kernel_size=1, stride=1),
-            nn.BatchNorm2d(input_channels, momentum=0.99, eps=1e-3)
+            nn.BatchNorm2d(input_channels, momentum=0.99, eps=1e-3),
         ]
 
         for t, c, n, s, k in inverted_residual_setting:
@@ -131,7 +133,7 @@ class Mnasnet(nn.Cell):
         features.extend([
             nn.Conv2d(input_channels, 1280, kernel_size=1, stride=1),
             nn.BatchNorm2d(1280, momentum=0.99, eps=1e-3),
-            nn.ReLU()
+            nn.ReLU(),
         ])
         self.features = nn.SequentialCell(features)
         self.pool = GlobalAvgPooling()
@@ -144,20 +146,19 @@ class Mnasnet(nn.Cell):
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 cell.weight.set_data(
-                    init.initializer(init.HeNormal(mode='fan_out', nonlinearity='relu'),
+                    init.initializer(init.HeNormal(mode="fan_out", nonlinearity="relu"),
                                      cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(
-                        init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+                    cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(init.initializer('ones', cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(init.initializer('zeros', cell.beta.shape, cell.beta.dtype))
+                cell.gamma.set_data(init.initializer("ones", cell.gamma.shape, cell.gamma.dtype))
+                cell.beta.set_data(init.initializer("zeros", cell.beta.shape, cell.beta.dtype))
             elif isinstance(cell, nn.Dense):
                 cell.weight.set_data(
-                    init.initializer(init.HeUniform(mode='fan_out', nonlinearity='sigmoid'),
+                    init.initializer(init.HeUniform(mode="fan_out", nonlinearity="sigmoid"),
                                      cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+                    cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
 
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)
@@ -178,8 +179,8 @@ class Mnasnet(nn.Cell):
 @register_model
 def mnasnet0_5(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
     """Get MnasNet model with width scaled by 0.5.
-     Refer to the base class `models.Mnasnet` for more details."""
-    default_cfg = default_cfgs['mnasnet0.5']
+    Refer to the base class `models.Mnasnet` for more details."""
+    default_cfg = default_cfgs["mnasnet0.5"]
     model = Mnasnet(alpha=0.5, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
@@ -191,8 +192,8 @@ def mnasnet0_5(pretrained: bool = False, num_classes: int = 1000, in_channels=3,
 @register_model
 def mnasnet0_75(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
     """Get MnasNet model with width scaled by 0.75.
-     Refer to the base class `models.Mnasnet` for more details."""
-    default_cfg = default_cfgs['mnasnet0.75']
+    Refer to the base class `models.Mnasnet` for more details."""
+    default_cfg = default_cfgs["mnasnet0.75"]
     model = Mnasnet(alpha=0.75, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
@@ -204,8 +205,8 @@ def mnasnet0_75(pretrained: bool = False, num_classes: int = 1000, in_channels=3
 @register_model
 def mnasnet1_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
     """Get MnasNet model with width scaled by 1.0.
-     Refer to the base class `models.Mnasnet` for more details."""
-    default_cfg = default_cfgs['mnasnet1.0']
+    Refer to the base class `models.Mnasnet` for more details."""
+    default_cfg = default_cfgs["mnasnet1.0"]
     model = Mnasnet(alpha=1.0, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
@@ -217,8 +218,8 @@ def mnasnet1_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3,
 @register_model
 def mnasnet1_3(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
     """Get MnasNet model with width scaled by 1.3.
-     Refer to the base class `models.Mnasnet` for more details."""
-    default_cfg = default_cfgs['mnasnet1.3']
+    Refer to the base class `models.Mnasnet` for more details."""
+    default_cfg = default_cfgs["mnasnet1.3"]
     model = Mnasnet(alpha=1.3, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
@@ -230,8 +231,8 @@ def mnasnet1_3(pretrained: bool = False, num_classes: int = 1000, in_channels=3,
 @register_model
 def mnasnet1_4(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
     """Get MnasNet model with width scaled by 1.4.
-     Refer to the base class `models.Mnasnet` for more details."""
-    default_cfg = default_cfgs['mnasnet1.4']
+    Refer to the base class `models.Mnasnet` for more details."""
+    default_cfg = default_cfgs["mnasnet1.4"]
     model = Mnasnet(alpha=1.4, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:

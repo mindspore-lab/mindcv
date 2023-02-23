@@ -1,44 +1,49 @@
 """Callbacks for mindspore.Model"""
 import os
 from time import time
-#import stat
+
+# import stat
 import numpy as np
 
 import mindspore as ms
+from mindspore import ParameterTuple, SummaryRecord, Tensor, load_param_into_net
 from mindspore import log as logger
-from mindspore import Tensor, ops, save_checkpoint, SummaryRecord, ParameterTuple, load_param_into_net
-from mindspore.train.callback import Callback
+from mindspore import ops, save_checkpoint
 from mindspore.train._utils import _make_directory
+from mindspore.train.callback import Callback
 
 from .checkpoint_manager import CheckpointManager
 from .reduce_manager import AllReduceSum
+
 
 class StateMonitor(Callback):
     """
     Train loss and validation accuracy monitor, after each epoch save the
     best checkpoint file with highest validation accuracy.
     """
-    def __init__(self,
-                 model,
-                 summary_dir="./",
-                 dataset_val=None,
-                 val_interval=1,
-                 val_start_epoch=1,
-                 save_best_ckpt=True,
-                 ckpt_dir="./",
-                 ckpt_save_interval=1,
-                 best_ckpt_name="best.ckpt",
-                 metric_name=["accuracy"],
-                 rank_id=None,
-                 device_num=None,
-                 log_interval=100,
-                 model_name='',
-                 last_epoch=0,
-                 keep_checkpoint_max=10,
-                 ckpt_save_policy=None,
-                 use_ema=False,
-                 dataset_sink_mode=True
-                 ):
+
+    def __init__(
+        self,
+        model,
+        summary_dir="./",
+        dataset_val=None,
+        val_interval=1,
+        val_start_epoch=1,
+        save_best_ckpt=True,
+        ckpt_dir="./",
+        ckpt_save_interval=1,
+        best_ckpt_name="best.ckpt",
+        metric_name=["accuracy"],
+        rank_id=None,
+        device_num=None,
+        log_interval=100,
+        model_name="",
+        last_epoch=0,
+        keep_checkpoint_max=10,
+        ckpt_save_policy=None,
+        use_ema=False,
+        dataset_sink_mode=True,
+    ):
         super().__init__()
         self.model = model
         self.dataset_val = dataset_val
@@ -55,7 +60,7 @@ class StateMonitor(Callback):
         self.ckpt_dir = ckpt_dir
         self.ckpt_save_interval = ckpt_save_interval
         self.last_epoch = last_epoch
-        self.best_epoch= -1
+        self.best_epoch = -1
 
         self.keep_checkpoint_max = keep_checkpoint_max
         self.ckpt_save_policy = ckpt_save_policy
@@ -66,16 +71,16 @@ class StateMonitor(Callback):
         if self.rank_id in [0, None]:
             if not os.path.isdir(ckpt_dir):
                 os.makedirs(ckpt_dir)
-            self.log_txt_fp = os.path.join(ckpt_dir, 'result.log')
-            result_log = 'Epoch\tTrainLoss\t'
-            name_dict = {'Top_1_Accuracy': 'ValAcc@1', 'Top_5_Accuracy': 'ValAcc@5'}
+            self.log_txt_fp = os.path.join(ckpt_dir, "result.log")
+            result_log = "Epoch\tTrainLoss\t"
+            name_dict = {"Top_1_Accuracy": "ValAcc@1", "Top_5_Accuracy": "ValAcc@5"}
             for i in range(len(self.metric_name)):
                 if self.metric_name[i] in name_dict.keys():
                     result_log += name_dict[self.metric_name[i]] + "\t"
                 else:
                     result_log += self.metric_name[i] + "\t"
             result_log += "Time\n"
-            with open(self.log_txt_fp, 'w', encoding="utf-8") as fp:
+            with open(self.log_txt_fp, "w", encoding="utf-8") as fp:
                 fp.write(result_log)
 
             self.best_ckpt_path = os.path.join(ckpt_dir, best_ckpt_name)
@@ -89,7 +94,7 @@ class StateMonitor(Callback):
         self.use_ema = use_ema
         if self.use_ema:
             self.online_params = ParameterTuple(self.model.train_network.get_parameters())
-            self.swap_params = self.online_params.clone('swap', 'zeros')
+            self.swap_params = self.online_params.clone("swap", "zeros")
 
     def __enter__(self):
         self.summary_record = SummaryRecord(self.summary_dir)
@@ -123,7 +128,7 @@ class StateMonitor(Callback):
     def on_train_step_end(self, run_context):
         cb_params = run_context.original_args()
         num_batches = cb_params.batch_num
-        cur_epoch = cb_params.cur_epoch_num + self.last_epoch -1 #(global_step-1) // num_batches
+        cur_epoch = cb_params.cur_epoch_num + self.last_epoch - 1  # (global_step-1) // num_batches
         cur_step_in_epoch = int((cb_params.cur_step_num - 1) % cb_params.batch_num)
 
         if cb_params.optimizer is not None:
@@ -133,18 +138,23 @@ class StateMonitor(Callback):
         else:
             optimizer = cb_params.train_network.optimizer
 
-        if (cur_step_in_epoch  + 1) % self.log_interval == 0 or \
-                (cur_step_in_epoch  + 1) >= num_batches or cur_step_in_epoch == 0:
+        if (
+            (cur_step_in_epoch + 1) % self.log_interval == 0
+            or (cur_step_in_epoch + 1) >= num_batches
+            or cur_step_in_epoch == 0
+        ):
             step = optimizer.global_step
             if optimizer.dynamic_lr:
-                cur_lr = optimizer.learning_rate(step-1)[0].asnumpy()
+                cur_lr = optimizer.learning_rate(step - 1)[0].asnumpy()
             else:
                 cur_lr = optimizer.learning_rate.asnumpy()
             loss = self._get_loss(cb_params)
 
-            print(f"Epoch: {cur_epoch+1}, "
-                  f"batch:[{cur_step_in_epoch+1}/{num_batches}], "
-                  f"loss:{loss.asnumpy():.6f}, lr: {cur_lr:.7f},  time:{time() - self.start:.6f}s")
+            print(
+                f"Epoch: {cur_epoch+1}, "
+                f"batch:[{cur_step_in_epoch+1}/{num_batches}], "
+                f"loss:{loss.asnumpy():.6f}, lr: {cur_lr:.7f},  time:{time() - self.start:.6f}s"
+            )
             self.start = time()
 
     def on_train_epoch_end(self, run_context):
@@ -163,10 +173,10 @@ class StateMonitor(Callback):
         # the global step may larger than batch_size * epoch due to graph mode async
         global_step = optimizer.global_step.asnumpy()[0]
         cur_epoch = cb_params.cur_epoch_num + self.last_epoch
-        cur_step_in_epoch = cb_params.batch_num #(global_step - 1) % cb_params.batch_num
+        cur_step_in_epoch = cb_params.batch_num  # (global_step - 1) % cb_params.batch_num
 
         loss = self._get_loss(cb_params)
-        self.summary_record.add_value('scalar', f'train_loss_{self.rank_id}', loss)
+        self.summary_record.add_value("scalar", f"train_loss_{self.rank_id}", loss)
 
         # val while training if validation loader is not None
         res = Tensor(np.zeros(len(self.metric_name)), ms.float32)
@@ -198,7 +208,7 @@ class StateMonitor(Callback):
                     if not isinstance(res, Tensor):
                         res = Tensor(res)
                     for i in range(len(res)):
-                        self.summary_record.add_value('scalar', 'val_' + self.metric_name[i], res[i])
+                        self.summary_record.add_value("scalar", "val_" + self.metric_name[i], res[i])
 
         # log
         if self.rank_id in [0, None]:
@@ -207,33 +217,34 @@ class StateMonitor(Callback):
                     self._flush_from_cache(cb_params)
 
                 # save optim for resume
-                optim_save_path = os.path.join(self.ckpt_dir, f'optim_{self.model_name}.ckpt')
+                optim_save_path = os.path.join(self.ckpt_dir, f"optim_{self.model_name}.ckpt")
                 ms.save_checkpoint(optimizer, optim_save_path, async_save=True)
 
-                cur_ckpoint_file = self.model_name + "-" + str(cur_epoch) + "_" \
-                                   + str(cur_step_in_epoch) + ".ckpt"
+                cur_ckpoint_file = self.model_name + "-" + str(cur_epoch) + "_" + str(cur_step_in_epoch) + ".ckpt"
 
                 # keep checkpoint files number equal max number.
                 ckpt_save_path = os.path.join(self.ckpt_dir, cur_ckpoint_file)
-                ckpoint_filelist = self._manager.save_ckpoint(cb_params.train_network,
-                                                              num_ckpt=self.keep_checkpoint_max,
-                                                              metric=res[0],
-                                                              save_path=ckpt_save_path)
-                if self.ckpt_save_policy == 'top_k':
+                ckpoint_filelist = self._manager.save_ckpoint(
+                    cb_params.train_network,
+                    num_ckpt=self.keep_checkpoint_max,
+                    metric=res[0],
+                    save_path=ckpt_save_path,
+                )
+                if self.ckpt_save_policy == "top_k":
                     print("Top K accuracy checkpoints:")
-                    print('\n'.join(ckpt + '\t' + str(acc)  for ckpt, acc in ckpoint_filelist))
+                    print("\n".join(ckpt + "\t" + str(acc) for ckpt, acc in ckpoint_filelist))
                 else:
                     print(f"Saving model to {ckpt_save_path}")
 
             epoch_time = time() - self.epoch_start
-            print(f'Total time since last epoch: {epoch_time:.3f}')
+            print(f"Total time since last epoch: {epoch_time:.3f}")
             print("-" * 80)
             self.epoch_start = time()
-            result_log = f'{cur_epoch}\t\t\t{loss.asnumpy():.7f}\t\t\t'
+            result_log = f"{cur_epoch}\t\t\t{loss.asnumpy():.7f}\t\t\t"
             for i in range(len(res)):
                 result_log += f"{res[i].asnumpy():.3f}\t\t\t"
             result_log += f"{epoch_time:.2f}\n"
-            with open(self.log_txt_fp, 'a', encoding="utf-8") as fp:
+            with open(self.log_txt_fp, "a", encoding="utf-8") as fp:
                 fp.write(result_log)
 
         self.summary_record.record(int(global_step))
@@ -265,8 +276,10 @@ class StateMonitor(Callback):
             # we assume that the first one is loss.
             loss = output[0]
         else:
-            logger.warning("The output type could not be identified, expect type is one of "
-                           "[int, float, Tensor, list, tuple], so no loss was recorded in SummaryCollector.")
+            logger.warning(
+                "The output type could not be identified, expect type is one of "
+                "[int, float, Tensor, list, tuple], so no loss was recorded in SummaryCollector."
+            )
             return None
 
         if not isinstance(loss, Tensor):
@@ -291,15 +304,19 @@ class StateMonitor(Callback):
         ckpoint_files = sorted(self._ckpoint_filelist, key=os.path.getmtime)
         self.remove_ckpoint_file(ckpoint_files[0])
 
+
 class LossAccSummary(Callback):
-    ''' A callback for recording loss and acc during training '''
-    def __init__(self,
-                 summary_dir,
-                 model,
-                 dataset_val,
-                 val_interval=1,
-                 val_start_epoch=1,
-                 metric_name="accuracy"):
+    """A callback for recording loss and acc during training"""
+
+    def __init__(
+        self,
+        summary_dir,
+        model,
+        dataset_val,
+        val_interval=1,
+        val_start_epoch=1,
+        metric_name="accuracy",
+    ):
         super().__init__()
         self._summary_dir = _make_directory(summary_dir, "summary_dir")
         self.model = model
@@ -323,9 +340,9 @@ class LossAccSummary(Callback):
             val_acc = self.model.eval(self.dataset_val)[self.metric_name]
             if not isinstance(val_acc, Tensor):
                 val_acc = Tensor(val_acc)
-            self.summary_record.add_value('scalar', 'test_dataset_' + self.metric_name, val_acc)
+            self.summary_record.add_value("scalar", "test_dataset_" + self.metric_name, val_acc)
 
-        self.summary_record.add_value('scalar', 'loss/auto', loss)
+        self.summary_record.add_value("scalar", "loss/auto", loss)
         self.summary_record.record(cb_params.cur_step_num)
 
     def _get_loss(self, cb_params):
@@ -348,8 +365,10 @@ class LossAccSummary(Callback):
             # we assume that the first one is loss.
             loss = output[0]
         else:
-            logger.warning("The output type could not be identified, expect type is one of "
-                           "[int, float, Tensor, list, tuple], so no loss was recorded in SummaryCollector.")
+            logger.warning(
+                "The output type could not be identified, expect type is one of "
+                "[int, float, Tensor, list, tuple], so no loss was recorded in SummaryCollector."
+            )
             return None
 
         if not isinstance(loss, Tensor):
@@ -358,6 +377,7 @@ class LossAccSummary(Callback):
         loss = Tensor(np.mean(loss.asnumpy()))
         return loss
 
+
 class ValCallback(Callback):
     def __init__(self, log_step_interval=100):
         super().__init__()
@@ -365,6 +385,6 @@ class ValCallback(Callback):
 
     def on_eval_step_end(self, run_context):
         cb_params = run_context.original_args()
-        #cur_step_in_epoch = int((cb_params.cur_step_num - 1) % cb_params.batch_num)
+        # cur_step_in_epoch = int((cb_params.cur_step_num - 1) % cb_params.batch_num)
         if cb_params.cur_step_num % self.log_step_interval == 0:
-            print(f'{cb_params.cur_step_num }/{cb_params.batch_num}')
+            print(f"{cb_params.cur_step_num }/{cb_params.batch_num}")

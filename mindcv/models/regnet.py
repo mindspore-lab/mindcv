@@ -4,10 +4,11 @@ Refer to: Designing Network Design Spaces
 """
 
 import math
+
 import numpy as np
 
-from mindspore import nn
 import mindspore.common.initializer as init
+from mindspore import nn
 
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExcite
@@ -15,67 +16,68 @@ from .registry import register_model
 from .utils import load_pretrained
 
 __all__ = [
-    'regnet_x_200mf',
-    'regnet_x_400mf',
-    'regnet_x_600mf',
-    'regnet_x_800mf',
-    'regnet_x_1_6gf',
-    'regnet_x_3_2gf',
-    'regnet_x_4_0gf',
-    'regnet_x_6_4gf',
-    'regnet_x_8_0gf',
-    'regnet_x_12gf',
-    'regnet_x_16gf',
-    'regnet_x_32gf',
-    'regnet_y_200mf',
-    'regnet_y_400mf',
-    'regnet_y_600mf',
-    'regnet_y_800mf',
-    'regnet_y_1_6gf',
-    'regnet_y_3_2gf',
-    'regnet_y_4_0gf',
-    'regnet_y_6_4gf',
-    'regnet_y_8_0gf',
-    'regnet_y_12gf',
-    'regnet_y_16gf',
-    'regnet_y_32gf'
+    "regnet_x_200mf",
+    "regnet_x_400mf",
+    "regnet_x_600mf",
+    "regnet_x_800mf",
+    "regnet_x_1_6gf",
+    "regnet_x_3_2gf",
+    "regnet_x_4_0gf",
+    "regnet_x_6_4gf",
+    "regnet_x_8_0gf",
+    "regnet_x_12gf",
+    "regnet_x_16gf",
+    "regnet_x_32gf",
+    "regnet_y_200mf",
+    "regnet_y_400mf",
+    "regnet_y_600mf",
+    "regnet_y_800mf",
+    "regnet_y_1_6gf",
+    "regnet_y_3_2gf",
+    "regnet_y_4_0gf",
+    "regnet_y_6_4gf",
+    "regnet_y_8_0gf",
+    "regnet_y_12gf",
+    "regnet_y_16gf",
+    "regnet_y_32gf",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': '', 'classifier': 'classifier',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "",
+        "classifier": "classifier",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'regnet_x_200mf': _cfg(url=''),
-    'regnet_x_400mf': _cfg(url=''),
-    'regnet_x_600mf': _cfg(url=''),
-    'regnet_x_800mf': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_800mf-198_2502.ckpt'),
-    'regnet_x_1_6gf': _cfg(url=''),
-    'regnet_x_3_2gf': _cfg(url=''),
-    'regnet_x_4_0gf': _cfg(url=''),
-    'regnet_x_6_4gf': _cfg(url=''),
-    'regnet_x_8_0gf': _cfg(url=''),
-    'regnet_x_12gf': _cfg(url=''),
-    'regnet_x_16gf': _cfg(url=''),
-    'regnet_x_32gf': _cfg(url=''),
-    'regnet_y_200mf': _cfg(url=''),
-    'regnet_y_400mf': _cfg(url=''),
-    'regnet_y_600mf': _cfg(url=''),
-    'regnet_y_800mf': _cfg(url=''),
-    'regnet_y_1_6gf': _cfg(url=''),
-    'regnet_y_3_2gf': _cfg(url=''),
-    'regnet_y_4_0gf': _cfg(url=''),
-    'regnet_y_6_4gf': _cfg(url=''),
-    'regnet_y_8_0gf': _cfg(url=''),
-    'regnet_y_12gf': _cfg(url=''),
-    'regnet_y_16gf': _cfg(url=''),
-    'regnet_y_32gf': _cfg(url=''),
+    "regnet_x_200mf": _cfg(url=""),
+    "regnet_x_400mf": _cfg(url=""),
+    "regnet_x_600mf": _cfg(url=""),
+    "regnet_x_800mf": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_800mf-198_2502.ckpt"),
+    "regnet_x_1_6gf": _cfg(url=""),
+    "regnet_x_3_2gf": _cfg(url=""),
+    "regnet_x_4_0gf": _cfg(url=""),
+    "regnet_x_6_4gf": _cfg(url=""),
+    "regnet_x_8_0gf": _cfg(url=""),
+    "regnet_x_12gf": _cfg(url=""),
+    "regnet_x_16gf": _cfg(url=""),
+    "regnet_x_32gf": _cfg(url=""),
+    "regnet_y_200mf": _cfg(url=""),
+    "regnet_y_400mf": _cfg(url=""),
+    "regnet_y_600mf": _cfg(url=""),
+    "regnet_y_800mf": _cfg(url=""),
+    "regnet_y_1_6gf": _cfg(url=""),
+    "regnet_y_3_2gf": _cfg(url=""),
+    "regnet_y_4_0gf": _cfg(url=""),
+    "regnet_y_6_4gf": _cfg(url=""),
+    "regnet_y_8_0gf": _cfg(url=""),
+    "regnet_y_12gf": _cfg(url=""),
+    "regnet_y_16gf": _cfg(url=""),
+    "regnet_y_32gf": _cfg(url=""),
 }
 
 
@@ -83,7 +85,7 @@ def conv2d(w_in, w_out, k, *, stride=1, groups=1, bias=False):
     """Helper for building a conv2d layer."""
     assert k % 2 == 1, "Only odd size kernels supported to avoid padding issues."
     s, p, g, b = stride, (k - 1) // 2, groups, bias
-    return nn.Conv2d(w_in, w_out, k, stride=s, pad_mode='pad', padding=p, group=g, has_bias=b)
+    return nn.Conv2d(w_in, w_out, k, stride=s, pad_mode="pad", padding=p, group=g, has_bias=b)
 
 
 def norm2d(w_in, eps=1e-5, mom=0.9):
@@ -398,13 +400,13 @@ class AnyNet(nn.Cell):
                     init.initializer(init.Normal(sigma=math.sqrt(2.0 / fan_out), mean=0.0),
                                      cell.weight.shape, cell.weight.dtype))
             elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(init.initializer('ones', cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(init.initializer('zeros', cell.beta.shape, cell.beta.dtype))
+                cell.gamma.set_data(init.initializer("ones", cell.gamma.shape, cell.gamma.dtype))
+                cell.beta.set_data(init.initializer("zeros", cell.beta.shape, cell.beta.dtype))
             elif isinstance(cell, nn.Dense):
                 cell.weight.set_data(
                     init.initializer(init.Normal(sigma=0.01, mean=0.0), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+                    cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
 
     def forward_features(self, x):
         x = self.stem(x)
@@ -488,19 +490,19 @@ class RegNet(AnyNet):
             "num_classes": num_classes,
         }
 
-    def __init__(self, w_a, w_0, w_m, d, group_w, stride=2, bot_mul=1.0, stem_type='simple_stem_in', stem_w=32,
-                 block_type='res_bottleneck_block', head_w=0, num_classes=1000, se_r=0.0, in_channels=3):
+    def __init__(self, w_a, w_0, w_m, d, group_w, stride=2, bot_mul=1.0, stem_type="simple_stem_in", stem_w=32,
+                 block_type="res_bottleneck_block", head_w=0, num_classes=1000, se_r=0.0, in_channels=3):
         params = RegNet.regnet_get_params(w_a, w_0, w_m, d, stride, bot_mul, group_w, stem_type, stem_w, block_type,
                                           head_w, num_classes, se_r)
         print(params)
-        super(RegNet, self).__init__(params['depths'], params['stem_type'], params['stem_w'], params['block_type'],
-                                     params['widths'], params['strides'], params['bot_muls'], params['group_ws'],
-                                     params['head_w'], params['num_classes'], params['se_r'], in_channels)
+        super(RegNet, self).__init__(params["depths"], params["stem_type"], params["stem_w"], params["block_type"],
+                                     params["widths"], params["strides"], params["bot_muls"], params["group_ws"],
+                                     params["head_w"], params["num_classes"], params["se_r"], in_channels)
 
 
 @register_model
 def regnet_x_200mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_x_200mf']
+    default_cfg = default_cfgs["regnet_x_200mf"]
     model = RegNet(36.44, 24, 2.49, 13, 8, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -510,7 +512,7 @@ def regnet_x_200mf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_x_400mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_x_400mf']
+    default_cfg = default_cfgs["regnet_x_400mf"]
     model = RegNet(24.48, 24, 2.54, 22, 16, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -520,7 +522,7 @@ def regnet_x_400mf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_x_600mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_x_600mf']
+    default_cfg = default_cfgs["regnet_x_600mf"]
     model = RegNet(36.97, 48, 2.24, 16, 24, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -530,7 +532,7 @@ def regnet_x_600mf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_x_800mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_x_800mf']
+    default_cfg = default_cfgs["regnet_x_800mf"]
     model = RegNet(35.73, 56, 2.28, 16, 16, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -540,7 +542,7 @@ def regnet_x_800mf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_x_1_6gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_x_1_6gf']
+    default_cfg = default_cfgs["regnet_x_1_6gf"]
     model = RegNet(34.01, 80, 2.25, 18, 24, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -550,7 +552,7 @@ def regnet_x_1_6gf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_x_3_2gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_x_3_2gf']
+    default_cfg = default_cfgs["regnet_x_3_2gf"]
     model = RegNet(26.31, 88, 2.25, 25, 48, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -560,7 +562,7 @@ def regnet_x_3_2gf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_x_4_0gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_x_4_0gf']
+    default_cfg = default_cfgs["regnet_x_4_0gf"]
     model = RegNet(38.65, 96, 2.43, 23, 40, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -570,7 +572,7 @@ def regnet_x_4_0gf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_x_6_4gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_x_6_4gf']
+    default_cfg = default_cfgs["regnet_x_6_4gf"]
     model = RegNet(60.83, 184, 2.07, 17, 56, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -580,7 +582,7 @@ def regnet_x_6_4gf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_x_8_0gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_x_8_0gf']
+    default_cfg = default_cfgs["regnet_x_8_0gf"]
     model = RegNet(49.56, 80, 2.88, 23, 120, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -590,7 +592,7 @@ def regnet_x_8_0gf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_x_12gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_x_12gf']
+    default_cfg = default_cfgs["regnet_x_12gf"]
     model = RegNet(73.36, 168, 2.37, 19, 112, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -600,7 +602,7 @@ def regnet_x_12gf(pretrained: bool = False, num_classes: int = 1000, in_channels
 
 @register_model
 def regnet_x_16gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_x_16gf']
+    default_cfg = default_cfgs["regnet_x_16gf"]
     model = RegNet(55.59, 216, 2.1, 22, 128, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -610,7 +612,7 @@ def regnet_x_16gf(pretrained: bool = False, num_classes: int = 1000, in_channels
 
 @register_model
 def regnet_x_32gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_x_32gf']
+    default_cfg = default_cfgs["regnet_x_32gf"]
     model = RegNet(69.86, 320, 2.0, 23, 168, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -620,7 +622,7 @@ def regnet_x_32gf(pretrained: bool = False, num_classes: int = 1000, in_channels
 
 @register_model
 def regnet_y_200mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_y_200mf']
+    default_cfg = default_cfgs["regnet_y_200mf"]
     model = RegNet(36.44, 24, 2.49, 13, 8, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -630,7 +632,7 @@ def regnet_y_200mf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_y_400mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_y_400mf']
+    default_cfg = default_cfgs["regnet_y_400mf"]
     model = RegNet(27.89, 48, 2.09, 16, 8, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -640,7 +642,7 @@ def regnet_y_400mf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_y_600mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_y_600mf']
+    default_cfg = default_cfgs["regnet_y_600mf"]
     model = RegNet(32.54, 48, 2.32, 15, 16, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -650,7 +652,7 @@ def regnet_y_600mf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_y_800mf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_y_800mf']
+    default_cfg = default_cfgs["regnet_y_800mf"]
     model = RegNet(38.84, 56, 2.4, 14, 16, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -660,7 +662,7 @@ def regnet_y_800mf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_y_1_6gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_y_1_6gf']
+    default_cfg = default_cfgs["regnet_y_1_6gf"]
     model = RegNet(20.71, 48, 2.65, 27, 24, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -670,7 +672,7 @@ def regnet_y_1_6gf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_y_3_2gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_y_3_2gf']
+    default_cfg = default_cfgs["regnet_y_3_2gf"]
     model = RegNet(42.63, 80, 2.66, 21, 24, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -680,7 +682,7 @@ def regnet_y_3_2gf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_y_4_0gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_y_4_0gf']
+    default_cfg = default_cfgs["regnet_y_4_0gf"]
     model = RegNet(31.41, 96, 2.24, 22, 64, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -690,7 +692,7 @@ def regnet_y_4_0gf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_y_6_4gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_y_6_4gf']
+    default_cfg = default_cfgs["regnet_y_6_4gf"]
     model = RegNet(33.22, 112, 2.27, 25, 72, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -700,7 +702,7 @@ def regnet_y_6_4gf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_y_8_0gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_y_8_0gf']
+    default_cfg = default_cfgs["regnet_y_8_0gf"]
     model = RegNet(76.82, 192, 2.19, 17, 56, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -710,7 +712,7 @@ def regnet_y_8_0gf(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 @register_model
 def regnet_y_12gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_y_12gf']
+    default_cfg = default_cfgs["regnet_y_12gf"]
     model = RegNet(73.36, 168, 2.37, 19, 112, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -720,7 +722,7 @@ def regnet_y_12gf(pretrained: bool = False, num_classes: int = 1000, in_channels
 
 @register_model
 def regnet_y_16gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_y_16gf']
+    default_cfg = default_cfgs["regnet_y_16gf"]
     model = RegNet(106.23, 200, 2.48, 18, 112, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -730,7 +732,7 @@ def regnet_y_16gf(pretrained: bool = False, num_classes: int = 1000, in_channels
 
 @register_model
 def regnet_y_32gf(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs['regnet_y_32gf']
+    default_cfg = default_cfgs["regnet_y_32gf"]
     model = RegNet(115.89, 232, 2.53, 20, 232, se_r=0.25, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:

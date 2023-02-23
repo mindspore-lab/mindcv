@@ -7,3 +7,9 @@ sections = ["FUTURE", "STDLIB", "THIRDPARTY", "MINDSPORE", "FIRSTPARTY", "LOCALF
 
 [tool.black]
 line-length = 120
+force-exclude = '''
+(
+  docs
+  | ^/mindcv/models  # exclude the models folder where reviewers MUST check the script WORD BY WORD.
+)
+'''

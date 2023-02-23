@@ -1,44 +1,48 @@
-''' Model training pipeline '''
-import os
+""" Model training pipeline """
 import copy
 import logging
-import mindspore as ms
+import os
 import random
-import numpy as np
-from mindspore import nn, Tensor
-from mindspore import FixedLossScaleManager, Model
-from mindspore.communication import init, get_rank, get_group_size
-import mindspore.dataset.transforms as transforms
 
-from mindcv.models import create_model
-from mindcv.data import create_dataset, create_transforms, create_loader
+import numpy as np
+
+import mindspore as ms
+import mindspore.dataset.transforms as transforms
+from mindspore import FixedLossScaleManager, Model, Tensor, nn
+from mindspore.communication import get_group_size, get_rank, init
+
+from mindcv.data import create_dataset, create_loader, create_transforms
 from mindcv.loss import create_loss
+from mindcv.models import create_model
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
-from mindcv.utils import StateMonitor, AllReduceSum, TrainOneStepWithEMA
+from mindcv.utils import AllReduceSum, StateMonitor, TrainOneStepWithEMA
 from mindcv.utils.random import set_seed
-from config import parse_args
 
+from config import parse_args  # isort: skip
 
 # TODO: arg parser already has a logger
-logger = logging.getLogger('train')
+logger = logging.getLogger("train")
 logger.setLevel(logging.INFO)
 h1 = logging.StreamHandler()
-formatter1 = logging.Formatter('%(message)s',)
+formatter1 = logging.Formatter("%(message)s")
 logger.addHandler(h1)
 h1.setFormatter(formatter1)
 
+
 def train(args):
-    ''' main train function'''
+    """main train function"""
 
     ms.set_context(mode=args.mode)
     if args.distribute:
         init()
         device_num = get_group_size()
         rank_id = get_rank()
-        ms.set_auto_parallel_context(device_num=device_num,
-                                     parallel_mode='data_parallel',
-                                     gradients_mean=True)
+        ms.set_auto_parallel_context(
+            device_num=device_num,
+            parallel_mode="data_parallel",
+            gradients_mean=True,
+        )
     else:
         device_num = None
         rank_id = None
@@ -56,7 +60,8 @@ def train(args):
         shard_id=rank_id,
         num_parallel_workers=args.num_parallel_workers,
         download=args.dataset_download,
-        num_aug_repeats=args.aug_repeats)
+        num_aug_repeats=args.aug_repeats,
+    )
 
     if args.num_classes is None:
         num_classes = dataset_train.num_classes()
@@ -81,10 +86,10 @@ def train(args):
         re_scale=args.re_scale,
         re_ratio=args.re_ratio,
         re_value=args.re_value,
-        re_max_attempts=args.re_max_attempts
+        re_max_attempts=args.re_max_attempts,
     )
-    
-    target_transform = transforms.OneHot(num_classes) if args.loss == 'BCE' else None
+
+    target_transform = transforms.OneHot(num_classes) if args.loss == "BCE" else None
 
     # load dataset
     loader_train = create_loader(
@@ -109,7 +114,8 @@ def train(args):
             num_shards=device_num,
             shard_id=rank_id,
             num_parallel_workers=args.num_parallel_workers,
-            download=args.dataset_download)
+            download=args.dataset_download,
+        )
 
         transform_list_eval = create_transforms(
             dataset_name=args.dataset,
@@ -118,7 +124,7 @@ def train(args):
             crop_pct=args.crop_pct,
             interpolation=args.interpolation,
             mean=args.mean,
-            std=args.std
+            std=args.std,
         )
 
         loader_eval = create_loader(
@@ -146,158 +152,184 @@ def train(args):
         train_count = all_reduce(Tensor(train_count, ms.int32))
 
     # create model
-    network = create_model(model_name=args.model,
-                           num_classes=num_classes,
-                           in_channels=args.in_channels,
-                           drop_rate=args.drop_rate,
-                           drop_path_rate=args.drop_path_rate,
-                           pretrained=args.pretrained,
-                           checkpoint_path=args.ckpt_path,
-                           use_ema=args.use_ema)
-    
+    network = create_model(
+        model_name=args.model,
+        num_classes=num_classes,
+        in_channels=args.in_channels,
+        drop_rate=args.drop_rate,
+        drop_path_rate=args.drop_path_rate,
+        pretrained=args.pretrained,
+        checkpoint_path=args.ckpt_path,
+        use_ema=args.use_ema,
+    )
+
     num_params = sum([param.size for param in network.get_parameters()])
 
     # create loss
-    loss = create_loss(name=args.loss,
-                       reduction=args.reduction,
-                       label_smoothing=args.label_smoothing,
-                       aux_factor=args.aux_factor)
+    loss = create_loss(
+        name=args.loss,
+        reduction=args.reduction,
+        label_smoothing=args.label_smoothing,
+        aux_factor=args.aux_factor,
+    )
 
     # create learning rate schedule
-    lr_scheduler = create_scheduler(num_batches,
-                                    scheduler=args.scheduler,
-                                    lr=args.lr,
-                                    min_lr=args.min_lr,
-                                    warmup_epochs=args.warmup_epochs,
-                                    warmup_factor=args.warmup_factor,
-                                    decay_epochs=args.decay_epochs,
-                                    decay_rate=args.decay_rate,
-                                    milestones=args.multi_step_decay_milestones,
-                                    num_epochs=args.epoch_size,
-                                    lr_epoch_stair=args.lr_epoch_stair,
-                                    num_cycles=args.num_cycles,
-                                    cycle_decay=args.cycle_decay)
-    
+    lr_scheduler = create_scheduler(
+        num_batches,
+        scheduler=args.scheduler,
+        lr=args.lr,
+        min_lr=args.min_lr,
+        warmup_epochs=args.warmup_epochs,
+        warmup_factor=args.warmup_factor,
+        decay_epochs=args.decay_epochs,
+        decay_rate=args.decay_rate,
+        milestones=args.multi_step_decay_milestones,
+        num_epochs=args.epoch_size,
+        lr_epoch_stair=args.lr_epoch_stair,
+        num_cycles=args.num_cycles,
+        cycle_decay=args.cycle_decay,
+    )
+
     # resume training if ckpt_path is given
-    if args.ckpt_path != '' and args.resume_opt: 
-        opt_ckpt_path = os.path.join(args.ckpt_save_dir, f'optim_{args.model}.ckpt')
+    if args.ckpt_path != "" and args.resume_opt:
+        opt_ckpt_path = os.path.join(args.ckpt_save_dir, f"optim_{args.model}.ckpt")
     else:
-        opt_ckpt_path = '' 
+        opt_ckpt_path = ""
 
     # create optimizer
-    #TODO: consistent naming opt, name, dataset_name
+    # TODO: consistent naming opt, name, dataset_name
     if args.use_ema:
-        optimizer = create_optimizer(network.trainable_params(),
-                                     opt=args.opt,
-                                     lr=lr_scheduler,
-                                     weight_decay=args.weight_decay,
-                                     momentum=args.momentum,
-                                     nesterov=args.use_nesterov,
-                                     filter_bias_and_bn=args.filter_bias_and_bn,
-                                     checkpoint_path=opt_ckpt_path,
-                                     eps=args.eps)
+        optimizer = create_optimizer(
+            network.trainable_params(),
+            opt=args.opt,
+            lr=lr_scheduler,
+            weight_decay=args.weight_decay,
+            momentum=args.momentum,
+            nesterov=args.use_nesterov,
+            filter_bias_and_bn=args.filter_bias_and_bn,
+            checkpoint_path=opt_ckpt_path,
+            eps=args.eps,
+        )
     else:
-        optimizer = create_optimizer(network.trainable_params(),
-                                     opt=args.opt,
-                                     lr=lr_scheduler,
-                                     weight_decay=args.weight_decay,
-                                     momentum=args.momentum,
-                                     nesterov=args.use_nesterov,
-                                     filter_bias_and_bn=args.filter_bias_and_bn,
-                                     loss_scale=args.loss_scale,
-                                     checkpoint_path=opt_ckpt_path,
-                                     eps=args.eps)
+        optimizer = create_optimizer(
+            network.trainable_params(),
+            opt=args.opt,
+            lr=lr_scheduler,
+            weight_decay=args.weight_decay,
+            momentum=args.momentum,
+            nesterov=args.use_nesterov,
+            filter_bias_and_bn=args.filter_bias_and_bn,
+            loss_scale=args.loss_scale,
+            checkpoint_path=opt_ckpt_path,
+            eps=args.eps,
+        )
 
     # Define eval metrics.
     if num_classes >= 5:
-        eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy(),
-                        'Top_5_Accuracy': nn.Top5CategoricalAccuracy()}
+        eval_metrics = {"Top_1_Accuracy": nn.Top1CategoricalAccuracy(), "Top_5_Accuracy": nn.Top5CategoricalAccuracy()}
     else:
-        eval_metrics = {'Top_1_Accuracy': nn.Top1CategoricalAccuracy()}
+        eval_metrics = {"Top_1_Accuracy": nn.Top1CategoricalAccuracy()}
 
     # init model
     if args.use_ema:
         net_with_loss = nn.WithLossCell(network, loss)
         loss_scale_manager = nn.FixedLossScaleUpdateCell(loss_scale_value=args.loss_scale)
         ms.amp.auto_mixed_precision(net_with_loss, amp_level=args.amp_level)
-        net_with_loss = TrainOneStepWithEMA(net_with_loss, optimizer, scale_sense=loss_scale_manager,
-                                            use_ema=args.use_ema, ema_decay=args.ema_decay)
+        net_with_loss = TrainOneStepWithEMA(
+            net_with_loss, optimizer, scale_sense=loss_scale_manager, use_ema=args.use_ema, ema_decay=args.ema_decay
+        )
         eval_network = nn.WithEvalCell(network, loss, args.amp_level in ["O2", "O3", "auto"])
         model = Model(net_with_loss, eval_network=eval_network, metrics=eval_metrics, eval_indexes=[0, 1, 2])
     else:
         loss_scale_manager = FixedLossScaleManager(loss_scale=args.loss_scale, drop_overflow_update=False)
-        model = Model(network, loss_fn=loss, optimizer=optimizer, metrics=eval_metrics, amp_level=args.amp_level,
-                      loss_scale_manager=loss_scale_manager)
+        model = Model(
+            network,
+            loss_fn=loss,
+            optimizer=optimizer,
+            metrics=eval_metrics,
+            amp_level=args.amp_level,
+            loss_scale_manager=loss_scale_manager,
+        )
 
     # callback
     # save checkpoint, summary training loss
     # recorad val acc and do model selection if val dataset is availabe
     begin_epoch = 0
-    if args.ckpt_path != '':
-        if args.ckpt_path != '':
+    if args.ckpt_path != "":
+        if args.ckpt_path != "":
             begin_step = optimizer.global_step.asnumpy()[0]
-            begin_epoch = args.ckpt_path.split('/')[-1].split('-')[1].split('_')[0]
+            begin_epoch = args.ckpt_path.split("/")[-1].split("-")[1].split("_")[0]
             begin_epoch = int(begin_epoch)
 
     summary_dir = f"./{args.ckpt_save_dir}/summary"
-    assert (args.ckpt_save_policy != 'top_k' or args.val_while_train == True), \
-        "ckpt_save_policy is top_k, val_while_train must be True."
-    state_cb = StateMonitor(model, summary_dir=summary_dir,
-                            dataset_val=loader_eval,
-                            val_interval=args.val_interval,
-                            metric_name=list(eval_metrics.keys()),
-                            ckpt_dir=args.ckpt_save_dir,
-                            ckpt_save_interval=args.ckpt_save_interval,
-                            best_ckpt_name=args.model + '_best.ckpt',
-                            rank_id=rank_id,
-                            device_num=device_num,
-                            log_interval=args.log_interval,
-                            keep_checkpoint_max=args.keep_checkpoint_max,
-                            model_name=args.model,
-                            last_epoch=begin_epoch,
-                            ckpt_save_policy=args.ckpt_save_policy,
-                            use_ema=args.use_ema,
-                            dataset_sink_mode=args.dataset_sink_mode)
+    assert (
+        args.ckpt_save_policy != "top_k" or args.val_while_train == True
+    ), "ckpt_save_policy is top_k, val_while_train must be True."
+    state_cb = StateMonitor(
+        model,
+        summary_dir=summary_dir,
+        dataset_val=loader_eval,
+        val_interval=args.val_interval,
+        metric_name=list(eval_metrics.keys()),
+        ckpt_dir=args.ckpt_save_dir,
+        ckpt_save_interval=args.ckpt_save_interval,
+        best_ckpt_name=args.model + "_best.ckpt",
+        rank_id=rank_id,
+        device_num=device_num,
+        log_interval=args.log_interval,
+        keep_checkpoint_max=args.keep_checkpoint_max,
+        model_name=args.model,
+        last_epoch=begin_epoch,
+        ckpt_save_policy=args.ckpt_save_policy,
+        use_ema=args.use_ema,
+        dataset_sink_mode=args.dataset_sink_mode,
+    )
 
     callbacks = [state_cb]
     # log
     if rank_id in [None, 0]:
         logger.info(f"-" * 40)
-        logger.info(f"Num devices: {device_num if device_num is not None else 1} \n"
-                    f"Distributed mode: {args.distribute} \n"
-                    f"Num training samples: {train_count}")
+        logger.info(
+            f"Num devices: {device_num if device_num is not None else 1} \n"
+            f"Distributed mode: {args.distribute} \n"
+            f"Num training samples: {train_count}"
+        )
         if args.val_while_train:
             logger.info(f"Num validation samples: {eval_count}")
-        logger.info(f"Num classes: {num_classes} \n"
-                    f"Num batches: {num_batches} \n"
-                    f"Batch size: {args.batch_size} \n"
-                    f"Auto augment: {args.auto_augment} \n"
-                    f"Model: {args.model} \n"
-                    f"Model param: {num_params} \n"
-                    f"Num epochs: {args.epoch_size} \n"
-                    f"Optimizer: {args.opt} \n"
-                    f"LR: {args.lr} \n"
-                    f"LR Scheduler: {args.scheduler}")
+        logger.info(
+            f"Num classes: {num_classes} \n"
+            f"Num batches: {num_batches} \n"
+            f"Batch size: {args.batch_size} \n"
+            f"Auto augment: {args.auto_augment} \n"
+            f"Model: {args.model} \n"
+            f"Model param: {num_params} \n"
+            f"Num epochs: {args.epoch_size} \n"
+            f"Optimizer: {args.opt} \n"
+            f"LR: {args.lr} \n"
+            f"LR Scheduler: {args.scheduler}"
+        )
         logger.info(f"-" * 40)
 
-        if args.ckpt_path != '':
+        if args.ckpt_path != "":
             logger.info(f"Resume training from {args.ckpt_path}, last step: {begin_step}, last epoch: {begin_epoch}")
         else:
-            logger.info('Start training')
+            logger.info("Start training")
 
     model.train(args.epoch_size, loader_train, callbacks=callbacks, dataset_sink_mode=args.dataset_sink_mode)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     args = parse_args()
-    
+
     # data sync for cloud platform if enabled
     if args.enable_modelarts:
         import moxing as mox
-        args.data_dir = f'/cache/{args.data_url}'
-        mox.file.copy_parallel(src_url= os.path.join(args.data_url, args.dataset) , dst_url= args.data_dir)
-    
+
+        args.data_dir = f"/cache/{args.data_url}"
+        mox.file.copy_parallel(src_url=os.path.join(args.data_url, args.dataset), dst_url=args.data_dir)
+
     # core training
     train(args)
 
     if args.enable_modelarts:
-        mox.file.copy_parallel(src_url= args.ckpt_save_dir, dst_url=args.train_url)
+        mox.file.copy_parallel(src_url=args.ckpt_save_dir, dst_url=args.train_url)

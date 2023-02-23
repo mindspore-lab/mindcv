@@ -1,28 +1,37 @@
+import math
 import sys
-sys.path.append('.')
 
-import pytest
+sys.path.append(".")
 
 import numpy as np
-from mindspore import Tensor
-import mindspore as ms
-import mindspore
-from mindcv import list_models, list_modules
-from mindcv.models import create_model, model_entrypoint, is_model_in_modules, is_model_pretrained, get_pretrained_cfg_value
-from mindcv.loss import create_loss
-from mindcv.optim import create_optimizer
-from mindspore.nn import TrainOneStepCell, WithLossCell
-import math
+import pytest
 
-#TODO: the global avg pooling op used in EfficientNet is not supported for CPU. 
-model_name_list = list_models(exclude_filters='efficientnet*')
+import mindspore
+import mindspore as ms
+from mindspore import Tensor
+from mindspore.nn import TrainOneStepCell, WithLossCell
+
+from mindcv import list_models, list_modules
+from mindcv.loss import create_loss
+from mindcv.models import (
+    create_model,
+    get_pretrained_cfg_value,
+    is_model_in_modules,
+    is_model_pretrained,
+    model_entrypoint,
+)
+from mindcv.optim import create_optimizer
+
+# TODO: the global avg pooling op used in EfficientNet is not supported for CPU.
+model_name_list = list_models(exclude_filters="efficientnet*")
 
 check_loss_decrease = False
 
-#@pytest.mark.parametrize('mode', [ms.PYNATIVE_MODE, ms.GRAPH_MODE])
-@pytest.mark.parametrize('name', model_name_list)
+
+# @pytest.mark.parametrize('mode', [ms.PYNATIVE_MODE, ms.GRAPH_MODE])
+@pytest.mark.parametrize("name", model_name_list)
 def test_model_forward(name):
-    #ms.set_context(mode=ms.PYNATIVE_MODE)
+    # ms.set_context(mode=ms.PYNATIVE_MODE)
     bs = 2
     c = 10
     model = create_model(model_name=name, num_classes=c)
@@ -33,9 +42,10 @@ def test_model_forward(name):
         input_size = (bs, 3, 224, 224)
     dummy_input = Tensor(np.random.rand(*input_size), dtype=mindspore.float32)
     y = model(dummy_input)
-    assert y.shape == (bs, 10), 'output shape not match'
+    assert y.shape == (bs, 10), "output shape not match"
 
-'''
+
+"""
 @pytest.mark.parametrize('name', model_name_list)
 def test_model_backward(name):
     # TODO: check number of gradient == number of parameters
@@ -56,11 +66,12 @@ def test_model_backward(name):
     for _ in range(2):
         cur_loss = train_network(input_data, label)
     print("begin loss: {}, end loss:  {}".format(begin_loss, cur_loss))
-    
-    assert not math.isnan(cur_loss), 'loss NaN when training {name}' 
+
+    assert not math.isnan(cur_loss), 'loss NaN when training {name}'
     if check_loss_decrease:
         assert cur_loss < begin_loss, 'Loss does NOT decrease'
-'''
+"""
+
 
 def test_list_models():
     model_name_list = list_models()
@@ -73,10 +84,12 @@ def test_model_entrypoint():
     for model_name in model_name_list:
         print(model_entrypoint(model_name))
 
+
 def test_list_modules():
     module_name_list = list_modules()
     for module_name in module_name_list:
         print(module_name)
+
 
 def test_is_model_in_modules():
     model_name_list = list_models()
@@ -85,9 +98,10 @@ def test_is_model_in_modules():
     for model_name in model_name_list:
         if not is_model_in_modules(model_name, module_names):
             ouptput_false_list.append(model_name)
-    assert ouptput_false_list == [], \
-        '{}\n, Above mentioned models do not exist within a subset of modules.'.format(ouptput_false_list)
-    
+    assert ouptput_false_list == [], "{}\n, Above mentioned models do not exist within a subset of modules.".format(
+        ouptput_false_list
+    )
+
 
 def test_is_model_pretrained():
     model_name_list = list_models()
@@ -98,16 +112,17 @@ def test_is_model_pretrained():
             ouptput_false_list.append(model_name)
         else:
             num_pretrained += 1
-    #assert ouptput_false_list == [], \
+    # assert ouptput_false_list == [], \
     #    '{}\n, Above mentioned models do not have pretrained models.'.format(ouptput_false_list)
 
-    assert num_pretrained > 0, 'No pretrained models'
+    assert num_pretrained > 0, "No pretrained models"
 
-if __name__== '__main__':
-    test_model_forward('pnasnet')
-    '''
-    for model in model_name_list: 
+
+if __name__ == "__main__":
+    test_model_forward("pnasnet")
+    """
+    for model in model_name_list:
         if '384' in model:
             print(model)
             test_model_forward(model)
-    '''
+    """

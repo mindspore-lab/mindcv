@@ -3,37 +3,38 @@ MindSpore implementation of `edgenext`.
 Refer to EdgeNeXt: Efficiently Amalgamated CNN-Transformer Architecture for Mobile Vision Applications.
 """
 
-import numpy as np
 import math
 from typing import Tuple
 
-import mindspore as ms
-from mindspore import nn, Tensor, Parameter, ops
-import mindspore.common.initializer as init
+import numpy as np
 
-from .registry import register_model
+import mindspore as ms
+import mindspore.common.initializer as init
+from mindspore import Parameter, Tensor, nn, ops
+
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
+from .registry import register_model
 from .utils import load_pretrained
 
 __all__ = [
-    'EdgeNeXt',
-    'edgenext_small',
+    "EdgeNeXt",
+    "edgenext_small",
 ]
 
 
-def _cfg(url='', **kwargs):
+def _cfg(url="", **kwargs):
     return {
-        'url': url,
-        'num_classes': 1000,
-        'first_conv': 'conv_0.conv',
-        'classifier': 'last_linear',
-        **kwargs
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "conv_0.conv",
+        "classifier": "last_linear",
+        **kwargs,
     }
 
 
 default_cfgs = {
-    'edgenext_small': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt'),
+    "edgenext_small": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt"),
 }
 
 
@@ -45,20 +46,21 @@ def ssplit(x: Tensor, dim, width):
         begin = 0
         temp = []
         while begin + width < C:
-            temp.append(x[:, begin:begin + width, :, :])
+            temp.append(x[:, begin : begin + width, :, :])
             begin += width
         temp.append(x[:, begin:, :, :])
         return temp
 
 
 class LayerNorm(nn.LayerNorm):
-    r""" LayerNorm for channels_first tensors with 2d spatial dimensions (ie N, C, H, W).
-    """
-    def __init__(self,
-                 normalized_shape: Tuple[int],
-                 epsilon: float,
-                 norm_axis: int = -1
-                 ) -> None:
+    r"""LayerNorm for channels_first tensors with 2d spatial dimensions (ie N, C, H, W)."""
+
+    def __init__(
+        self,
+        normalized_shape: Tuple[int],
+        epsilon: float,
+        norm_axis: int = -1,
+    ) -> None:
         super().__init__(normalized_shape=normalized_shape, epsilon=epsilon)
         assert norm_axis in (-1, 1), "ConvNextLayerNorm's norm_axis must be 1 or -1."
         self.norm_axis = norm_axis
@@ -113,12 +115,14 @@ class PositionalEncodingFourier(nn.Cell):
 
 
 class ConvEncoder(nn.Cell):
-    def __init__(self,
-                 dim,
-                 drop_path=0.,
-                 layer_scale_init_value=1e-6,
-                 expan_ratio=4,
-                 kernel_size=7):
+    def __init__(
+        self,
+        dim,
+        drop_path=0.0,
+        layer_scale_init_value=1e-6,
+        expan_ratio=4,
+        kernel_size=7,
+    ):
         super().__init__()
         self.dwconv = nn.Conv2d(dim, dim, kernel_size=kernel_size, pad_mode="pad", padding=kernel_size // 2, group=dim,
                                 has_bias=True)
@@ -127,8 +131,12 @@ class ConvEncoder(nn.Cell):
         self.act = nn.GELU(approximate=False)
         self.pwconv2 = nn.Dense(expan_ratio * dim, dim)
 
-        self.gamma1 = Parameter(Tensor(layer_scale_init_value * np.ones(dim), ms.float32), requires_grad=True) if layer_scale_init_value > 0. else None
-        self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
+        self.gamma1 = (
+            Parameter(Tensor(layer_scale_init_value * np.ones(dim), ms.float32), requires_grad=True)
+            if layer_scale_init_value > 0.0
+            else None
+        )
+        self.drop_path = DropPath(drop_path) if drop_path > 0.0 else Identity()
 
     def construct(self, x: Tensor) -> Tensor:
         input = x
@@ -147,16 +155,19 @@ class ConvEncoder(nn.Cell):
 
 
 class SDTAEncoder(nn.Cell):
-    def __init__(self,
-                 dim, drop_path=0.,
-                 layer_scale_init_value=1e-6,
-                 expan_ratio=4,
-                 use_pos_emb=True,
-                 num_heads=8,
-                 qkv_bias=True,
-                 attn_drop=0.,
-                 drop=0.,
-                 scales=1):
+    def __init__(
+        self,
+        dim,
+        drop_path=0.0,
+        layer_scale_init_value=1e-6,
+        expan_ratio=4,
+        use_pos_emb=True,
+        num_heads=8,
+        qkv_bias=True,
+        attn_drop=0.0,
+        drop=0.0,
+        scales=1,
+    ):
         super().__init__()
         width = max(int(math.ceil(dim / scales)), int(math.floor(dim // scales)))
         self.width = width
@@ -225,12 +236,14 @@ class SDTAEncoder(nn.Cell):
 
 
 class XCA(nn.Cell):
-    def __init__(self,
-                 dim,
-                 num_heads=8,
-                 qkv_bias=False,
-                 attn_drop=0.,
-                 proj_drop=0.):
+    def __init__(
+        self,
+        dim,
+        num_heads=8,
+        qkv_bias=False,
+        attn_drop=0.0,
+        proj_drop=0.0,
+    ):
         super().__init__()
         self.num_heads = num_heads
         self.temperature = Parameter(Tensor(np.ones((num_heads, 1, 1)), ms.float32))
@@ -287,13 +300,13 @@ class EdgeNeXt(nn.Cell):
     """
     def __init__(self, in_chans=3, num_classes=1000,
                  depths=[3, 3, 9, 3], dims=[24, 48, 88, 168],
-                 global_block=[0, 0, 0, 3], global_block_type=['None', 'None', 'None', 'SDTA'],
+                 global_block=[0, 0, 0, 3], global_block_type=["None", "None", "None", "SDTA"],
                  drop_path_rate=0., layer_scale_init_value=1e-6, head_init_scale=1., expan_ratio=4,
                  kernel_sizes=[7, 7, 7, 7], heads=[8, 8, 8, 8], use_pos_embd_xca=[False, False, False, False],
                  use_pos_embd_global=False, d2_scales=[2, 3, 4, 5], **kwargs):
         super().__init__()
         for g in global_block_type:
-            assert g in ['None', 'SDTA']
+            assert g in ["None", "SDTA"]
         if use_pos_embd_global:
             self.pos_embd = PositionalEncodingFourier(dim=dims[0])
         else:
@@ -301,7 +314,7 @@ class EdgeNeXt(nn.Cell):
         self.downsample_layers = nn.CellList()  # stem and 3 intermediate downsampling conv layers
         stem = nn.SequentialCell(
             nn.Conv2d(in_chans, dims[0], kernel_size=4, stride=4, has_bias=True),
-            LayerNorm((dims[0],), epsilon=1e-6, norm_axis=1)
+            LayerNorm((dims[0],), epsilon=1e-6, norm_axis=1),
         )
         self.downsample_layers.append(stem)
         for i in range(3):
@@ -318,7 +331,7 @@ class EdgeNeXt(nn.Cell):
             stage_blocks = []
             for j in range(depths[i]):
                 if j > depths[i] - global_block[i] - 1:
-                    if global_block_type[i] == 'SDTA':
+                    if global_block_type[i] == "SDTA":
                         stage_blocks.append(SDTAEncoder(dim=dims[i], drop_path=dp_rates[cur + j],
                                                         expan_ratio=expan_ratio, scales=d2_scales[i],
                                                         use_pos_emb=use_pos_embd_xca[i], num_heads=heads[i]))
@@ -343,20 +356,14 @@ class EdgeNeXt(nn.Cell):
         """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
             if isinstance(cell, (nn.Dense, nn.Conv2d)):
-                cell.weight.set_data(init.initializer(init.TruncatedNormal(sigma=0.02),
-                                                      cell.weight.shape,
-                                                      cell.weight.dtype))
+                cell.weight.set_data(
+                    init.initializer(init.TruncatedNormal(sigma=0.02), cell.weight.shape, cell.weight.dtype)
+                )
                 if isinstance(cell, nn.Dense) and cell.bias is not None:
-                    cell.bias.set_data(init.initializer(init.Zero(),
-                                                        cell.bias.shape,
-                                                        cell.bias.dtype))
+                    cell.bias.set_data(init.initializer(init.Zero(), cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, (nn.LayerNorm)):
-                cell.gamma.set_data(init.initializer(init.One(),
-                                                     cell.gamma.shape,
-                                                     cell.gamma.dtype))
-                cell.beta.set_data(init.initializer(init.Zero(),
-                                                    cell.beta.shape,
-                                                    cell.beta.dtype))
+                cell.gamma.set_data(init.initializer(init.One(), cell.gamma.shape, cell.gamma.dtype))
+                cell.beta.set_data(init.initializer(init.Zero(), cell.beta.shape, cell.beta.dtype))
         self.head.weight.set_data(self.head.weight * self.head_init_scale)
         self.head.bias.set_data(self.head.bias * self.head_init_scale)
 
@@ -378,24 +385,22 @@ class EdgeNeXt(nn.Cell):
 
 
 @register_model
-def edgenext_small(pretrained: bool = False,
-                   num_classes: int = 1000,
-                   in_channels: int = 3,
-                   **kwargs) -> EdgeNeXt:
+def edgenext_small(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> EdgeNeXt:
     """Get edgenext_small model.
-        Refer to the base class `models.EdgeNeXt` for more details."""
-    default_cfg = default_cfgs['edgenext_small']
-    model = EdgeNeXt(depths=[3, 3, 9, 3], dims=[48, 96, 160, 304], expan_ratio=4,
-                     num_classes=num_classes,
-                     global_block=[0, 1, 1, 1],
-                     global_block_type=['None', 'SDTA', 'SDTA', 'SDTA'],
-                     use_pos_embd_xca=[False, True, False, False],
-                     kernel_sizes=[3, 5, 7, 9],
-                     d2_scales=[2, 2, 3, 4],
-                     **kwargs)
+    Refer to the base class `models.EdgeNeXt` for more details."""
+    default_cfg = default_cfgs["edgenext_small"]
+    model = EdgeNeXt(
+        depths=[3, 3, 9, 3],
+        dims=[48, 96, 160, 304],
+        expan_ratio=4,
+        num_classes=num_classes,
+        global_block=[0, 1, 1, 1],
+        global_block_type=["None", "SDTA", "SDTA", "SDTA"],
+        use_pos_embd_xca=[False, True, False, False],
+        kernel_sizes=[3, 5, 7, 9],
+        d2_scales=[2, 2, 3, 4],
+        **kwargs
+    )
     if pretrained:
-        load_pretrained(model,
-                        default_cfg,
-                        num_classes=num_classes,
-                        in_channels=in_channels)
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
