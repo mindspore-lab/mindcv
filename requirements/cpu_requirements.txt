@@ -1,5 +1,0 @@
-pyyaml >= 5.3
-tqdm
-mindspore
-pylint
-pytest
