@@ -44,18 +44,21 @@ def create_optimizer(
     r"""Creates optimizer by name.
 
     Args:
-        params: network parameters. Union[list[Parameter],list[dict]], which must be the list of parameters or list of dicts.
-            When the list element is a dictionary, the key of the dictionary can be "params", "lr", "weight_decay","grad_centralization" and "order_params".
-        opt: Wrapped optimizer. You could choose like 'sgd', 'nesterov', 'momentum', 'adam', 'adamw', 'rmsprop', 'adagrad', 'lamb'.
-            'adam' is the default choise for convolution-based networks.
+        params: network parameters. Union[list[Parameter],list[dict]], which must be the list of parameters
+            or list of dicts. When the list element is a dictionary, the key of the dictionary can be
+            "params", "lr", "weight_decay","grad_centralization" and "order_params".
+        opt: wrapped optimizer. You could choose like 'sgd', 'nesterov', 'momentum', 'adam', 'adamw',
+            'rmsprop', 'adagrad', 'lamb'. 'adam' is the default choose for convolution-based networks.
             'adamw' is recommended for ViT-based networks. Default: 'adam'.
         lr: learning rate: float or lr scheduler. Fixed and dynamic learning rate are supported. Default: 1e-3.
-        weight_decay: weight decay factor. It should be noted that weight decay can be a constant value or a Cell. It is a Cell only when dynamic weight decay is applied.
-            Dynamic weight decay is similar to dynamic learning rate, users need to customize a weight decay schedule only with global step as input, and during training, the optimizer calls the instance of WeightDecaySchedule to get the weight decay value of current step.
-            Default: 0.
+        weight_decay: weight decay factor. It should be noted that weight decay can be a constant value or a Cell.
+            It is a Cell only when dynamic weight decay is applied. Dynamic weight decay is similar to
+            dynamic learning rate, users need to customize a weight decay schedule only with global step as input,
+            and during training, the optimizer calls the instance of WeightDecaySchedule to get the weight decay value
+            of current step. Default: 0.
         momentum: momentum if the optimizer supports. Default: 0.9.
         nesterov: Whether to use Nesterov Accelerated Gradient (NAG) algorithm to update the gradients. Default: False.
-        filter_bias_and_bn: whether to filter batch norm paramters and bias from weight decay.
+        filter_bias_and_bn: whether to filter batch norm parameters and bias from weight decay.
             If True, weight decay will not apply on BN parameters and bias in Conv or Dense layers. Default: True.
         loss_scale: A floating point value for the loss scale, which must be larger than 0.0. Default: 1.0.
 

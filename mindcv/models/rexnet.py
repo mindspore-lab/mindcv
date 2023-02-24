@@ -6,8 +6,6 @@ import math
 from math import ceil
 from typing import Any
 
-import numpy as np
-
 import mindspore.common.initializer as init
 import mindspore.nn as nn
 

@@ -1,5 +1,4 @@
-""" cross entorpy smooth """
-# import warnings
+""" cross entropy smooth """
 from mindspore import nn
 from mindspore.ops import functional as F
 from mindspore.ops import operations as P
@@ -14,18 +13,20 @@ class BinaryCrossEntropySmooth(nn.LossBase):
     Args:
         smoothing: Label smoothing factor, a regularization tool used to prevent the model
             from overfitting when calculating Loss. The value range is [0.0, 1.0]. Default: 0.0.
-        aux_factor: Auxiliary loss factor. Set aux_fuactor > 0.0 if the model has auxilary logit outputs (i.e., deep supervision), like inception_v3.  Default: 0.0.
+        aux_factor: Auxiliary loss factor. Set aux_factor > 0.0 if the model has auxiliary logit outputs
+            (i.e., deep supervision), like inception_v3.  Default: 0.0.
         reduction: Apply specific reduction method to the output: 'mean' or 'sum'. Default: 'mean'.
-        weight (Tensor): Class weight. A rescaling weight applied to the loss of each batch element. Shape [C]. It can be
-          broadcast to a tensor with shape of `logits`. Data type must be float16 or float32.
-        pos_weight (Tensor): Positive weight for each class. A weight of positive examples. Shape [C]. Must be a vector with length equal to the
-          number of classes. It can be broadcast to a tensor with shape of `logits`. Data type must be float16 or float32.
+        weight (Tensor): Class weight. A rescaling weight applied to the loss of each batch element. Shape [C].
+            It can be broadcast to a tensor with shape of `logits`. Data type must be float16 or float32.
+        pos_weight (Tensor): Positive weight for each class. A weight of positive examples. Shape [C].
+            Must be a vector with length equal to the number of classes.
+            It can be broadcast to a tensor with shape of `logits`. Data type must be float16 or float32.
 
     Inputs:
         logits (Tensor or Tuple of Tensor): (1) Input logits. Shape [N, C], where N is # samples, C is # classes.
-                ,or (2) Tuple of two input logits (main_logits and aux_logits) for auxilary loss.
-        labels (Tensor): Ground truth label, shape [N, C], has the same shape as `logits`. can be a class probability matrix or one-hot labels.
-          Data type must be float16 or float32.
+            Or (2) Tuple of two input logits (main_logits and aux_logits) for auxiliary loss.
+        labels (Tensor): Ground truth label, shape [N, C], has the same shape as `logits`.
+            can be a class probability matrix or one-hot labels. Data type must be float16 or float32.
     """
 
     def __init__(self, smoothing=0.0, aux_factor=0.0, reduction="mean", weight=None, pos_weight=None):
@@ -67,7 +68,7 @@ class BinaryCrossEntropySmooth(nn.LossBase):
                     aux_logits, labels, weight=weight, pos_weight=pos_weight, reduction=self.reduction
                 )
         # else:
-        #    warnings.warn("There are logit tuple input, but the auxilary loss factor is 0.")
+        #    warnings.warn("There are logit tuple input, but the auxiliary loss factor is 0.")
 
         loss_logits = F.binary_cross_entropy_with_logits(
             main_logits, labels, weight=weight, pos_weight=pos_weight, reduction=self.reduction

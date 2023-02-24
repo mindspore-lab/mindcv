@@ -1,8 +1,5 @@
 import glob
 import os
-import re
-
-import pandas as pd
 
 clear_empty_urls = True
 rm_columns = []  # ['Infer T.', 'Log']
@@ -47,11 +44,17 @@ fout = open(output_path, "w")
 kw = ["Model", "Top", "Download", "Config"]
 
 # process table head
-head = "|       Model    | Context  | Top-1 (%) | Top-5 (%) | Params(M) |                                                 Recipe                                                  |                                    Download                                   |"
+head = (
+    "|       Model    | Context  | Top-1 (%) | Top-5 (%) | Params(M) "
+    "|                                                 Recipe                                                  "
+    "|                                    Download                                   |"
+)
 fout.write(head + "\n")
 
 fout.write(
-    "| -------------- | -------- | --------- | --------- | --------- | ------------------------------------------------------------------------------------------------------- |  ---------------------------------------------------------------------------- |\n"
+    "| -------------- | -------- | --------- | --------- | --------- "
+    "| ------------------------------------------------------------------------------------------------------- "
+    "|  ---------------------------------------------------------------------------- |\n"
 )
 
 attrs = head.replace(" ", "")[1:-1].split("|")
@@ -152,7 +155,10 @@ fout.write(md_doc)
 fout.write("\n#### Notes\n")
 
 fout.write(
-    "- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.\n- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K."
+    "- Context: Training context denoted as {device}x{pieces}-{MS mode}, "
+    "where mindspore mode can be G - graph mode or F - pynative mode with ms function. "
+    "For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.\n"
+    "- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K."
 )
 
 fout.close()

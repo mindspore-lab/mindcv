@@ -50,7 +50,9 @@ def create_dataset(
             This argument can only be specified when `num_shards` is also specified.
         num_parallel_workers: Number of workers to read the data (default=None, set in the config).
         download: whether to download the dataset. Default: False
-        num_aug_repeats: Number of dataset repeatition for repeated augmentation. If 0 or 1, repeated augmentation is diabled. Otherwise, repeated augmentation is enabled and the common choice is 3. (Default: 0)
+        num_aug_repeats: Number of dataset repetition for repeated augmentation.
+            If 0 or 1, repeated augmentation is disabled.
+            Otherwise, repeated augmentation is enabled and the common choice is 3. (Default: 0)
 
     Note:
         For custom datasets and imagenet, the dataset dir should follow the structure like:
@@ -116,7 +118,7 @@ def create_dataset(
             f"INFO: Repeated augmentation is enabled, num_aug_repeats: {num_aug_repeats}, "
             f"original dataset size: {dataset_size}."
         )
-        # since drop_remainder is usally True, we don't need to do rounding in sampling
+        # since drop_remainder is usually True, we don't need to do rounding in sampling
         sampler = RepeatAugSampler(
             dataset_size,
             num_shards=num_shards,
@@ -165,7 +167,8 @@ def create_dataset(
         dataset = ImageFolderDataset(dataset_dir=root, **mindspore_kwargs)
         """ Another implementation which a bit slower than ImageFolderDataset
             imagenet_dataset = ImageNetDataset(dataset_dir=root)
-            sampler = RepeatAugSampler(len(imagenet_dataset), num_shards=num_shards, rank_id=shard_id, num_repeats=repeated_aug, selected_round=1, shuffle=shuffle)
+            sampler = RepeatAugSampler(len(imagenet_dataset), num_shards=num_shards, rank_id=shard_id,
+                                       num_repeats=repeated_aug, selected_round=1, shuffle=shuffle)
             dataset = ds.GeneratorDataset(imagenet_dataset, column_names=imagenet_dataset.column_names, sampler=sampler)
         """
     return dataset

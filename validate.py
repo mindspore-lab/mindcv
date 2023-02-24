@@ -35,7 +35,7 @@ def validate(args):
     )
 
     # read num clases
-    num_classes = dataset_eval.num_classes() if args.num_classes == None else args.num_classes
+    num_classes = dataset_eval.num_classes() if args.num_classes is None else args.num_classes
 
     # check batch size
     batch_size = check_batch_size(dataset_eval.get_dataset_size(), args.batch_size)
@@ -90,7 +90,7 @@ def validate(args):
     num_batches = loader_eval.get_dataset_size()
     print(f"Model: {args.model}")
     print(f"Num batches: {num_batches}")
-    print(f"Start validating...")
+    print("Start validating...")
 
     # validate
     result = model.eval(loader_eval, dataset_sink_mode=False, callbacks=[ValCallback(args.log_interval)])

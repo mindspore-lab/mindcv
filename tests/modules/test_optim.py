@@ -9,7 +9,6 @@ import mindspore as ms
 import mindspore.nn as nn
 from mindspore import Tensor
 from mindspore.common.initializer import Normal
-from mindspore.communication import get_group_size, get_rank, init
 from mindspore.nn import TrainOneStepCell, WithLossCell
 
 from mindcv.optim import create_optimizer

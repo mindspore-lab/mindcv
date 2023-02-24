@@ -350,7 +350,8 @@ def auto_augment_transform(configs, hparams):
     Args:
         configs: A string that defines the automatic augmentation configuration.
             It is composed of multiple parts separated by dashes ("-"). The first part defines
-            the AutoAugment policy ('autoaug' or 'autoaugr', 'autoaug' for the original AutoAugment policy with PosterizeOriginal,
+            the AutoAugment policy ('autoaug' or 'autoaugr',
+            'autoaug' for the original AutoAugment policy with PosterizeOriginal,
             'autoaugr' for the AutoAugment policy with PosterizeIncreasing operation).
             There is no order requirement for the remaining config parts.
 
@@ -473,11 +474,14 @@ def rand_augment_transform(configs, hparams):
             - m: Integer magnitude of rand augment. Default: 10
             - n: Integer num layer (number of transform operations selected for each image). Default: 2
             - w: Integer probability weight index (the index that affects a group of weights selected by operations).
-            - mstd: Floating standard deviation of applied magnitude noise, or uniform sampling at infinity (or greater than 100).
-            - mmax: Set the upper range limit for magnitude to a value other than the default value of _LEVEL_DENOM (10).
+            - mstd: Floating standard deviation of applied magnitude noise,
+                or uniform sampling at infinity (or greater than 100).
+            - mmax: Set the upper range limit for magnitude to a value
+                other than the default value of _LEVEL_DENOM (10).
             - inc: Integer (bool), using the severity increase with magnitude (default: 0).
 
-            Example: 'randaug-w0-n3-mstd0.5' will be random augment using the weights 0, num_layers 3, magnitude_std 0.5.
+            Example: 'randaug-w0-n3-mstd0.5' will be random augment
+                using the weights 0, num_layers 3, magnitude_std 0.5.
         hparams: Other hparams (kwargs) for the RandAugmentation scheme.
     """
     magnitude = _LEVEL_DENOM  # default to _LEVEL_DENOM for magnitude (currently 10)

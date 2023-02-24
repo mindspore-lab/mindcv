@@ -122,7 +122,7 @@ class ShuffleV1Block(nn.Cell):
 
 class ShuffleNetV1(nn.Cell):
     r"""ShuffleNetV1 model class, based on
-    `"ShuffleNet: An Extremely Efficient Convolutional Neural Network for Mobile Devices" <https://arxiv.org/abs/1707.01083>`_
+    `"ShuffleNet: An Extremely Efficient Convolutional Neural Network for Mobile Devices" <https://arxiv.org/abs/1707.01083>`_  # noqa: E501
 
     Args:
         num_classes: number of classification classes. Default: 1000.

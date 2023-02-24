@@ -1,5 +1,4 @@
-""" cross entorpy smooth """
-# import warnings
+""" cross entropy smooth """
 from mindspore import nn
 from mindspore.ops import functional as F
 
@@ -13,16 +12,20 @@ class CrossEntropySmooth(nn.LossBase):
     Args:
         smoothing: Label smoothing factor, a regularization tool used to prevent the model
             from overfitting when calculating Loss. The value range is [0.0, 1.0]. Default: 0.0.
-        aux_factor: Auxiliary loss factor. Set aux_fuactor > 0.0 if the model has auxilary logit outputs (i.e., deep supervision), like inception_v3.  Default: 0.0.
+        aux_factor: Auxiliary loss factor. Set aux_factor > 0.0 if the model has auxiliary logit outputs
+            (i.e., deep supervision), like inception_v3.  Default: 0.0.
         reduction: Apply specific reduction method to the output: 'mean' or 'sum'. Default: 'mean'.
-        weight (Tensor): Class weight. Shape [C]. A rescaling weight applied to the loss of each batch element. Data type must be float16 or float32.
+        weight (Tensor): Class weight. Shape [C]. A rescaling weight applied to the loss of each batch element.
+            Data type must be float16 or float32.
 
     Inputs:
         logits (Tensor or Tuple of Tensor): Input logits. Shape [N, C], where N is # samples, C is # classes.
-                Tuple composed of mulitple logits are supported in order (main_logits, aux_logits) for auxilary loss used in networks like inception_v3.
+            Tuple composed of multiple logits are supported in order (main_logits, aux_logits)
+            for auxiliary loss used in networks like inception_v3.
         labels (Tensor): Ground truth label. Shape: [N] or [N, C].
-                (1) Shape (N), sparse labels representing the class indinces. Must be int type.
-                (2) Shape [N, C], dense labels representing the ground truth class probability values, or the one-hot labels. Must be float type.
+            (1) Shape (N), sparse labels representing the class indices. Must be int type.
+            (2) Shape [N, C], dense labels representing the ground truth class probability values,
+            or the one-hot labels. Must be float type.
     """
 
     def __init__(self, smoothing=0.0, aux_factor=0.0, reduction="mean", weight=None):

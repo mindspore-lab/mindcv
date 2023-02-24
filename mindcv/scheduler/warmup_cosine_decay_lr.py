@@ -14,7 +14,8 @@ class WarmupCosineDecayLR(LearningRateSchedule):
         steps_per_epoch: (int) the number of steps per epoch.
         step_mode: (bool) determine decay along steps or epochs. True for steps, False for epochs.
 
-    The learning rate will increase from 0 to max_lr in `warmup_epochs` epochs, then decay to min_lr in `decay_epoches` epochs
+    The learning rate will increase from 0 to max_lr in `warmup_epochs` epochs,
+    then decay to min_lr in `decay_epochs` epochs
     """
 
     def __init__(

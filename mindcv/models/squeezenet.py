@@ -59,7 +59,7 @@ class Fire(nn.Cell):
 
 class SqueezeNet(nn.Cell):
     r"""SqueezeNet model class, based on
-    `"SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size" <https://arxiv.org/abs/1602.07360>`_
+    `"SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size" <https://arxiv.org/abs/1602.07360>`_  # noqa: E501
 
     .. note::
         **Important**: In contrast to the other models the inception_v3 expects tensors with a size of

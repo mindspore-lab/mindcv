@@ -6,12 +6,12 @@ sys.path.append(".")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from mindspore import LossMonitor, Model, TimeMonitor  # , CheckpointConfig, ModelCheckpoint
+from mindspore import LossMonitor, Model, TimeMonitor
 
+from mindcv.data import create_dataset, create_loader, create_transforms
 from mindcv.loss import create_loss
 from mindcv.models import create_model
 from mindcv.optim import create_optimizer
-from mindcv.scheduler import create_scheduler
 from mindcv.utils.download import DownLoad
 
 freeze_backbone = False
@@ -24,8 +24,6 @@ root_dir = "./"
 
 if not os.path.exists(os.path.join(root_dir, "data/Canidae")):
     DownLoad().download_and_extract_archive(dataset_url, root_dir)
-
-from mindcv.data import create_dataset, create_loader, create_transforms
 
 num_workers = 8
 

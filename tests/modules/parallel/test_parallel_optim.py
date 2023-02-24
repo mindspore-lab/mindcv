@@ -48,7 +48,7 @@ class SimpleCNN(nn.Cell):
 def test_sgd_optimizer(opt, nesterov, filter_bias_and_bn):
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",
@@ -90,7 +90,7 @@ def test_sgd_optimizer(opt, nesterov, filter_bias_and_bn):
 def test_bs_adam_optimizer(opt, bs):
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",
@@ -126,7 +126,7 @@ def test_bs_adam_optimizer(opt, bs):
 def test_lr_weight_decay_loss_scale_optimizer(lr, weight_decay, loss_scale):
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",
@@ -166,7 +166,7 @@ def test_lr_weight_decay_loss_scale_optimizer(lr, weight_decay, loss_scale):
 def test_momentum_optimizer(momentum):
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",
@@ -205,7 +205,7 @@ def test_momentum_optimizer(momentum):
 def test_param_lr_001_filter_bias_and_bn_optimizer():
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",
@@ -251,7 +251,7 @@ def test_param_lr_001_filter_bias_and_bn_optimizer():
 def test_param_lr_0001_filter_bias_and_bn_optimizer():
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",
@@ -298,7 +298,7 @@ def test_param_lr_0001_filter_bias_and_bn_optimizer():
 def test_wrong_momentum_optimizer(momentum):
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",
@@ -340,7 +340,7 @@ def test_wrong_momentum_optimizer(momentum):
 def test_wrong_loss_scale_optimizer(loss_scale):
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",
@@ -383,7 +383,7 @@ def test_wrong_loss_scale_optimizer(loss_scale):
 def test_wrong_weight_decay_optimizer(weight_decay):
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",
@@ -425,7 +425,7 @@ def test_wrong_weight_decay_optimizer(weight_decay):
 def test_wrong_lr_optimizer(lr):
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",
@@ -466,7 +466,7 @@ def test_wrong_lr_optimizer(lr):
 def test_param_lr_01_filter_bias_and_bn_optimizer():
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",
@@ -513,7 +513,7 @@ def test_param_lr_01_filter_bias_and_bn_optimizer():
 def test_wrong_opt_optimizer(opt):
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",
@@ -554,7 +554,7 @@ def test_wrong_opt_optimizer(opt):
 def test_wrong_params_more_optimizer():
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",
@@ -603,7 +603,7 @@ def test_wrong_params_more_optimizer():
 def test_wrong_params_input_optimizer():
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",
@@ -658,7 +658,7 @@ def test_wrong_params_input_optimizer():
 def test_mode_mult_single_optimizer(mode):
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",

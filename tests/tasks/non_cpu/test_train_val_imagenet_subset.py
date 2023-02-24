@@ -57,7 +57,10 @@ def test_train_ema(use_ema, val_while_train, model="resnet18"):
     # --------- Test running validate.py using the trained model ------------- #
     # begin_ckpt = os.path.join(ckpt_dir, f'{model}-1_1.ckpt')
     end_ckpt = os.path.join(ckpt_dir, f"{model}-{num_epochs}_{num_samples // batch_size}.ckpt")
-    cmd = f"python validate.py --model={model} --dataset={dataset} --val_split=val --data_dir={data_dir} --num_classes={num_classes} --ckpt_path={end_ckpt} --batch_size=40 --num_parallel_workers=2"
+    cmd = (
+        f"python validate.py --model={model} --dataset={dataset} --val_split=val --data_dir={data_dir} "
+        f"--num_classes={num_classes} --ckpt_path={end_ckpt} --batch_size=40 --num_parallel_workers=2"
+    )
     # ret = subprocess.call(cmd.split(), stdout=sys.stdout, stderr=sys.stderr)
     print(f"Running command: \n{cmd}")
     p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)

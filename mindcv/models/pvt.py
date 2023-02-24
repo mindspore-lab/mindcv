@@ -168,7 +168,7 @@ class PatchEmbed(nn.Cell):
 
 class PyramidVisionTransformer(nn.Cell):
     r"""Pyramid Vision Transformer model class, based on
-    `"Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions" <https://arxiv.org/abs/2102.12122>`_
+    `"Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions" <https://arxiv.org/abs/2102.12122>`_  # noqa: E501
 
     Args:
         img_size(int) : size of a input image.

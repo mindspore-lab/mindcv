@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 import mindspore as ms
-from mindspore import Tensor, nn, ops
+from mindspore import nn
 from mindspore.common.initializer import Normal
 from mindspore.nn import TrainOneStepCell, WithLossCell
 

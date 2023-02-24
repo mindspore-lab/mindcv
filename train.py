@@ -1,10 +1,6 @@
 """ Model training pipeline """
-import copy
 import logging
 import os
-import random
-
-import numpy as np
 
 import mindspore as ms
 import mindspore.dataset.transforms as transforms
@@ -263,7 +259,7 @@ def train(args):
 
     summary_dir = f"./{args.ckpt_save_dir}/summary"
     assert (
-        args.ckpt_save_policy != "top_k" or args.val_while_train == True
+        args.ckpt_save_policy != "top_k" or args.val_while_train is True
     ), "ckpt_save_policy is top_k, val_while_train must be True."
     state_cb = StateMonitor(
         model,
@@ -288,7 +284,7 @@ def train(args):
     callbacks = [state_cb]
     # log
     if rank_id in [None, 0]:
-        logger.info(f"-" * 40)
+        logger.info("-" * 40)
         logger.info(
             f"Num devices: {device_num if device_num is not None else 1} \n"
             f"Distributed mode: {args.distribute} \n"
@@ -308,7 +304,7 @@ def train(args):
             f"LR: {args.lr} \n"
             f"LR Scheduler: {args.scheduler}"
         )
-        logger.info(f"-" * 40)
+        logger.info("-" * 40)
 
         if args.ckpt_path != "":
             logger.info(f"Resume training from {args.ckpt_path}, last step: {begin_step}, last epoch: {begin_epoch}")

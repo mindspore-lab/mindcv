@@ -3,7 +3,6 @@ import logging
 import os
 from time import time
 
-import numpy as np
 from tqdm import tqdm
 
 import mindspore as ms
@@ -200,7 +199,7 @@ def train(args):
         checkpoint_path=opt_ckpt_path,
     )
 
-    from mindspore.amp import LossScaler, StaticLossScaler
+    from mindspore.amp import DynamicLossScaler, StaticLossScaler
 
     # set loss scale for mixed precision training
     if args.amp_level != "O0":
@@ -221,7 +220,7 @@ def train(args):
 
     # log
     if rank_id in [None, 0]:
-        logger.info(f"-" * 40)
+        logger.info("-" * 40)
         logger.info(
             f"Num devices: {device_num if device_num is not None else 1} \n"
             f"Distributed mode: {args.distribute} \n"
@@ -241,7 +240,7 @@ def train(args):
             f"LR: {args.lr} \n"
             f"LR Scheduler: {args.scheduler}"
         )
-        logger.info(f"-" * 40)
+        logger.info("-" * 40)
 
         if args.ckpt_path != "":
             logger.info(f"Resume training from {args.ckpt_path}, last step: {begin_step}, last epoch: {begin_epoch}")
@@ -262,7 +261,7 @@ def train(args):
     # Training
     need_flush_from_cache = True
     assert (
-        args.ckpt_save_policy != "top_k" or args.val_while_train == True
+        args.ckpt_save_policy != "top_k" or args.val_while_train is True
     ), "ckpt_save_policy is top_k, val_while_train must be True."
     manager = CheckpointManager(ckpt_save_policy=args.ckpt_save_policy)
     with SummaryRecord(summary_dir) as summary_record:
@@ -387,7 +386,7 @@ def train_epoch(
     network.set_train()
     n_batches = dataset.get_dataset_size()
     n_steps = n_batches * n_epochs
-    epoch_width, batch_width, step_width = len(str(n_epochs)), len(str(n_batches)), len(str(n_steps))
+    epoch_width, batch_width, step_width = len(str(n_epochs)), len(str(n_batches)), len(str(n_steps))  # noqa: F841
     total, correct = 0, 0
 
     start = time()

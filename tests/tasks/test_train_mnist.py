@@ -6,7 +6,7 @@ sys.path.append(".")
 import pytest
 
 import mindspore as ms
-from mindspore import CheckpointConfig, FixedLossScaleManager, LossMonitor, Model, ModelCheckpoint, TimeMonitor, nn
+from mindspore import nn
 
 from mindcv.data import create_dataset, create_loader, create_transforms
 from mindcv.loss import create_loss
@@ -23,9 +23,9 @@ def test_train_mnist(mode):
     num_workers = 2
     num_classes = 10
     batch_size = 16
-    num_epochs = 1
+    num_epochs = 1  # noqa: F841
 
-    set_sink_mode = True
+    set_sink_mode = True  # noqa: F841
 
     dataset_name = "mnist"
     data_dir = "./datasets/mnist"
@@ -35,7 +35,6 @@ def test_train_mnist(mode):
     loss_name = "CE"
     opt_name = "adam"
     # ckpt_save_dir = './tests/ckpt_tmp'
-    data_dir
 
     if not os.path.exists(data_dir):
         download = True

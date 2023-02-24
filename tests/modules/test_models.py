@@ -1,4 +1,3 @@
-import math
 import sys
 
 sys.path.append(".")
@@ -6,13 +5,10 @@ sys.path.append(".")
 import numpy as np
 import pytest
 
-import mindspore
 import mindspore as ms
 from mindspore import Tensor
-from mindspore.nn import TrainOneStepCell, WithLossCell
 
 from mindcv import list_models, list_modules
-from mindcv.loss import create_loss
 from mindcv.models import (
     create_model,
     get_pretrained_cfg_value,
@@ -20,7 +16,6 @@ from mindcv.models import (
     is_model_pretrained,
     model_entrypoint,
 )
-from mindcv.optim import create_optimizer
 
 # TODO: the global avg pooling op used in EfficientNet is not supported for CPU.
 model_name_list = list_models(exclude_filters="efficientnet*")
@@ -40,7 +35,7 @@ def test_model_forward(name):
         input_size = (bs,) + tuple(input_size)
     else:
         input_size = (bs, 3, 224, 224)
-    dummy_input = Tensor(np.random.rand(*input_size), dtype=mindspore.float32)
+    dummy_input = Tensor(np.random.rand(*input_size), dtype=ms.float32)
     y = model(dummy_input)
     assert y.shape == (bs, 10), "output shape not match"
 
@@ -51,7 +46,7 @@ def test_model_backward(name):
     # TODO: check number of gradient == number of parameters
     bs = 8
     c = 2
-    input_data = Tensor(np.random.rand(bs, 3, 224, 224), dtype=mindspore.float32)
+    input_data = Tensor(np.random.rand(bs, 3, 224, 224), dtype=ms.float32)
     label = Tensor(np.random.randint(0, high=c, size=(bs)), dtype=ms.int32)
 
     model= create_model(model_name=name, num_classes=c)
