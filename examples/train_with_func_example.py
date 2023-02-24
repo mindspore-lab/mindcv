@@ -5,7 +5,7 @@ from time import time
 sys.path.append(".")
 
 import mindspore as ms
-from mindspore import Model, ops
+from mindspore import ops
 
 from mindcv.data import create_dataset, create_loader, create_transforms
 from mindcv.loss import create_loss

@@ -1,5 +1,4 @@
 """ auto mixed precision related functions """
-import mindspore as ms
 
 # from mindspore.amp import LossScaler  # this line of code leads to “get rank id error” in modelarts
 from mindspore.common.api import ms_class

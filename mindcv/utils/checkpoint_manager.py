@@ -5,9 +5,7 @@ import stat
 import numpy as np
 
 import mindspore as ms
-from mindspore import Tensor
 from mindspore import log as logger
-from mindspore import ops
 
 
 class CheckpointManager:

@@ -251,7 +251,7 @@ class InceptionC(nn.Cell):
 
 class InceptionV4(nn.Cell):
     r"""Inception v4 model architecture from
-    `"Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning" <https://arxiv.org/abs/1602.07261>`_.
+    `"Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning" <https://arxiv.org/abs/1602.07261>`_.  # noqa: E501
 
     Args:
         num_classes: number of classification classes. Default: 1000.

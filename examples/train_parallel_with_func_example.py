@@ -1,4 +1,3 @@
-import argparse
 import os
 import sys
 from time import time
@@ -7,7 +6,7 @@ sys.path.append(".")
 
 import mindspore as ms
 import mindspore.nn as nn
-from mindspore import Model, Tensor, ops
+from mindspore import Tensor, ops
 from mindspore.communication import get_group_size, get_rank, init
 from mindspore.parallel._utils import _get_device_num, _get_gradients_mean
 
@@ -15,7 +14,7 @@ from mindcv.data import create_dataset, create_loader, create_transforms
 from mindcv.loss import create_loss
 from mindcv.models import create_model
 from mindcv.optim import create_optimizer
-from mindcv.utils import Allreduce, StateMonitor
+from mindcv.utils import Allreduce
 
 
 def main():

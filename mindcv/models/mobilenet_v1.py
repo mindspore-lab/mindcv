@@ -60,7 +60,7 @@ def depthwise_separable_conv(inp: int, oup: int, stride: int) -> nn.SequentialCe
 
 class MobileNetV1(nn.Cell):
     r"""MobileNetV1 model class, based on
-    `"MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications" <https://arxiv.org/abs/1704.04861>`_
+    `"MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications" <https://arxiv.org/abs/1704.04861>`_  # noqa: E501
 
     Args:
         alpha: scale factor of model width. Default: 1.

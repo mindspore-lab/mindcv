@@ -3,12 +3,8 @@ import sys
 sys.path.append(".")
 
 import numpy as np
-import pytest
 
-import mindspore as ms
-from mindspore import Tensor
-
-from mindcv.scheduler import create_scheduler, dynamic_lr
+from mindcv.scheduler import dynamic_lr
 
 
 # fmt: off

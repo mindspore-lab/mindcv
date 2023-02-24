@@ -10,6 +10,8 @@ from mindspore.dataset.transforms import OneHot
 
 from mindcv.data import create_dataset, create_loader
 
+MAX = 10
+
 
 @pytest.mark.parametrize("mode", [0, 1])
 @pytest.mark.parametrize("split", ["train", "val"])
@@ -17,7 +19,7 @@ from mindcv.data import create_dataset, create_loader
 @pytest.mark.parametrize("drop_remainder", [True, False])
 @pytest.mark.parametrize("is_training", [True, False])
 @pytest.mark.parametrize("transform", [None])
-@pytest.mark.parametrize("target_transform", [None, [OneHot(num_classes)]])
+@pytest.mark.parametrize("target_transform", [None, [OneHot(MAX)]])
 @pytest.mark.parametrize("mixup", [0, 1])
 @pytest.mark.parametrize("num_classes", [1, MAX])
 @pytest.mark.parametrize("num_parallel_workers", [2, 4, 8, 16])

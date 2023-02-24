@@ -118,9 +118,9 @@ class RepMLPBlock(nn.Cell):
                  deploy=False):
         super().__init__()
 
-        self.C = in_channels
-        self.O = out_channels
-        self.S = num_sharesets
+        self.C = in_channels  # noqa: E741
+        self.O = out_channels  # noqa: E741
+        self.S = num_sharesets  # noqa: E741
 
         self.h, self.w = h, w
 
@@ -228,8 +228,7 @@ class RepMLPBlock(nn.Cell):
         self.fc3.bias.data = fc3_bias
 
     def _convert_conv_to_fc(self, conv_kernel, conv_bias):
-        I = ops.eye(self.h * self.w).repeat(1, self.S).reshape(self.h * self.w, self.S, self.h, self.w).to(
-            conv_kernel.device)
+        I = ops.eye(self.h * self.w).repeat(1, self.S).reshape(self.h * self.w, self.S, self.h, self.w)  # noqa: E741
         fc_k = ops.Conv2D(I, conv_kernel, pad=(conv_kernel.size(2) // 2, conv_kernel.size(3) // 2), group=self.S)
         fc_k = fc_k.reshape(self.h * self.w, self.S * self.h * self.w).t()
         fc_bias = conv_bias.repeat_interleave(self.h * self.w)
@@ -283,13 +282,14 @@ class RepMLPNet(nn.Cell):
         num_classes: number of classification classes. Default: 1000.
         patch_size: size of a single image patch. Default: (4, 4)
         num_blocks: number of blocks per stage. Default: (2,2,6,2)
-        channels: number of in_channels(channels[stage_idx]) and out_channels(channels[stage_idx + 1]) per stage. Default: (192,384,768,1536)
+        channels: number of in_channels(channels[stage_idx]) and out_channels(channels[stage_idx + 1]) per stage.
+            Default: (192,384,768,1536)
         hs: height of picture per stage. Default: (64,32,16,8)
         ws: width of picture per stage. Default: (64,32,16,8)
         sharesets_nums: number of share sets per stage. Default: (4,8,16,32)
         reparam_conv_k: convolution kernel size in local Perceptron. Default: (3,)
-        globalperceptron_reduce: Intermediate convolution output size(in_channal = inchannal, out_channel = in_channel/globalperceptron_reduce)
-            in globalperceptron. Default: 4
+        globalperceptron_reduce: Intermediate convolution output size
+            (in_channal = inchannal, out_channel = in_channel/globalperceptron_reduce) in globalperceptron. Default: 4
         use_checkpoint: whether to use checkpoint
         deploy: whether to use bias
     """

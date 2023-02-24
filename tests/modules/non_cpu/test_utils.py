@@ -1,5 +1,4 @@
 """Test utils"""
-import os
 import sys
 
 sys.path.append(".")
@@ -8,11 +7,10 @@ import numpy as np
 import pytest
 
 import mindspore as ms
-from mindspore import Tensor, nn, ops
+from mindspore import Tensor, nn
 from mindspore.common.initializer import Normal
 from mindspore.nn import WithLossCell
 
-from mindcv.loss import create_loss
 from mindcv.optim import create_optimizer
 from mindcv.utils import TrainOneStepWithEMA
 

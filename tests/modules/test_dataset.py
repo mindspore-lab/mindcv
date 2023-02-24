@@ -56,7 +56,7 @@ def test_create_dataset_standalone_imagenet(mode, name, split, shuffle, num_samp
     )
 
     assert type(dataset) == ms.dataset.engine.datasets_vision.ImageFolderDataset
-    assert dataset != None
+    assert dataset is not None
 
 
 # test MNIST CIFAR10
@@ -100,4 +100,4 @@ def test_create_dataset_standalone_mc(mode, name, split, shuffle, num_samples, n
         type(dataset) == ms.dataset.engine.datasets_vision.MnistDataset
         or type(dataset) == ms.dataset.engine.datasets_vision.Cifar10Dataset
     )
-    assert dataset != None
+    assert dataset is not None

@@ -1,7 +1,7 @@
 """ema define"""
 
 import mindspore as ms
-from mindspore import Parameter, ParameterTuple, Tensor, nn
+from mindspore import Parameter, Tensor, nn
 from mindspore.common import RowTensor
 from mindspore.ops import composite as C
 from mindspore.ops import functional as F

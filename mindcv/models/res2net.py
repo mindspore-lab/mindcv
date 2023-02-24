@@ -217,18 +217,18 @@ class Res2Net(nn.Cell):
             if isinstance(cell, nn.Conv2d):
                 cell.weight.set_data(
                     init.initializer(init.HeNormal(math.sqrt(5), mode="fan_out", nonlinearity="relu"),
-                                    cell.weight.shape, cell.weight.dtype))
+                                     cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(
                         init.initializer(init.HeUniform(math.sqrt(5), mode="fan_in", nonlinearity="leaky_relu"),
-                                        cell.bias.shape, cell.bias.dtype))
+                                         cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, nn.BatchNorm2d):
                 cell.gamma.set_data(init.initializer("ones", cell.gamma.shape, cell.gamma.dtype))
                 cell.beta.set_data(init.initializer("zeros", cell.beta.shape, cell.beta.dtype))
             elif isinstance(cell, nn.Dense):
                 cell.weight.set_data(
                     init.initializer(init.HeUniform(math.sqrt(5), mode="fan_in", nonlinearity="leaky_relu"),
-                                    cell.weight.shape, cell.weight.dtype))
+                                     cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
 

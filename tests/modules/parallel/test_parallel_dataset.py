@@ -1,5 +1,4 @@
 import sys
-from pickletools import uint8
 
 sys.path.append(".")
 
@@ -58,7 +57,7 @@ def test_create_dataset_distribute_imagenet(mode, name, split, shuffle, num_para
     )
 
     assert type(dataset) == ms.dataset.engine.datasets_vision.ImageFolderDataset
-    assert dataset != None
+    assert dataset is not None
     print(dataset.output_types())
 
 
@@ -107,5 +106,5 @@ def test_create_dataset_distribute_mc(mode, name, split, shuffle, num_parallel_w
     )
 
     assert type(dataset) == ms.dataset.engine.datasets_vision.ImageFolderDataset
-    assert dataset != None
+    assert dataset is not None
     print(dataset.output_types())

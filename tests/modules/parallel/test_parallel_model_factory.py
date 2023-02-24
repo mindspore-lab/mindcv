@@ -14,8 +14,6 @@ from mindcv.loss import create_loss
 from mindcv.models.model_factory import create_model
 from mindcv.models.registry import list_models
 
-from config import parse_args  # isort: skip
-
 MAX = 6250
 
 
@@ -29,7 +27,7 @@ def test_model_factory_parallel(mode, num_classes, in_channels, pretrained, chec
 
     init("nccl")
     device_num = get_group_size()
-    rank_id = get_rank()
+    rank_id = get_rank()  # noqa: F841
     ms.set_auto_parallel_context(
         device_num=device_num,
         parallel_mode="data_parallel",

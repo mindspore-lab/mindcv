@@ -207,7 +207,10 @@ if __name__ == "__main__":
         (("cosine_decay_lr", cosine_decay_lr(5, 1.0, eta_max=2.0, steps_per_epoch=2, epochs=10)),
          ("cosine_decay_refined_lr", cosine_decay_refined_lr(5, 1.0, eta_max=2.0, steps_per_epoch=2, epochs=10)),),
         (("cosine_annealing_lr", cosine_annealing_lr(5, 0.0, eta_max=1.0, steps_per_epoch=2, epochs=15)),
-         ("cosine_annealing_warm_restarts_lr", cosine_annealing_warm_restarts_lr(5, 2, 0.0, eta_max=1.0, steps_per_epoch=2, epochs=15)),)
+         (
+             "cosine_annealing_warm_restarts_lr",
+             cosine_annealing_warm_restarts_lr(5, 2, 0.0, eta_max=1.0, steps_per_epoch=2, epochs=15),
+         ),)
     )
     for variants in table:
         n_variants = len(variants)
