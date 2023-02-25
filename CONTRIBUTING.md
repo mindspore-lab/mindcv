@@ -1,15 +1,22 @@
-# MindCV contributing guidelines
+# MindCV Contributing Guidelines
+
+Contributions are welcome, and they are greatly appreciated! Every little bit
+helps, and credit will always be given.
 
 <!-- TOC -->
 
-- [MindCV contributing guidelines](#mindcv-contributing-guidelines)
+- [MindCV Contributing Guidelines](#mindcv-contributing-guidelines)
     - [Contributor License Agreement](#contributor-license-agreement)
+    - [Types of Contributions](#types-of-contributions)
+      - [Report Bugs](#report-bugs)
+      - [Fix Bugs](#fix-bugs)
+      - [Implement Features](#implement-features)
+      - [Write Documentation](#write-documentation)
+      - [Submit Feedback](#submit-feedback)
     - [Getting Started](#getting-started)
-    - [Contribution workflow](#contribution-workflow)
-        - [Code style](#code-style)
-        - [Fork-Pull development model](#fork-pull-development-model)
-        - [Report issues](#report-issues)
-        - [Propose PRs](#propose-prs)
+    - [Pull Request Guidelines](#pull-request-guidelines)
+    - [Tips](#tips)
+    - [Releasing](#releasing)
 
 <!-- /TOC -->
 
@@ -19,113 +26,139 @@ It's required to sign CLA before your first code submission to MindCV community.
 
 For individual contributor, please refer to [ICLA online document](https://www.mindspore.cn/icla) for the detailed information.
 
+## Types of Contributions
+
+### Report Bugs
+
+Report bugs at https://github.com/mindspore-lab/mindcv/issues.
+
+If you are reporting a bug, please include:
+
+* Your operating system name and version.
+* Any details about your local setup that might be helpful in troubleshooting.
+* Detailed steps to reproduce the bug.
+
+### Fix Bugs
+
+Look through the GitHub issues for bugs. Anything tagged with "bug" and "help
+wanted" is open to whoever wants to implement it.
+
+### Implement Features
+
+Look through the GitHub issues for features. Anything tagged with "enhancement"
+and "help wanted" is open to whoever wants to implement it.
+
+### Write Documentation
+
+MindCV could always use more documentation, whether as part of the
+official MindCV docs, in docstrings, or even on the web in blog posts,
+articles, and such.
+
+### Submit Feedback
+
+The best way to send feedback is to file an issue at https://github.com/mindspore-lab/mindcv/issues.
+
+If you are proposing a feature:
+
+* Explain in detail how it would work.
+* Keep the scope as narrow as possible, to make it easier to implement.
+* Remember that this is a volunteer-driven project, and that contributions are welcome :)
+
 ## Getting Started
 
-- Fork the repository on [Github](https://github.com/mindlab-ai/mindcv).
-- Read the [README.md](README.md).
+Ready to contribute? Here's how to set up `mindcv` for local development.
 
-## Contribution Workflow
+1. Fork the `mindcv` repo on [GitHub](https://github.com/mindlab-ai/mindcv).
+2. Clone your fork locally:
 
-### Code style
+   ```shell
+   git clone git@github.com:your_name_here/mindcv.git
+   ```
 
-Please follow this style to make MindCV easy to review, maintain and develop.
+   After that, you should add official repository as the upstream repository:
 
-- Coding guidelines
+   ```shell
+   git remote add upstream git@github.com:mindspore-lab/mindcv
+   ```
 
-    The *Python* coding style suggested by [Python PEP 8 Coding Style](https://pep8.org/) and *C++* coding style suggested by [Google C++ Coding Guidelines](http://google.github.io/styleguide/cppguide.html) are used in MindCV community. The [CppLint](https://github.com/cpplint/cpplint), [CppCheck](http://cppcheck.sourceforge.net), [CMakeLint](https://github.com/cmake-lint/cmake-lint), [CodeSpell](https://github.com/codespell-project/codespell), [Lizard](http://www.lizard.ws), [ShellCheck](https://github.com/koalaman/shellcheck) and [PyLint](https://pylint.org) are used to check the format of codes, installing these plugins in your IDE is recommended.
+3. Install your local copy into a conda environment. Assuming you have conda installed, this is how you set up your fork for local development:
 
-- Unittest guidelines
+   ```shell
+   conda create -n mindcv python=3.8
+   conda activate mindcv
+   cd mindcv
+   pip install -e .
+   ```
 
-    The *Python* unittest style suggested by [pytest](http://www.pytest.org/en/latest/) and *C++* unittest style suggested by [Googletest Primer](https://github.com/google/googletest/blob/master/docs/primer.md) are used in MindCV community. The design intent of a testcase should be reflected by its name of comment.
+4. Create a branch for local development:
 
-- Refactoring guidelines
+   ```shell
+   git checkout -b name-of-your-bugfix-or-feature
+   ```
 
-    We encourage developers to refactor our code to eliminate the [code smell](https://en.wikipedia.org/wiki/Code_smell). All codes should conform to needs to the coding style and testing style, and refactoring codes are no exception. [Lizard](http://www.lizard.ws) threshold for nloc (lines of code without comments) is 100 and for cnc (cyclomatic complexity number) is 20, when you receive a *Lizard* warning, you have to refactor the code you want to merge.
+   Now you can make your changes locally.
 
-- Document guidelines
+5. When you're done making changes, check that your changes pass the linters and the tests:
 
-    We use *MarkdownLint* to check the format of markdown documents. MindCV CI modifies the following rules based on the default configuration.
-    - MD007 (unordered list indentation): The **indent** parameter is set to **4**, indicating that all content in the unordered list needs to be indented using four spaces.
-    - MD009 (spaces at the line end): The **br_spaces** parameter is set to **2**, indicating that there can be 0 or 2 spaces at the end of a line.
-    - MD029 (sequence numbers of an ordered list): The **style** parameter is set to **ordered**, indicating that the sequence numbers of the ordered list are in ascending order.
+   ```shell
+   pre-commit run --show-diff-on-failure --color=always --all-files
+   pytest
+   ```
 
-    For details, please refer to [RULES](https://github.com/markdownlint/markdownlint/blob/master/docs/RULES.md).
+   If all static linting are passed, you will get output like:
 
-### Fork-Pull development model
+   ![pre-commit-succeed](https://user-images.githubusercontent.com/74176172/221346245-ea868015-bb09-4e53-aa56-73b015e1e336.png)
 
-- Fork MindCV repository
+   otherwise, you need to fix the warnings according to the output:
 
-    Before submitting code to MindCV project, please make sure that this project have been forked to your own repository. It means that there will be parallel development between MindCV repository and your own repository, so be careful to avoid the inconsistency between them.
+   ![pre-commit-failed](https://user-images.githubusercontent.com/74176172/221346251-7d8f531f-9094-474b-97f0-fd5a55e6d3de.png)
 
-- Clone the remote repository
+   To get pre-commit and pytest, just pip install them into your conda environment.
 
-    If you want to download the code to the local machine, `git` is the best way:
+6. Commit your changes and push your branch to GitHub:
 
-    ```shell
-    # For GitHub
-    git clone https://github.com/{insert_your_forked_repo}/mindcv.git
-    git remote add upstream https://github.com/mindlab-ai/mindcv.git
-    ```
+   ```shell
+   git add .
+   git commit -m "Your detailed description of your changes."
+   git push origin name-of-your-bugfix-or-feature
+   ```
 
-- Develop code locally
+7. Submit a pull request through the GitHub website.
 
-    To avoid inconsistency between multiple branches, checking out to a new branch is `SUGGESTED`:
+## Pull Request Guidelines
 
-    ```shell
-    git checkout -b {new_branch_name} origin/master
-    ```
+Before you submit a pull request, check that it meets these guidelines:
 
-    Taking the master branch as an example, MindCV may create version branches and downstream development branches as needed, please fix bugs upstream first.
-    Then you can change the code arbitrarily.
+1. The pull request should include tests.
+2. If the pull request adds functionality, the docs should be updated. Put
+   your new functionality into a function with a docstring, and add the
+   feature to the list in README.md.
+3. The pull request should work for Python 3.7, 3.8 and 3.9, and for PyPy. Check
+   https://github.com/mindspore-lab/mindcv/actions
+   and make sure that the tests pass for all supported Python versions.
 
-- Push the code to the remote repository
+## Tips
 
-    After updating the code, you should push the update in the formal way:
+You can install the git hook scripts instead of linting with `pre-commit run -a` manually.
 
-    ```shell
-    git add .
-    git status # Check the update status
-    git commit -m "Your commit title"
-    git commit -s --amend #Add the concrete description of your commit
-    git push origin {new_branch_name}
-    ```
+run flowing command to set up the git hook scripts
 
-- Pull a request to MindCV repository
+```shell
+pre-commit install
+```
 
-    In the last step, your need to pull a compare request between your new branch and MindCV `master` branch. After finishing the pull request, the Jenkins CI will be automatically set up for building test. Your pull request should be merged into the upstream master branch as soon as possible to reduce the risk of merging.
+now `pre-commit` will run automatically on `git commit`!
 
-### Report issues
+## Releasing
 
-A great way to contribute to the project is to send a detailed report when you encounter an issue. We always appreciate a well-written, thorough bug report, and will thank you for it!
+A reminder for the maintainers on how to deploy.
+Make sure all your changes are committed (including an entry in HISTORY.md).
+Then run:
 
-When reporting issues, refer to this format:
+```shell
+bump2version patch # possible: major / minor / patch
+git push
+git push --tags
+```
 
-- What version of env (mindspore, os, python, mindcv etc) are you using?
-- Is this a BUG REPORT or FEATURE REQUEST?
-- What kind of issue is, add the labels to highlight it on the issue dashboard.
-- What happened?
-- What you expected to happen?
-- How to reproduce it?(as minimally and precisely as possible)
-- Special notes for your reviewers?
-
-**Issues advisory:**
-
-- **If you find an unclosed issue, which is exactly what you are going to solve,** please put some comments on that issue to tell others you would be in charge of it.
-- **If an issue is opened for a while,** it's recommended for contributors to precheck before working on solving that issue.
-- **If you resolve an issue which is reported by yourself,** it's also required to let others know before closing that issue.
-- **If you want the issue to be responded as quickly as possible,** please try to label it, you can find kinds of labels on [Label List](https://gitee.com/mindspore/community/blob/master/sigs/dx/docs/labels.md)
-
-### Propose PRs
-
-- Raise your idea as an *issue* on [GitHub](https://github.com/mindlab-ai/mindcv/issues)
-- If it is a new feature that needs lots of design details, a design proposal should also be submitted.
-- After reaching consensus in the issue discussions and design proposal reviews, complete the development on the forked repo and submit a PR.
-- None of PRs is not permitted until it receives **2+ LGTM** from approvers. Please NOTICE that approver is NOT allowed to add *LGTM* on his own PR.
-- After PR is sufficiently discussed, it will get merged, abandoned or rejected depending on the outcome of the discussion.
-
-**PRs advisory:**
-
-- Any irrelevant changes should be avoided.
-- Make sure your commit history being ordered.
-- Always keep your branch up with the master branch.
-- For bug-fix PRs, make sure all related issues being linked.
+GitHub Action will then deploy to PyPI if tests pass.
