@@ -1,29 +1,17 @@
+<div align="center">
+
 # MindCV
 
-<p align="left">
-    <a href="https://mindcv.readthedocs.io/en/latest">
-        <img alt="docs" src="https://img.shields.io/badge/docs-latest-blue">
-    </a>
-    <a href="https://github.com/mindspore-lab/mindcv/blob/main/LICENSE.md">
-        <img alt="GitHub" src="https://img.shields.io/github/license/mindspore-lab/mindcv.svg">
-    </a>
-    <a href="https://github.com/mindspore-lab/mindcv/pulls">
-        <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-pink.svg">
-    </a>
-    <a href="https://github.com/mindspore-lab/mindcv/issues">
-        <img alt="open issues" src="https://img.shields.io/github/issues/mindspore-lab/mindcv">
-    </a>
-    <!---
-    <a href="https://github.com/mindspore-lab/mindcv/tags">
-        <img alt="GitHub tags" src="https://img.shields.io/github/tags/mindspore-lab/mindcv">
-    </a>
-    -->
-</p>
-
-
-| **Build Type**   |`Linux`           |`MacOS`           |`Windows`         |
-| :---:            | :---:            | :---:            | :---:            |
-| **Build Status** | [![Status](https://github.com/mindspore-lab/mindcv/actions/workflows/main.yml/badge.svg)](https://github.com/mindspore-lab/mindcv/actions) | [![Status](https://github.com/mindspore-lab/mindcv/actions/workflows/mac.yml/badge.svg)](https://github.com/mindspore-lab/mindcv/actions) | Not tested|
+[![CI](https://github.com/mindspore-lab/mindcv/actions/workflows/ci.yml/badge.svg)](https://github.com/mindspore-lab/mindcv/actions/workflows/ci.yml)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/mindcv)](https://pypi.org/project/mindcv)
+[![PyPI](https://img.shields.io/pypi/v/mindcv)](https://pypi.org/project/mindcv)
+[![docs](https://img.shields.io/badge/docs-latest-blue)](https://mindcv.readthedocs.io/en/latest)
+[![license](https://img.shields.io/github/license/mindspore-lab/mindcv.svg)](https://github.com/mindspore-lab/mindcv/blob/main/LICENSE.md)
+[![open issues](https://img.shields.io/github/issues/mindspore-lab/mindcv)](https://github.com/mindspore-lab/mindcv/issues)
+[![PRs](https://img.shields.io/badge/PRs-welcome-pink.svg)](https://github.com/mindspore-lab/mindcv/pulls)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
 English | [中文](README_CN.md)
 
@@ -35,6 +23,7 @@ English | [中文](README_CN.md)
 [Supported Algorithms](#supported-algorithms) |
 [Notes](#notes)
 
+</div>
 
 ## Introduction
 MindCV is an open-source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pre-trained weights and training strategies. SoTA methods such as auto augmentation are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks.
