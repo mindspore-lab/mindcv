@@ -9,11 +9,9 @@ import mindspore as ms
 from mindspore import ParameterTuple, SummaryRecord, Tensor, load_param_into_net
 from mindspore import log as logger
 from mindspore import ops, save_checkpoint
-from mindspore.train._utils import _make_directory
 from mindspore.train.callback import Callback
 
-from .checkpoint_manager import CheckpointManager
-from .reduce_manager import AllReduceSum
+from mindcv.utils import AllReduceSum, CheckpointManager
 
 
 class StateMonitor(Callback):
@@ -303,79 +301,6 @@ class StateMonitor(Callback):
         """Remove the oldest checkpoint file from this checkpoint manager and also from the directory."""
         ckpoint_files = sorted(self._ckpoint_filelist, key=os.path.getmtime)
         self.remove_ckpoint_file(ckpoint_files[0])
-
-
-class LossAccSummary(Callback):
-    """A callback for recording loss and acc during training"""
-
-    def __init__(
-        self,
-        summary_dir,
-        model,
-        dataset_val,
-        val_interval=1,
-        val_start_epoch=1,
-        metric_name="accuracy",
-    ):
-        super().__init__()
-        self._summary_dir = _make_directory(summary_dir, "summary_dir")
-        self.model = model
-        self.dataset_val = dataset_val
-        self.val_start_epoch = val_start_epoch
-        self.metric_name = metric_name
-        self.val_interval = val_interval
-
-    def __enter__(self):
-        self.summary_record = SummaryRecord(self._summary_dir)
-        return self
-
-    def __exit__(self, *exc_args):
-        self.summary_record.close()
-
-    def on_train_epoch_end(self, run_context):
-        cb_params = run_context.original_args()
-        loss = self._get_loss(cb_params)
-        cur_epoch = cb_params.cur_epoch_num
-        if cur_epoch >= self.val_start_epoch and (cur_epoch - self.val_start_epoch) % self.val_interval == 0:
-            val_acc = self.model.eval(self.dataset_val)[self.metric_name]
-            if not isinstance(val_acc, Tensor):
-                val_acc = Tensor(val_acc)
-            self.summary_record.add_value("scalar", "test_dataset_" + self.metric_name, val_acc)
-
-        self.summary_record.add_value("scalar", "loss/auto", loss)
-        self.summary_record.record(cb_params.cur_step_num)
-
-    def _get_loss(self, cb_params):
-        """
-        Get loss from the network output.
-        Args:
-            cb_params (_InternalCallbackParam): Callback parameters.
-        Returns:
-            Union[Tensor, None], if parse loss success, will return a Tensor value(shape is [1]), else return None.
-        """
-        output = cb_params.net_outputs
-        if output is None:
-            logger.warning("Can not find any output by this network, so SummaryCollector will not collect loss.")
-            return None
-
-        if isinstance(output, (int, float, Tensor)):
-            loss = output
-        elif isinstance(output, (list, tuple)) and output:
-            # If the output is a list, since the default network returns loss first,
-            # we assume that the first one is loss.
-            loss = output[0]
-        else:
-            logger.warning(
-                "The output type could not be identified, expect type is one of "
-                "[int, float, Tensor, list, tuple], so no loss was recorded in SummaryCollector."
-            )
-            return None
-
-        if not isinstance(loss, Tensor):
-            loss = Tensor(loss)
-
-        loss = Tensor(np.mean(loss.asnumpy()))
-        return loss
 
 
 class ValCallback(Callback):

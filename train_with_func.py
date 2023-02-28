@@ -7,6 +7,7 @@ from tqdm import tqdm
 
 import mindspore as ms
 from mindspore import SummaryRecord, Tensor, nn, ops
+from mindspore.amp import StaticLossScaler
 from mindspore.communication import get_group_size, get_rank, init
 from mindspore.parallel._utils import _get_device_num, _get_gradients_mean
 
@@ -199,14 +200,9 @@ def train(args):
         checkpoint_path=opt_ckpt_path,
     )
 
-    from mindspore.amp import DynamicLossScaler, StaticLossScaler
-
     # set loss scale for mixed precision training
     if args.amp_level != "O0":
-        if args.dynamic_loss_scale:
-            loss_scaler = DynamicLossScaler(args.loss_scale, 2, 1000)
-        else:
-            loss_scaler = StaticLossScaler(args.loss_scale)
+        loss_scaler = StaticLossScaler(args.loss_scale)
     else:
         loss_scaler = NoLossScaler()
 

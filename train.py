@@ -8,12 +8,12 @@ from mindspore import FixedLossScaleManager, Model, Tensor, nn
 from mindspore.communication import get_group_size, get_rank, init
 
 from mindcv.data import create_dataset, create_loader, create_transforms
+from mindcv.engine import StateMonitor, TrainStep
 from mindcv.loss import create_loss
 from mindcv.models import create_model
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
-from mindcv.utils import AllReduceSum, StateMonitor, TrainOneStepWithEMA
-from mindcv.utils.random import set_seed
+from mindcv.utils import AllReduceSum, set_seed
 
 from config import parse_args  # isort: skip
 
@@ -227,13 +227,20 @@ def train(args):
         eval_metrics = {"Top_1_Accuracy": nn.Top1CategoricalAccuracy()}
 
     # init model
-    if args.use_ema:
+    if args.use_ema or args.use_clip_grad:
         net_with_loss = nn.WithLossCell(network, loss)
         loss_scale_manager = nn.FixedLossScaleUpdateCell(loss_scale_value=args.loss_scale)
         ms.amp.auto_mixed_precision(net_with_loss, amp_level=args.amp_level)
-        net_with_loss = TrainOneStepWithEMA(
-            net_with_loss, optimizer, scale_sense=loss_scale_manager, use_ema=args.use_ema, ema_decay=args.ema_decay
+        net_with_loss = TrainStep(
+            net_with_loss,
+            optimizer,
+            scale_sense=loss_scale_manager,
+            use_ema=args.use_ema,
+            ema_decay=args.ema_decay,
+            use_clip_grad=args.use_clip_grad,
+            clip_value=args.clip_value,
         )
+
         eval_network = nn.WithEvalCell(network, loss, args.amp_level in ["O2", "O3", "auto"])
         model = Model(net_with_loss, eval_network=eval_network, metrics=eval_metrics, eval_indexes=[0, 1, 2])
     else:

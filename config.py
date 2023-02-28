@@ -156,6 +156,9 @@ def create_parser():
     group.add_argument('--use_ema', type=str2bool, nargs='?', const=True, default=False,
                        help='training with ema (default=False)')
     group.add_argument('--ema_decay', type=float, default=0.9999, help='ema decay')
+    group.add_argument('--use_clip_grad', type=str2bool, nargs='?', const=True, default=False,
+                       help='Whether use clip grad (default=False)')
+    group.add_argument('--clip_value', type=float, default=15.0, help='clip value')
 
     # Optimize parameters
     group = parser.add_argument_group('Optimizer parameters')

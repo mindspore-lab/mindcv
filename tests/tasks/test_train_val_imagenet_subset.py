@@ -17,7 +17,7 @@ check_acc = True
 
 @pytest.mark.parametrize("mode", ["GRAPH", "PYNATIVE_FUNC"])
 @pytest.mark.parametrize("val_while_train", [True, False])
-def test_train(mode, val_while_train, model="resnet18", opt="adamw", scheduler="polynomial"):
+def test_train(mode, val_while_train, model="resnet18"):
     """train on a imagenet subset dataset"""
     # prepare data
     data_dir = "data/Canidae"
