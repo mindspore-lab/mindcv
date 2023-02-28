@@ -1,5 +1,5 @@
 """ cross entropy smooth """
-from mindspore import nn
+from mindspore import Tensor, nn
 from mindspore.ops import functional as F
 from mindspore.ops import operations as P
 
@@ -25,7 +25,7 @@ class BinaryCrossEntropySmooth(nn.LossBase):
     Inputs:
         logits (Tensor or Tuple of Tensor): (1) Input logits. Shape [N, C], where N is # samples, C is # classes.
             Or (2) Tuple of two input logits (main_logits and aux_logits) for auxiliary loss.
-        labels (Tensor): Ground truth label, shape [N, C], has the same shape as `logits`.
+        labels (Tensor): Ground truth label, (1) shape [N, C], has the same shape as `logits` or (2) shape [N].
             can be a class probability matrix or one-hot labels. Data type must be float16 or float32.
     """
 
@@ -37,6 +37,7 @@ class BinaryCrossEntropySmooth(nn.LossBase):
         self.weight = weight
         self.pos_weight = pos_weight
         self.ones = P.OnesLike()
+        self.one_hot = P.OneHot()
 
     def construct(self, logits, labels):
         loss_aux = 0
@@ -46,6 +47,13 @@ class BinaryCrossEntropySmooth(nn.LossBase):
             main_logits = logits[0]
         else:
             main_logits = logits
+
+        if main_logits.size != labels.size:
+            # We must explicitly convert the label to one-hot,
+            # for binary_cross_entropy_with_logits restricting input and label have the same shape.
+            class_dim = 0 if main_logits.ndim == 1 else 1
+            n_classes = main_logits.shape[class_dim]
+            labels = self.one_hot(labels, n_classes, Tensor(1.0), Tensor(0.0))
 
         ones_input = self.ones(main_logits)
         if self.weight is not None:
