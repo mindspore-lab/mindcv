@@ -82,10 +82,6 @@ def create_loader(
 
     if target_transform is None:
         target_transform = transforms.TypeCast(ms.int32)
-        is_onehot_target = False
-    else:
-        is_onehot_target = True
-
     target_input_columns = "label" if "label" in dataset.get_col_names() else "fine_label"
     dataset = dataset.map(
         operations=target_transform,
@@ -96,10 +92,7 @@ def create_loader(
 
     dataset = dataset.batch(batch_size=batch_size, drop_remainder=drop_remainder)
 
-    # assert (mixup * cutmix == 0), 'Currently, mixup and cutmix cannot be applied together'
-
     if is_training:
-        trans_batch = []
         if (mixup + cutmix > 0.0) and batch_size > 1:
             # TODO: use mindspore vision cutmix and mixup after the confliction fixed in later release
             # set label_smoothing 0 here since label smoothing is computed in loss module
@@ -111,17 +104,12 @@ def create_loader(
                 switch_prob=0.5,
                 label_smoothing=0.0,
                 num_classes=num_classes,
-                is_onehot_label=is_onehot_target,
             )
-            trans_batch = mixup_fn
-            # trans_batch = vision.MixUpBatch(alpha=mixup)
-
-        if trans_batch != []:
             # images in a batch are mixed. labels are converted soft onehot labels.
             dataset = dataset.map(
+                operations=mixup_fn,
                 input_columns=["image", target_input_columns],
                 num_parallel_workers=num_parallel_workers,
-                operations=trans_batch,
             )
 
     return dataset

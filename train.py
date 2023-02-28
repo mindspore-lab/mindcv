@@ -3,7 +3,6 @@ import logging
 import os
 
 import mindspore as ms
-import mindspore.dataset.transforms as transforms
 from mindspore import FixedLossScaleManager, Model, Tensor, nn
 from mindspore.communication import get_group_size, get_rank, init
 
@@ -85,8 +84,6 @@ def train(args):
         re_max_attempts=args.re_max_attempts,
     )
 
-    target_transform = transforms.OneHot(num_classes) if args.loss == "BCE" else None
-
     # load dataset
     loader_train = create_loader(
         dataset=dataset_train,
@@ -98,7 +95,6 @@ def train(args):
         cutmix_prob=args.cutmix_prob,
         num_classes=num_classes,
         transform=transform_list,
-        target_transform=target_transform,
         num_parallel_workers=args.num_parallel_workers,
     )
 
@@ -129,7 +125,6 @@ def train(args):
             drop_remainder=False,
             is_training=False,
             transform=transform_list_eval,
-            target_transform=target_transform,
             num_parallel_workers=args.num_parallel_workers,
         )
         # validation dataset count
