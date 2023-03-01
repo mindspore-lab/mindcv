@@ -8,7 +8,7 @@ from typing import Optional
 import mindspore.dataset as ds
 from mindspore.dataset import Cifar10Dataset, Cifar100Dataset, DistributedSampler, ImageFolderDataset, MnistDataset
 
-from .dataset_download import Cifar10Download, Cifar100Download, MnistDownload
+from .dataset_download import Cifar10Download, Cifar100Download, MnistDownload, get_dataset_download_root
 from .distributed_sampler import RepeatAugSampler
 
 __all__ = [
@@ -24,10 +24,10 @@ _MINDSPORE_BASIC_DATASET = dict(
 
 def create_dataset(
     name: str = "",
-    root: str = "./",
+    root: Optional[str] = None,
     split: str = "train",
     shuffle: bool = True,
-    num_samples: Optional[bool] = None,
+    num_samples: Optional[int] = None,
     num_shards: Optional[int] = None,
     shard_id: Optional[int] = None,
     num_parallel_workers: Optional[int] = None,
@@ -39,7 +39,7 @@ def create_dataset(
 
     Args:
         name: dataset name like MNIST, CIFAR10, ImageNeT, ''. '' means a customized dataset. Default: ''.
-        root: dataset root dir. Default: './'.
+        root: dataset root dir. Default: None.
         split: data split: '' or split name string (train/val/test), if it is '', no split is used.
             Otherwise, it is a subfolder of root dir, e.g., train, val, test. Default: 'train'.
         shuffle: whether to shuffle the dataset. Default: True.
@@ -79,10 +79,12 @@ def create_dataset(
     Returns:
         Dataset object
     """
+    name = name.lower()
+    if root is None:
+        root = os.path.join(get_dataset_download_root(), name)
 
     assert (num_samples is None) or (num_aug_repeats == 0), "num_samples and num_aug_repeats can NOT be set together."
 
-    name = name.lower()
     # subset sampling
     if num_samples is not None and num_samples > 0:
         # TODO: rewrite ordered distributed sampler (subset sampling in distributed mode is not tested)

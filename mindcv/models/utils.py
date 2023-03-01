@@ -9,7 +9,11 @@ from typing import List, Optional
 
 from mindspore import load_checkpoint, load_param_into_net
 
-from mindcv.utils.download import DownLoad
+from mindcv.utils.download import DownLoad, get_default_download_root
+
+
+def get_checkpoint_download_root():
+    return os.path.join(get_default_download_root(), "models")
 
 
 class ConfigDict(dict):
@@ -20,17 +24,18 @@ class ConfigDict(dict):
     __delattr__ = dict.__delitem__
 
 
-def load_pretrained(model, default_cfg, path="./", num_classes=1000, in_channels=3, filter_fn=None):
+def load_pretrained(model, default_cfg, num_classes=1000, in_channels=3, filter_fn=None):
     """load pretrained model depending on cfgs of model"""
     if "url" not in default_cfg or not default_cfg["url"]:
         logging.warning("Pretrained model URL is invalid")
         return
 
     # download files
-    os.makedirs(path, exist_ok=True)
-    DownLoad().download_url(default_cfg["url"], path=path)
+    download_path = get_checkpoint_download_root()
+    os.makedirs(download_path, exist_ok=True)
+    DownLoad().download_url(default_cfg["url"], path=download_path)
 
-    param_dict = load_checkpoint(os.path.join(path, os.path.basename(default_cfg["url"])))
+    param_dict = load_checkpoint(os.path.join(download_path, os.path.basename(default_cfg["url"])))
 
     if in_channels == 1:
         conv1_name = default_cfg["first_conv"]

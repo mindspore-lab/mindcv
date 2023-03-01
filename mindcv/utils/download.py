@@ -2,6 +2,7 @@
 import bz2
 import gzip
 import hashlib
+import logging
 import os
 import ssl
 import tarfile
@@ -9,11 +10,26 @@ import urllib
 import urllib.error
 import urllib.request
 import zipfile
+from copy import deepcopy
 from typing import Optional
 
 from tqdm import tqdm
 
 from .path import detect_file_type
+
+_logger = logging.getLogger(__name__)
+# The default root directory where we save downloaded files.
+# Use Get/Set to R/W this variable.
+_DEFAULT_DOWNLOAD_ROOT = os.path.join(os.path.expanduser("~"), ".mindspore")
+
+
+def get_default_download_root():
+    return deepcopy(_DEFAULT_DOWNLOAD_ROOT)
+
+
+def set_default_download_root(path):
+    global _DEFAULT_DOWNLOAD_ROOT
+    _DEFAULT_DOWNLOAD_ROOT = path
 
 
 class DownLoad:
@@ -85,6 +101,7 @@ class DownLoad:
         # Define request headers.
         headers = {"User-Agent": self.USER_AGENT}
 
+        _logger.info(f"Downloading from {url} to {file_path} ...")
         with open(file_path, "wb") as f:
             request = urllib.request.Request(url, headers=headers)
             with urllib.request.urlopen(request) as response:
@@ -98,11 +115,13 @@ class DownLoad:
     def download_url(
         self,
         url: str,
-        path: str = "./",
+        path: Optional[str] = None,
         filename: Optional[str] = None,
         md5: Optional[str] = None,
     ) -> None:
         """Download a file from a url and place it in root."""
+        if path is None:
+            path = get_default_download_root()
         path = os.path.expanduser(path)
         os.makedirs(path, exist_ok=True)
 
@@ -135,13 +154,15 @@ class DownLoad:
     def download_and_extract_archive(
         self,
         url: str,
-        download_path: str,
+        download_path: Optional[str] = None,
         extract_path: Optional[str] = None,
         filename: Optional[str] = None,
         md5: Optional[str] = None,
         remove_finished: bool = False,
     ) -> None:
         """Download and extract archive."""
+        if download_path is None:
+            download_path = get_default_download_root()
         download_path = os.path.expanduser(download_path)
 
         if not filename:
