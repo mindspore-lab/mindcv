@@ -3,14 +3,20 @@ Dataset download
 """
 
 import os
+from typing import Optional
 
-from mindcv.utils.download import DownLoad
+from mindcv.utils.download import DownLoad, get_default_download_root
 
 __all__ = [
+    "get_dataset_download_root",
     "MnistDownload",
     "Cifar10Download",
     "Cifar100Download",
 ]
+
+
+def get_dataset_download_root():
+    return os.path.join(get_default_download_root(), "datasets")
 
 
 class MnistDownload(DownLoad):
@@ -29,8 +35,10 @@ class MnistDownload(DownLoad):
         ("t10k-labels-idx1-ubyte.gz", "ec29112dd5afa0611ce80d1b7f02629c"),
     ]
 
-    def __init__(self, root: str):
+    def __init__(self, root: Optional[str] = None):
         super().__init__()
+        if root is None:
+            root = os.path.join(get_dataset_download_root(), "mnist")
         self.root = root
         self.path = root
 
@@ -77,8 +85,10 @@ class Cifar10Download(DownLoad):
         "batches.meta.txt",
     ]
 
-    def __init__(self, root: str):
+    def __init__(self, root: Optional[str] = None):
         super().__init__()
+        if root is None:
+            root = os.path.join(get_dataset_download_root(), "cifar10")
         self.root = root
         self.path = os.path.join(self.root, self.base_dir)
 
@@ -118,8 +128,10 @@ class Cifar100Download(DownLoad):
         "coarse_label_names.txt",
     ]
 
-    def __init__(self, root: str):
+    def __init__(self, root: Optional[str] = None):
         super().__init__()
+        if root is None:
+            root = os.path.join(get_dataset_download_root(), "cifar100")
         self.root = root
         self.path = os.path.join(self.root, self.base_dir)
 
