@@ -1,4 +1,3 @@
-import os
 import sys
 
 sys.path.append(".")
@@ -28,18 +27,11 @@ def test_train_mnist(mode):
     set_sink_mode = True  # noqa: F841
 
     dataset_name = "mnist"
-    data_dir = "./datasets/mnist"
     model_name = "resnet18"
     scheduler_name = "constant"
     lr = 1e-3
     loss_name = "CE"
     opt_name = "adam"
-    # ckpt_save_dir = './tests/ckpt_tmp'
-
-    if not os.path.exists(data_dir):
-        download = True
-    else:
-        download = False
 
     ms.set_seed(1)
     ms.set_context(mode=mode)
@@ -49,11 +41,10 @@ def test_train_mnist(mode):
 
     dataset_train = create_dataset(
         name=dataset_name,
-        root=data_dir,
         num_samples=100,
         num_shards=device_num,
         shard_id=rank_id,
-        download=download,
+        download=True,
     )
 
     transform_train = create_transforms(dataset_name=dataset_name)
