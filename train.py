@@ -189,7 +189,7 @@ def train(args):
 
     # create optimizer
     # TODO: consistent naming opt, name, dataset_name
-    if args.use_ema:
+    if args.use_ema or args.dynamic_loss_scale:
         optimizer = create_optimizer(
             network.trainable_params(),
             opt=args.opt,
@@ -222,6 +222,7 @@ def train(args):
         eval_metrics = {"Top_1_Accuracy": nn.Top1CategoricalAccuracy()}
 
     # init model
+    # TODO: add dynamic_loss_scale for ema and clip_grad
     if args.use_ema or args.use_clip_grad:
         net_with_loss = nn.WithLossCell(network, loss)
         loss_scale_manager = nn.FixedLossScaleUpdateCell(loss_scale_value=args.loss_scale)
@@ -239,7 +240,14 @@ def train(args):
         eval_network = nn.WithEvalCell(network, loss, args.amp_level in ["O2", "O3", "auto"])
         model = Model(net_with_loss, eval_network=eval_network, metrics=eval_metrics, eval_indexes=[0, 1, 2])
     else:
-        loss_scale_manager = FixedLossScaleManager(loss_scale=args.loss_scale, drop_overflow_update=False)
+        if args.dynamic_loss_scale:
+            loss_scale_manager = ms.amp.DynamicLossScaleManager(
+                init_loss_scale=args.loss_scale,
+                scale_factor=2,
+                scale_window=1000,
+            )
+        else:
+            loss_scale_manager = FixedLossScaleManager(loss_scale=args.loss_scale, drop_overflow_update=False)
         model = Model(
             network,
             loss_fn=loss,
