@@ -172,6 +172,8 @@ def create_parser():
                        help='Weight decay (default=1e-6)')
     group.add_argument('--loss_scale', type=float, default=1.0,
                        help='Loss scale (default=1.0)')
+    group.add_argument('--dynamic_loss_scale', type=str2bool, nargs='?', const=True, default=False,
+                       help='Whether to use dynamic loss scale (default=False)')
     group.add_argument('--use_nesterov', type=str2bool, nargs='?', const=True, default=False,
                        help='Enables the Nesterov momentum (default=False)')
     group.add_argument('--filter_bias_and_bn', type=str2bool, nargs='?', const=True, default=True,
