@@ -153,10 +153,10 @@ def create_parser():
                        help='Input channels (default=3)')
     group.add_argument('--ckpt_save_policy', type=str, default='latest_k',
                        help='Checkpoint saving strategy. The optional values is None, "top_k" or "latest_k".')
-    group.add_argument('--use_ema', type=str2bool, nargs='?', const=True, default=False,
+    group.add_argument('--ema', type=str2bool, nargs='?', const=True, default=False,
                        help='training with ema (default=False)')
     group.add_argument('--ema_decay', type=float, default=0.9999, help='ema decay')
-    group.add_argument('--use_clip_grad', type=str2bool, nargs='?', const=True, default=False,
+    group.add_argument('--clip_grad', type=str2bool, nargs='?', const=True, default=False,
                        help='Whether use clip grad (default=False)')
     group.add_argument('--clip_value', type=float, default=15.0, help='clip value')
 

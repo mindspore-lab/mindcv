@@ -151,7 +151,7 @@ def train(args):
         drop_path_rate=args.drop_path_rate,
         pretrained=args.pretrained,
         checkpoint_path=args.ckpt_path,
-        use_ema=args.use_ema,
+        ema=args.ema,
     )
 
     num_params = sum([param.size for param in network.get_parameters()])
@@ -189,7 +189,7 @@ def train(args):
 
     # create optimizer
     # TODO: consistent naming opt, name, dataset_name
-    if args.use_ema or args.dynamic_loss_scale:
+    if args.ema or args.dynamic_loss_scale:
         optimizer = create_optimizer(
             network.trainable_params(),
             opt=args.opt,
@@ -223,7 +223,7 @@ def train(args):
 
     # init model
     # TODO: add dynamic_loss_scale for ema and clip_grad
-    if args.use_ema or args.use_clip_grad:
+    if args.ema or args.clip_grad:
         net_with_loss = nn.WithLossCell(network, loss)
         loss_scale_manager = nn.FixedLossScaleUpdateCell(loss_scale_value=args.loss_scale)
         ms.amp.auto_mixed_precision(net_with_loss, amp_level=args.amp_level)
@@ -231,9 +231,9 @@ def train(args):
             net_with_loss,
             optimizer,
             scale_sense=loss_scale_manager,
-            use_ema=args.use_ema,
+            ema=args.ema,
             ema_decay=args.ema_decay,
-            use_clip_grad=args.use_clip_grad,
+            clip_grad=args.clip_grad,
             clip_value=args.clip_value,
         )
 
@@ -287,7 +287,7 @@ def train(args):
         model_name=args.model,
         last_epoch=begin_epoch,
         ckpt_save_policy=args.ckpt_save_policy,
-        use_ema=args.use_ema,
+        ema=args.ema,
         dataset_sink_mode=args.dataset_sink_mode,
     )
 

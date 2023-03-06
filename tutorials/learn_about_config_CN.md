@@ -255,7 +255,7 @@ def train(args):
                     drop_path_rate=args.drop_path_rate,
                     pretrained=args.pretrained,
                     checkpoint_path=args.ckpt_path,
-                    use_ema=args.use_ema)
+                    ema=args.ema)
     ...
 ```
 
@@ -385,7 +385,7 @@ python train.py ... --opt momentum --filter_bias_and_bn True --weight_decay 0.00
 ```python
 def train(args):
     ...
-    if args.use_ema:
+    if args.ema:
         optimizer = create_optimizer(network.trainable_params(),
                             opt=args.opt,
                             lr=lr_scheduler,

@@ -11,8 +11,8 @@ from mindspore import Tensor, nn
 from mindspore.common.initializer import Normal
 from mindspore.nn import WithLossCell
 
+from mindcv.engine import TrainStep
 from mindcv.optim import create_optimizer
-from mindcv.utils import TrainOneStepWithEMA
 
 ms.set_seed(1)
 np.random.seed(1)
@@ -46,9 +46,9 @@ class SimpleCNN(nn.Cell):
         return ret
 
 
-@pytest.mark.parametrize("use_ema", [True, False])
+@pytest.mark.parametrize("ema", [True, False])
 @pytest.mark.parametrize("ema_decay", [0.9997, 0.5])
-def test_ema(use_ema, ema_decay):
+def test_ema(ema, ema_decay):
     network = SimpleCNN(in_channels=1, num_classes=10)
     net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
 
@@ -60,10 +60,7 @@ def test_ema(use_ema, ema_decay):
 
     net_with_loss = WithLossCell(network, net_loss)
     loss_scale_manager = Tensor(1, ms.float32)
-    train_network = TrainOneStepWithEMA(
-        net_with_loss, net_opt, scale_sense=loss_scale_manager, use_ema=use_ema, ema_decay=ema_decay
-    )
-
+    train_network = TrainStep(net_with_loss, net_opt, scale_sense=loss_scale_manager, ema=ema, ema_decay=ema_decay)
     train_network.set_train()
 
     begin_loss = train_network(input_data, label)
