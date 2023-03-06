@@ -39,7 +39,7 @@ class StateMonitor(Callback):
         last_epoch=0,
         keep_checkpoint_max=10,
         ckpt_save_policy=None,
-        use_ema=False,
+        ema=False,
         dataset_sink_mode=True,
     ):
         super().__init__()
@@ -89,8 +89,8 @@ class StateMonitor(Callback):
         self.start = time()
         self.epoch_start = time()
         self.map = ops.HyperMap()
-        self.use_ema = use_ema
-        if self.use_ema:
+        self.ema = ema
+        if self.ema:
             self.online_params = ParameterTuple(self.model.train_network.get_parameters())
             self.swap_params = self.online_params.clone("swap", "zeros")
 
@@ -103,7 +103,7 @@ class StateMonitor(Callback):
 
     def apply_eval(self, run_context):
         """Model evaluation, return validation accuracy."""
-        if self.use_ema:
+        if self.ema:
             cb_params = run_context.original_args()
             self.map(ops.assign, self.swap_params, self.online_params)
             ema_dict = dict()

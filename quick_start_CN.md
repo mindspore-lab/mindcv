@@ -181,7 +181,7 @@ network = create_model(model_name='densenet121', num_classes=num_classes, pretra
 
 - checkpoint_path：checkpoint的路径。默认值：“ ”。
 
-- use_ema：是否使用ema方法 默认值: False。
+- ema：是否使用ema方法 默认值: False。
 
 使用[mindcv.loss.create_loss](https://mindcv.readthedocs.io/en/latest/api/mindcv.loss.html#mindcv.loss.create_loss)接口创建损失函数（cross_entropy loss）。
 

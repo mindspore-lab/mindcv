@@ -39,19 +39,19 @@ class TrainStep(nn.TrainOneStepWithLossScaleCell):
         network,
         optimizer,
         scale_sense=1.0,
-        use_ema=False,
+        ema=False,
         ema_decay=0.9999,
         updates=0,
-        use_clip_grad=False,
+        clip_grad=False,
         clip_value=15.0,
     ):
         super(TrainStep, self).__init__(network, optimizer, scale_sense)
-        self.use_ema = use_ema
+        self.ema = ema
         self.ema_decay = ema_decay
         self.updates = Parameter(Tensor(updates, ms.float32))
-        self.use_clip_grad = use_clip_grad
+        self.clip_grad = clip_grad
         self.clip_value = clip_value
-        if self.use_ema:
+        if self.ema:
             self.weights_all = ms.ParameterTuple(list(network.get_parameters()))
             self.ema_weight = self.weights_all.clone("ema", init="same")
 
@@ -73,11 +73,11 @@ class TrainStep(nn.TrainOneStepWithLossScaleCell):
         scaling_sens_filled = C.ones_like(loss) * F.cast(scaling_sens, F.dtype(loss))
         grads = self.grad(self.network, weights)(*inputs, scaling_sens_filled)
         grads = self.hyper_map(F.partial(_grad_scale, scaling_sens), grads)
-        if self.use_clip_grad:
+        if self.clip_grad:
             grads = ops.clip_by_global_norm(grads, clip_norm=self.clip_value)
         # apply grad reducer on grads
         grads = self.grad_reducer(grads)
         loss = F.depend(loss, self.optimizer(grads))
-        if self.use_ema:
+        if self.ema:
             self.ema_update()
         return loss
