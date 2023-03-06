@@ -13,7 +13,7 @@ def create_model(
     pretrained=False,
     in_channels: int = 3,
     checkpoint_path: str = "",
-    use_ema=False,
+    ema=False,
     **kwargs,
 ):
     r"""Creates model by name.
@@ -24,7 +24,7 @@ def create_model(
         pretrained (bool): Whether to load the pretrained model. Default: False.
         in_channels (int): The input channels. Default: 3.
         checkpoint_path (str): The path of checkpoint files. Default: "".
-        use_ema (bool): Whether use ema method. Default: False.
+        ema (bool): Whether use ema method. Default: False.
     """
 
     if checkpoint_path != "" and pretrained:
@@ -49,10 +49,10 @@ def create_model(
                 ema_data.name = new_name
                 ema_param_dict[new_name] = ema_data
 
-        if ema_param_dict and use_ema:
+        if ema_param_dict and ema:
             load_param_into_net(model, ema_param_dict)
-        elif bool(ema_param_dict) is False and use_ema:
-            raise ValueError("chekpoint_param does not contain ema_parameter, please set use_ema is False.")
+        elif bool(ema_param_dict) is False and ema:
+            raise ValueError("chekpoint_param does not contain ema_parameter, please set ema is False.")
         else:
             load_param_into_net(model, checkpoint_param)
 
