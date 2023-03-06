@@ -6,6 +6,7 @@ from mindspore import load_checkpoint, load_param_into_net, nn
 
 from .adamw import AdamW
 from .adan import Adan
+from .lion import Lion
 from .nadam import NAdam
 
 __all__ = ["create_optimizer"]
@@ -47,7 +48,7 @@ def create_optimizer(
         params: network parameters. Union[list[Parameter],list[dict]], which must be the list of parameters
             or list of dicts. When the list element is a dictionary, the key of the dictionary can be
             "params", "lr", "weight_decay","grad_centralization" and "order_params".
-        opt: wrapped optimizer. You could choose like 'sgd', 'nesterov', 'momentum', 'adam', 'adamw',
+        opt: wrapped optimizer. You could choose like 'sgd', 'nesterov', 'momentum', 'adam', 'adamw', 'lion',
             'rmsprop', 'adagrad', 'lamb'. 'adam' is the default choose for convolution-based networks.
             'adamw' is recommended for ViT-based networks. Default: 'adam'.
         lr: learning rate: float or lr scheduler. Fixed and dynamic learning rate are supported. Default: 1e-3.
@@ -108,6 +109,14 @@ def create_optimizer(
         )
     elif opt == "adamw":
         optimizer = AdamW(
+            params=params,
+            learning_rate=lr,
+            weight_decay=weight_decay,
+            loss_scale=loss_scale,
+            **opt_args,
+        )
+    elif opt == "lion":
+        optimizer = Lion(
             params=params,
             learning_rate=lr,
             weight_decay=weight_decay,

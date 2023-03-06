@@ -163,7 +163,7 @@ def create_parser():
     # Optimize parameters
     group = parser.add_argument_group('Optimizer parameters')
     group.add_argument('--opt', type=str, default='adam',
-                       choices=['sgd', 'momentum', 'adam', 'adamw', 'rmsprop', 'adagrad', 'lamb', "nadam"],
+                       choices=['sgd', 'momentum', 'adam', 'adamw', 'lion', 'rmsprop', 'adagrad', 'lamb', "nadam"],
                        help='Type of optimizer (default="adam")')
     group.add_argument('--momentum', type=float, default=0.9,
                        help='Hyperparameter of type float, means momentum for the moving average. '
