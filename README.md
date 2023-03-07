@@ -287,6 +287,7 @@ Please see [configs](./configs) for the details about model performance and pret
 * Optimizer
 	* Adam
 	* Adamw
+	* [Lion](https://arxiv.org/abs/2302.06675)
 	* Adan (experimental)
 	* AdaGrad
 	* LAMB
@@ -315,6 +316,18 @@ Please see [configs](./configs) for the details about model performance and pret
 
 ## Notes
 ### What is New
+- 2023/03/05
+1. Add Lion (EvoLved Sign Momentum) optimizer from paper https://arxiv.org/abs/2302.06675
+	- To replace adamw with lion, LR is usually 3-10x smaller, and weight decay is usually 3-10x larger than adamw.
+2. Add 6 new models with training recipes and pretrained weights for
+	- [HRNet](configs/hrnet)
+	- [SENet](configs/senet)
+	- [GoogLeNet](configs/googlenet)
+	- [Inception V3](configs/inception_v3)
+	- [Inception V4](configs/inception_v4)
+	- [Xception](configs/xception)
+3. Support gradient clip
+
 - 2023/01/10
 1. MindCV v0.1 released! It can be installed via PyPI `pip install mindcv` now.
 2. Add training recipe and trained weights of googlenet, inception_v3, inception_v4, xception

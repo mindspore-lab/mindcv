@@ -301,6 +301,7 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
 * 优化器
     * Adam
     * Adamw
+	* [Lion](https://arxiv.org/abs/2302.06675)
     * Adan (experimental)
     * AdaGrad
     * LAMB
@@ -331,7 +332,17 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
 ## 日志
 
 ### 更新
-
+- 2023/03/05
+1. 增加Lion (EvoLved Sign Momentum)优化器，论文 https://arxiv.org/abs/2302.06675
+	- Lion所使用的学习率一般比Adamw小3到10倍，而权重衰减(weigt_decay)要大3到10倍.
+2. 增加6个模型及其训练策略、预训练权重：
+	- [HRNet](configs/hrnet)
+	- [SENet](configs/senet)
+	- [GoogLeNet](configs/googlenet)
+	- [Inception V3](configs/inception_v3)
+	- [Inception V4](configs/inception_v4)
+	- [Xception](configs/xception)
+3. Support gradient clip
 
 - 2023/01/10
 1. MindCV v0.1发布! 支持通过PyPI安装 (`pip install mindcv`).
