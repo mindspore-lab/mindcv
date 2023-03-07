@@ -34,10 +34,10 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "dpn92": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/dpn/dpn92_224.ckpt"),
-    "dpn98": _cfg(url=""),
-    "dpn107": _cfg(url=""),
-    "dpn131": _cfg(url=""),
+    "dpn92": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/dpn/dpn92-e3e0fca.ckpt"),
+    "dpn98": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/dpn/dpn98-119a8207.ckpt"),
+    "dpn107": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/dpn/dpn107-7d7df07b.ckpt"),
+    "dpn131": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/dpn/dpn131-47f084b3.ckpt"),
 }
 
 
