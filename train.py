@@ -37,12 +37,13 @@ def train(args):
             device_num=device_num,
             parallel_mode="data_parallel",
             gradients_mean=True,
+            parameter_broadcast=True,
         )
     else:
         device_num = None
         rank_id = None
 
-    set_seed(args.seed, rank_id)
+    set_seed(args.seed)
 
     # create dataset
     dataset_train = create_dataset(
