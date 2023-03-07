@@ -13,6 +13,7 @@ from . import (
     inception_v3,
     inception_v4,
     layers,
+    mixnet,
     mnasnet,
     mobilenet_v1,
     mobilenet_v2,
@@ -54,6 +55,7 @@ from .hrnet import *
 from .inception_v3 import *
 from .inception_v4 import *
 from .layers import *
+from .mixnet import *
 from .mnasnet import *
 from .mobilenet_v1 import *
 from .mobilenet_v2 import *
@@ -99,6 +101,7 @@ __all__.extend(hrnet.__all__)
 __all__.extend(["InceptionV3", "inception_v3"])
 __all__.extend(["InceptionV4", "inception_v4"])
 __all__.extend(layers.__all__)
+__all__.extend(mixnet.__all__)
 __all__.extend(mnasnet.__all__)
 __all__.extend(mobilenet_v1.__all__)
 __all__.extend(mobilenet_v2.__all__)
