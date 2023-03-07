@@ -1,0 +1,52 @@
+# system
+mode: 0
+distribute: True
+num_parallel_workers: 8
+val_while_train: True
+
+# dataset
+dataset: 'imagenet'
+data_dir: 'path/to/imagenet'
+shuffle: True
+dataset_download: False
+batch_size: 32
+drop_remainder: True
+
+# augmentation
+image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+vflip: 0.0
+interpolation: 'bilinear'
+crop_pct: 0.875
+
+# model
+model: 'dpn131'
+num_classes: 1000
+pretrained: False
+ckpt_path: ''
+keep_checkpoint_max: 10
+ckpt_save_dir: './ckpt'
+epoch_size: 200
+dataset_sink_mode: True
+amp_level: 'O2'
+
+# loss
+loss: 'CE'
+label_smoothing: 0.1
+
+# lr scheduler
+scheduler: 'cosine_decay'
+min_lr: 1e-6
+lr: 0.05
+warmup_epochs: 0
+decay_epochs: 200
+
+# optimizer
+opt: 'SGD'
+filter_bias_and_bn: True
+momentum: 0.9
+weight_decay: 0.0001
+loss_scale: 1024
+use_nesterov: False
