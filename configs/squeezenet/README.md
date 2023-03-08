@@ -25,8 +25,10 @@ Middle: SqueezeNet with simple bypass; Right: SqueezeNet with complex bypass.
 
 | Model          | Context | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                               | Download                                                                                    |
 |----------------|---------|-----------|-----------|------------|------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
-| squeezenet_1.0 | GPUx8-G | 59.49     | 81.22     | 1.25       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.0_gpu.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.0_224.ckpt) |
-| squeezenet_1.1 | GPUx8-G | 58.99     | 80.99     | 1.24       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.1_gpu.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.1_224.ckpt) |
+| squeezenet_1.0 | D910x8-G | 59.01 | 81.01| 1.25 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_0-e2d78c4a.ckpt) |
+| squeezenet_1.0 | GPUx8-G | 59.49 | 81.22 | 1.25 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.0_gpu.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.0_224.ckpt) |
+| squeezenet_1.1 | D910x8-G | 58.44 | 80.84 | 1.24 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_1-da256d3a.ckpt) |
+| squeezenet_1.1 | GPUx8-G | 58.99 | 80.99 | 1.24 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.1_gpu.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.1_224.ckpt) |
 
 </div>
 
@@ -53,6 +55,8 @@ It is easy to reproduce the reported results with the pre-defined training recip
 
 ```shell
 # distributed training on multiple GPU/Ascend devices
+mpirun -n 8 python train.py --config configs/squeezenet/squeezenet_1.0_ascend.yaml --data_dir /path/to/imagenet
+
 mpirun -n 8 python train.py --config configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /path/to/imagenet
 ```
 
@@ -68,6 +72,8 @@ If you want to train or finetune the model on a smaller dataset without distribu
 
 ```shell
 # standalone training on a CPU/GPU/Ascend device
+python train.py --config configs/squeezenet/squeezenet_1.0_ascend.yaml --data_dir /path/to/dataset --distribute False
+
 python train.py --config configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /path/to/dataset --distribute False
 ```
 
@@ -76,6 +82,8 @@ python train.py --config configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```
+python validate.py -c configs/squeezenet/squeezenet_1.0_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+
 python validate.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
