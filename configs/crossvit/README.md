@@ -24,7 +24,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 | Model       | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                  | Download                                                                              |
 |-------------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
 | crossvit_15 | D910x8-G | 81.08     | 95.33     | 27.27      | [yaml](https://github.com/xusheng365/mindcv/blob/main/configs/crossvit/crossvit15.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_15-eaa43c02.ckpt)     |
-| crossvit_18 | D910x8-G | 81.99     | 95.87     | 43.27      | [yaml](https://github.com/xusheng365/mindcv/blob/main/configs/crossvit/crossvit18.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_18-ca0a2e43.ckpt) |
+| crossvit_18 | D910x8-G | 81.93     | 95.75     | 43.27      | [yaml](https://github.com/xusheng365/mindcv/blob/main/configs/crossvit/crossvit18.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_18-ca0a2e43.ckpt) |
 
 
 </div>
@@ -52,7 +52,7 @@ It is easy to reproduce the reported results with the pre-defined training recip
 
 ```shell
 # distributed training on multiple GPU/Ascend devices
-mpirun -n 8 python train.py --config configs/crossvit/crossvit_15_ascend.yaml .yaml --data_dir /path/to/imagenet
+mpirun -n 8 python train.py --config configs/crossvit/crossvit_15_ascend.yaml --data_dir /path/to/imagenet  --distribute False
 ```
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
 
@@ -68,7 +68,7 @@ If you want to train or finetune the model on a smaller dataset without distribu
 
 ```shell
 # standalone training on a CPU/GPU/Ascend device
-python train.py --config configs/crossvit/crossvit_15_ascend.yaml .yaml --data_dir /path/to/dataset 
+python train.py --config configs/crossvit/crossvit_15_ascend.yaml --data_dir /path/to/dataset
 ```
 
 ### Validation
@@ -76,7 +76,7 @@ python train.py --config configs/crossvit/crossvit_15_ascend.yaml .yaml --data_d
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```
-python validate.py -c configs/crossvit/crossvit15.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+python validate.py -c configs/crossvit/crossvit15_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 ### Deployment

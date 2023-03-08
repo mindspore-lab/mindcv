@@ -1,40 +1,37 @@
-import mindspore.nn as nn
-import mindspore as ms
-import mindspore.ops as ops
 import numpy as np
+
+import mindspore as ms
+import mindspore.common.initializer as init
+import mindspore.nn as nn
+import mindspore.ops as ops
 from mindspore import Tensor
 from mindspore import dtype as mstype
-import mindspore.common.initializer as init
 from mindspore.common.initializer import TruncatedNormal
 
+from .layers.drop_path import DropPath
 from .layers.helpers import to_2tuple
 from .layers.identity import Identity
-from .layers.patch_embed import PatchEmbed
-from .layers.drop_path import DropPath
 from .layers.mlp import Mlp
-from .utils import load_pretrained
 from .registry import register_model
-
-DEFAULT_CROP_PCT = 0.875
-IMAGENET_DEFAULT_MEAN = (0.485, 0.456, 0.406)
-IMAGENET_DEFAULT_STD = (0.229, 0.224, 0.225)
-IMAGENET_INCEPTION_MEAN = (0.5, 0.5, 0.5)
-IMAGENET_INCEPTION_STD = (0.5, 0.5, 0.5)
-IMAGENET_DPN_MEAN = (124 / 255, 117 / 255, 104 / 255)
-IMAGENET_DPN_STD = tuple([1 / (.0167 * 255)] * 3)
-
+from .utils import load_pretrained
 
 # dynative
 # from mindspore import context
 # context.set_context(mode=context.PYNATIVE_MODE)
 
+__all__ = [
+    "crossvit15",
+    "crossvit18",
+
+]
+
+
 def _cfg(url='', **kwargs):
     return {
         'url': url,
-        'num_classes': 1000, 'input_size': (3, 224, 224), 'pool_size': None,
-        'crop_pct': .9, 'interpolation': 'bicubic', 'fixed_input_size': True,
-        'mean': IMAGENET_INCEPTION_MEAN, 'std': IMAGENET_INCEPTION_STD,
-        'first_conv': 'patch_embed.proj', 'classifier': 'head',
+        'num_classes': 1000,
+        'first_conv': 'patch_embed.proj',
+        'classifier': 'head',
         **kwargs
     }
 
@@ -51,7 +48,7 @@ class Attention(nn.Cell):
         self.proj = nn.Dense(dim, dim)
         self.proj_drop = nn.Dropout(1.0 - proj_drop)
 
-    def construct(self, x):
+    def construct(self, x: Tensor) -> Tensor:
         B, N, C = x.shape
         qkv = self.qkv(x)
         qkv = qkv.reshape(B, N, 3, self.num_heads, C // self.num_heads)
@@ -86,7 +83,7 @@ class Block(nn.Cell):
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, drop=drop)
 
-    def construct(self, x):
+    def construct(self, x: Tensor) -> Tensor:
         x = x + self.drop_path(self.attn(self.norm1(x)))
         x = x + self.drop_path(self.mlp(self.norm2(x)))
         return x
@@ -125,7 +122,7 @@ class PatchEmbed(nn.Cell):
             self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size, pad_mode='valid',
                                   has_bias=True)
 
-    def construct(self, x):
+    def construct(self, x: Tensor) -> Tensor:
         B, C, H, W = x.shape
         # FIXME look at relaxing size constraints
 
@@ -153,7 +150,7 @@ class CrossAttention(nn.Cell):
         self.proj = nn.Dense(dim, dim)
         self.proj_drop = nn.Dropout(1.0 - proj_drop)
 
-    def construct(self, x):
+    def construct(self, x: Tensor) -> Tensor:
         B, N, C = x.shape  # 3,3,16
         q = self.wq(x[:, 0:1, ...]).reshape(B, 1, self.num_heads, C // self.num_heads)
         q = ops.transpose(q, (0, 2, 1, 3))  # B1C -> B1H(C/H) -> BH1(C/H) 3 8 1 2
@@ -197,7 +194,7 @@ class CrossAttentionBlock(nn.Cell):
             # 修改mlp
             self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer(), drop=drop)
 
-    def construct(self, x):
+    def construct(self, x: Tensor) -> Tensor:
         x = x[:, 0:1, ...] + self.drop_path(self.attn(self.norm1(x)))
         if self.has_mlp:
             x = x + self.drop_path(self.mlp(self.norm2(x)))
@@ -266,7 +263,7 @@ class MultiScaleBlock(nn.Cell):
             revert_projs.append(nn.SequentialCell(tmp))
         self.revert_projs = nn.CellList(revert_projs)
 
-    def construct(self, x):
+    def construct(self, x: Tensor) -> Tensor:
         outs_b = []
         i = 0
         for block in self.blocks:
@@ -320,7 +317,7 @@ class VisionTransformer(nn.Cell):
         self.num_branches = len(patch_size)
 
         patch_embed = []
-        if hybrid_backbone is None:  # 循环修改，因为tuple只接受元祖，并且元祖无法改变元祖内的元素
+        if hybrid_backbone is None:
             b = []
             for i in range(self.num_branches):
                 c = ms.Parameter(Tensor(np.zeros([1, 1 + num_patches[i], embed_dim[i]], np.float32)),
@@ -331,31 +328,10 @@ class VisionTransformer(nn.Cell):
             for im_s, p, d in zip(img_size, patch_size, embed_dim):
                 patch_embed.append(
                     PatchEmbed(img_size=im_s, patch_size=p, in_chans=in_channels, embed_dim=d, multi_conv=multi_conv))
-            self.patch_embed = nn.CellList(patch_embed)  # 修改
-        else:
-            from .layers.t2t import T2T, get_sinusoid_encoding
-            tokens_type = 'transformer' if hybrid_backbone == 't2t' else 'performer'
-            b = []
-            for idx, (im_s, p, d) in enumerate(zip(img_size, patch_size, embed_dim)):
-                patch_embed.append(T2T(im_s, tokens_type=tokens_type, patch_size=p, embed_dim=d))
-                c = ms.Parameter(get_sinusoid_encoding(n_position=1 + num_patches[idx], d_hid=embed_dim[idx]),
-                                 name=str(idx + 500), requires_grad=False)
-                b.append(c)
-            self.patch_embed = nn.CellList(patch_embed)
-            b = tuple(b)
-            self.pos_embed = ms.ParameterTuple(b)
-
-            del self.pos_embed
-            m = []
-            for i in range(self.num_branches):
-                c = ms.Parameter(Tensor(np.zeros([1, 1 + num_patches[i], embed_dim[i]], np.float32)),
-                                 name='pos_embed.' + str(i))
-                m.append(c)
-            m = tuple(b)
-            self.pos_embed = ms.ParameterTuple(m)
+            self.patch_embed = nn.CellList(patch_embed)  #
 
         d = []
-        for i in range(self.num_branches):  # 修改
+        for i in range(self.num_branches):  #
             c = ms.Parameter(Tensor(np.zeros([1, 1, embed_dim[i]], np.float32)), name='cls_token.' + str(i))
             d.append(c)
         d = tuple(d)
@@ -412,7 +388,7 @@ class VisionTransformer(nn.Cell):
         self.num_classes = num_classes
         self.head = nn.Dense(self.embed_dim, num_classes) if num_classes > 0 else Identity()
 
-    def forward_features(self, x):
+    def forward_features(self, x: Tensor) -> Tensor:
         B, C, H, W = x.shape
         xs = []
         # print(x)
@@ -447,7 +423,7 @@ class VisionTransformer(nn.Cell):
             out.append(x[:, 0])
         return out
 
-    def construct(self, x):
+    def construct(self, x: Tensor) -> Tensor:
         xs = self.forward_features(x)
         ce_logits = []
         zz = 0

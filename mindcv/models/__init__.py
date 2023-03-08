@@ -93,6 +93,7 @@ __all__ = []
 __all__.extend(bit.__all__)
 __all__.extend(convit.__all__)
 __all__.extend(convnext.__all__)
+__all__.extend(crossvit.__all__)
 __all__.extend(densenet.__all__)
 __all__.extend(dpn.__all__)
 __all__.extend(edgenext.__all__)
