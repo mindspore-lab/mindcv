@@ -3,11 +3,11 @@ import logging
 import os
 
 import mindspore as ms
-from mindspore import FixedLossScaleManager, Model, Tensor, nn
+from mindspore import Tensor
 from mindspore.communication import get_group_size, get_rank, init
 
 from mindcv.data import create_dataset, create_loader, create_transforms
-from mindcv.engine import StateMonitor, TrainStep
+from mindcv.engine import StateMonitor, create_trainer, get_metrics
 from mindcv.loss import create_loss
 from mindcv.models import create_model
 from mindcv.optim import create_optimizer
@@ -135,6 +135,7 @@ def train(args):
             eval_count = all_reduce(Tensor(eval_count, ms.int32))
     else:
         loader_eval = None
+        eval_count = None
 
     num_batches = loader_train.get_dataset_size()
     # Train dataset count
@@ -190,94 +191,62 @@ def train(args):
 
     # create optimizer
     # TODO: consistent naming opt, name, dataset_name
-    if args.ema or args.dynamic_loss_scale:
-        optimizer = create_optimizer(
-            network.trainable_params(),
-            opt=args.opt,
-            lr=lr_scheduler,
-            weight_decay=args.weight_decay,
-            momentum=args.momentum,
-            nesterov=args.use_nesterov,
-            filter_bias_and_bn=args.filter_bias_and_bn,
-            checkpoint_path=opt_ckpt_path,
-            eps=args.eps,
-        )
+    if args.loss_scale_type == "fixed" and args.drop_overflow_update is False:
+        optimizer_loss_scale = args.loss_scale
     else:
-        optimizer = create_optimizer(
-            network.trainable_params(),
-            opt=args.opt,
-            lr=lr_scheduler,
-            weight_decay=args.weight_decay,
-            momentum=args.momentum,
-            nesterov=args.use_nesterov,
-            filter_bias_and_bn=args.filter_bias_and_bn,
-            loss_scale=args.loss_scale,
-            checkpoint_path=opt_ckpt_path,
-            eps=args.eps,
-        )
+        optimizer_loss_scale = 1.0
+    optimizer = create_optimizer(
+        network.trainable_params(),
+        opt=args.opt,
+        lr=lr_scheduler,
+        weight_decay=args.weight_decay,
+        momentum=args.momentum,
+        nesterov=args.use_nesterov,
+        filter_bias_and_bn=args.filter_bias_and_bn,
+        loss_scale=optimizer_loss_scale,
+        checkpoint_path=opt_ckpt_path,
+        eps=args.eps,
+    )
 
     # Define eval metrics.
-    if num_classes >= 5:
-        eval_metrics = {"Top_1_Accuracy": nn.Top1CategoricalAccuracy(), "Top_5_Accuracy": nn.Top5CategoricalAccuracy()}
-    else:
-        eval_metrics = {"Top_1_Accuracy": nn.Top1CategoricalAccuracy()}
+    metrics = get_metrics(num_classes)
 
-    # init model
-    # TODO: add dynamic_loss_scale for ema and clip_grad
-    if args.ema or args.clip_grad:
-        net_with_loss = nn.WithLossCell(network, loss)
-        loss_scale_manager = nn.FixedLossScaleUpdateCell(loss_scale_value=args.loss_scale)
-        ms.amp.auto_mixed_precision(net_with_loss, amp_level=args.amp_level)
-        net_with_loss = TrainStep(
-            net_with_loss,
-            optimizer,
-            scale_sense=loss_scale_manager,
-            ema=args.ema,
-            ema_decay=args.ema_decay,
-            clip_grad=args.clip_grad,
-            clip_value=args.clip_value,
-        )
-
-        eval_network = nn.WithEvalCell(network, loss, args.amp_level in ["O2", "O3", "auto"])
-        model = Model(net_with_loss, eval_network=eval_network, metrics=eval_metrics, eval_indexes=[0, 1, 2])
-    else:
-        if args.dynamic_loss_scale:
-            loss_scale_manager = ms.amp.DynamicLossScaleManager(
-                init_loss_scale=args.loss_scale,
-                scale_factor=2,
-                scale_window=1000,
-            )
-        else:
-            loss_scale_manager = FixedLossScaleManager(loss_scale=args.loss_scale, drop_overflow_update=False)
-        model = Model(
-            network,
-            loss_fn=loss,
-            optimizer=optimizer,
-            metrics=eval_metrics,
-            amp_level=args.amp_level,
-            loss_scale_manager=loss_scale_manager,
-        )
+    # create trainer
+    trainer = create_trainer(
+        network,
+        loss,
+        optimizer,
+        metrics,
+        amp_level=args.amp_level,
+        loss_scale_type=args.loss_scale_type,
+        loss_scale=args.loss_scale,
+        drop_overflow_update=args.drop_overflow_update,
+        ema=args.ema,
+        ema_decay=args.ema_decay,
+        clip_grad=args.clip_grad,
+        clip_value=args.clip_value,
+    )
 
     # callback
     # save checkpoint, summary training loss
-    # recorad val acc and do model selection if val dataset is availabe
+    # record val acc and do model selection if val dataset is available
+    begin_step = 0
     begin_epoch = 0
     if args.ckpt_path != "":
-        if args.ckpt_path != "":
-            begin_step = optimizer.global_step.asnumpy()[0]
-            begin_epoch = args.ckpt_path.split("/")[-1].split("-")[1].split("_")[0]
-            begin_epoch = int(begin_epoch)
+        begin_step = optimizer.global_step.asnumpy()[0]
+        begin_epoch = args.ckpt_path.split("/")[-1].split("-")[1].split("_")[0]
+        begin_epoch = int(begin_epoch)
 
     summary_dir = f"./{args.ckpt_save_dir}/summary"
     assert (
         args.ckpt_save_policy != "top_k" or args.val_while_train is True
     ), "ckpt_save_policy is top_k, val_while_train must be True."
     state_cb = StateMonitor(
-        model,
+        trainer,
         summary_dir=summary_dir,
         dataset_val=loader_eval,
         val_interval=args.val_interval,
-        metric_name=list(eval_metrics.keys()),
+        metric_name=list(metrics.keys()),
         ckpt_dir=args.ckpt_save_dir,
         ckpt_save_interval=args.ckpt_save_interval,
         best_ckpt_name=args.model + "_best.ckpt",
@@ -322,7 +291,7 @@ def train(args):
         else:
             logger.info("Start training")
 
-    model.train(args.epoch_size, loader_train, callbacks=callbacks, dataset_sink_mode=args.dataset_sink_mode)
+    trainer.train(args.epoch_size, loader_train, callbacks=callbacks, dataset_sink_mode=args.dataset_sink_mode)
 
 
 if __name__ == "__main__":

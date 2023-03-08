@@ -6,6 +6,10 @@ from mindspore.ops import composite as C
 from mindspore.ops import functional as F
 from mindspore.ops import operations as P
 
+__all__ = [
+    "TrainStep",
+]
+
 _ema_op = C.MultitypeFuncGraph("grad_ema_op")
 _grad_scale = C.MultitypeFuncGraph("grad_scale")
 reciprocal = P.Reciprocal()
