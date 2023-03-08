@@ -22,6 +22,7 @@ from . import (
     mobilenet_v3,
     model_factory,
     nasnet,
+    pit,
     pnasnet,
     poolformer,
     pvt,
@@ -66,6 +67,7 @@ from .mobilenet_v2 import *
 from .mobilenet_v3 import *
 from .model_factory import *
 from .nasnet import *
+from .pit import *
 from .pnasnet import *
 from .poolformer import *
 from .pvt import *
@@ -114,6 +116,7 @@ __all__.extend(mobilenet_v2.__all__)
 __all__.extend(mobilenet_v3.__all__)
 __all__.extend(model_factory.__all__)
 __all__.extend(["NASNetAMobile", "nasnet"])
+__all__.extend(pit.__all__)
 __all__.extend(["Pnasnet", "pnasnet"])
 __all__.extend(poolformer.__all__)
 __all__.extend(pvt.__all__)
