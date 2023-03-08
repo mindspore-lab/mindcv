@@ -3,6 +3,7 @@ from . import (
     bit,
     convit,
     convnext,
+    crossvit,
     densenet,
     dpn,
     edgenext,
@@ -45,6 +46,7 @@ from . import (
 from .bit import *
 from .convit import *
 from .convnext import *
+from .crossvit import *
 from .densenet import *
 from .dpn import *
 from .edgenext import *
