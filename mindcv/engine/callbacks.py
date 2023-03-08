@@ -13,6 +13,11 @@ from mindspore.train.callback import Callback
 
 from mindcv.utils import AllReduceSum, CheckpointManager
 
+__all__ = [
+    "StateMonitor",
+    "ValCallback",
+]
+
 
 class StateMonitor(Callback):
     """

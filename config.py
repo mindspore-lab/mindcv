@@ -224,11 +224,14 @@ def create_parser():
                        help='Amp level - Auto Mixed Precision level for saving memory and acceleration. '
                             'Choice: O0 - all FP32, O1 - only cast ops in white-list to FP16, '
                             'O2 - cast all ops except for blacklist to FP16, '
-                            'O3 - cast all ops to FP16 (default="O0")')
+                            'O3 - cast all ops to FP16. (default="O0").')
+    group.add_argument('--loss_scale_type', type=str, default='fixed',
+                       choices=['fixed', 'dynamic', 'auto'],
+                       help='The type of loss scale (default="fixed")')
     group.add_argument('--loss_scale', type=float, default=1.0,
                        help='Loss scale (default=1.0)')
-    group.add_argument('--dynamic_loss_scale', type=str2bool, nargs='?', const=True, default=False,
-                       help='Whether to use dynamic loss scale (default=False)')
+    group.add_argument('--drop_overflow_update', type=bool, default=False,
+                       help='Whether to execute optimizer if there is an overflow (default=False)')
 
     # modelarts
     group = parser.add_argument_group('modelarts')
