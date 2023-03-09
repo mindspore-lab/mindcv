@@ -32,10 +32,10 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "vgg11": _cfg(url=""),
-    "vgg13": _cfg(url=""),
-    "vgg16": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vgg/vgg16_224.ckpt"),
-    "vgg19": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vgg/vgg19_224.ckpt"),
+    "vgg11": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vgg/vgg11-59a09738.ckpt"),
+    "vgg13": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vgg/vgg13-d30c46b7.ckpt"),
+    "vgg16": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vgg/vgg16-22d7d708.ckpt"),
+    "vgg19": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vgg/vgg19-0c442461.ckpt"),
 }
 
 
