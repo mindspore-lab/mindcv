@@ -74,6 +74,7 @@
 | vit_l_16_224 | D910x8-G | 76.34     | 92.79     | 303.31     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l16_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224.ckpt) |
 | vit_l_32_224 | D910x8-G | 73.71     | 90.92     | 305.52     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224.ckpt) |
 | Xception | D910x8-G | 79.01     | 94.25     | 22.91      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/xception/xception_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/xception/xception_299.ckpt) |
+| xcit_tiny_12_p16 | D910x8-G | 77.674     | 93.792      | 7      | [yaml](https://github.com/bnucsy/mindcv/tree/main/configs/xcit/xcit_tiny_12_p16_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/xcit/xcit_tiny_12_p16_best.ckpt) |
 
 #### Notes
 - Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
