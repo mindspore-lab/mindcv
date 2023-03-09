@@ -37,6 +37,7 @@ from . import (
     sknet,
     squeezenet,
     swin_transformer,
+    tnt,
     vgg,
     visformer,
     vit,
@@ -79,6 +80,7 @@ from .shufflenetv2 import *
 from .sknet import *
 from .squeezenet import *
 from .swin_transformer import *
+from .tnt import *
 from .utils import *
 from .vgg import *
 from .visformer import *
@@ -125,6 +127,7 @@ __all__.extend(shufflenetv2.__all__)
 __all__.extend(sknet.__all__)
 __all__.extend(squeezenet.__all__)
 __all__.extend(swin_transformer.__all__)
+__all__.extend(tnt.__all__)
 __all__.extend(vgg.__all__)
 __all__.extend(visformer.__all__)
 __all__.extend(vit.__all__)
