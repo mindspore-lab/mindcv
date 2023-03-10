@@ -20,6 +20,7 @@ from . import (
     mobilenet_v3,
     model_factory,
     nasnet,
+    pcpvt,
     pnasnet,
     poolformer,
     pvt,
@@ -36,6 +37,7 @@ from . import (
     shufflenetv2,
     sknet,
     squeezenet,
+    svt,
     swin_transformer,
     vgg,
     visformer,
@@ -62,6 +64,7 @@ from .mobilenet_v2 import *
 from .mobilenet_v3 import *
 from .model_factory import *
 from .nasnet import *
+from .pcpvt import *
 from .pnasnet import *
 from .poolformer import *
 from .pvt import *
@@ -78,6 +81,7 @@ from .shufflenetv1 import *
 from .shufflenetv2 import *
 from .sknet import *
 from .squeezenet import *
+from .svt import *
 from .swin_transformer import *
 from .utils import *
 from .vgg import *
@@ -109,6 +113,7 @@ __all__.extend(mobilenet_v3.__all__)
 __all__.extend(model_factory.__all__)
 __all__.extend(["NASNetAMobile", "nasnet"])
 __all__.extend(["Pnasnet", "pnasnet"])
+__all__.extend(pcpvt.__all__)
 __all__.extend(poolformer.__all__)
 __all__.extend(pvt.__all__)
 __all__.extend(pvtv2.__all__)
@@ -124,6 +129,7 @@ __all__.extend(shufflenetv1.__all__)
 __all__.extend(shufflenetv2.__all__)
 __all__.extend(sknet.__all__)
 __all__.extend(squeezenet.__all__)
+__all__.extend(svt.__all__)
 __all__.extend(swin_transformer.__all__)
 __all__.extend(vgg.__all__)
 __all__.extend(visformer.__all__)
