@@ -51,7 +51,7 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 
 ```shell
 # distrubted training on multiple GPU/Ascend devices
-mpirun -n 8 python train.py --config configs/twins/svt_s.yaml --data_dir /path/to/imagenet
+mpirun -n 8 python train.py --config configs/twins/svt_s.yaml --data_dir /path/to/imagenet --distributed True
 ```
 
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
