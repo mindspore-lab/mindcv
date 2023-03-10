@@ -19,7 +19,9 @@ from .utils import load_pretrained
 
 __all__ = [
     "EdgeNeXt",
+    "edgenext_x_small",
     "edgenext_small",
+    "edgenext_base",
 ]
 
 
@@ -27,6 +29,7 @@ def _cfg(url="", **kwargs):
     return {
         "url": url,
         "num_classes": 1000,
+        "input_size": (3, 224, 224),
         "first_conv": "conv_0.conv",
         "classifier": "last_linear",
         **kwargs,
@@ -34,7 +37,15 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "edgenext_small": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt"),
+    "edgenext_x_small": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_x_small-c4defb56.ckpt",
+        input_size=(3, 256, 256)),
+    "edgenext_small": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt",
+        input_size=(3, 256, 256)),
+    "edgenext_base": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_base-215efef7.ckpt",
+        input_size=(3, 256, 256)),
 }
 
 
@@ -385,6 +396,29 @@ class EdgeNeXt(nn.Cell):
 
 
 @register_model
+def edgenext_x_small(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> EdgeNeXt:
+    """Get edgenext_x_small model.
+    Refer to the base class `models.EdgeNeXt` for more details."""
+    default_cfg = default_cfgs["edgenext_x_small"]
+    model = EdgeNeXt(
+        depths=[3, 3, 9, 3],
+        dims=[32, 64, 100, 192],
+        expan_ratio=4,
+        num_classes=num_classes,
+        global_block=[0, 1, 1, 1],
+        global_block_type=["None", "SDTA", "SDTA", "SDTA"],
+        use_pos_embd_xca=[False, True, False, False],
+        kernel_sizes=[3, 5, 7, 9],
+        heads=[4, 4, 4, 4],
+        d2_scales=[2, 2, 3, 4],
+        **kwargs
+    )
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
 def edgenext_small(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> EdgeNeXt:
     """Get edgenext_small model.
     Refer to the base class `models.EdgeNeXt` for more details."""
@@ -392,6 +426,28 @@ def edgenext_small(pretrained: bool = False, num_classes: int = 1000, in_channel
     model = EdgeNeXt(
         depths=[3, 3, 9, 3],
         dims=[48, 96, 160, 304],
+        expan_ratio=4,
+        num_classes=num_classes,
+        global_block=[0, 1, 1, 1],
+        global_block_type=["None", "SDTA", "SDTA", "SDTA"],
+        use_pos_embd_xca=[False, True, False, False],
+        kernel_sizes=[3, 5, 7, 9],
+        d2_scales=[2, 2, 3, 4],
+        **kwargs
+    )
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
+
+
+@register_model
+def edgenext_base(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> EdgeNeXt:
+    """Get edgenext_base model.
+    Refer to the base class `models.EdgeNeXt` for more details."""
+    default_cfg = default_cfgs["edgenext_base"]
+    model = EdgeNeXt(
+        depths=[3, 3, 9, 3],
+        dims=[80, 160, 288, 584],
         expan_ratio=4,
         num_classes=num_classes,
         global_block=[0, 1, 1, 1],
