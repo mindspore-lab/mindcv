@@ -7,6 +7,7 @@ from .dynamic_lr import (
     linear_lr,
     linear_refined_lr,
     multi_step_lr,
+    onecycle_lr,
     polynomial_lr,
     polynomial_refined_lr,
     step_lr,
@@ -35,9 +36,9 @@ def create_scheduler(
     Args:
         steps_per_epoch: number of steps per epoch.
         scheduler: scheduler name like 'constant', 'cosine_decay', 'step_decay',
-            'exponential_decay', 'polynomial_decay', 'multi_step_decay'. Default: 'constant'.
+            'exponential_decay', 'polynomial_decay', 'multi_step_decay', 'onecycle'. Default: 'constant'.
         lr: learning rate value. Default: 0.01.
-        min_lr: lower lr bound for 'cosine_decay' schedulers. Default: 1e-6.
+        min_lr: lower lr bound for 'cosine_decay' and 'onecycle' schedulers. Default: 1e-6.
         warmup_epochs: epochs to warmup LR, if scheduler supports. Default: 3.
         warmup_factor: the warmup phase of scheduler is a linearly increasing lr,
             the beginning factor is `warmup_factor`, i.e., the lr of the first step/epoch is lr*warmup_factor,
@@ -63,6 +64,8 @@ def create_scheduler(
     # lr warmup phase
     warmup_lr_scheduler = []
     if warmup_epochs > 0:
+        if scheduler == "onecycle":
+            raise ValueError("OneCycle scheduler has warmup built in, please set warmup_epochs to 0")
         if warmup_factor == 0 and lr_epoch_stair:
             print(
                 "[WARNING]: The warmup factor is set to 0, lr of 0-th epoch is always zero! " "Recommend value is 0.01."
@@ -108,6 +111,8 @@ def create_scheduler(
         main_lr_scheduler = multi_step_lr(
             milestones=milestones, gamma=decay_rate, lr=lr, steps_per_epoch=steps_per_epoch, epochs=main_epochs
         )
+    elif scheduler == "onecycle":
+        main_lr_scheduler = onecycle_lr(lr=lr, min_lr=min_lr, step_per_epoch=steps_per_epoch, epochs=main_epochs)
     elif scheduler == "constant":
         main_lr_scheduler = [lr for _ in range(steps_per_epoch * main_epochs)]
     else:

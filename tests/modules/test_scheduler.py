@@ -89,4 +89,14 @@ def test_scheduler_dynamic():
                     0.00615582970243117]
     lrs_ms = dynamic_lr.cosine_annealing_warm_restarts_lr(5, 2, 0.0, eta_max=1.0, steps_per_epoch=2, epochs=15)
     assert np.allclose(lrs_ms, lrs_manually)
+
+    # onecycle_lr
+    lrs_manually = [1.00000000e-06, 5.00000000e-04, 1.00000000e-03, 9.32142857e-04,
+                    8.64285714e-04, 7.96428571e-04, 7.28571429e-04, 6.60714286e-04,
+                    5.92857143e-04, 5.25000000e-04, 4.57142857e-04, 3.89285714e-04,
+                    3.21428571e-04, 2.53571429e-04, 1.85714286e-04, 1.17857143e-04,
+                    5.00000000e-05, 3.75000000e-05, 2.50000000e-05, 1.25000000e-05]
+    lrs_ms = dynamic_lr.onecycle_lr(lr=0.001, min_lr=0.000001, steps_per_epoch=2, epochs=10)
+    assert np.allclose(lrs_ms, lrs_manually)
+
 # fmt: on

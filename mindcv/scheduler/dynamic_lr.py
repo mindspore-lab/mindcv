@@ -22,6 +22,8 @@ The implemented fine-grained variation are list as follows: `linear_refined_lr`,
 import math
 from bisect import bisect_right
 
+import numpy as np
+
 
 def constant_lr(factor, total_iters, *, lr, steps_per_epoch, epochs):
     steps = steps_per_epoch * epochs
@@ -188,6 +190,32 @@ def cosine_annealing_warm_restarts_lr(te, tm, eta_min, *, eta_max, steps_per_epo
             tt = 0                    # by setting to 0 we set lr to lr_max, see above
             te = te * tm              # change the period of restarts
             te_next = te_next + te    # note the next restart's epoch
+    return lrs
+
+
+def onecycle_lr(lr, min_lr, steps_per_epoch, epochs):
+    """Get OneCycle lr"""
+    lrs = []
+
+    def _lr_adjuster(base_lr, epoch):
+        lr = np.interp(
+            [epoch],
+            [
+                0,
+                epochs * 0.5 // 5,
+                epochs * 4 // 5,
+                epochs
+            ],
+            [0, base_lr, base_lr / 20.0, 0]
+        )[0]
+
+        return lr
+
+    for epoch in range(epochs):
+        for batch in range(steps_per_epoch):
+            lrs.append(_lr_adjuster(lr, epoch + batch / steps_per_epoch))
+    lrs = np.array(lrs)
+    lrs = np.clip(lrs, min_lr, max(lrs))
     return lrs
 
 
