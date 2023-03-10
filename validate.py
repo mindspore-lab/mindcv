@@ -3,10 +3,9 @@ import mindspore.nn as nn
 from mindspore import Model
 
 from mindcv.data import create_dataset, create_loader, create_transforms
-from mindcv.engine import ValCallback
 from mindcv.loss import create_loss
 from mindcv.models import create_model
-from mindcv.utils import check_batch_size
+from mindcv.utils import ValCallback, check_batch_size
 
 from config import parse_args  # isort: skip
 
