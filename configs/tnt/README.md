@@ -17,9 +17,9 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model    | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                        | Download                                                                               |
 |----------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
-| tnt_small | 8xRTX3090 | 74.14     | 92.07     | -       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/tnt/tnt_s.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/TNT/tnt_s_patch16_224_ep138_acc_0.74.ckpt) |
-| tnt_small | Converted from PyTorch | 72.51 | 90.68 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/tnt/tnt_s.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/TNT/tnt_s_converted_0.718.ckpt) |
-| tnt_base | Converted from PyTorch | 79.62 | 94.81 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/tnt/tnt_b.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/TNT/tnt_b_converted_0.795.ckpt) |
+| tnt_small | 8xRTX3090 | 74.14     | 92.07     | -       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/tnt/tnt_s_gpu.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/TNT/tnt_s_patch16_224_ep138_acc_0.74.ckpt) |
+| tnt_small | Converted from PyTorch | 72.51 | 90.68 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/tnt/tnt_s_gpu.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/TNT/tnt_s_converted_0.718.ckpt) |
+| tnt_base | Converted from PyTorch | 79.62 | 94.81 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/tnt/tnt_b_gpu.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/TNT/tnt_b_converted_0.795.ckpt) |
 
 </div>
 
@@ -45,7 +45,7 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 
 ```shell
 # distrubted training on multiple GPU/Ascend devices
-mpirun -n 8 python train.py --config configs/tnt/tnt_s.yaml --data_dir /path/to/imagenet --distributed True
+mpirun -n 8 python train.py --config configs/tnt/tnt_s_gpu.yaml --data_dir /path/to/imagenet --distributed True
 ```
 
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
@@ -62,7 +62,7 @@ If you want to train or finetune the model on a smaller dataset without distribu
 
 ```shell
 # standalone training on a CPU/GPU/Ascend device
-python train.py --config configs/tnt/tnt_s.yaml --data_dir /path/to/dataset --distribute False
+python train.py --config configs/tnt/tnt_s_gpu.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 ### Validation
@@ -70,13 +70,13 @@ python train.py --config configs/tnt/tnt_s.yaml --data_dir /path/to/dataset --di
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```shell
-python validate.py -c configs/tnt/tnt_s.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+python validate.py -c configs/tnt/tnt_s_gpu.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 Or use '--pretrained' parameter to automatically download the checkpoint.
 
 ```shell
-python validate.py -c configs/tnt/tnt_s.yaml --data_dir /path/to/imagenet --pretrained
+python validate.py -c configs/tnt/tnt_s_gpu.yaml --data_dir /path/to/imagenet --pretrained
 ```
 
 ### Deployment
