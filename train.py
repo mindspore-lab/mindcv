@@ -7,12 +7,11 @@ from mindspore import Tensor
 from mindspore.communication import get_group_size, get_rank, init
 
 from mindcv.data import create_dataset, create_loader, create_transforms
-from mindcv.engine import StateMonitor, create_trainer, get_metrics
 from mindcv.loss import create_loss
 from mindcv.models import create_model
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
-from mindcv.utils import AllReduceSum, set_seed
+from mindcv.utils import AllReduceSum, StateMonitor, create_trainer, get_metrics, set_seed
 
 from config import parse_args  # isort: skip
 
