@@ -20,12 +20,12 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model    | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                        | Download                                                                               |
 |----------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
-| svt_small | Converted from PyTorch | 81     | 95.38     | -       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/twins/svt_s.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/Twins/converted/svt_s_new.ckpt) |
-| svt_base | Converted from PyTorch | 82.63 | 96.17 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/twins/svt_s.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/Twins/converted/svt_b_new.ckpt) |
-| svt_large | Converted from PyTorch | 83.04 | 96.35 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/twins/svt_s.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/Twins/converted/svt_l_new.ckpt) |
-| pcpvt_small | Converted from Pytorch | 80.58 | 95.40 | - |[yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/twins/pcpvt_l.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/Twins/converted/pcpvt_s_new.ckpt) |
-| pcpvt_base | Converted from Pytorch | 82.19 | 96.08 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/twins/pcpvt_l.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/Twins/converted/pcpvt_b_new.ckpt) |
-| pcpvt_large | Converted from PyTorch | 82.51 | 96.37 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/twins/pcpvt_l.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/Twins/converted/pcpvt_l_new.ckpt)
+| svt_small | Converted from PyTorch | 81     | 95.38     | -       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/twins/svt_s_gpu.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/Twins/converted/svt_s_new.ckpt) |
+| svt_base | Converted from PyTorch | 82.63 | 96.17 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/twins/svt_s_gpu.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/Twins/converted/svt_b_new.ckpt) |
+| svt_large | Converted from PyTorch | 83.04 | 96.35 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/twins/svt_s_gpu.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/Twins/converted/svt_l_new.ckpt) |
+| pcpvt_small | Converted from Pytorch | 80.58 | 95.40 | - |[yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/twins/pcpvt_l_gpu.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/Twins/converted/pcpvt_s_new.ckpt) |
+| pcpvt_base | Converted from Pytorch | 82.19 | 96.08 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/twins/pcpvt_l_gpu.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/Twins/converted/pcpvt_b_new.ckpt) |
+| pcpvt_large | Converted from PyTorch | 82.51 | 96.37 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/twins/pcpvt_l_gpu.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/Twins/converted/pcpvt_l_new.ckpt)
 
 </div>
 
@@ -51,7 +51,7 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 
 ```shell
 # distrubted training on multiple GPU/Ascend devices
-mpirun -n 8 python train.py --config configs/twins/svt_s.yaml --data_dir /path/to/imagenet --distributed True
+mpirun -n 8 python train.py --config configs/twins/svt_s_gpu.yaml --data_dir /path/to/imagenet --distributed True
 ```
 
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
@@ -68,7 +68,7 @@ If you want to train or finetune the model on a smaller dataset without distribu
 
 ```shell
 # standalone training on a CPU/GPU/Ascend device
-python train.py --config configs/twins/svt_s.yaml --data_dir /path/to/dataset --distribute False
+python train.py --config configs/twins/svt__gpus.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 ### Validation
@@ -76,7 +76,7 @@ python train.py --config configs/twins/svt_s.yaml --data_dir /path/to/dataset --
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```shell
-python validate.py -c configs/twins/svt_s.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+python validate.py -c configs/twins/svt_s_gpu.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 ### Deployment
