@@ -16,10 +16,10 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model    | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                        | Download                                                                               |
 |----------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
-| deit_base | Converted from PyTorch | 81.62     | 95.58     | -  | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/deit/deit_b.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/DeiT/Converted/deit_base_patch16_224.ckpt) |
-| deit_base | 8xRTX3090 | 72.29 | 89.93 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/deit/deit_b.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/DeiT/deit_base_patch16_224_acc%3D0.725.ckpt)
-| deit_small | Converted from PyTorch | 79.39 | 94.80 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/deit/deit_b.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/DeiT/Converted/deit_small_patch16_224.ckpt) |
-| deit_tiny | Converted from PyTorch | 71.58 | 90.76 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/deit/deit_b.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/DeiT/Converted/deit_tiny_patch16_224.ckpt) |
+| deit_base | Converted from PyTorch | 81.62     | 95.58     | -  | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/deit/deit_b_gpu.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/DeiT/Converted/deit_base_patch16_224.ckpt) |
+| deit_base | 8xRTX3090 | 72.29 | 89.93 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/deit/deit_b_gpu.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/DeiT/deit_base_patch16_224_acc%3D0.725.ckpt)
+| deit_small | Converted from PyTorch | 79.39 | 94.80 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/deit/deit_b_gpu.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/DeiT/Converted/deit_small_patch16_224.ckpt) |
+| deit_tiny | Converted from PyTorch | 71.58 | 90.76 | - | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/deit/deit_b_gpu.yaml) | [weights](https://storage.googleapis.com/huawei-mindspore-hk/DeiT/Converted/deit_tiny_patch16_224.ckpt) |
 
 </div>
 
@@ -45,7 +45,7 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 
 ```shell
 # distrubted training on multiple GPU/Ascend devices
-mpirun -n 8 python train.py --config configs/deit/deit_b.yaml --data_dir /path/to/imagenet --distributed True
+mpirun -n 8 python train.py --config configs/deit/deit_b_gpu.yaml --data_dir /path/to/imagenet --distributed True
 ```
 
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
@@ -62,7 +62,7 @@ If you want to train or finetune the model on a smaller dataset without distribu
 
 ```shell
 # standalone training on a CPU/GPU/Ascend device
-python train.py --config configs/deit/deit_b.yaml --data_dir /path/to/dataset --distribute False
+python train.py --config configs/deit/deit_b_gpu.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 ### Validation
@@ -70,7 +70,7 @@ python train.py --config configs/deit/deit_b.yaml --data_dir /path/to/dataset --
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```shell
-python validate.py -c configs/deit/deit_b.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+python validate.py -c configs/deit/deit_b_gpu.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 ### Deployment
