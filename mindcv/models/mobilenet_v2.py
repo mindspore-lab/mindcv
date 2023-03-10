@@ -51,70 +51,70 @@ def _cfg(url="", **kwargs):
 
 default_cfgs = {
     "mobilenet_v2_1.4_224": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.4_224.ckpt"
+        url=""
     ),
     "mobilenet_v2_1.3_224": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.3_224.ckpt"
+        url=""
     ),
     "mobilenet_v2_1.0_224": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_224.ckpt"
+        url=""
     ),
     "mobilenet_v2_1.0_192": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_192.ckpt"
+        url=""
     ),
     "mobilenet_v2_1.0_160": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_160.ckpt"
+        url=""
     ),
     "mobilenet_v2_1.0_128": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_128.ckpt"
+        url=""
     ),
     "mobilenet_v2_1.0_96": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_1.0_96.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.75_224": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_224.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.75_192": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_192.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.75_160": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_160.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.75_128": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_128.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.75_96": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.75_96.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.5_224": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_224.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.5_192": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_192.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.5_160": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_160.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.5_128": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_128.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.5_96": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.5_96.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.35_224": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_224.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.35_192": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_192.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.35_160": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_160.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.35_128": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_128.ckpt"
+        url=""
     ),
     "mobilenet_v2_0.35_96": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2_transfer/mobilenet_v2_0.35_96.ckpt"
+        url=""
     ),
 }
 
