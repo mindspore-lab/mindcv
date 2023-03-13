@@ -3,6 +3,7 @@ from . import (
     bit,
     convit,
     convnext,
+    deit,
     densenet,
     dpn,
     edgenext,
@@ -45,6 +46,7 @@ from . import (
 from .bit import *
 from .convit import *
 from .convnext import *
+from .deit import *
 from .densenet import *
 from .dpn import *
 from .edgenext import *
@@ -91,6 +93,7 @@ __all__ = []
 __all__.extend(bit.__all__)
 __all__.extend(convit.__all__)
 __all__.extend(convnext.__all__)
+__all__.extend(deit.__all__)
 __all__.extend(densenet.__all__)
 __all__.extend(dpn.__all__)
 __all__.extend(edgenext.__all__)
