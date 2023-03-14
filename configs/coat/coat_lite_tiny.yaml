@@ -1,0 +1,59 @@
+# system
+mode: 0
+distribute: True
+num_parallel_workers: 8
+val_while_train: True
+
+# dataset
+dataset: 'imagenet'
+data_dir: '/path/to/imagenet/'
+shuffle: True
+dataset_download: False
+batch_size: 64
+drop_remainder: True
+
+# augmentation
+image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+interpolation: 'bicubic'
+auto_augment: 'randaug-m7-mstd0.5-inc1'
+re_prob: 0.1
+mixup: 0.2
+cutmix: 1.0
+cutmix_prob: 1.0
+crop_pct: 0.9
+color_jitter: 0.4
+
+# model
+model: 'coat_lite_tiny'
+num_classes: 1000
+pretrained: False
+ckpt_path: ''
+ckpt_save_policy: 'top_k'
+keep_checkpoint_max: 10
+ckpt_save_dir: './ckpt/'
+dataset_sink_mode: True
+amp_level: 'O2'
+
+# loss
+loss: 'CE'
+label_smoothing: 0.1
+
+# lr scheduler
+scheduler: 'cosine_decay'
+lr: 0.0008
+min_lr: 0.000005
+warmup_epochs: 20
+decay_epochs: 280
+epoch_size: 900
+num_cycles: 3
+cycle_decay: 1.0
+
+# optimizer
+opt: 'adamw'
+weight_decay: 0.025
+filter_bias_and_bn: True
+loss_scale: 1024
+use_nesterov: False
