@@ -327,6 +327,7 @@ Please see [configs](./configs) for the details about model performance and pret
 	- [Inception V4](configs/inception_v4)
 	- [Xception](configs/xception)
 3. Support gradient clip
+4. Arg name `use_ema` changed to **`ema`**, add `ema: True` in yaml to enable EMA.
 
 - 2023/01/10
 1. MindCV v0.1 released! It can be installed via PyPI `pip install mindcv` now.
