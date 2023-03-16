@@ -28,8 +28,8 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "squeezenet_1.0": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.0_224.ckpt"),
-    "squeezenet_1.1": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.1_224.ckpt"),
+    "squeezenet1_0": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_0-e2d78c4a.ckpt"),
+    "squeezenet1_1": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_1-da256d3a.ckpt"),
 }
 
 
@@ -154,7 +154,7 @@ def squeezenet1_0(pretrained: bool = False, num_classes: int = 1000, in_channels
     """Get SqueezeNet model of version 1.0.
     Refer to the base class `models.SqueezeNet` for more details.
     """
-    default_cfg = default_cfgs["squeezenet_1.0"]
+    default_cfg = default_cfgs["squeezenet1_0"]
     model = SqueezeNet(version="1_0", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -168,7 +168,7 @@ def squeezenet1_1(pretrained: bool = False, num_classes: int = 1000, in_channels
     """Get SqueezeNet model of version 1.1.
     Refer to the base class `models.SqueezeNet` for more details.
     """
-    default_cfg = default_cfgs["squeezenet_1.1"]
+    default_cfg = default_cfgs["squeezenet1_1"]
     model = SqueezeNet(version="1_1", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
