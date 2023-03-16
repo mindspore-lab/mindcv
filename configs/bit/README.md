@@ -19,10 +19,11 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model         | Context  | Top-1 (%) | Top-5 (%) | Params(M) | Recipe                                                                                          | Download                                                                       |
-|---------------|----------|-----------|-----------|-----------|-------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| bit_resnet50  | D910x8-G | 76.81     | 93.17     | 25.55     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet50_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt)  |
-| bit_resnet101 | D910x8-G | 77.93     | 93.75     | 44.54     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet101_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet101.ckpt) |
+| Model          | Context  | Top-1 (%) | Top-5 (%) | Params(M) | Recipe                                                                                           |                                    Download                                 |
+|----------------| -------- |-----------|-----------|-----------|--------------------------------------------------------------------------------------------------|  -------------------------------------------------------------------------- |
+| bit_resnet50   | D910x8-G | 76.81     | 93.17     | 25.55     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet50_ascend.yaml)   | [weights](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt) |
+| bit_resnet50x3 | D910x8-G | 80.63     | 95.12     | 217.31    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet50x3_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50x3-703782b3.ckpt) |
+| bit_resnet101  | D910x8-G | 77.93     | 93.75     | 44.54     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet101_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet101.ckpt) |
 
 </div>
 

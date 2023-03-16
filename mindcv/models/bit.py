@@ -15,6 +15,7 @@ from .utils import load_pretrained
 __all__ = [
     "BiT_ResNet",
     "BiTresnet50",
+    "BiTresnet50x3",
     "BiTresnet101",
 ]
 
@@ -31,6 +32,7 @@ def _cfg(url="", **kwargs):
 
 default_cfgs = {
     "BiTresnet50": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt"),
+    "BiTresnet50x3": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50x3-703782b3.ckpt"),
     "BiTresnet101": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet101.ckpt"),
 }
 
@@ -272,6 +274,20 @@ def BiTresnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3
     """
     default_cfg = default_cfgs["BiTresnet50"]
     model = BiT_ResNet(Bottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
+    return model
+
+
+@register_model
+def BiTresnet50x3(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    """Get 50 layers ResNet model.
+     Refer to the base class `models.BiT_Resnet` for more details.
+     """
+    default_cfg = default_cfgs["BiTresnet50x3"]
+    model = BiT_ResNet(Bottleneck, [3, 4, 6, 3], wf=3, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
