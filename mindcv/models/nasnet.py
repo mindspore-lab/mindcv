@@ -13,7 +13,7 @@ from .utils import load_pretrained
 
 __all__ = [
     "NASNetAMobile",
-    "nasnet",
+    "nasnet_a_4x1056",
 ]
 
 
@@ -28,7 +28,7 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "nasnet": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/nasnet/nasnet_224.ckpt"),
+    "nasnet_a_4x1056": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/nasnet/nasnet_a_4x1056-0fbb5cdd.ckpt"),
 }
 
 
@@ -871,10 +871,10 @@ class NASNetAMobile(nn.Cell):
 
 
 @register_model
-def nasnet(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> NASNetAMobile:
+def nasnet_a_4x1056(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> NASNetAMobile:
     """Get NasNet model.
     Refer to the base class `models.NASNetAMobile` for more details."""
-    default_cfg = default_cfgs["nasnet"]
+    default_cfg = default_cfgs["nasnet_a_4x1056"]
     model = NASNetAMobile(in_channels=in_channels, num_classes=num_classes, **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)

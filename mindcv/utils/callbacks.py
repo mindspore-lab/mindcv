@@ -11,7 +11,8 @@ from mindspore import log as logger
 from mindspore import ops, save_checkpoint
 from mindspore.train.callback import Callback
 
-from mindcv.utils import AllReduceSum, CheckpointManager
+from .checkpoint_manager import CheckpointManager
+from .reduce_manager import AllReduceSum
 
 __all__ = [
     "StateMonitor",
