@@ -11,8 +11,8 @@ from mindspore import Tensor, nn
 from mindspore.common.initializer import Normal
 from mindspore.nn import WithLossCell
 
-from mindcv.engine import TrainStep
 from mindcv.optim import create_optimizer
+from mindcv.utils import TrainStep
 
 ms.set_seed(1)
 np.random.seed(1)

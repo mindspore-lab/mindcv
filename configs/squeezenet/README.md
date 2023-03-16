@@ -56,8 +56,6 @@ It is easy to reproduce the reported results with the pre-defined training recip
 ```shell
 # distributed training on multiple GPU/Ascend devices
 mpirun -n 8 python train.py --config configs/squeezenet/squeezenet_1.0_ascend.yaml --data_dir /path/to/imagenet
-
-mpirun -n 8 python train.py --config configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /path/to/imagenet
 ```
 
 Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
@@ -73,8 +71,6 @@ If you want to train or finetune the model on a smaller dataset without distribu
 ```shell
 # standalone training on a CPU/GPU/Ascend device
 python train.py --config configs/squeezenet/squeezenet_1.0_ascend.yaml --data_dir /path/to/dataset --distribute False
-
-python train.py --config configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 ### Validation
@@ -83,8 +79,6 @@ To validate the accuracy of the trained model, you can use `validate.py` and par
 
 ```
 python validate.py -c configs/squeezenet/squeezenet_1.0_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
-
-python validate.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 ### Deployment

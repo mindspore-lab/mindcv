@@ -18,7 +18,46 @@ from mindcv.models import (
 )
 
 # TODO: the global avg pooling op used in EfficientNet is not supported for CPU.
-model_name_list = list_models(exclude_filters="efficientnet*")
+# TODO: memory resource is limited on free github action runner, ask the PM for self-hosted runners!
+model_name_list = [
+    "BiTresnet50",
+    "RepMLPNet_T224",
+    "convit_tiny",
+    "convnext_tiny",
+    "densenet121",
+    "dpn92",
+    "edgenext_small",
+    "ghostnet_1x",
+    "googlenet",
+    "hrnet_w32",
+    "inception_v3",
+    "inception_v4",
+    "mixnet_s",
+    "mnasnet0_5",
+    "mobilenet_v1_025_224",
+    "mobilenet_v2_035_128",
+    "mobilenet_v3_small_075",
+    "nasnet_a_4x1056",
+    "pnasnet",
+    "poolformer_s12",
+    "pvt_tiny",
+    "pvt_v2_b0",
+    "regnet_x_200mf",
+    "repvgg",
+    "res2net50",
+    "resnet18",
+    "resnext50_32x4d",
+    "rexnet_x09",
+    "seresnet18",
+    "shufflenet_v1_g3_x0_5",
+    "shufflenet_v2_x0_5",
+    "sk_resnet18",
+    "squeezenet1_0",
+    "swin_tiny",
+    "visformer_tiny",
+    "vit_b_32_224",
+    "xception",
+]
 
 check_loss_decrease = False
 
