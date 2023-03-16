@@ -36,7 +36,7 @@ def train(args):
             device_num=device_num,
             parallel_mode="data_parallel",
             gradients_mean=True,
-            parameter_broadcast=True,
+            # we should but cannot set parameter_broadcast=True, which will cause error on gpu.
         )
     else:
         device_num = None
