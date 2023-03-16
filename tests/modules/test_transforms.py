@@ -8,7 +8,7 @@ import pytest
 
 import mindspore as ms
 
-from mindcv.data import create_dataset, create_loader, create_transforms
+from mindcv.data import create_dataset, create_loader, create_transforms, get_dataset_download_root
 from mindcv.utils.download import DownLoad
 
 
@@ -33,11 +33,11 @@ def test_transforms_standalone_imagenet(mode, name, image_resize, is_training):
     dataset_url = (
         "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/intermediate/Canidae_data.zip"
     )
-    root_dir = "./"
-
-    if not os.path.exists(os.path.join(root_dir, "data/Canidae")):
+    root_dir = os.path.join(get_dataset_download_root(), "Canidae")
+    data_dir = os.path.join(root_dir, "data", "Canidae")  # Canidae has prefix path "data/Canidae" in unzipped file.
+    if not os.path.exists(data_dir):
         DownLoad().download_and_extract_archive(dataset_url, root_dir)
-    data_dir = "./data/Canidae/"
+
     dataset = create_dataset(
         name=name,
         root=data_dir,
@@ -170,20 +170,14 @@ def test_repeated_aug():
         rank_id = 0
 
     name = "imagenet"
-    """
-    data_dir = '/data/imagenette2-320'
-    num_classes = 10
-    """
     dataset_url = (
         "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/intermediate/Canidae_data.zip"
     )
-    root_dir = "./"
-
-    if not os.path.exists(os.path.join(root_dir, "data/Canidae")):
+    root_dir = os.path.join(get_dataset_download_root(), "Canidae")
+    data_dir = os.path.join(root_dir, "data", "Canidae")  # Canidae has prefix path "data/Canidae" in unzipped file.
+    if not os.path.exists(data_dir):
         DownLoad().download_and_extract_archive(dataset_url, root_dir)
-    data_dir = "./data/Canidae/"
     num_classes = 2
-
     num_aug_repeats = 3
 
     dataset = create_dataset(

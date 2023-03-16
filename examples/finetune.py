@@ -8,7 +8,7 @@ import numpy as np
 
 from mindspore import LossMonitor, Model, TimeMonitor
 
-from mindcv.data import create_dataset, create_loader, create_transforms
+from mindcv.data import create_dataset, create_loader, create_transforms, get_dataset_download_root
 from mindcv.loss import create_loss
 from mindcv.models import create_model
 from mindcv.optim import create_optimizer
@@ -20,15 +20,12 @@ visualize = False
 dataset_url = (
     "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/intermediate/Canidae_data.zip"
 )
-root_dir = "./"
-
-if not os.path.exists(os.path.join(root_dir, "data/Canidae")):
+root_dir = os.path.join(get_dataset_download_root(), "Canidae")
+data_dir = os.path.join(root_dir, "data", "Canidae")  # Canidae has prefix path "data/Canidae" in unzipped file.
+if not os.path.exists(data_dir):
     DownLoad().download_and_extract_archive(dataset_url, root_dir)
 
 num_workers = 8
-
-# 数据集目录路径
-data_dir = "./data/Canidae/"
 
 # 加载自定义数据集
 dataset_train = create_dataset(root=data_dir, split="train", num_parallel_workers=num_workers)
