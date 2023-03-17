@@ -34,6 +34,7 @@ from . import (
     res2net,
     resnest,
     resnet,
+    resnetv2,
     rexnet,
     senet,
     shufflenetv1,
@@ -81,6 +82,7 @@ from .repvgg import *
 from .res2net import *
 from .resnest import *
 from .resnet import *
+from .resnetv2 import *
 from .rexnet import *
 from .senet import *
 from .shufflenetv1 import *
@@ -132,6 +134,7 @@ __all__.extend(["RepVGG", "repvgg"])
 __all__.extend(res2net.__all__)
 __all__.extend(resnest.__all__)
 __all__.extend(resnet.__all__)
+__all__.extend(resnetv2.__all__)
 __all__.extend(rexnet.__all__)
 __all__.extend(senet.__all__)
 __all__.extend(shufflenetv1.__all__)
