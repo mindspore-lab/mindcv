@@ -1,6 +1,7 @@
 """models init"""
 from . import (
     bit,
+    coat,
     convit,
     convnext,
     crossvit,
@@ -46,6 +47,7 @@ from . import (
     xcit,
 )
 from .bit import *
+from .coat import *
 from .convit import *
 from .convnext import *
 from .crossvit import *
@@ -95,6 +97,7 @@ from .xcit import *
 # we cannot use net.__all__, so we manually copy net.__all__ here.
 __all__ = []
 __all__.extend(bit.__all__)
+__all__.extend(coat.__all__)
 __all__.extend(convit.__all__)
 __all__.extend(convnext.__all__)
 __all__.extend(crossvit.__all__)
