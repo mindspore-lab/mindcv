@@ -29,7 +29,7 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "swin_tiny": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/swin/swin_tiny_224.ckpt"),
+    "swin_tiny": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/swin/swin_tiny-0ff2f96d.ckpt"),
 }
 
 to_2tuple = _ntuple(2)
