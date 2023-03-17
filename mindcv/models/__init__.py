@@ -43,6 +43,7 @@ from . import (
     visformer,
     vit,
     xception,
+    xcit,
 )
 from .bit import *
 from .convit import *
@@ -88,6 +89,7 @@ from .vgg import *
 from .visformer import *
 from .vit import *
 from .xception import *
+from .xcit import *
 
 # some net module is replaced by the net function with the same name when we do from .net import *
 # we cannot use net.__all__, so we manually copy net.__all__ here.
@@ -135,3 +137,4 @@ __all__.extend(vgg.__all__)
 __all__.extend(visformer.__all__)
 __all__.extend(vit.__all__)
 __all__.extend(["Xception", "xception"])
+__all__.extend(xcit.__all__)
