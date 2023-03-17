@@ -7,12 +7,13 @@ from typing import Any, Callable, List, Optional, Sequence, Union
 
 import numpy as np
 
-from mindspore import Tensor, nn, ops
+from mindspore import Tensor, nn
 from mindspore.common import initializer as weight_init
 from mindspore.common.initializer import Normal, Uniform
 
 from .layers.activation import Swish
 from .layers.drop_path import DropPath
+from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExcite
 from .registry import register_model
 from .utils import load_pretrained, make_divisible
@@ -44,7 +45,8 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "efficientnet_b0": _cfg(url=""),
+    "efficientnet_b0": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt"),
     "efficientnet_b1": _cfg(url=""),
     "efficientnet_b2": _cfg(url=""),
     "efficientnet_b3": _cfg(url=""),
@@ -418,6 +420,7 @@ class EfficientNet(nn.Cell):
         ])
 
         self.features = nn.SequentialCell(layers)
+        self.avgpool = GlobalAvgPooling()
         self.dropout = nn.Dropout(1 - dropout_rate)
         self.mlp_head = nn.Dense(lastconv_output_channels, num_classes)
         self._initialize_weights()
@@ -425,8 +428,7 @@ class EfficientNet(nn.Cell):
     def forward_features(self, x: Tensor) -> Tensor:
         x = self.features(x)
 
-        x = ops.adaptive_avg_pool2d(x, 1)
-        x = ops.flatten(x)
+        x = self.avgpool(x)
 
         if self.training:
             x = self.dropout(x)
