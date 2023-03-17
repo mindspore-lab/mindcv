@@ -10,6 +10,7 @@ sys.path.append(".")
 
 import pytest
 
+from mindcv.data import get_dataset_download_root
 from mindcv.utils.download import DownLoad
 
 check_acc = True
@@ -20,16 +21,17 @@ check_acc = True
 def test_train_ema(ema, val_while_train, model="resnet18"):
     """train on a imagenet subset dataset"""
     # prepare data
-    data_dir = "data/Canidae"
-    num_classes = 2
     dataset_url = (
         "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/intermediate/Canidae_data.zip"
     )
+    root_dir = os.path.join(get_dataset_download_root(), "Canidae")
+    data_dir = os.path.join(root_dir, "data", "Canidae")  # Canidae has prefix path "data/Canidae" in unzipped file.
     if not os.path.exists(data_dir):
-        DownLoad().download_and_extract_archive(dataset_url, "./")
+        DownLoad().download_and_extract_archive(dataset_url, root_dir)
 
     # ---------------- test running train.py using the toy data ---------
     dataset = "imagenet"
+    num_classes = 2
     ckpt_dir = "./tests/ckpt_tmp"
     num_samples = 160
     num_epochs = 5

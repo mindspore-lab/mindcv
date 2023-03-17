@@ -8,7 +8,7 @@ import pytest
 import mindspore as ms
 from mindspore.dataset.transforms import OneHot
 
-from mindcv.data import create_dataset, create_loader
+from mindcv.data import create_dataset, create_loader, get_dataset_download_root
 from mindcv.utils.download import DownLoad
 
 num_classes = 1
@@ -56,15 +56,13 @@ def test_dataset_loader_standalone(
 
     ms.set_context(mode=mode)
     name = "ImageNet"
-    if name == "ImageNet":
-        dataset_url = (
-            "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/intermediate/Canidae_data.zip"
-        )
-        root_dir = "./"
-
-        if not os.path.exists(os.path.join(root_dir, "data/Canidae")):
-            DownLoad().download_and_extract_archive(dataset_url, root_dir)
-        data_dir = "./data/Canidae/"
+    dataset_url = (
+        "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/notebook/datasets/intermediate/Canidae_data.zip"
+    )
+    root_dir = os.path.join(get_dataset_download_root(), "Canidae")
+    data_dir = os.path.join(root_dir, "data", "Canidae")  # Canidae has prefix path "data/Canidae" in unzipped file.
+    if not os.path.exists(data_dir):
+        DownLoad().download_and_extract_archive(dataset_url, root_dir)
 
     dataset = create_dataset(
         name=name,
