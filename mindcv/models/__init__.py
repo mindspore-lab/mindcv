@@ -32,6 +32,7 @@ from . import (
     repmlp,
     repvgg,
     res2net,
+    resnest,
     resnet,
     rexnet,
     senet,
@@ -78,6 +79,7 @@ from .regnet import *
 from .repmlp import *
 from .repvgg import *
 from .res2net import *
+from .resnest import *
 from .resnet import *
 from .rexnet import *
 from .senet import *
@@ -128,6 +130,7 @@ __all__.extend(regnet.__all__)
 __all__.extend(repmlp.__all__)
 __all__.extend(["RepVGG", "repvgg"])
 __all__.extend(res2net.__all__)
+__all__.extend(resnest.__all__)
 __all__.extend(resnet.__all__)
 __all__.extend(rexnet.__all__)
 __all__.extend(senet.__all__)
