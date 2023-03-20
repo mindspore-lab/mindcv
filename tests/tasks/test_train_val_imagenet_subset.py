@@ -75,3 +75,5 @@ def test_train(mode, val_while_train, model="resnet18"):
         acc = res[idx:].split(",")[0].split(":")[1]
         print("Val acc: ", acc)
         assert float(acc) > 0.5, "Acc is too low"
+
+    p.kill()
