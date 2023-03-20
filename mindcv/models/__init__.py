@@ -1,6 +1,7 @@
 """models init"""
 from . import (
     bit,
+    coat,
     convit,
     convnext,
     crossvit,
@@ -31,7 +32,9 @@ from . import (
     repmlp,
     repvgg,
     res2net,
+    resnest,
     resnet,
+    resnetv2,
     rexnet,
     senet,
     shufflenetv1,
@@ -43,8 +46,10 @@ from . import (
     visformer,
     vit,
     xception,
+    xcit,
 )
 from .bit import *
+from .coat import *
 from .convit import *
 from .convnext import *
 from .crossvit import *
@@ -75,7 +80,9 @@ from .regnet import *
 from .repmlp import *
 from .repvgg import *
 from .res2net import *
+from .resnest import *
 from .resnet import *
+from .resnetv2 import *
 from .rexnet import *
 from .senet import *
 from .shufflenetv1 import *
@@ -88,11 +95,13 @@ from .vgg import *
 from .visformer import *
 from .vit import *
 from .xception import *
+from .xcit import *
 
 # some net module is replaced by the net function with the same name when we do from .net import *
 # we cannot use net.__all__, so we manually copy net.__all__ here.
 __all__ = []
 __all__.extend(bit.__all__)
+__all__.extend(coat.__all__)
 __all__.extend(convit.__all__)
 __all__.extend(convnext.__all__)
 __all__.extend(crossvit.__all__)
@@ -123,7 +132,9 @@ __all__.extend(regnet.__all__)
 __all__.extend(repmlp.__all__)
 __all__.extend(["RepVGG", "repvgg"])
 __all__.extend(res2net.__all__)
+__all__.extend(resnest.__all__)
 __all__.extend(resnet.__all__)
+__all__.extend(resnetv2.__all__)
 __all__.extend(rexnet.__all__)
 __all__.extend(senet.__all__)
 __all__.extend(shufflenetv1.__all__)
@@ -135,3 +146,4 @@ __all__.extend(vgg.__all__)
 __all__.extend(visformer.__all__)
 __all__.extend(vit.__all__)
 __all__.extend(["Xception", "xception"])
+__all__.extend(xcit.__all__)
