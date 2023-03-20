@@ -14,8 +14,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model           | Context   |  Top-1 (%)  |  Top-5 (%)  | Params (M) | Recipe                                                                                   | Weight                                                                            |
 |-----------------|-----------|-------|------------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| coat_lite_tiny | D910x8-G | 77.35 | 93.43 | 5.72      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_tiny.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_tiny_fa7bf894.ckpt) |
-| coat_lite_mini | D910x8-G | 78.51 | 93.84 | 11.01 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_mini.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_mini_55a52f05.ckpt) |
+| coat_lite_tiny | D910x8-G | 77.35 | 93.43 | 5.72      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_tiny_fa7bf894.ckpt) |
+| coat_lite_mini | D910x8-G | 78.51 | 93.84 | 11.01 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_mini_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_mini_55a52f05.ckpt) |
 
 </div>
 
@@ -42,7 +42,7 @@ It is easy to reproduce the reported results with the pre-defined training recip
 
 ```shell
 # distributed training on multiple GPU/Ascend devices
-mpirun -n 8 python train.py --config configs/coat/coat_lite_tiny.yaml --data_dir /path/to/imagenet
+mpirun -n 8 python train.py --config configs/coat/coat_lite_tiny_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`
@@ -59,7 +59,7 @@ If you want to train or finetune the model on a smaller dataset without distribu
 
 ```shell
 # standalone training on a CPU/GPU/Ascend device
-python train.py --config configs/coat/coat_lite_tiny.yaml --data_dir /path/to/dataset --distribute False
+python train.py --config configs/coat/coat_lite_tiny_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 ### Validation
@@ -67,7 +67,7 @@ python train.py --config configs/coat/coat_lite_tiny.yaml --data_dir /path/to/da
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```shell
-python validate.py -c configs/coat/coat_lite_tiny.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+python validate.py -c configs/coat/coat_lite_tiny_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 ### Deployment
