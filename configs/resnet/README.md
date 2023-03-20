@@ -21,11 +21,11 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model           | Context   | Top-1 (%) | Top-5 (%) |  Params (M) | Recipe  | Download                                                                           |
 |-----------------|-----------|-----------|-----------|-------|-------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| ResNet18 | D910x8-G | 70.21     | 89.62     |  11.70   | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_18_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet18_224.ckpt)  |
-| ResNet34 | D910x8-G | 74.15     | 91.98     | 21.81  | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_34_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet34_224.ckpt)  |
-| ResNet50 | D910x8-G | 76.69     | 93.50     | 25.61 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_50_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet50_224.ckpt)  |
-| ResNet101 | D910x8-G | 78.24     | 94.09     |44.65 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_101_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet101_224.ckpt) |
-| ResNet152 | D910x8-G | 78.72     | 94.45     | 60.34| [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_152_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet152_224.ckpt) |
+| ResNet18 | D910x8-G | 70.31     | 89.62     |  11.70   | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_18_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet18-b518c050.ckpt)  |
+| ResNet34 | D910x8-G | 74.15     | 91.98     | 21.81  | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_34_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet34-712a1834.ckpt)  |
+| ResNet50 | D910x8-G | 76.69     | 93.50     | 25.61 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_50_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet50-ca727b4d.ckpt)  |
+| ResNet101 | D910x8-G | 78.24     | 94.09     |44.65 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_101_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet101-7f6648de.ckpt) |
+| ResNet152 | D910x8-G | 78.72     | 94.45     | 60.34| [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_152_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet152-33ed9fdf.ckpt) |
 
 </div>
 
