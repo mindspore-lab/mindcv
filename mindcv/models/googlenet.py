@@ -3,6 +3,7 @@ MindSpore implementation of `GoogLeNet`.
 Refer to Going deeper with convolutions.
 """
 
+import math
 from typing import Tuple, Union
 
 import mindspore.common.initializer as init
@@ -29,7 +30,7 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "googlenet": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/googlenet/googlenet_224.ckpt"),
+    "googlenet": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/googlenet/googlenet-5552fcd3.ckpt"),
 }
 
 
@@ -173,18 +174,23 @@ class GoogLeNet(nn.Cell):
         self.classifier = nn.Dense(1024, num_classes)
         self._initialize_weights()
 
-    def _initialize_weights(self) -> None:
-        """Initialize weights for cells."""
+    def _initialize_weights(self):
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
-                cell.weight.set_data(
-                    init.initializer(init.TruncatedNormal(0.02), cell.weight.shape, cell.weight.dtype))
+                cell.weight.set_data(init.initializer(init.HeNormal(0, mode='fan_in', nonlinearity='leaky_relu'),
+                                                      cell.weight.shape, cell.weight.dtype))
+                if cell.bias is not None:
+                    cell.bias.set_data(init.initializer(init.Constant(0), cell.bias.shape, cell.bias.dtype))
+            elif isinstance(cell, nn.BatchNorm2d) or isinstance(cell, nn.BatchNorm1d):
+                cell.gamma.set_data(init.initializer(init.Constant(1), cell.gamma.shape, cell.gamma.dtype))
+                if cell.beta is not None:
+                    cell.beta.set_data(init.initializer(init.Constant(0), cell.beta.shape, cell.gamma.dtype))
             elif isinstance(cell, nn.Dense):
                 cell.weight.set_data(
-                    init.initializer(init.TruncatedNormal(0.02), cell.weight.shape, cell.weight.dtype))
+                    init.initializer(init.HeUniform(math.sqrt(5), mode='fan_in', nonlinearity='leaky_relu'),
+                                     cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(
-                        init.initializer(init.TruncatedNormal(0.02), cell.bias.shape, cell.bias.dtype))
+                    cell.bias.set_data(init.initializer(init.Constant(0), cell.bias.shape, cell.weight.dtype))
 
     def construct(self, x: Tensor) -> Union[Tensor, Tuple[Tensor, Tensor, Tensor]]:
         x = self.conv1(x)

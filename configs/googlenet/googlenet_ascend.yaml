@@ -27,21 +27,20 @@ pretrained: False
 ckpt_path: ''
 keep_checkpoint_max: 10
 ckpt_save_dir: './ckpt'
-epoch_size: 300
+epoch_size: 150
 dataset_sink_mode: True
 amp_level: 'O0'
 
 # loss
 loss: 'CE'
 label_smoothing: 0.1
-smooth_factor: 0.1
 
 # lr scheduler
-scheduler: 'warmup_cosine_decay'
-lr: 0.01
-min_lr: 0.0001
-decay_epochs: 200
-warmup_epochs: 2
+scheduler: 'cosine_decay'
+lr: 0.045
+min_lr: 0.0
+decay_epochs: 145
+warmup_epochs: 5
 
 # optimizer
 opt: 'momentum'
