@@ -2,6 +2,8 @@
 import logging
 import os
 
+import yaml
+
 import mindspore as ms
 from mindspore import Tensor
 from mindspore.communication import get_group_size, get_rank, init
@@ -289,6 +291,10 @@ def train(args):
             logger.info(f"Resume training from {args.ckpt_path}, last step: {begin_step}, last epoch: {begin_epoch}")
         else:
             logger.info("Start training")
+        # save args used for training
+        with open(os.path.join(args.ckpt_save_dir, "args.yaml"), "w") as f:
+            args_text = yaml.safe_dump(vars(args), default_flow_style=False)
+            f.write(args_text)
 
     trainer.train(args.epoch_size, loader_train, callbacks=callbacks, dataset_sink_mode=args.dataset_sink_mode)
 
