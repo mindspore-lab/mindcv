@@ -23,9 +23,9 @@ crop_pct: 0.875
 model: "resnet152"
 num_classes: 1000
 pretrained: False
-ckpt_path: "./ckpt"
+ckpt_path: ""
 keep_checkpoint_max: 30
-ckpt_save_dir: ""
+ckpt_save_dir: "./ckpt"
 epoch_size: 120
 dataset_sink_mode: True
 amp_level: "O2"
