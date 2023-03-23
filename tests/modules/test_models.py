@@ -43,7 +43,7 @@ model_name_list = [
     "pvt_tiny",
     "pvt_v2_b0",
     "regnet_x_200mf",
-    "repvgg",
+    "repvgg_a0",
     "res2net50",
     "resnet18",
     "resnext50_32x4d",
