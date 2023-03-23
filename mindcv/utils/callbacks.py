@@ -83,7 +83,7 @@ class StateMonitor(Callback):
                     result_log += name_dict[self.metric_name[i]] + "\t"
                 else:
                     result_log += self.metric_name[i] + "\t"
-            result_log += "Time\n"
+            result_log += "TrainTime\tEvalTime\tTotalTime\n"
             with open(self.log_txt_fp, "w", encoding="utf-8") as fp:
                 fp.write(result_log)
 
@@ -92,8 +92,9 @@ class StateMonitor(Callback):
         if self.device_num > 1:
             self.all_reduce = AllReduceSum()
 
-        self.start = time()
-        self.epoch_start = time()
+        self.step_start = None
+        self.epoch_start = None
+        self.time_sum = 0
         self.map = ops.HyperMap()
         self.ema = ema
         if self.ema:
@@ -129,6 +130,12 @@ class StateMonitor(Callback):
 
         return res
 
+    def on_train_step_begin(self, run_context):
+        self.step_start = time()
+
+    def on_train_epoch_begin(self, run_context):
+        self.epoch_start = time()
+
     def on_train_step_end(self, run_context):
         cb_params = run_context.original_args()
         num_batches = cb_params.batch_num
@@ -142,6 +149,7 @@ class StateMonitor(Callback):
         else:
             optimizer = cb_params.train_network.optimizer
 
+        self.time_sum += time() - self.step_start
         if (
             (cur_step_in_epoch + 1) % self.log_interval == 0
             or (cur_step_in_epoch + 1) >= num_batches
@@ -157,15 +165,17 @@ class StateMonitor(Callback):
             print(
                 f"Epoch: {cur_epoch+1}, "
                 f"batch:[{cur_step_in_epoch+1}/{num_batches}], "
-                f"loss:{loss.asnumpy():.6f}, lr: {cur_lr:.7f},  time:{time() - self.start:.6f}s"
+                f"loss:{loss.asnumpy():.6f}, lr: {cur_lr:.7f},  time:{self.time_sum:.6f}s"
             )
-            self.start = time()
+            self.time_sum = 0
 
     def on_train_epoch_end(self, run_context):
         """
         After epoch, print train loss and val accuracy,
         save the best ckpt file with highest validation accuracy.
         """
+        train_time = time() - self.epoch_start
+
         cb_params = run_context.original_args()
         if cb_params.optimizer is not None:
             optimizer = cb_params.optimizer
@@ -183,6 +193,7 @@ class StateMonitor(Callback):
         self.summary_record.add_value("scalar", f"train_loss_{self.rank_id}", loss)
 
         # val while training if validation loader is not None
+        val_time = 0
         res = Tensor(np.zeros(len(self.metric_name)), ms.float32)
         if self.dataset_val is not None:
             if cur_epoch >= self.val_start_epoch and (cur_epoch - self.val_start_epoch) % self.val_interval == 0:
@@ -195,11 +206,12 @@ class StateMonitor(Callback):
                     res = self.all_reduce(res)
                     res /= self.device_num
                 # record val acc
+                val_time = time() - val_time
                 if self.rank_id in [0, None]:
                     metric_str = "Validation "
                     for i in range(len(self.metric_name)):
                         metric_str += self.metric_name[i] + ": " + str(res[i]) + ", "
-                    metric_str += f"time:{time() -val_time:.6f}s"
+                    metric_str += f"time:{val_time:.6f}s"
                     print(metric_str)
                     # Save the best ckpt file
                     if res[0] > self.best_res:
@@ -240,14 +252,14 @@ class StateMonitor(Callback):
                 else:
                     print(f"Saving model to {ckpt_save_path}")
 
-            epoch_time = time() - self.epoch_start
-            print(f"Total time since last epoch: {epoch_time:.3f}")
+            total_time = time() - self.epoch_start
+            print(f"Total time since last epoch: {total_time:.3f}")
             print("-" * 80)
             self.epoch_start = time()
             result_log = f"{cur_epoch}\t\t\t{loss.asnumpy():.7f}\t\t\t"
             for i in range(len(res)):
                 result_log += f"{res[i].asnumpy():.3f}\t\t\t"
-            result_log += f"{epoch_time:.2f}\n"
+            result_log += f"{train_time:.2f}\t\t\t{val_time:.2f}\t\t\t{total_time:.2f}\n"
             with open(self.log_txt_fp, "a", encoding="utf-8") as fp:
                 fp.write(result_log)
 
@@ -313,9 +325,13 @@ class ValCallback(Callback):
     def __init__(self, log_step_interval=100):
         super().__init__()
         self.log_step_interval = log_step_interval
+        self.start = time()
 
     def on_eval_step_end(self, run_context):
         cb_params = run_context.original_args()
-        # cur_step_in_epoch = int((cb_params.cur_step_num - 1) % cb_params.batch_num)
-        if cb_params.cur_step_num % self.log_step_interval == 0:
-            print(f"{cb_params.cur_step_num }/{cb_params.batch_num}")
+        cur_step_num = cb_params.cur_step_num
+        num_batch = cb_params.batch_num
+
+        if cur_step_num % self.log_step_interval == 0 or cur_step_num == num_batch:
+            print(f"batch: {cur_step_num}/{num_batch}, time: {time() - self.start:.6f}s")
+            self.start = time()
