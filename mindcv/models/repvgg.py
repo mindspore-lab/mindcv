@@ -16,7 +16,13 @@ from .utils import load_pretrained
 
 __all__ = [
     "RepVGG",
-    "repvgg",
+    "repvgg_a0",
+    "repvgg_a1",
+    "repvgg_a2",
+    "repvgg_b0",
+    "repvgg_b1",
+    "repvgg_b2",
+    "repvgg_b3",
 ]
 
 
@@ -31,7 +37,13 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "RepVGG-A0": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repvgg/RepVGG_A0_224.ckpt"),
+    "repvgg_a0": _cfg(url=""),
+    "repvgg_a1": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a1-539513ac.ckpt"),
+    "repvgg_a2": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a2-cdc90b11.ckpt"),
+    "repvgg_b0": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b0-54d5862c.ckpt"),
+    "repvgg_b1": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b1-4673797.ckpt"),
+    "repvgg_b2": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b2-7c91ccd4.ckpt"),
+    "repvgg_b3": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b3-30b35f52.ckpt"),
 }
 
 
@@ -235,14 +247,25 @@ class RepVGG(nn.Cell):
             self.cur_layer_idx += 1
         return nn.SequentialCell(blocks)
 
-    def _initialize_weights(self):
+    def _initialize_weights(self) -> None:
         """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
-            if isinstance(cell, (nn.Dense, nn.Conv2d)):
-                cell.weight.set_data(init.initializer(init.TruncatedNormal(sigma=0.02),
-                                                      cell.weight.shape, cell.weight.dtype))
-                if isinstance(cell, nn.Dense) and cell.bias is not None:
-                    cell.bias.set_data(init.initializer(init.Zero(), cell.bias.shape, cell.bias.dtype))
+            if isinstance(cell, nn.Conv2d):
+                cell.weight.set_data(
+                    init.initializer(init.HeNormal(mode='fan_out', nonlinearity='relu'),
+                                     cell.weight.shape, cell.weight.dtype))
+                if cell.bias is not None:
+                    cell.bias.set_data(
+                        init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+            elif isinstance(cell, nn.BatchNorm2d):
+                cell.gamma.set_data(init.initializer('ones', cell.gamma.shape, cell.gamma.dtype))
+                cell.beta.set_data(init.initializer('zeros', cell.beta.shape, cell.beta.dtype))
+            elif isinstance(cell, nn.Dense):
+                cell.weight.set_data(
+                    init.initializer(init.HeUniform(mode='fan_in', nonlinearity='sigmoid'),
+                                     cell.weight.shape, cell.weight.dtype))
+                if cell.bias is not None:
+                    cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
 
     def construct(self, x):
         x = self.stage0(x)
@@ -256,15 +279,105 @@ class RepVGG(nn.Cell):
 
 
 @register_model
-def repvgg(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> RepVGG:
+def repvgg_a0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> RepVGG:
     """Get RepVGG model with num_blocks=[2, 4, 14, 1], width_multiplier=[0.75, 0.75, 0.75, 2.5].
     Refer to the base class `models.RepVGG` for more details.
     """
-    default_cfg = default_cfgs["RepVGG-A0"]
+    default_cfg = default_cfgs["repvgg_a0"]
     model = RepVGG(num_blocks=[2, 4, 14, 1], num_classes=num_classes, in_channels=in_channels,
                    width_multiplier=[0.75, 0.75, 0.75, 2.5], override_group_map=None, deploy=False, **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
+    return model
+
+
+@register_model
+def repvgg_a1(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> RepVGG:
+    """Get RepVGG model with num_blocks=[2, 4, 14, 1], width_multiplier=[1.0, 1.0, 1.0, 2.5].
+     Refer to the base class `models.RepVGG` for more details.
+     """
+    default_cfg = default_cfgs["repvgg_a1"]
+    model = RepVGG(num_blocks=[2, 4, 14, 1], num_classes=num_classes, in_channels=in_channels,
+                   width_multiplier=[1.0, 1.0, 1.0, 2.5], override_group_map=None, deploy=False, **kwargs)
+    if pretrained:
+        load_pretrained(model, default_cfg,
+                        num_classes=num_classes, in_channels=in_channels)
+
+    return model
+
+
+@register_model
+def repvgg_a2(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> RepVGG:
+    """Get RepVGG model with num_blocks=[2, 4, 14, 1], width_multiplier=[1.5, 1.5, 1.5, 2.75].
+     Refer to the base class `models.RepVGG` for more details.
+     """
+    default_cfg = default_cfgs["repvgg_a2"]
+    model = RepVGG(num_blocks=[2, 4, 14, 1], num_classes=num_classes, in_channels=in_channels,
+                   width_multiplier=[1.5, 1.5, 1.5, 2.75], override_group_map=None, deploy=False, **kwargs)
+    if pretrained:
+        load_pretrained(model, default_cfg,
+                        num_classes=num_classes, in_channels=in_channels)
+
+    return model
+
+
+@register_model
+def repvgg_b0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> RepVGG:
+    """Get RepVGG model with num_blocks=[4, 6, 16, 1], width_multiplier=[1.0, 1.0, 1.0, 2.5].
+     Refer to the base class `models.RepVGG` for more details.
+     """
+    default_cfg = default_cfgs['repvgg_b0']
+    model = RepVGG(num_blocks=[4, 6, 16, 1], num_classes=num_classes, in_channels=in_channels,
+                   width_multiplier=[1.0, 1.0, 1.0, 2.5], override_group_map=None, deploy=False, **kwargs)
+    if pretrained:
+        load_pretrained(model, default_cfg,
+                        num_classes=num_classes, in_channels=in_channels)
+
+    return model
+
+
+@register_model
+def repvgg_b1(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> RepVGG:
+    """Get RepVGG model with num_blocks=[4, 6, 16, 1], width_multiplier=[2.0, 2.0, 2.0, 4.0].
+     Refer to the base class `models.RepVGG` for more details.
+     """
+    default_cfg = default_cfgs['repvgg_b1']
+    model = RepVGG(num_blocks=[4, 6, 16, 1], num_classes=num_classes, in_channels=in_channels,
+                   width_multiplier=[2.0, 2.0, 2.0, 4.0], override_group_map=None, deploy=False, **kwargs)
+    if pretrained:
+        load_pretrained(model, default_cfg,
+                        num_classes=num_classes, in_channels=in_channels)
+
+    return model
+
+
+@register_model
+def repvgg_b2(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> RepVGG:
+    """Get RepVGG model with num_blocks=[4, 6, 16, 1], width_multiplier=[2.5, 2.5, 2.5, 5.0].
+     Refer to the base class `models.RepVGG` for more details.
+     """
+    default_cfg = default_cfgs['repvgg_b2']
+    model = RepVGG(num_blocks=[4, 6, 16, 1], num_classes=num_classes, in_channels=in_channels,
+                   width_multiplier=[2.5, 2.5, 2.5, 5.0], override_group_map=None, deploy=False, **kwargs)
+    if pretrained:
+        load_pretrained(model, default_cfg,
+                        num_classes=num_classes, in_channels=in_channels)
+
+    return model
+
+
+@register_model
+def repvgg_b3(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> RepVGG:
+    """Get RepVGG model with num_blocks=[4, 6, 16, 1], width_multiplier=[3.0, 3.0, 3.0, 5.0].
+     Refer to the base class `models.RepVGG` for more details.
+     """
+    default_cfg = default_cfgs['repvgg_b3']
+    model = RepVGG(num_blocks=[4, 6, 16, 1], num_classes=num_classes, in_channels=in_channels,
+                   width_multiplier=[3.0, 3.0, 3.0, 5.0], override_group_map=None, deploy=False, **kwargs)
+    if pretrained:
+        load_pretrained(model, default_cfg,
+                        num_classes=num_classes, in_channels=in_channels)
 
     return model
 

@@ -5,8 +5,8 @@ num_parallel_workers: 8
 val_while_train: True
 
 # dataset
-dataset: 'imagenet'
-data_dir: '/path/to/imagenet'
+dataset: "imagenet"
+data_dir: "/path/to/imagenet"
 shuffle: True
 dataset_download: False
 batch_size: 32
@@ -17,35 +17,39 @@ image_resize: 224
 scale: [0.08, 1.0]
 ratio: [0.75, 1.333]
 hflip: 0.5
-interpolation: 'bilinear'
+interpolation: "bilinear"
 crop_pct: 0.875
+auto_augment: "autoaug"
+mixup: 0.8
+cutmix: 1.0
 
 # model
-model: 'googlenet'
+model: "repvgg_b3"
 num_classes: 1000
 pretrained: False
-ckpt_path: ''
+ckpt_path: ""
 keep_checkpoint_max: 10
-ckpt_save_dir: './ckpt'
-epoch_size: 150
+ckpt_save_dir: "./ckpt"
+epoch_size: 240
 dataset_sink_mode: True
-amp_level: 'O0'
+amp_level: "O0"
 
 # loss
-loss: 'CE'
+loss: "CE"
 label_smoothing: 0.1
 
 # lr scheduler
-scheduler: 'cosine_decay'
-lr: 0.045
-min_lr: 0.0
-decay_epochs: 145
+scheduler: "cosine_decay"
+lr: 0.4
 warmup_epochs: 5
+decay_epochs: 235
 
 # optimizer
-opt: 'momentum'
+opt: "momentum"
 filter_bias_and_bn: True
 momentum: 0.9
-weight_decay: 0.00004
-loss_scale: 1024
+weight_decay: 0.0001
+loss_scale_type: "dynamic"
+drop_overflow_update: True
 use_nesterov: False
+eps: 0.00000001

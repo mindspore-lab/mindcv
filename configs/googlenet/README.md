@@ -11,7 +11,7 @@ resources more efficiently, and can extract more features under the same amount 
 training results.[[1](#references)]
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/53842165/210749903-5ff23c0e-547f-487d-bb64-70b6e99031ea.jpg" width=500 />
+  <img src="https://user-images.githubusercontent.com/53842165/210749903-5ff23c0e-547f-487d-bb64-70b6e99031ea.jpg" width=180 />
 </p>
 <p align="center">
   <em>Figure 1. Architecture of GoogLENet [<a href="#references">1</a>] </em>
@@ -23,9 +23,9 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model     | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                            | Download                                                                              |
-|-----------|----------|-----------|-----------|------------|---------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| GoogLeNet | D910x8-G | 71.66     | 90.01     | 6.99       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/googlenet/googlenet_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/googlenet/googlenet_224.ckpt) |
+| Model     | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                            | Download                                                                                   |
+|-----------|----------|-----------|-----------|------------|---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| GoogLeNet | D910x8-G | 72.68     | 90.89     | 6.99       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/googlenet/googlenet_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/googlenet/googlenet-5552fcd3.ckpt) |
 
 </div>
 
