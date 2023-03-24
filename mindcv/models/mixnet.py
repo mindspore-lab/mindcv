@@ -33,7 +33,7 @@ def _cfg(url="", **kwargs):
 
 default_cfgs = {
     "mixnet_s": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_s-2a5ef3a3.ckpt"),
-    "mixnet_m": _cfg(url=""),
+    "mixnet_m": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_m-74cc4cb1.ckpt"),
     "mixnet_l": _cfg(url=""),
 }
 
