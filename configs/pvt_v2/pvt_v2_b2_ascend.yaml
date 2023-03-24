@@ -26,14 +26,14 @@ mixup: 0.8
 cutmix: 1.0
 
 # model
-model: "pvt_v2_b1"
+model: "pvt_v2_b2"
 num_classes: 1000
 pretrained: False
 ckpt_path: ""
 keep_checkpoint_max: 10
 ckpt_save_dir: "./ckpt"
-epoch_size: 500
-drop_path_rate: 0.1
+epoch_size: 550
+drop_path_rate: 0.2
 dataset_sink_mode: True
 amp_level: "O2"
 
@@ -44,10 +44,9 @@ label_smoothing: 0.1
 # lr scheduler
 scheduler: "cosine_decay"
 lr: 0.001
-min_lr: 0.00001
-lr_epoch_stair: True
-decay_epochs: 490
-warmup_epochs: 10
+min_lr: 0.000001
+decay_epochs: 530
+warmup_epochs: 20
 
 # optimizer
 opt: "adamw"
