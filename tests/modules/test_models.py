@@ -51,7 +51,7 @@ model_name_list = [
     "seresnet18",
     "shufflenet_v1_g3_x0_5",
     "shufflenet_v2_x0_5",
-    "sk_resnet18",
+    "skresnet18",
     "squeezenet1_0",
     "swin_tiny",
     "visformer_tiny",

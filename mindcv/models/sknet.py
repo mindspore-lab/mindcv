@@ -14,10 +14,10 @@ from .utils import load_pretrained
 
 __all__ = [
     "SKNet",
-    "sk_resnet18",
-    "sk_resnet34",
-    "sk_resnet50",
-    "sk_resnext50_32x4d",
+    "skresnet18",
+    "skresnet34",
+    "skresnet50",
+    "skresnext50_32x4d",
 ]
 
 
@@ -32,10 +32,11 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "sk_resnet18": _cfg(url=""),
-    "sk_resnet34": _cfg(url=""),
-    "sk_resnet50": _cfg(url=""),
-    "sk_resnext50_32X4d": _cfg(url=""),
+    "skresnet18": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/sknet/sknet18-868228e5.ckpt"),
+    "skresnet34": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/sknet/skresnet34-d668b629.ckpt"),
+    "skresnet50": _cfg(url=""),
+    "skresnext50_32x4d": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/sknet/skresnext50_32x4d-395413a2.ckpt"),
 }
 
 
@@ -215,11 +216,11 @@ class SKNet(ResNet):
 
 
 @register_model
-def sk_resnet18(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ResNet:
+def skresnet18(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ResNet:
     """Get 18 layers SKNet model.
     Refer to the base class `models.SKNet` for more details.
     """
-    default_cfg = default_cfgs["sk_resnet18"]
+    default_cfg = default_cfgs["skresnet18"]
     sk_kwargs = dict(rd_ratio=1 / 8, rd_divisor=16, split_input=True)
     model = SKNet(SelectiveKernelBasic, [2, 2, 2, 2], num_classes=num_classes, in_channels=in_channels,
                   sk_kwargs=sk_kwargs, **kwargs)
@@ -231,11 +232,11 @@ def sk_resnet18(pretrained: bool = False, num_classes: int = 1000, in_channels=3
 
 
 @register_model
-def sk_resnet34(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ResNet:
+def skresnet34(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ResNet:
     """Get 34 layers SKNet model.
     Refer to the base class `models.SKNet` for more details.
     """
-    default_cfg = default_cfgs["sk_resnet34"]
+    default_cfg = default_cfgs["skresnet34"]
     sk_kwargs = dict(rd_ratio=1 / 8, rd_divisor=16, split_input=True)
     model = SKNet(SelectiveKernelBasic, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels,
                   sk_kwargs=sk_kwargs, **kwargs)
@@ -247,11 +248,11 @@ def sk_resnet34(pretrained: bool = False, num_classes: int = 1000, in_channels=3
 
 
 @register_model
-def sk_resnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ResNet:
+def skresnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ResNet:
     """Get 50 layers SKNet model.
     Refer to the base class `models.SKNet` for more details.
     """
-    default_cfg = default_cfgs["sk_resnet50"]
+    default_cfg = default_cfgs["skresnet50"]
     sk_kwargs = dict(split_input=True)
     model = SKNet(SelectiveKernelBottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels,
                   sk_kwargs=sk_kwargs, **kwargs)
@@ -263,11 +264,11 @@ def sk_resnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3
 
 
 @register_model
-def sk_resnext50_32x4d(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ResNet:
+def skresnext50_32x4d(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ResNet:
     """Get 50 layers SKNeXt model with 32 groups of GPConv.
     Refer to the base class `models.SKNet` for more details.
     """
-    default_cfg = default_cfgs["sk_resnext50_32X4d"]
+    default_cfg = default_cfgs["skresnext50_32x4d"]
     sk_kwargs = dict(rd_ratio=1 / 16, rd_divisor=32, split_input=False)
     model = SKNet(SelectiveKernelBottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels,
                   sk_kwargs=sk_kwargs, **kwargs)
