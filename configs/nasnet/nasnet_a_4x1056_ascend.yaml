@@ -6,7 +6,7 @@ val_while_train: True
 
 # dataset
 dataset: 'imagenet'
-data_dir: 'path/to/imagenet'
+data_dir: '/path/to/imagenet'
 shuffle: True
 dataset_download: False
 batch_size: 256
@@ -47,6 +47,7 @@ opt: 'rmsprop'
 filter_bias_and_bn: True
 momentum: 0.9
 weight_decay: 1e-5
-dynamic_loss_scale: True
+loss_scale_type: 'dynamic'
+drop_overflow_update: True
 use_nesterov: False
 eps: 1e-3
