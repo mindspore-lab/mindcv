@@ -16,14 +16,19 @@ _logger = logging.getLogger(__name__)
 
 
 def get_metrics(num_classes):
+    if ms.__version__[:3] in ["2.0"]:
+        from mindspore import train as metric_module
+    else:
+        from mindspore import nn as metric_module
+
     if num_classes >= 5:
         metrics = {
-            "Top_1_Accuracy": nn.Top1CategoricalAccuracy(),
-            "Top_5_Accuracy": nn.Top5CategoricalAccuracy(),
+            "Top_1_Accuracy": metric_module.Top1CategoricalAccuracy(),
+            "Top_5_Accuracy": metric_module.Top5CategoricalAccuracy(),
         }
     else:
         metrics = {
-            "Top_1_Accuracy": nn.Top1CategoricalAccuracy(),
+            "Top_1_Accuracy": metric_module.Top1CategoricalAccuracy(),
         }
     return metrics
 
