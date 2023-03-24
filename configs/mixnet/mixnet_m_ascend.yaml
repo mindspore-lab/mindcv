@@ -25,7 +25,7 @@ mixup: 0.2
 cutmix: 1.0
 
 # model
-model: "mixnet_s"
+model: "mixnet_m"
 num_classes: 1000
 pretrained: False
 ckpt_path: ""
@@ -38,6 +38,7 @@ amp_level: "O3"
 # loss
 loss: "CE"
 label_smoothing: 0.1
+smooth_factor: 0.1
 
 # lr scheduler
 scheduler: "cosine_decay"
@@ -51,5 +52,5 @@ opt: "momentum"
 filter_bias_and_bn: True
 momentum: 0.9
 weight_decay: 0.00002
-loss_scale: 256
+loss_scale: 1024
 use_nesterov: False
