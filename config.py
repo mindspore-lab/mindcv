@@ -55,7 +55,7 @@ def create_parser():
     group.add_argument('--val_split', type=str, default='val',
                        help='Dataset validation split name (default="val")')
     group.add_argument('--dataset_download', type=str2bool, nargs='?', const=True, default=False,
-                       help='Download dataset (default=False)')
+                       help='If downloading the dataset, only support Mnist, Cifar10 and Cifar100 (default=False)')
     group.add_argument('--num_parallel_workers', type=int, default=8,
                        help='Number of parallel workers (default=8)')
     group.add_argument('--shuffle', type=str2bool, nargs='?', const=True, default=True,
