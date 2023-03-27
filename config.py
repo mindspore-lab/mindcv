@@ -251,13 +251,22 @@ def create_parser():
 # fmt: on
 
 
-def parse_args():
+def _check_cfgs_in_parser(cfgs: dict, parser: argparse.ArgumentParser):
+    actions_dest = [action.dest for action in parser._actions]
+    defaults_key = parser._defaults.keys()
+    for k in cfgs.keys():
+        if k not in actions_dest and k not in defaults_key:
+            raise KeyError(f"{k} does not exist in ArgumentParser!")
+
+
+def parse_args(args=None):
     parser_config, parser = create_parser()
     # Do we have a config file to parse?
-    args_config, remaining = parser_config.parse_known_args()
+    args_config, remaining = parser_config.parse_known_args(args)
     if args_config.config:
         with open(args_config.config, "r") as f:
             cfg = yaml.safe_load(f)
+            _check_cfgs_in_parser(cfg, parser)
             parser.set_defaults(**cfg)
             parser.set_defaults(config=args_config.config)
 
