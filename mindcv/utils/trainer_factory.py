@@ -73,9 +73,6 @@ def create_trainer(
     if loss_scale < 1.0:
         raise ValueError("Loss scale cannot be less than 1.0!")
 
-    if drop_overflow_update is False and loss_scale_type.lower() == "dynamic":
-        raise ValueError("DynamicLossScale ALWAYS drop overflow!")
-
     if not _require_customized_train_step(ema, clip_grad):
         mindspore_kwargs = dict(
             network=network,
@@ -112,6 +109,7 @@ def create_trainer(
             ema_decay=ema_decay,
             clip_grad=clip_grad,
             clip_value=clip_value,
+            drop_overflow_update=drop_overflow_update,
         )
         if loss_scale_type.lower() == "fixed":
             # todo: drop_overflow_update. If drop_overflow_update is False, scale_sense should be a number
@@ -124,9 +122,6 @@ def create_trainer(
             )
         else:
             raise ValueError(f"Loss scale type only support ['fixed', 'dynamic'], but got{loss_scale_type}.")
-        # todo: remove this check when TrainStep support dynamic loss scale and dropping overflow
-        if drop_overflow_update or loss_scale_type.lower() != "fixed":
-            raise ValueError("TrainStep only support fixed loss scale without dropping overflow!")
         train_step_cell = TrainStep(**train_step_kwargs)
         eval_network = nn.WithEvalCell(network, loss, amp_level in ["O2", "O3", "auto"])
         model = Model(train_step_cell, eval_network=eval_network, metrics=metrics, eval_indexes=[0, 1, 2])

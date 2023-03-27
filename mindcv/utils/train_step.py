@@ -1,6 +1,6 @@
 """Ema define"""
 import mindspore as ms
-from mindspore import Parameter, Tensor, nn, ops
+from mindspore import Parameter, Tensor, context, nn, ops
 from mindspore.common import RowTensor
 from mindspore.ops import composite as C
 from mindspore.ops import functional as F
@@ -48,6 +48,7 @@ class TrainStep(nn.TrainOneStepWithLossScaleCell):
         updates=0,
         clip_grad=False,
         clip_value=15.0,
+        drop_overflow_update=True,
     ):
         super(TrainStep, self).__init__(network, optimizer, scale_sense)
         self.ema = ema
@@ -55,9 +56,12 @@ class TrainStep(nn.TrainOneStepWithLossScaleCell):
         self.updates = Parameter(Tensor(updates, ms.float32))
         self.clip_grad = clip_grad
         self.clip_value = clip_value
+        self.drop_overflow_update = drop_overflow_update
         if self.ema:
             self.weights_all = ms.ParameterTuple(list(network.get_parameters()))
             self.ema_weight = self.weights_all.clone("ema", init="same")
+
+        self.is_cpu_device = context.get_context("device_target") == "CPU"  # to support CPU run
 
     def ema_update(self):
         """Update EMA parameters."""
@@ -74,14 +78,39 @@ class TrainStep(nn.TrainOneStepWithLossScaleCell):
         loss = self.network(*inputs)
         scaling_sens = self.scale_sense
 
+        if not self.is_cpu_device:
+            status, scaling_sens = self.start_overflow_check(loss, scaling_sens)
+        else:
+            status = None
+
         scaling_sens_filled = C.ones_like(loss) * F.cast(scaling_sens, F.dtype(loss))
         grads = self.grad(self.network, weights)(*inputs, scaling_sens_filled)
         grads = self.hyper_map(F.partial(_grad_scale, scaling_sens), grads)
         if self.clip_grad:
             grads = ops.clip_by_global_norm(grads, clip_norm=self.clip_value)
+
         # apply grad reducer on grads
         grads = self.grad_reducer(grads)
-        loss = F.depend(loss, self.optimizer(grads))
-        if self.ema:
-            self.ema_update()
-        return loss
+
+        # get the overflow buffer
+        if not self.is_cpu_device:
+            cond = self.get_overflow_status(status, grads)
+            overflow = self.process_loss_scale(cond)
+        else:
+            overflow = ms.Tensor(False)
+            cond = ms.Tensor(False)
+
+        if self.drop_overflow_update:
+            # if there is no overflow, do optimize
+            if not overflow:
+                loss = F.depend(loss, self.optimizer(grads))
+                if self.ema:
+                    self.ema_update()
+
+        else:
+            # still optimizer even overflow
+            loss = F.depend(loss, self.optimizer(grads))
+            if self.ema:
+                self.ema_update()
+
+        return loss, cond, scaling_sens
