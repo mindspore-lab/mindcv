@@ -1,7 +1,6 @@
 """models init"""
 from . import (
     bit,
-    cait,
     coat,
     convit,
     convnext,
@@ -24,7 +23,6 @@ from . import (
     mobilenet_v3,
     model_factory,
     nasnet,
-    pit,
     pnasnet,
     poolformer,
     pvt,
@@ -51,7 +49,6 @@ from . import (
     xcit,
 )
 from .bit import *
-from .cait import *
 from .coat import *
 from .convit import *
 from .convnext import *
@@ -74,7 +71,6 @@ from .mobilenet_v2 import *
 from .mobilenet_v3 import *
 from .model_factory import *
 from .nasnet import *
-from .pit import *
 from .pnasnet import *
 from .poolformer import *
 from .pvt import *
@@ -105,7 +101,6 @@ from .xcit import *
 # we cannot use net.__all__, so we manually copy net.__all__ here.
 __all__ = []
 __all__.extend(bit.__all__)
-__all__.extend(cait.__all__)
 __all__.extend(coat.__all__)
 __all__.extend(convit.__all__)
 __all__.extend(convnext.__all__)
@@ -127,8 +122,7 @@ __all__.extend(mobilenet_v1.__all__)
 __all__.extend(mobilenet_v2.__all__)
 __all__.extend(mobilenet_v3.__all__)
 __all__.extend(model_factory.__all__)
-__all__.extend(["NASNetAMobile", "nasnet"])
-__all__.extend(pit.__all__)
+__all__.extend(nasnet.__all__)
 __all__.extend(["Pnasnet", "pnasnet"])
 __all__.extend(poolformer.__all__)
 __all__.extend(pvt.__all__)
@@ -136,7 +130,7 @@ __all__.extend(pvtv2.__all__)
 __all__.extend(registry.__all__)
 __all__.extend(regnet.__all__)
 __all__.extend(repmlp.__all__)
-__all__.extend(["RepVGG", "repvgg"])
+__all__.extend(repvgg.__all__)
 __all__.extend(res2net.__all__)
 __all__.extend(resnest.__all__)
 __all__.extend(resnet.__all__)
