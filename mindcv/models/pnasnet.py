@@ -30,7 +30,7 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "pnasnet": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/pnasnet/pnasnet_224.ckpt"),
+    "pnasnet": _cfg(url=""),
 }
 
 

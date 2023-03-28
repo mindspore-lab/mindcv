@@ -31,16 +31,16 @@ def _cfg(url="", **kwargs):
 
 default_cfgs = {
     "mobilenet_v1_0.25_224": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025_224-200_2502.ckpt"
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025-d3377fba.ckpt"
     ),
     "mobilenet_v1_0.5_224": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_050_224-200_2502.ckpt"
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_050-23e9ddbe.ckpt"
     ),
     "mobilenet_v1_0.75_224": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_075_224-200_2502.ckpt"
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_075-5bed0c73.ckpt"
     ),
     "mobilenet_v1_1.0_224": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_100_224-200_2502.ckpt"
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_100-91c7b206.ckpt"
     ),
 }
 

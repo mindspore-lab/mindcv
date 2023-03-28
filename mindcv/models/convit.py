@@ -40,12 +40,13 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "convit_tiny": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny.ckpt"),
-    "convit_tiny_plus": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny_plus.ckpt"),
-    "convit_small": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_small.ckpt"),
-    "convit_small_plus": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_small_plus.ckpt"),
-    "convit_base": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_base.ckpt"),
-    "convit_base_plus": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_base_plus.ckpt"),
+    "convit_tiny": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny-e31023f2.ckpt"),
+    "convit_tiny_plus": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny_plus-e9d7fb92.ckpt"),
+    "convit_small": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_small-ba858604.ckpt"),
+    "convit_small_plus": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_small_plus-2352b9f7.ckpt"),
+    "convit_base": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_base-c61b808c.ckpt"),
+    "convit_base_plus": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/convit/convit_base_plus-5c61c9ce.ckpt"),
 }
 
 

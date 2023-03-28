@@ -45,7 +45,7 @@ default_cfgs = {
         url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_x_small-c4defb56.ckpt",
         input_size=(3, 256, 256)),
     "edgenext_small": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt",
+        url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small-f530c372.ckpt",
         input_size=(3, 256, 256)),
     "edgenext_base": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_base-215efef7.ckpt",

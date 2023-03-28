@@ -26,8 +26,8 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "hrnet_w32": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w32_224.ckpt"),
-    "hrnet_w48": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w48_224.ckpt"),
+    "hrnet_w32": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w32-cc4fbd91.ckpt"),
+    "hrnet_w48": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w48-2e3399cd.ckpt"),
 }
 
 

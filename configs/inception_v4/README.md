@@ -23,7 +23,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model        | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                  | Download                                                                                    |
 |--------------|----------|-----------|-----------|------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
-| Inception_v4 | D910x8-G | 80.88     | 95.34     | 42.74      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inception_v4/inception_v4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/inception_v4/inception_v4_299.ckpt) |
+| Inception_v4 | D910x8-G | 80.88     | 95.34     | 42.74      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inception_v4/inception_v4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/inception_v4/inception_v4-db9c45b3.ckpt) |
 
 </div>
 

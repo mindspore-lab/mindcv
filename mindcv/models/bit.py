@@ -31,9 +31,9 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "BiTresnet50": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet50.ckpt"),
-    "BiTresnet50x3": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50x3-703782b3.ckpt"),
-    "BiTresnet101": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiTresnet101.ckpt"),
+    "BiTresnet50": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50-1e4795a4.ckpt"),
+    "BiTresnet50x3": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50x3-a960f91f.ckpt"),
+    "BiTresnet101": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet101-2efa9106.ckpt"),
 }
 
 

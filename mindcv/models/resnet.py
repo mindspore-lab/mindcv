@@ -43,8 +43,10 @@ default_cfgs = {
     "resnet101": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet101-7f6648de.ckpt"),
     "resnet152": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet152-33ed9fdf.ckpt"),
     "resnext50_32x4d": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext50_32x4d-af8aba16.ckpt"),
-    "resnext101_32x4d": _cfg(url=""),
-    "resnext101_64x4d": _cfg(url=""),
+    "resnext101_32x4d": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext101_32x4d-3c1e9c51.ckpt"),
+    "resnext101_64x4d": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext101_64x4d-8929255b.ckpt"),
     "resnext152_64x4d": _cfg(url=""),
 }
 

@@ -16,7 +16,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 |     Model      | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                              | Download                                                                                     |
 |:--------------:|:--------:|:---------:|:---------:|:----------:|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
-| regnet_x_800mf | D910x8-G |   76.04   |   92.97   |    7.26    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_800mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_800mf-198_2502.ckpt) |
+| regnet_x_800mf | D910x8-G |   76.04   |   92.97   |    7.26    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_800mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_800mf-617227f4.ckpt) |
 
 </div>
 
