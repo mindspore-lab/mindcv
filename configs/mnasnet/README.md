@@ -20,9 +20,9 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model           | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                             | Download                                                                                 |
 |-----------------|----------|-----------|-----------|------------|----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
-| MnasNet-B1-0_75 | D910x8-G | 71.81     | 90.53     | 3.20       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet0_75_ascend.ckpt) |
-| MnasNet-B1-1_0  | D910x8-G | 74.28     | 91.70     | 4.42       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.0_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet1_0_ascend.ckpt)  |
-| MnasNet-B1-1_4  | D910x8-G | 76.01     | 92.83     | 7.16       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.4_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet1_4_ascend.ckpt)  |
+| MnasNet-B1-0_75 | D910x8-G | 71.81     | 90.53     | 3.20       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_075-465d366d.ckpt) |
+| MnasNet-B1-1_0  | D910x8-G | 74.28     | 91.70     | 4.42       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.0_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_100-1bcf43f8.ckpt)  |
+| MnasNet-B1-1_4  | D910x8-G | 76.01     | 92.83     | 7.16       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.4_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_140-7e20bb30.ckpt)  |
 
 </div>
 

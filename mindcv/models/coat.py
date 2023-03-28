@@ -47,8 +47,8 @@ default_cfgs = {
     'coat_tiny': _cfg(url=''),
     'coat_mini': _cfg(url=''),
     'coat_small': _cfg(url=''),
-    'coat_lite_tiny': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_tiny_fa7bf894.ckpt'),
-    'coat_lite_mini': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_mini_55a52f05.ckpt'),
+    'coat_lite_tiny': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_tiny-fa7bf894.ckpt'),
+    'coat_lite_mini': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_mini-55a52f05.ckpt'),
     'coat_lite_small': _cfg(url=''),
     'coat_lite_medium': _cfg(url='')
 }

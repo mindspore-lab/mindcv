@@ -14,8 +14,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model           | Context   |  Top-1 (%)  |  Top-5 (%)  | Params (M) | Recipe                                                                                   | Weight                                                                            |
 |-----------------|-----------|-------|------------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| coat_lite_tiny | D910x8-G | 77.35 | 93.43 | 5.72      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_tiny_fa7bf894.ckpt) |
-| coat_lite_mini | D910x8-G | 78.51 | 93.84 | 11.01 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_mini_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_mini_55a52f05.ckpt) |
+| coat_lite_tiny | D910x8-G | 77.35 | 93.43 | 5.72      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_tiny-fa7bf894.ckpt) |
+| coat_lite_mini | D910x8-G | 78.51 | 93.84 | 11.01 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_mini_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_mini-55a52f05.ckpt) |
 
 </div>
 

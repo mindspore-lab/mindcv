@@ -16,10 +16,10 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 |   Model    | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                       | Download                                                                         |
 |:----------:|:--------:|:---------:|:---------:|:----------:|----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-|  PVT_tiny  | D910x8-G |   74.81   |   92.18   |   13.23    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_tiny_ascend.yaml)   | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_tiny_224.ckpt)   |
-| PVT_small  | D910x8-G |   79.66   |   94.71   |   24.49    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_small_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_small_224.ckpt)  |
-| PVT_medium | D910x8-G |   81.82   |   95.81   |   44.21    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_medium_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_medium_224.ckpt) |
-| PVT_large  | D910x8-G |   81.75   |   95.70   |   61.36    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_large_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_large_224.ckpt)  |
+|  PVT_tiny  | D910x8-G |   74.81   |   92.18   |   13.23    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_tiny_ascend.yaml)   | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_tiny-6abb953d.ckpt)   |
+| PVT_small  | D910x8-G |   79.66   |   94.71   |   24.49    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_small_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_small-213c2ed1.ckpt)  |
+| PVT_medium | D910x8-G |   81.82   |   95.81   |   44.21    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_medium_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_medium-469e6802.ckpt) |
+| PVT_large  | D910x8-G |   81.75   |   95.70   |   61.36    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_large_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_large-bb6895d7.ckpt)  |
 
 </div>
 
