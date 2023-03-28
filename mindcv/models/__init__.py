@@ -22,6 +22,7 @@ from . import (
     mobilenet_v1,
     mobilenet_v2,
     mobilenet_v3,
+    mobilevit,
     model_factory,
     nasnet,
     pit,
@@ -72,6 +73,7 @@ from .mnasnet import *
 from .mobilenet_v1 import *
 from .mobilenet_v2 import *
 from .mobilenet_v3 import *
+from .mobilevit import *
 from .model_factory import *
 from .nasnet import *
 from .pit import *
@@ -126,6 +128,7 @@ __all__.extend(mnasnet.__all__)
 __all__.extend(mobilenet_v1.__all__)
 __all__.extend(mobilenet_v2.__all__)
 __all__.extend(mobilenet_v3.__all__)
+__all__.extend(mobilevit.__all__)
 __all__.extend(model_factory.__all__)
 __all__.extend(["NASNetAMobile", "nasnet"])
 __all__.extend(pit.__all__)
