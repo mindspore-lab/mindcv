@@ -316,6 +316,15 @@ Please see [configs](./configs) for the details about model performance and pret
 
 ## Notes
 ### What is New
+- 2023/03/25
+1. Update checkpoints for pretrained ResNet for better accuracy
+    - ResNet18 (from 70.09 to 70.31 @Top1 accuracy)
+    - ResNet34 (from 73.69 to 74.15 @Top1 accuracy)
+    - ResNet50 (from 76.64 to 76.69 @Top1 accuracy)
+    - ResNet101 (from 77.63 to 78.24 @Top1 accuracy)
+    - ResNet152 (from 78.63 to 78.72 @Top1 accuracy)
+2. Rename checkpoint file name to follow naming rule ({model_scale-sha256sum.ckpt}) and update download URLs.
+
 - 2023/03/05
 1. Add Lion (EvoLved Sign Momentum) optimizer from paper https://arxiv.org/abs/2302.06675
 	- To replace adamw with lion, LR is usually 3-10x smaller, and weight decay is usually 3-10x larger than adamw.
