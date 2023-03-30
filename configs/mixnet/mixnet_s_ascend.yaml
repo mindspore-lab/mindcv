@@ -6,7 +6,7 @@ val_while_train: True
 
 # dataset
 dataset: "imagenet"
-data_dir: "path/to/imagenet"
+data_dir: "/path/to/imagenet"
 shuffle: True
 dataset_download: False
 batch_size: 128
@@ -28,7 +28,7 @@ cutmix: 1.0
 model: "mixnet_s"
 num_classes: 1000
 pretrained: False
-ckpt_path: ''
+ckpt_path: ""
 keep_checkpoint_max: 10
 ckpt_save_dir: "./ckpt"
 epoch_size: 600
@@ -40,7 +40,7 @@ loss: "CE"
 label_smoothing: 0.1
 
 # lr scheduler
-scheduler: "warmup_cosine_decay"
+scheduler: "cosine_decay"
 lr: 0.2
 min_lr: 0.00001
 decay_epochs: 585

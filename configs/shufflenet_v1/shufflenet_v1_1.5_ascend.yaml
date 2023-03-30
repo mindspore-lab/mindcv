@@ -24,7 +24,6 @@ num_classes: 1000
 pretrained: False
 ckpt_path: ""
 keep_checkpoint_max: 30
-save_checkpoint: True
 ckpt_save_dir: "./ckpt"
 epoch_size: 250
 dataset_sink_mode: True

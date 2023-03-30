@@ -34,8 +34,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model     | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                        | Download                                                                          |
 |-----------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
-| hrnet_w32 | D910x8-G | 80.64     | 95.44     | 41.30      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w32_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w32_224.ckpt) |
-| hrnet_w48 | D910x8-G | 81.19     | 95.69     | 77.57      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w48_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w48_224.ckpt) |
+| hrnet_w32 | D910x8-G | 80.64     | 95.44     | 41.30      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w32_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w32-cc4fbd91.ckpt) |
+| hrnet_w48 | D910x8-G | 81.19     | 95.69     | 77.57      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w48_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w48-2e3399cd.ckpt) |
 
 
 </div>

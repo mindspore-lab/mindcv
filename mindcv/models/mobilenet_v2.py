@@ -51,13 +51,13 @@ def _cfg(url="", **kwargs):
 
 default_cfgs = {
     "mobilenet_v2_1.4_224": _cfg(
-        url=""
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_140-015cfb04.ckpt"
     ),
     "mobilenet_v2_1.3_224": _cfg(
         url=""
     ),
     "mobilenet_v2_1.0_224": _cfg(
-        url=""
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_100-52122156.ckpt"
     ),
     "mobilenet_v2_1.0_192": _cfg(
         url=""
@@ -72,7 +72,7 @@ default_cfgs = {
         url=""
     ),
     "mobilenet_v2_0.75_224": _cfg(
-        url=""
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_075-243f9404.ckpt"
     ),
     "mobilenet_v2_0.75_192": _cfg(
         url=""

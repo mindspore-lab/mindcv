@@ -34,7 +34,6 @@ amp_level: 'O0'
 # loss
 loss: 'CE'
 label_smoothing: 0.1
-smooth_factor: 0.1
 
 # lr scheduler
 scheduler: 'warmup_cosine_decay'

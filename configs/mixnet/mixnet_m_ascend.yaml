@@ -5,49 +5,51 @@ num_parallel_workers: 8
 val_while_train: True
 
 # dataset
-dataset: 'imagenet'
-data_dir: '/path/to/imagenet'
+dataset: "imagenet"
+data_dir: "/path/to/imagenet"
 shuffle: True
 dataset_download: False
-batch_size: 32
+batch_size: 128
 drop_remainder: True
 
 # augmentation
-image_resize: 299
+image_resize: 224
 scale: [0.08, 1.0]
 ratio: [0.75, 1.333]
 hflip: 0.5
-interpolation: 'bilinear'
-auto_augment: 'autoaug'
+interpolation: "bicubic"
+auto_augment: "randaug-m9-mstd0.5"
 re_prob: 0.25
 crop_pct: 0.875
+mixup: 0.2
+cutmix: 1.0
 
 # model
-model: 'xception'
+model: "mixnet_m"
 num_classes: 1000
 pretrained: False
-ckpt_path: ''
+ckpt_path: ""
 keep_checkpoint_max: 10
-ckpt_save_dir: './ckpt'
-epoch_size: 200
+ckpt_save_dir: "./ckpt"
+epoch_size: 600
 dataset_sink_mode: True
-amp_level: 'O2'
+amp_level: "O3"
 
 # loss
-loss: 'CE'
+loss: "CE"
 label_smoothing: 0.1
 
 # lr scheduler
-scheduler: 'warmup_cosine_decay'
-lr: 0.045
-min_lr: 0.0
-decay_epochs: 195
-warmup_epochs: 5
+scheduler: "cosine_decay"
+lr: 0.2
+min_lr: 0.00001
+decay_epochs: 585
+warmup_epochs: 15
 
 # optimizer
-opt: 'sgd'
+opt: "momentum"
 filter_bias_and_bn: True
 momentum: 0.9
-weight_decay: 0.00001
+weight_decay: 0.00002
 loss_scale: 1024
 use_nesterov: False

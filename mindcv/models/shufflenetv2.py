@@ -33,16 +33,16 @@ def _cfg(url="", **kwargs):
 
 default_cfgs = {
     "shufflenet_v2_0.5": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x0_5-Ascend.ckpt"
+        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_05-a53c62b9.ckpt"
     ),
     "shufflenet_v2_1.0": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_0-Ascend.ckpt"
+        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_10-e6b8c4fe.ckpt"
     ),
     "shufflenet_v2_1.5": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_5-Ascend.ckpt"
+        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_15-e717dd88.ckpt"
     ),
     "shufflenet_v2_2.0": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x2_0-Ascend.ckpt"
+        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_20-ada6a359.ckpt"
     ),
 }
 

@@ -19,6 +19,7 @@ from .utils import load_pretrained
 
 __all__ = [
     "EdgeNeXt",
+    "edgenext_xx_small",
     "edgenext_x_small",
     "edgenext_small",
     "edgenext_base",
@@ -37,11 +38,14 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
+    "edgenext_xx_small": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_xx_small-f8236d41.ckpt",
+        input_size=(3, 256, 256)),
     "edgenext_x_small": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_x_small-c4defb56.ckpt",
         input_size=(3, 256, 256)),
     "edgenext_small": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small.ckpt",
+        url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small-f530c372.ckpt",
         input_size=(3, 256, 256)),
     "edgenext_base": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_base-215efef7.ckpt",
@@ -393,6 +397,29 @@ class EdgeNeXt(nn.Cell):
         x = self.forward_features(x)
         x = self.head(self.head_dropout(x))
         return x
+
+
+@register_model
+def edgenext_xx_small(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> EdgeNeXt:
+    """Get edgenext_xx_small model.
+        Refer to the base class `models.EdgeNeXt` for more details."""
+    default_cfg = default_cfgs["edgenext_xx_small"]
+    model = EdgeNeXt(
+        depths=[2, 2, 6, 2],
+        dims=[24, 48, 88, 168],
+        expan_ratio=4,
+        global_block=[0, 1, 1, 1],
+        global_block_type=['None', 'SDTA', 'SDTA', 'SDTA'],
+        use_pos_embd_xca=[False, True, False, False],
+        kernel_sizes=[3, 5, 7, 9],
+        heads=[4, 4, 4, 4],
+        d2_scales=[2, 2, 3, 4],
+        **kwargs
+    )
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
+    return model
 
 
 @register_model

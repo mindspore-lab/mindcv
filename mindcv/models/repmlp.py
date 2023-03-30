@@ -35,7 +35,7 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "RepMLPNet_T224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repmlp/RepMLPNet_T224-8dbedd00.ckpt"),
+    "RepMLPNet_T224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repmlp/repmlp_t224-8dbedd00.ckpt"),
     "RepMLPNet_T256": _cfg(url="", input_size=(3, 256, 256)),
     "RepMLPNet_B224": _cfg(url=""),
     "RepMLPNet_B256": _cfg(url="", input_size=(3, 256, 256)),

@@ -34,7 +34,8 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'xcit_tiny_12_p16': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/xcit/xcit_tiny_12_p16_best.ckpt'),
+    'xcit_tiny_12_p16': _cfg(
+        url='https://download.mindspore.cn/toolkits/mindcv/xcit/xcit_tiny_12_p16_224-1b1c9301.ckpt'),
 }
 
 to_2tuple = _ntuple(2)
