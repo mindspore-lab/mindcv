@@ -23,6 +23,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model       | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                  | Download                                                                              |
 |-------------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| crossvit_9 | D910x8-G | 73.56     | 91.79     | 8.55      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/crossvit/crossvit_9_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_9-e74c8e18.ckpt)     |
 | crossvit_15 | D910x8-G | 81.08     | 95.33     | 27.27      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/crossvit/crossvit_15_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_15-eaa43c02.ckpt)     |
 | crossvit_18 | D910x8-G | 81.93     | 95.75     | 43.27      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/crossvit/crossvit_18_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_18-ca0a2e43.ckpt) |
 
