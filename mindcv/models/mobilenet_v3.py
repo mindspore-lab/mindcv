@@ -34,10 +34,10 @@ def _cfg(url="", **kwargs):
 
 default_cfgs = {
     "mobilenet_v3_small_1.0": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenetv3_small_100-bcc7282f.ckpt"
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenetv3_small_100-c884b105.ckpt"
     ),
     "mobilenet_v3_large_1.0": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-Ascend.ckpt"
+        url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-6f5bf961.ckpt"
     ),
     "mobilenet_v3_small_0.75": _cfg(url=""),
     "mobilenet_v3_large_0.75": _cfg(url=""),

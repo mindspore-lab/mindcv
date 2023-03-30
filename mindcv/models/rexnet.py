@@ -35,11 +35,11 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "rexnet_x09": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet0.9_acc77.07_bs64_8p.ckpt"),
-    "rexnet_x10": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet1.0_acc77.4_bs64_8p.ckpt"),
-    "rexnet_x13": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet1.3_acc79.06_bs64_8p.ckpt"),
-    "rexnet_x15": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet1.5_acc79.94_bs64_8p.ckpt"),
-    "rexnet_x20": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet2.0_acc80.6_bs64_8p.ckpt"),
+    "rexnet_x09": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_09-da498331.ckpt"),
+    "rexnet_x10": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_10-c5fb2dc7.ckpt"),
+    "rexnet_x13": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_13-a49c41e5.ckpt"),
+    "rexnet_x15": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_15-37a931d3.ckpt"),
+    "rexnet_x20": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_20-c5810914.ckpt"),
 }
 
 

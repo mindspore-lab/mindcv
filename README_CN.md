@@ -332,6 +332,15 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
 ## 日志
 
 ### 更新
+- 2023/03/25
+1. 更新ResNet网络预训练权重，现在预训练权重有更高Top1精度
+    - ResNet18精度从70.09提升到70.31
+    - ResNet34精度从73.69提升到74.15
+    - ResNet50精度从76.64提升到76.69
+    - ResNet101精度从77.63提升到78.24
+    - ResNet152精度从78.63提升到78.72
+2. 按照规则(model_scale-sha256sum.ckpt)更新预训练权重名字和相应下载URL链接。
+
 - 2023/03/05
 1. 增加Lion (EvoLved Sign Momentum)优化器，论文 https://arxiv.org/abs/2302.06675
 	- Lion所使用的学习率一般比Adamw小3到10倍，而权重衰减(weigt_decay)要大3到10倍.

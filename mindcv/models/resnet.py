@@ -37,14 +37,16 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "resnet18": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet18_224.ckpt"),
-    "resnet34": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet34_224.ckpt"),
-    "resnet50": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet50_224.ckpt"),
-    "resnet101": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet101_224.ckpt"),
-    "resnet152": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet152_224.ckpt"),
+    "resnet18": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet18-b518c050.ckpt"),
+    "resnet34": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet34-712a1834.ckpt"),
+    "resnet50": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet50-ca727b4d.ckpt"),
+    "resnet101": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet101-7f6648de.ckpt"),
+    "resnet152": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet152-33ed9fdf.ckpt"),
     "resnext50_32x4d": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext50_32x4d-af8aba16.ckpt"),
-    "resnext101_32x4d": _cfg(url=""),
-    "resnext101_64x4d": _cfg(url=""),
+    "resnext101_32x4d": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext101_32x4d-3c1e9c51.ckpt"),
+    "resnext101_64x4d": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext101_64x4d-8929255b.ckpt"),
     "resnext152_64x4d": _cfg(url=""),
 }
 

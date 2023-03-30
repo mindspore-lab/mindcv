@@ -22,8 +22,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model                 | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                       | Download                                                                                                          |
 |-----------------------|----------|-----------|-----------|------------|--------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| MobileNetV3_small_100 | D910x8-G | 67.81     | 87.82     | 2.55       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenetv3_small_100-bcc7282f.ckpt) |
-| MobileNetV3_large_100 | D910x8-G | 75.14     | 92.33     | 5.51       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_large_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-Ascend.ckpt) |
+| MobileNetV3_small_100 | D910x8-G | 67.81     | 87.82     | 2.55       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenetv3_small_100-c884b105.ckpt) |
+| MobileNetV3_large_100 | D910x8-G | 75.14     | 92.33     | 5.51       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_large_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-6f5bf961.ckpt) |
 
 </div>
 

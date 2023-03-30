@@ -36,9 +36,9 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model        | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                        | Download                                                                       |
 |--------------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| vit_b_32_224 | D910x8-G | 75.86     | 92.08     | 87.46      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224.ckpt) |
-| vit_l_16_224 | D910x8-G | 76.34     | 92.79     | 303.31     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l16_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224.ckpt) |
-| vit_l_32_224 | D910x8-G | 73.71     | 90.92     | 305.52     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224.ckpt) |
+| vit_b_32_224 | D910x8-G | 75.86     | 92.08     | 87.46      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224-7553218f.ckpt) |
+| vit_l_16_224 | D910x8-G | 76.34     | 92.79     | 303.31     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l16_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224-f02b2487.ckpt) |
+| vit_l_32_224 | D910x8-G | 73.71     | 90.92     | 305.52     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224-3a961018.ckpt) |
 
 </div>
 

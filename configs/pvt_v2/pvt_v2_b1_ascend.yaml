@@ -6,7 +6,7 @@ val_while_train: True
 
 # dataset
 dataset: "imagenet"
-data_dir: "path/to/imagenet"
+data_dir: "/path/to/imagenet"
 shuffle: True
 dataset_download: False
 batch_size: 128
@@ -42,7 +42,7 @@ loss: "ce"
 label_smoothing: 0.1
 
 # lr scheduler
-scheduler: "warmup_cosine_decay"
+scheduler: "cosine_decay"
 lr: 0.001
 min_lr: 0.00001
 lr_epoch_stair: True
@@ -54,5 +54,6 @@ opt: "adamw"
 filter_bias_and_bn: True
 momentum: 0.9
 weight_decay: 0.05
-dynamic_loss_scale: True
+loss_scale_type: "dynamic"
+drop_overflow_update: True
 use_nesterov: False

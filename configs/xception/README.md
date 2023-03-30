@@ -26,7 +26,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model    | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                          | Download                                                                            |
 |----------|----------|-----------|-----------|------------|-------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
-| Xception | D910x8-G | 79.01     | 94.25     | 22.91      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/xception/xception_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/xception/xception_299.ckpt) |
+| Xception | D910x8-G | 79.01     | 94.25     | 22.91      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/xception/xception_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/xception/xception-2c1e711df.ckpt) |
 
 </div>
 
