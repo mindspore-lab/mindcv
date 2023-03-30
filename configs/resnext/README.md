@@ -24,9 +24,12 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model           | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                | Download                                                                                       |
-|-----------------|----------|-----------|-----------|------------|-------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| ResNeXt50_32x4d | D910x8-G | 78.53     | 94.10     | 25.10      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnext/resnext50_32x4d_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnext/resnext50_32x4d-af8aba16.ckpt) |
+| Model            | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                 | Download                                                                                        |
+|------------------|----------|-----------|-----------|------------|--------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| ResNeXt50_32x4d  | D910x8-G | 78.53     | 94.10     | 25.10      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnext/resnext50_32x4d_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/resnext/resnext50_32x4d-af8aba16.ckpt)  |
+| ResNeXt101_32x4d | D910x8-G | 79.83     | 94.80     | 44.32      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnext/resnext101_32x4d_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnext/resnext101_32x4d-3c1e9c51.ckpt) |
+| ResNeXt101_64x4d | D910x8-G | 80.30     | 94.82     | 83.66      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnext/resnext101_64x4d_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnext/resnext101_64x4d-8929255b.ckpt) |
+| ResNeXt152_64x4d | D910x8-G | 80.52     | 95.00     | 115.27     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnext/resnext152_64x4d_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnext/resnext152_64x4d-3aba275c.ckpt) |
 
 </div>
 
