@@ -39,16 +39,16 @@ def _cfg(url="", **kwargs):
 
 default_cfgs = {
     "edgenext_xx_small": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_xx_small-f8236d41.ckpt",
+        url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_xx_small-afc971fb.ckpt",
         input_size=(3, 256, 256)),
     "edgenext_x_small": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_x_small-c4defb56.ckpt",
+        url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_x_small-a200c6fc.ckpt",
         input_size=(3, 256, 256)),
     "edgenext_small": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small-f530c372.ckpt",
         input_size=(3, 256, 256)),
     "edgenext_base": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_base-215efef7.ckpt",
+        url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_base-4335e9dc.ckpt",
         input_size=(3, 256, 256)),
 }
 

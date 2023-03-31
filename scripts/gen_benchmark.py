@@ -1,3 +1,8 @@
+"""
+Usage:
+    $ python scripts/gen_benchmark.py
+"""
+
 import glob
 import os
 
@@ -151,6 +156,8 @@ md_doc = df.to_markdown(mode='w', index=False, tablefmt='pipe')
 fout = open(output_path, 'w')
 fout.write(md_doc)
 """
+
+
 # write notes
 fout.write("\n#### Notes\n")
 
@@ -162,3 +169,6 @@ fout.write(
 )
 
 fout.close()
+
+
+print(f"\n ===> Done! Benchmark generated in {output_path}")
