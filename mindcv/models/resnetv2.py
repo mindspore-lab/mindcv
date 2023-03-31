@@ -28,8 +28,8 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    "resnetv2_50": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_50-8da5c0f4.ckpt"),
-    "resnetv2_101": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_101-c14199e9.ckpt"),
+    "resnetv2_50": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_50-3c2f143b.ckpt"),
+    "resnetv2_101": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_101-5d4c49a1.ckpt"),
 }
 
 

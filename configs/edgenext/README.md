@@ -25,10 +25,10 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model          | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                | Download                                                                              |
 |----------------|----------|-----------|-----------|------------|-------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| edgenext_xx_small | D910x8-G | 71.02     | 89.99     | 1.33       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_xx_small-f8236d41.ckpt) |
-| edgenext_x_small | D910x8-G | 75.14     | 92.50     | 2.34       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_x_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_x_small-c4defb56.ckpt) |
+| edgenext_xx_small | D910x8-G | 71.02     | 89.99     | 1.33       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_xx_small-afc971fb.ckpt) |
+| edgenext_x_small | D910x8-G | 75.14     | 92.50     | 2.34       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_x_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_x_small-a200c6fc.ckpt) |
 | edgenext_small | D910x8-G | 79.15     | 94.39     | 5.59       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small-f530c372.ckpt) |
-| edgenext_base | D910x8-G | 82.24     | 95.94     | 18.51       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_base_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_base-215efef7.ckpt) |
+| edgenext_base | D910x8-G | 82.24     | 95.94     | 18.51       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_base_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_base-4335e9dc.ckpt) |
 
 </div>
 
