@@ -23,7 +23,7 @@ color_jitter: 0.4
 re_prob: 0.1
 
 # model
-model: ''
+model: 'regnet_x_800mf'
 num_classes: 1000
 keep_checkpoint_max: 10
 ckpt_save_dir: './ckpt'
