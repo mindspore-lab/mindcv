@@ -44,10 +44,14 @@ default_cfgs = {
     "resnet152": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet152-33ed9fdf.ckpt"),
     "resnext50_32x4d": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext50_32x4d-af8aba16.ckpt"),
     "resnext101_32x4d": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext101_32x4d-3c1e9c51.ckpt"),
+        url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext101_32x4d-3c1e9c51.ckpt"
+    ),
     "resnext101_64x4d": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext101_64x4d-8929255b.ckpt"),
-    "resnext152_64x4d": _cfg(url=""),
+        url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext101_64x4d-8929255b.ckpt"
+    ),
+    "resnext152_64x4d": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext152_64x4d-3aba275c.ckpt"
+    ),
 }
 
 
@@ -409,7 +413,7 @@ def resnext101_64x4d(pretrained: bool = False, num_classes: int = 1000, in_chann
 
 @register_model
 def resnext152_64x4d(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    default_cfg = default_cfgs["resnext101_64x4d"]
+    default_cfg = default_cfgs["resnext152_64x4d"]
     model = ResNet(Bottleneck, [3, 8, 36, 3], groups=64, base_width=4, num_classes=num_classes,
                    in_channels=in_channels, **kwargs)
 
