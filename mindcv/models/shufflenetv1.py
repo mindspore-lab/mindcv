@@ -40,12 +40,8 @@ default_cfgs = {
     "shufflenet_v1_g3_1.0": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_10-245f0ccf.ckpt"
     ),
-    "shufflenet_v1_g3_1.5": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_15-40caaa99.ckpt"
-    ),
-    "shufflenet_v1_g3_2.0": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_20-df3f5199.ckpt"
-    ),
+    "shufflenet_v1_g3_1.5": _cfg(url=""),
+    "shufflenet_v1_g3_2.0": _cfg(url=""),
     "shufflenet_v1_g8_0.5": _cfg(url=""),
     "shufflenet_v1_g8_1.0": _cfg(url=""),
     "shufflenet_v1_g8_1.5": _cfg(url=""),
