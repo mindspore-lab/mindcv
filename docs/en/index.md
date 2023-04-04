@@ -85,7 +85,7 @@ Below are a few code snippets for your taste.
       <img src="https://user-images.githubusercontent.com/8156835/210049681-89f68b9f-eb44-44e2-b689-4d30c93c6191.jpg" width=360 />
     </p>
 
-    Classify the dowloaded image with a pretrained SoTA model:
+    Classify the downloaded image with a pretrained SoTA model:
 
     ```pycon
     >>> !python infer.py --model=swin_tiny --image_path='./dog.jpg'
@@ -156,7 +156,7 @@ It is easy to train your model on a standard or customized dataset using `train.
 
     [Pynative mode with ms_function](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) is a mixed mode for comprising flexibility and efficiency in MindSpore. To apply pynative mode with ms_function for training, please run `train_with_func.py`, e.g.,
 
-    ``` shell
+    ```shell
     python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download  --epoch_size=10
     ```
 
@@ -201,42 +201,42 @@ We provide the following jupyter notebook tutorials to help users learn to use M
 <summary> Supported algorithms </summary>
 
 * Augmentation
-	* [AutoAugment](https://arxiv.org/abs/1805.09501)
-	* [RandAugment](https://arxiv.org/abs/1909.13719)
-	* [Repeated Augmentation](https://openaccess.thecvf.com/content_CVPR_2020/papers/Hoffer_Augment_Your_Batch_Improving_Generalization_Through_Instance_Repetition_CVPR_2020_paper.pdf)
-	* RandErasing (Cutout)
-	* CutMix
-	* MixUp
-	* RandomResizeCrop
-	* Color Jitter, Flip, etc
+    * [AutoAugment](https://arxiv.org/abs/1805.09501)
+    * [RandAugment](https://arxiv.org/abs/1909.13719)
+    * [Repeated Augmentation](https://openaccess.thecvf.com/content_CVPR_2020/papers/Hoffer_Augment_Your_Batch_Improving_Generalization_Through_Instance_Repetition_CVPR_2020_paper.pdf)
+    * RandErasing (Cutout)
+    * CutMix
+    * MixUp
+    * RandomResizeCrop
+    * Color Jitter, Flip, etc
 * Optimizer
-	* Adam
-	* AdamW
-	* [Lion](https://arxiv.org/abs/2302.06675)
-	* Adan (experimental)
-	* AdaGrad
-	* LAMB
-	* Momentum
-	* RMSProp
-	* SGD
-	* NAdam
+    * Adam
+    * AdamW
+    * [Lion](https://arxiv.org/abs/2302.06675)
+    * Adan (experimental)
+    * AdaGrad
+    * LAMB
+    * Momentum
+    * RMSProp
+    * SGD
+    * NAdam
 * LR Scheduler
-	* Warmup Cosine Decay
-	* Step LR
-	* Polynomial Decay
-	* Exponential Decay
+    * Warmup Cosine Decay
+    * Step LR
+    * Polynomial Decay
+    * Exponential Decay
 * Regularization
-	* Weight Decay
-	* Label Smoothing
-	* Stochastic Depth (depends on networks)
-	* Dropout (depends on networks)
+    * Weight Decay
+    * Label Smoothing
+    * Stochastic Depth (depends on networks)
+    * Dropout (depends on networks)
 * Loss
-	* Cross Entropy (w/ class weight and auxiliary logit support)
-	* Binary Cross Entropy  (w/ class weight and auxiliary logit support)
-	* Soft Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
-	* Soft Binary Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
+    * Cross Entropy (w/ class weight and auxiliary logit support)
+    * Binary Cross Entropy  (w/ class weight and auxiliary logit support)
+    * Soft Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
+    * Soft Binary Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
 * Ensemble
-	* Warmup EMA (Exponential Moving Average)
+    * Warmup EMA (Exponential Moving Average)
 
 </details>
 

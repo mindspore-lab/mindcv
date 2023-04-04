@@ -47,7 +47,7 @@ def main():
     logits = nn.Softmax()(network(ms.Tensor(img)))[0].asnumpy()
     preds = np.argsort(logits)[::-1][:5]
     probs = logits[preds]
-    with open("./tutorials/imagenet1000_clsidx_to_labels.txt", encoding="utf-8") as f:
+    with open("./examples/data/imagenet1000_clsidx_to_labels.txt", encoding="utf-8") as f:
         idx2label = ast.literal_eval(f.read())
     # print(f"Predict result of {args.image_path}:")
     cls_prob = {}
