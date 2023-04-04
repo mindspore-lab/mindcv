@@ -1,22 +1,6 @@
-# Copyright 2020-2022 Huawei Technologies Co., Ltd
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ============================================================================
 """adan"""
 from __future__ import absolute_import
 
-from mindspore._checkparam import Rel
-from mindspore._checkparam import Validator as validator
 from mindspore.common import dtype as mstype
 from mindspore.common.api import ms_function
 from mindspore.common.tensor import Tensor
@@ -129,12 +113,9 @@ def _update_run_op(
 
 def _check_param_value(beta1, beta2, eps, prim_name):
     """Check the type of inputs."""
-    validator.check_value_type("beta1", beta1, [float], prim_name)
-    validator.check_value_type("beta2", beta2, [float], prim_name)
-    validator.check_value_type("eps", eps, [float], prim_name)
-    validator.check_float_range(beta1, 0.0, 1.0, Rel.INC_NEITHER, "beta1", prim_name)
-    validator.check_float_range(beta2, 0.0, 1.0, Rel.INC_NEITHER, "beta2", prim_name)
-    validator.check_positive_float(eps, "eps", prim_name)
+    assert isinstance(beta1, float) and 0 <= beta1 <= 1.0, f"For {prim_name}, beta1 should between 0 and 1"
+    assert isinstance(beta2, float) and 0 <= beta2 <= 1.0, f"For {prim_name}, beta2 should between 0 and 1"
+    assert isinstance(eps, float) and eps > 0, f"For {prim_name}, eps should be bigger than 0"
 
 
 class Adan(Optimizer):
@@ -162,7 +143,7 @@ class Adan(Optimizer):
         )  # Optimized inherit weight decay is bloaked. weight decay is computed in this py.
 
         _check_param_value(beta1, beta2, eps, self.cls_name)
-        validator.check_value_type("use_locking", use_locking, [bool], self.cls_name)
+        assert isinstance(use_locking, bool), f"For {self.cls_name}, use_looking should be bool"
 
         self.beta1 = Tensor(beta1, mstype.float32)
         self.beta2 = Tensor(beta2, mstype.float32)
