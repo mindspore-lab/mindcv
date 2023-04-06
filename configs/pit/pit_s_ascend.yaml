@@ -19,7 +19,7 @@ ratio: [0.75, 1.333]
 re_value: "random"
 hflip: 0.5
 interpolation: "bicubic"
-color_jitter: [0.3, 0.3, 0.3]
+color_jitter: 0.3
 auto_augment: "randaug-m9-mstd0.5-inc1"
 re_prob: 0.25
 crop_pct: 0.875
@@ -27,7 +27,7 @@ mixup: 0.8
 cutmix: 1.0
 
 # model
-model: "pit_xs"
+model: "pit_s"
 num_classes: 1000
 pretrained: False
 ckpt_path: ""
@@ -44,10 +44,12 @@ label_smoothing: 0.1
 
 # lr scheduler
 scheduler: "cosine_decay"
-lr: 0.001
+lr: 0.002
 min_lr: 0.00001
+lr_epoch_stair: True
 decay_epochs: 590
 warmup_epochs: 10
+warmup_factor: 0.002
 
 # optimizer
 opt: "adamw"
