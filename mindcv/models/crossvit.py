@@ -21,6 +21,7 @@ from .registry import register_model
 from .utils import load_pretrained
 
 __all__ = [
+    "crossvit9",
     "crossvit15",
     "crossvit18",
 ]
@@ -30,6 +31,7 @@ def _cfg(url='', **kwargs):
     return {
         'url': url,
         'num_classes': 1000,
+        "input_size": (3, 224, 224),
         'first_conv': 'patch_embed.proj',
         'classifier': 'head',
         **kwargs
@@ -37,6 +39,9 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
+    "crossvit_9": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_9-e74c8e18.ckpt",
+        input_size=(3, 240, 240)),
     "crossvit_15": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_15-eaa43c02.ckpt"),
     "crossvit_18": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_18-ca0a2e43.ckpt"),
 }
@@ -443,6 +448,18 @@ class VisionTransformer(nn.Cell):
         x = self.forward_features(x)
         x = self.forward_head(x)
         return x
+
+
+@register_model
+def crossvit9(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+    model = VisionTransformer(img_size=[240, 224],
+                              patch_size=[12, 16], embed_dim=[128, 256], depth=[[1, 3, 0], [1, 3, 0], [1, 3, 0]],
+                              num_heads=[4, 4], mlp_ratio=[3, 3, 1], qkv_bias=True,
+                              norm_layer=nn.LayerNorm, in_channels=in_channels, num_classes=num_classes, **kwargs)
+    default_cfg = default_cfgs["crossvit_9"]
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+    return model
 
 
 @register_model

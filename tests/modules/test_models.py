@@ -24,6 +24,7 @@ model_name_list = [
     "RepMLPNet_T224",
     "convit_tiny",
     "convnext_tiny",
+    "crossvit9",
     "densenet121",
     "dpn92",
     "edgenext_small",

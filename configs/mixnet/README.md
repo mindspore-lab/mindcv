@@ -27,6 +27,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 |----------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
 | MixNet_s | D910x8-G | 75.52     | 92.52     | 4.17       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_s_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_s-2a5ef3a3.ckpt) |
 | MixNet_m | D910x8-G | 76.64     | 93.05     | 5.06       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_m_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_m-74cc4cb1.ckpt) |
+| MixNet_l | D910x8-G | 78.73     | 94.31     | 7.38       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_l_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_l-978edf2b.ckpt) |
 
 </div>
 

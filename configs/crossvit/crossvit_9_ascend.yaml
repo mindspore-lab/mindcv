@@ -1,0 +1,63 @@
+# system
+mode: 0
+distribute: True
+num_parallel_workers: 8
+val_while_train: True
+
+# dataset
+dataset: 'imagenet'
+data_dir: '/path/to/imagenet'
+shuffle: True
+dataset_download: False
+batch_size: 256
+drop_remainder: True
+
+# augmentation
+image_resize: 240
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+vflip: 0.
+interpolation: 'bicubic'
+auto_augment: 'randaug-m9-mstd0.5-inc1'
+re_prob: 0.25
+mixup: 0.8
+cutmix: 1.0
+color_jitter: 0.4
+crop_pct: 0.935
+
+# model
+model: 'crossvit9'
+num_classes: 1000
+pretrained: False
+ckpt_path: ''
+keep_checkpoint_max: 10
+ckpt_save_dir: './ckpt'
+epoch_size: 300
+dataset_sink_mode: True
+amp_level: 'O2'
+drop_path_rate: 0.1
+
+# loss
+loss: 'CE'
+label_smoothing: 0.1
+
+# lr scheduler
+scheduler: 'cosine_decay'
+lr: 0.0011
+min_lr: 0.00001
+warmup_epochs: 30
+decay_epochs: 270
+decay_rate: 0.1
+
+# optimizer
+opt: 'adamw'
+weight_decay: 0.05
+filter_bias_and_bn: True
+loss_scale_type: 'dynamic'
+drop_overflow_update: True
+use_nesterov: False
+eps: 1e-8
+
+# Scheduler parameters
+lr_epoch_stair: True

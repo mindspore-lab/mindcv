@@ -1,19 +1,16 @@
-# Crossvit
-> [CrossViT: Cross-Attention Multi-Scale Vision Transformer for Image Classification](https://arxiv.org/abs/2103.14899)
+# MobileViT
+> [MobileViT：Light-weight, General-purpose, and Mobile-friendly Vision Transformer](https://arxiv.org/pdf/2110.02178.pdf)
 
 ## Introduction
 
-CrossViT is a type of vision transformer that uses a dual-branch architecture to extract multi-scale feature representations for image classification. The architecture combines image patches (i.e. tokens in a transformer) of different sizes to produce stronger visual features for image classification. It processes small and large patch tokens with two separate branches of different computational complexities and these tokens are fused together multiple times to complement each other.
-
-Fusion is achieved by an efficient cross-attention module, in which each transformer branch creates a non-patch token as an agent to exchange information with the other branch by attention. This allows for linear-time generation of the attention map in fusion instead of quadratic time otherwise.[[1](#references)]
+MobileViT, a light-weight and general-purpose vision transformer for mobile devices. MobileViT presents a different perspective for the global processing of information with transformers, i.e., transformers as convolutions. MobileViT significantly outperforms CNN- and ViT-based networks across different tasks and datasets. On the ImageNet-1k dataset, MobileViT achieves top-1 accuracy of 78.4% with about 6 million parameters, which is 3.2% and 6.2% more accurate than MobileNetv3 (CNN-based) and DeIT (ViT-based) for a similar number of parameters. On the MS-COCO object detection task, MobileViT is 5.7% more accurate than MobileNetv3 for a similar number of parameters.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/52945530/223635248-5871596d-43f2-44ee-b8be-1e7927ade243.jpg" width=400 />
+  <img src="https://user-images.githubusercontent.com/64628185/229476902-1b97496a-4a38-40ca-9e50-a88c52defcbb.png" width=800 />
 </p>
 <p align="center">
-  <em>Figure 1. Architecture of CrossViT [<a href="#references">1</a>] </em>
+  <em>Figure 1. Architecture of MobileViT [<a href="#references">1</a>] </em>
 </p>
-
 
 ## Results
 
@@ -23,10 +20,9 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model       | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                  | Download                                                                              |
 |-------------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| crossvit_9 | D910x8-G | 73.56     | 91.79     | 8.55      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/crossvit/crossvit_9_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_9-e74c8e18.ckpt)     |
-| crossvit_15 | D910x8-G | 81.08     | 95.33     | 27.27      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/crossvit/crossvit_15_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_15-eaa43c02.ckpt)     |
-| crossvit_18 | D910x8-G | 81.93     | 95.75     | 43.27      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/crossvit/crossvit_18_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_18-ca0a2e43.ckpt) |
-
+| mobilevit_xx_small | D910x8-G | 68.90 | 88.92 | 1.27 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_xx_small-af9da8a0.ckpt) |
+| mobilevit_x_small | D910x8-G | 74.98 | 92.33 | 2.32 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_x_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_x_small-673fc6f2.ckpt) |
+| mobilevit_small | D910x8-G | 78.48 | 94.18 | 5.59 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_small-caf79638.ckpt) |
 
 </div>
 
@@ -53,7 +49,7 @@ It is easy to reproduce the reported results with the pre-defined training recip
 
 ```shell
 # distributed training on multiple GPU/Ascend devices
-mpirun -n 8 python train.py --config configs/crossvit/crossvit_15_ascend.yaml --data_dir /path/to/imagenet
+mpirun -n 8 python train.py --config configs/mobilevit/mobilevit_xx_small_ascend.yaml --data_dir /path/to/imagenet
 ```
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
 
@@ -69,7 +65,7 @@ If you want to train or finetune the model on a smaller dataset without distribu
 
 ```shell
 # standalone training on a CPU/GPU/Ascend device
-python train.py --config configs/crossvit/crossvit_15_ascend.yaml --data_dir /path/to/dataset --distribute False
+python train.py --config configs/mobilevit/mobilevit_xx_small_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 ### Validation
@@ -77,14 +73,9 @@ python train.py --config configs/crossvit/crossvit_15_ascend.yaml --data_dir /pa
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```
-python validate.py -c configs/crossvit/crossvit15_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+python validate.py -c configs/mobilevit/mobilevit_xx_small_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 ### Deployment
 
 Please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md) in MindCV.
-
-## References
-
-<!--- Guideline: Citation format should follow GB/T 7714. -->
-[1] Chun-Fu Chen, Quanfu Fan, Rameswar Panda. CrossViT: Cross-Attention Multi-Scale Vision Transformer for Image Classification

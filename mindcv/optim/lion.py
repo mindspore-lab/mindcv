@@ -2,8 +2,6 @@ import numpy as np
 
 import mindspore as ms
 from mindspore import ops
-from mindspore._checkparam import Rel
-from mindspore._checkparam import Validator as validator
 from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
@@ -13,10 +11,8 @@ from mindspore.nn.optim.optimizer import opt_init_args_register
 
 def _check_param_value(beta1, beta2, prim_name):
     """Check the type of inputs."""
-    validator.check_value_type("beta1", beta1, [float], prim_name)
-    validator.check_value_type("beta2", beta2, [float], prim_name)
-    validator.check_float_range(beta1, 0.0, 1.0, Rel.INC_NEITHER, "beta1", prim_name)
-    validator.check_float_range(beta2, 0.0, 1.0, Rel.INC_NEITHER, "beta2", prim_name)
+    assert isinstance(beta1, float) and 0 <= beta1 <= 1.0, f"For {prim_name}, beta1 should between 0 and 1"
+    assert isinstance(beta2, float) and 0 <= beta2 <= 1.0, f"For {prim_name}, beta2 should between 0 and 1"
 
 
 _grad_scale = ops.MultitypeFuncGraph("grad_scale")

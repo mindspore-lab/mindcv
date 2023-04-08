@@ -1,0 +1,55 @@
+# system
+mode: 0
+distribute: True
+num_parallel_workers: 8
+val_while_train: True
+
+# dataset
+dataset: 'imagenet'
+data_dir: '/path/to/imagenet'
+shuffle: True
+dataset_download: False
+batch_size: 64
+drop_remainder: True
+
+# augmentation
+image_resize: 256
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+interpolation: 'bilinear'
+crop_pct: 0.875
+color_jitter: [0.4, 0.4, 0.4]
+re_prob: 1.0
+
+# model
+model: 'mobilevit_xx_small'
+num_classes: 1000
+pretrained: False
+ckpt_path: ''
+keep_checkpoint_max: 10
+ckpt_save_dir: './ckpt'
+epoch_size: 450
+dataset_sink_mode: True
+amp_level: 'O3'
+
+# loss
+loss: 'ce'
+label_smoothing: 0.1
+
+# lr scheduler
+scheduler: 'cosine_decay'
+min_lr: 0.000002
+lr: 0.002
+warmup_epochs: 40
+decay_epochs: 410
+
+# optimizer
+opt: 'adamw'
+filter_bias_and_bn: True
+momentum: 0.9
+weight_decay: 0.01
+use_nesterov: False
+loss_scale_type: 'dynamic'
+drop_overflow_update: True
+loss_scale: 1024

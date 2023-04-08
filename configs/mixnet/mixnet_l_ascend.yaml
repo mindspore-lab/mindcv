@@ -1,7 +1,7 @@
 # system
 mode: 0
 distribute: True
-num_parallel_workers: 8
+num_parallel_workers: 16
 val_while_train: True
 
 # dataset
@@ -16,44 +16,42 @@ drop_remainder: True
 image_resize: 224
 scale: [0.08, 1.0]
 ratio: [0.75, 1.333]
-re_value: "random"
 hflip: 0.5
 interpolation: "bicubic"
-color_jitter: [0.3, 0.3, 0.3]
 auto_augment: "randaug-m9-mstd0.5-inc1"
 re_prob: 0.25
 crop_pct: 0.875
-mixup: 0.8
+mixup: 0.2
 cutmix: 1.0
 
 # model
-model: "pit_xs"
+model: "mixnet_l"
 num_classes: 1000
 pretrained: False
 ckpt_path: ""
 keep_checkpoint_max: 10
 ckpt_save_dir: "./ckpt"
 epoch_size: 600
-drop_path_rate: 0.1
 dataset_sink_mode: True
-amp_level: "O2"
+amp_level: "O3"
 
 # loss
-loss: "ce"
+loss: "CE"
 label_smoothing: 0.1
 
 # lr scheduler
 scheduler: "cosine_decay"
-lr: 0.001
+lr: 0.25
 min_lr: 0.00001
-decay_epochs: 590
-warmup_epochs: 10
+decay_epochs: 580
+warmup_epochs: 20
 
 # optimizer
-opt: "adamw"
+opt: "momentum"
 filter_bias_and_bn: True
 momentum: 0.9
-weight_decay: 0.05
+weight_decay: 0.00002
 loss_scale_type: "dynamic"
 drop_overflow_update: True
+loss_scale: 16777216
 use_nesterov: False

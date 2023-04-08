@@ -41,10 +41,10 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "pit_ti_224": _cfg(url=""),
-    "pit_xs_224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/pit/pit_xs-fea0d37e.ckpt"),
-    "pit_s_224": _cfg(url=""),
-    "pit_b_224": _cfg(url=""),
+    "pit_ti": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/pit/pit_ti-e647a593.ckpt"),
+    "pit_xs": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/pit/pit_xs-fea0d37e.ckpt"),
+    "pit_s": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/pit/pit_s-3c1ba36f.ckpt"),
+    "pit_b": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/pit/pit_b-2411c9b6.ckpt"),
 }
 
 
@@ -403,7 +403,7 @@ class PoolingTransformer(nn.Cell):
 def pit_ti(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PoolingTransformer:
     """Get PiT-Ti model.
     Refer to the base class `models.PoolingTransformer` for more details."""
-    default_cfg = default_cfgs["pit_ti_224"]
+    default_cfg = default_cfgs["pit_ti"]
     model = PoolingTransformer(
         image_size=224,
         patch_size=16,
@@ -424,17 +424,17 @@ def pit_ti(pretrained: bool = False, num_classes: int = 1000, in_channels: int =
 
 
 @register_model
-def pit_b(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PoolingTransformer:
-    """Get PiT-B model.
+def pit_xs(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PoolingTransformer:
+    """Get PiT-XS model.
     Refer to the base class `models.PoolingTransformer` for more details."""
-    default_cfg = default_cfgs["pit_b_224"]
+    default_cfg = default_cfgs["pit_xs"]
     model = PoolingTransformer(
         image_size=224,
-        patch_size=14,
-        stride=7,
-        base_dims=[64, 64, 64],
-        depth=[3, 6, 4],
-        heads=[4, 8, 16],
+        patch_size=16,
+        stride=8,
+        base_dims=[48, 48, 48],
+        depth=[2, 6, 4],
+        heads=[2, 4, 8],
         mlp_ratio=4.0,
         num_classes=num_classes,
         in_chans=in_channels,
@@ -451,7 +451,7 @@ def pit_b(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 
 def pit_s(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PoolingTransformer:
     """Get PiT-S model.
     Refer to the base class `models.PoolingTransformer` for more details."""
-    default_cfg = default_cfgs["pit_s_224"]
+    default_cfg = default_cfgs["pit_s"]
     model = PoolingTransformer(
         image_size=224,
         patch_size=16,
@@ -472,17 +472,17 @@ def pit_s(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 
 
 
 @register_model
-def pit_xs(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PoolingTransformer:
-    """Get PiT-XS model.
+def pit_b(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs) -> PoolingTransformer:
+    """Get PiT-B model.
     Refer to the base class `models.PoolingTransformer` for more details."""
-    default_cfg = default_cfgs["pit_xs_224"]
+    default_cfg = default_cfgs["pit_b"]
     model = PoolingTransformer(
         image_size=224,
-        patch_size=16,
-        stride=8,
-        base_dims=[48, 48, 48],
-        depth=[2, 6, 4],
-        heads=[2, 4, 8],
+        patch_size=14,
+        stride=7,
+        base_dims=[64, 64, 64],
+        depth=[3, 6, 4],
+        heads=[4, 8, 16],
         mlp_ratio=4.0,
         num_classes=num_classes,
         in_chans=in_channels,
