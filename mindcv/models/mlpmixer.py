@@ -6,6 +6,9 @@ Refer to MLP-Mixer: An all-MLP Architecture for Vision.
 import mindspore.nn as nn
 import mindspore.ops as ops
 
+from .registry import register_model
+from .utils import load_pretrained
+
 __all__ = [
     "MLPMixer",
     "mlp_mixer_s_p32",
@@ -16,6 +19,27 @@ __all__ = [
     "mlp_mixer_l_p32",
     "mlp_mixer_h_p14"
 ]
+
+
+def _cfg(url="", **kwargs):
+    return {
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "to_patch_embedding.0",
+        "classifier": "mlp_head",
+        **kwargs,
+    }
+
+
+default_cfgs = {
+    "mlp_mixer_s_p16": _cfg(url=""),
+    "mlp_mixer_s_p32": _cfg(url=""),
+    "mlp_mixer_b_p16": _cfg(url=""),
+    "mlp_mixer_b_p32": _cfg(url=""),
+    "mlp_mixer_l_p16": _cfg(url=""),
+    "mlp_mixer_l_p32": _cfg(url=""),
+    "mlp_mixer_h_p14": _cfg(url=""),
+}
 
 
 class FeedForward(nn.Cell):
@@ -87,23 +111,25 @@ class MLPMixer(nn.Cell):
         n_channels (int) : channels(dimension) of a single embedded patch.
         token_dim (int) : hidden dim of token-mixing MLP.
         channel_dim (int) : hidden dim of channel-mixing MLP.
-        n_classes (int) : number of classification classes.
+        num_classes (int) : number of classification classes.
+        in_channels: number the channels of the input. Default: 3.
     """
 
-    def __init__(self, depth, patch_size, n_patches, n_channels, token_dim, channel_dim, n_classes=1000):
+    def __init__(self, depth, patch_size, n_patches, n_channels, token_dim, channel_dim, num_classes=1000,
+                 in_channels=3):
         super().__init__()
         self.n_patches = n_patches
         self.n_channels = n_channels
         # patch with shape of (3, patch_size, patch_size) is embedded to n_channels dim feature.
         self.to_patch_embedding = nn.SequentialCell(
-            nn.Conv2d(3, n_channels, patch_size, patch_size, pad_mode="pad", padding=0),
+            nn.Conv2d(in_channels, n_channels, patch_size, patch_size, pad_mode="pad", padding=0),
             TransPose(permutation=(0, 2, 1), embedding=True),
         )
         self.mixer_blocks = nn.SequentialCell()
         for _ in range(depth):
             self.mixer_blocks.append(MixerBlock(n_patches, n_channels, token_dim, channel_dim))
         self.layer_norm = nn.LayerNorm((n_channels,))
-        self.mlp_head = nn.Dense(n_channels, n_classes)
+        self.mlp_head = nn.Dense(n_channels, num_classes)
         self.mean = ops.ReduceMean()
         self._initialize_weights()
 
@@ -130,67 +156,100 @@ def _check_resolution_and_length_of_patch(pr, sl):
         assert sl == (ir[0] // pr[0]) * (ir[1] // pr[1]), "Sequence length must be equal to ir/pr."
 
 
-def mlp_mixer_s_p32(**kwargs):
+@register_model
+def mlp_mixer_s_p32(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     # number_of_layers, patch_resolution, length_of_sequence, hidden_size, mpl_dim_sequence, mpl_dim_channel
     nl, pr, ls, hs, ds, dc = 8, 32, 49, 512, 256, 2048
     _check_resolution_and_length_of_patch(pr, ls)
-    return MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs,
-                    token_dim=ds, channel_dim=dc, **kwargs)
+    model = MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs,
+                     token_dim=ds, channel_dim=dc, num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    default_cfg = default_cfgs["mlp_mixer_s_p32"]
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
+    return model
 
 
-def mlp_mixer_s_p16(**kwargs):
+@register_model
+def mlp_mixer_s_p16(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     nl, pr, ls, hs, ds, dc = 8, 16, 196, 512, 256, 2048
     _check_resolution_and_length_of_patch(pr, ls)
-    return MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs,
-                    token_dim=ds, channel_dim=dc, **kwargs)
+    model = MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs, token_dim=ds, channel_dim=dc,
+                     num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    default_cfg = default_cfgs["mlp_mixer_s_p16"]
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
+    return model
 
 
-def mlp_mixer_b_p32(**kwargs):
+@register_model
+def mlp_mixer_b_p32(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     nl, pr, ls, hs, ds, dc = 12, 32, 49, 768, 384, 3072
     _check_resolution_and_length_of_patch(pr, ls)
-    return MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs,
-                    token_dim=ds, channel_dim=dc, **kwargs)
+    model = MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs, token_dim=ds, channel_dim=dc,
+                     num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    default_cfg = default_cfgs["mlp_mixer_b_p32"]
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
+    return model
 
 
-def mlp_mixer_b_p16(**kwargs):
+@register_model
+def mlp_mixer_b_p16(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     nl, pr, ls, hs, ds, dc = 12, 16, 196, 768, 384, 3072
     _check_resolution_and_length_of_patch(pr, ls)
-    return MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs,
-                    token_dim=ds, channel_dim=dc, **kwargs)
+    model = MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs, token_dim=ds, channel_dim=dc,
+                     num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    default_cfg = default_cfgs["mlp_mixer_b_p16"]
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
+    return model
 
 
-def mlp_mixer_l_p32(**kwargs):
+@register_model
+def mlp_mixer_l_p32(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     nl, pr, ls, hs, ds, dc = 24, 32, 49, 1024, 512, 4096
     _check_resolution_and_length_of_patch(pr, ls)
-    return MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs,
-                    token_dim=ds, channel_dim=dc, **kwargs)
+    model = MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs, token_dim=ds, channel_dim=dc,
+                     num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    default_cfg = default_cfgs["mlp_mixer_l_p32"]
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
+    return model
 
 
-def mlp_mixer_l_p16(**kwargs):
+@register_model
+def mlp_mixer_l_p16(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     nl, pr, ls, hs, ds, dc = 24, 16, 196, 1024, 512, 4096
     _check_resolution_and_length_of_patch(pr, ls)
-    return MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs,
-                    token_dim=ds, channel_dim=dc, **kwargs)
+    model = MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs, token_dim=ds, channel_dim=dc,
+                     num_classes=num_classes, in_channels=in_channels, **kwargs)
+
+    default_cfg = default_cfgs["mlp_mixer_l_p16"]
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
+    return model
 
 
-def mlp_mixer_h_p14(**kwargs):
+@register_model
+def mlp_mixer_h_p14(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     nl, pr, ls, hs, ds, dc = 32, 14, 256, 1280, 640, 5120
     _check_resolution_and_length_of_patch(pr, ls)
-    return MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs,
-                    token_dim=ds, channel_dim=dc, **kwargs)
+    model = MLPMixer(depth=nl, patch_size=pr, n_patches=ls, n_channels=hs, token_dim=ds, channel_dim=dc,
+                     num_classes=num_classes, in_channels=in_channels, **kwargs)
 
+    default_cfg = default_cfgs["mlp_mixer_h_p14"]
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
-if __name__ == "__main__":
-    import numpy as np
-
-    import mindspore
-    from mindspore import Tensor
-
-    model = mlp_mixer_s_p16()
-    print(model)
-    parameters = model.trainable_params()
-    parameters = sum([np.prod(p.shape) for p in parameters]) / 1_000_000
-    print('Trainable Parameters: %.3fM' % parameters)
-    dummy_input = Tensor(np.random.rand(8, 3, 224, 224), dtype=mindspore.float32)
-    y = model(dummy_input)
-    print("Shape of out :", y.shape)
+    return model
