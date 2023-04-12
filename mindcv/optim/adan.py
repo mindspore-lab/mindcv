@@ -1,17 +1,12 @@
 """adan"""
-from __future__ import absolute_import
-
+import mindspore as ms
+from mindspore import ops
 from mindspore.common import dtype as mstype
 from mindspore.common.api import ms_function
 from mindspore.common.tensor import Tensor
 from mindspore.nn.optim.optimizer import Optimizer, opt_init_args_register
-from mindspore.ops import composite as C
-from mindspore.ops import functional as F
-from mindspore.ops import operations as P
 
-_adan_opt = C.MultitypeFuncGraph("adan_opt")
-_scaler_one = Tensor(1, mstype.int32)
-_scaler_ten = Tensor(10, mstype.float32)
+_adan_opt = ops.MultitypeFuncGraph("adan_opt")
 
 
 @_adan_opt.register(
@@ -59,23 +54,18 @@ def _update_run_op(
     Returns:
         Tensor, the new value of v after updating.
     """
-    op_cast = P.Cast()
-    op_mul = P.Mul()
-    op_square = P.Square()
-    op_sqrt = P.Sqrt()
-    op_cast = P.Cast()
-    op_reshape = P.Reshape()
-    op_shape = P.Shape()
+    op_mul = ops.Mul()
+    op_square = ops.Square()
+    op_sqrt = ops.Sqrt()
+    op_cast = ops.Cast()
+    op_reshape = ops.Reshape()
+    op_shape = ops.Shape()
 
-    success = True
+    success = ms.Tensor(True, dtype=ms.bool_)
 
-    # if global_step == 0.0: # init
-    # TODO: use global_step==0 as the condition to init prev_gradient as gradient
-    # if (F.reduce_min(prev_gradient) == 0.0) and (F.reduce_max(prev_gradient) == 0.0):
-    if F.reduce_sum(prev_gradient) == 0.0:
-        success = F.depend(success, F.assign(prev_gradient, gradient))
+    if ops.reduce_sum(prev_gradient) == 0.0:
+        success = ops.depend(success, ops.assign(prev_gradient, gradient))
 
-    # TODO: is casting needed?
     param_fp32 = op_cast(param, mstype.float32)
     m_fp32 = op_cast(m, mstype.float32)
     v_fp32 = op_cast(v, mstype.float32)
@@ -83,32 +73,29 @@ def _update_run_op(
     gradient_fp32 = op_cast(gradient, mstype.float32)
     prev_gradient_fp32 = op_cast(prev_gradient, mstype.float32)
 
-    next_m = op_mul(F.tuple_to_array((1.0,)) - beta1, m_fp32) + op_mul(beta1, gradient_fp32)
+    next_m = op_mul(ops.tuple_to_array((1.0,)) - beta1, m_fp32) + op_mul(beta1, gradient_fp32)
 
-    next_v = op_mul(F.tuple_to_array((1.0,)) - beta2, v_fp32) + op_mul(beta2, gradient_fp32 - prev_gradient_fp32)
+    next_v = op_mul(ops.tuple_to_array((1.0,)) - beta2, v_fp32) + op_mul(beta2, gradient_fp32 - prev_gradient_fp32)
 
-    next_n = op_mul(F.tuple_to_array((1.0,)) - beta3, n_fp32) + op_mul(
-        beta3, op_square(gradient + op_mul(F.tuple_to_array((1.0,)) - beta2, gradient_fp32 - prev_gradient_fp32))
+    next_n = op_mul(ops.tuple_to_array((1.0,)) - beta3, n_fp32) + op_mul(
+        beta3, op_square(gradient + op_mul(ops.tuple_to_array((1.0,)) - beta2, gradient_fp32 - prev_gradient_fp32))
     )
 
     lr_t = lr / (eps + op_sqrt(next_n))
 
-    update = next_m + op_mul(F.tuple_to_array((1.0,)) - beta2, next_v)
-
-    # if decay_flag:
-    #    update = op_mul(weight_decay, param_fp32) + update
+    update = next_m + op_mul(ops.tuple_to_array((1.0,)) - beta2, next_v)
 
     next_param = param_fp32 - op_reshape(op_mul(lr_t, update), op_shape(param_fp32))
 
     next_param = next_param / (Tensor(1.0, mstype.float32) + op_mul(weight_decay, lr_t))
 
-    success = F.depend(success, F.assign(param, op_cast(next_param, F.dtype(param))))
-    success = F.depend(success, F.assign(m, op_cast(next_m, F.dtype(m))))
-    success = F.depend(success, F.assign(v, op_cast(next_v, F.dtype(v))))
-    success = F.depend(success, F.assign(n, op_cast(next_n, F.dtype(n))))
-    success = F.depend(success, F.assign(prev_gradient, gradient))
+    success = ops.depend(success, ops.assign(param, op_cast(next_param, ops.dtype(param))))
+    success = ops.depend(success, ops.assign(m, op_cast(next_m, ops.dtype(m))))
+    success = ops.depend(success, ops.assign(v, op_cast(next_v, ops.dtype(v))))
+    success = ops.depend(success, ops.assign(n, op_cast(next_n, ops.dtype(n))))
+    success = ops.depend(success, ops.assign(prev_gradient, gradient))
 
-    return op_cast(next_param, F.dtype(param))
+    return op_cast(next_param, ops.dtype(param))
 
 
 def _check_param_value(beta1, beta2, eps, prim_name):
@@ -135,7 +122,7 @@ class Adan(Optimizer):
         beta3=0.99,
         eps=1e-8,
         use_locking=False,
-        weight_decay=1e-6,
+        weight_decay=0.0,
         loss_scale=1.0,
     ):
         super().__init__(
@@ -148,16 +135,13 @@ class Adan(Optimizer):
         self.beta1 = Tensor(beta1, mstype.float32)
         self.beta2 = Tensor(beta2, mstype.float32)
         self.beta3 = Tensor(beta3, mstype.float32)
-        # self.beta1_power = Parameter(initializer(1, [1], mstype.float32), name="beta1_power")
-        # self.beta2_power = Parameter(initializer(1, [1], mstype.float32), name="beta2_power")
-        # self.beta3_power = Parameter(initializer(1, [1], mstype.float32), name="beta3_power")
+
         self.eps = Tensor(eps, mstype.float32)
         self.use_locking = use_locking
         self.moment1 = self._parameters.clone(prefix="moment1", init="zeros")  # m
         self.moment2 = self._parameters.clone(prefix="moment2", init="zeros")  # v
         self.moment3 = self._parameters.clone(prefix="moment3", init="zeros")  # n
         self.prev_gradient = self._parameters.clone(prefix="prev_gradient", init="zeros")
-        # print('prev g: ', type(self.prev_gradient))
 
         self.weight_decay = Tensor(weight_decay, mstype.float32)
 
@@ -167,21 +151,16 @@ class Adan(Optimizer):
         moment1 = self.moment1
         moment2 = self.moment2
         moment3 = self.moment3
-        # vhat = self.vhat
+
         gradients = self.flatten_gradients(gradients)
-        # gradients = self.decay_weight(gradients) # we decay weight in adan_opt func
         gradients = self.gradients_centralization(gradients)
         gradients = self.scale_grad(gradients)
         gradients = self._grad_sparse_indices_deduplicate(gradients)
         lr = self.get_lr()
-        # weight_decay = self.get_weight_decay()
-
-        # if self.global_step == 0:
-        #    success = F.depend(True, F.assign(self.prev_gradient, gradients))
 
         # TODO: currently not support dist
         success = self.map_(
-            F.partial(_adan_opt, self.beta1, self.beta2, self.beta3, self.eps, lr, self.weight_decay),
+            ops.partial(_adan_opt, self.beta1, self.beta2, self.beta3, self.eps, lr, self.weight_decay),
             params,
             moment1,
             moment2,
@@ -189,7 +168,6 @@ class Adan(Optimizer):
             gradients,
             self.prev_gradient,
         )
-        # params, moment1, moment2, moment3, gradients, self.prev_gradient, self.global_step)
 
         return success
 
