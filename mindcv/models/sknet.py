@@ -176,6 +176,8 @@ class SKNet(ResNet):
         channels: int,
         block_nums: int,
         stride: int = 1,
+        name: str = "",
+        reduction: int = 1,
     ) -> nn.SequentialCell:
         down_sample = None
 

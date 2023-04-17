@@ -83,7 +83,8 @@ class SimpleCNNWithInnerSequential(nn.Cell):
 
 
 @pytest.mark.parametrize("mode", [0, 1])
-def test_feature_extraction_result_using_feature_wrapper():
+def test_feature_extraction_result_using_feature_wrapper(mode):
+    ms.set_context(mode=mode)
     np.random.seed(0)
 
     net = SimpleCNN()
@@ -100,7 +101,8 @@ def test_feature_extraction_result_using_feature_wrapper():
 
 
 @pytest.mark.parametrize("mode", [0, 1])
-def test_feature_extraction_result_using_feature_wrapper_with_flatten_sequential():
+def test_feature_extraction_result_using_feature_wrapper_with_flatten_sequential(mode):
+    ms.set_context(mode=mode)
     np.random.seed(0)
 
     net = SimpleCNNWithInnerSequential()
@@ -117,7 +119,8 @@ def test_feature_extraction_result_using_feature_wrapper_with_flatten_sequential
 
 
 @pytest.mark.parametrize("mode", [0, 1])
-def test_feature_extraction_indices_using_feature_wrapper():
+def test_feature_extraction_indices_using_feature_wrapper(mode):
+    ms.set_context(mode=mode)
     np.random.seed(0)
 
     net = SimpleCNN()
