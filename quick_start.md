@@ -182,6 +182,10 @@ network = create_model(model_name='densenet121', num_classes=num_classes, pretra
 
 - checkpoint_path: The path of checkpoint files. Default: “”.
 
+- features_only: Perform the feature extraction. Default: False
+
+- out_indices: The indicies of the output features when `features_only` is True. Default: [0, 1, 2, 3, 4]
+
 - use_ema: Whether use ema method. Default: False.
 
 Use the [mindcv.loss.create_loss](https://mindcv.readthedocs.io/en/latest/api/mindcv.loss.html#mindcv.loss.create_loss) interface to create a loss function (cross_entropy loss).

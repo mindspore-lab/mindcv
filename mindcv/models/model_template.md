@@ -122,6 +122,8 @@ The main model is the network model definition proposed in the paper, which is c
 - `forward_head` function. The operation of the classifier of the model is defined in the function.
 - `construct` function. In function call feature network and classifier operation.
 - `_initialize_weights` function. We agree that the random initialization of model parameters is completed by this member function. See code below.
+- `feature_info` property. This property provides the detail information of the features of the network, and it is usually necessary for the feature pyramid extraction in the downstream tasks. This property maintains a list of dictionary. And each dictionary contains {"chs", "reduction", "name"} three keys, which corredsponds to the number of channels, the scale of downsampling and the node name in the network. For example, {"chs": 64, "reduction": 4, "name": "layer1"} means that the feature has 64 feature channels, it has a 4 scale reduction for downsampling, and the corredsponding node name is ".layer1". If the master model does not have feature_info property, it means that the model does not support feature pyramid extraction at this stage. You can refer to "resnet" for the detail implementation.
+- `flatten_sequential` property. This propety is a boolean value, which means that if the model needs to do a flatten operation at the feature pyramid extraction stage, by default it is False. When the feature outputs are the outmost layers of the network (e.g., our `resnet` implementation), flatten_sequential is False. However, when the feature outputs are the second inner layers of the network (e.g., our `vgg` implementation), this propery must set to be True.
 
 Examples are as follows:
 
