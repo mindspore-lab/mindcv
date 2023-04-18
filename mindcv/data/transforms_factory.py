@@ -7,7 +7,12 @@ import math
 from mindspore.dataset import vision
 from mindspore.dataset.vision import Inter
 
-from .auto_augment import auto_augment_transform, rand_augment_transform
+from .auto_augment import (
+    augment_and_mix_transform,
+    auto_augment_transform,
+    rand_augment_transform,
+    trivial_augment_wide_transform,
+)
 from .constants import DEFAULT_CROP_PCT, IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
 __all__ = [
@@ -65,8 +70,13 @@ def transforms_imagenet_train(
         augement_params["interpolation"] = interpolation
         if auto_augment.startswith("randaug"):
             trans_list += [rand_augment_transform(auto_augment, augement_params)]
-        elif auto_augment.startswith("autoaug") or auto_augment.startswith("autoaugr"):
+        elif auto_augment.startswith("autoaug") or auto_augment.startswith("3a"):
             trans_list += [auto_augment_transform(auto_augment, augement_params)]
+        elif auto_augment.startswith("trivialaugwide"):
+            trans_list += [trivial_augment_wide_transform(auto_augment, augement_params)]
+        elif auto_augment.startswith("augmix"):
+            augement_params["translate_pct"] = 0.3
+            trans_list += [augment_and_mix_transform(auto_augment, augement_params)]
         else:
             assert False, "Unknown auto augment policy (%s)" % auto_augment
     elif color_jitter is not None:
@@ -168,6 +178,7 @@ def create_transforms(
     dataset_name="",
     image_resize=224,
     is_training=False,
+    auto_augment=None,
     **kwargs,
 ):
     r"""Creates a list of transform operation on image data.
@@ -189,7 +200,7 @@ def create_transforms(
     if dataset_name in ("imagenet", ""):
         trans_args = dict(image_resize=image_resize, **kwargs)
         if is_training:
-            return transforms_imagenet_train(**trans_args)
+            return transforms_imagenet_train(auto_augment=auto_augment, **trans_args)
 
         return transforms_imagenet_eval(**trans_args)
     elif dataset_name in ("cifar10", "cifar100"):

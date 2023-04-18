@@ -86,7 +86,10 @@ def create_parser():
                        help='Image interpolation mode for resize operator(default="bilinear")')
     group.add_argument('--auto_augment', type=str, default=None,
                        help='AutoAugment policy. "randaug" for RandAugment, "autoaug" for original AutoAugment, '
-                            '"autoaugr" for AutoAugment with increasing posterize. '
+                            '"autoaugr" for AutoAugment with increasing posterize. and "3a" for AutoAugment with only 3'
+                            'transformations. '
+                            '"augmix" for AugmixAugment. '
+                            '"trivialaugwide" for TrivialAugmentWide. '
                             'If apply, recommend for imagenet: randaug-m7-mstd0.5 (default=None).'
                             'Example: "randaug-m10-n2-w0-mstd0.5-mmax10-inc0", "autoaug-mstd0.5" or autoaugr-mstd0.5.')
     group.add_argument('--re_prob', type=float, default=0.0,
