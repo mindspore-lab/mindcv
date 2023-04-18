@@ -224,6 +224,7 @@ def train(args):
         ema_decay=args.ema_decay,
         clip_grad=args.clip_grad,
         clip_value=args.clip_value,
+        accumulate_grad_batches=args.accumulate_grad_batches,
     )
 
     # callback
