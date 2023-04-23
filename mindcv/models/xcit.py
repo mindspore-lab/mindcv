@@ -94,7 +94,7 @@ def conv3x3(in_planes, out_planes, stride=1):
         nn.Conv2d(
             in_planes, out_planes, kernel_size=3, stride=stride, padding=1, pad_mode='pad', has_bias=False
         ),
-        nn.BatchNorm2d(out_planes, use_batch_statistics=True)
+        nn.BatchNorm2d(out_planes)
     ])
 
 
@@ -165,7 +165,7 @@ class LPI(nn.Cell):
         self.conv1 = nn.Conv2d(in_features, out_features, kernel_size=kernel_size,
                                padding=padding, pad_mode='pad', group=out_features, has_bias=True)
         self.act = act_layer()
-        self.bn = nn.BatchNorm2d(in_features, use_batch_statistics=True)
+        self.bn = nn.BatchNorm2d(in_features)
         self.conv2 = nn.Conv2d(in_features, out_features, kernel_size=kernel_size,
                                padding=padding, pad_mode='pad', group=out_features, has_bias=True)
 
