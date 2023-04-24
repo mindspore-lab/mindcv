@@ -50,7 +50,7 @@ class TrainStep(nn.TrainOneStepWithLossScaleCell):
         updates=0,
         clip_grad=False,
         clip_value=15.0,
-        accumulate_grad_batches=1,
+        gradient_accumulation_steps=1,
     ):
         super(TrainStep, self).__init__(network, optimizer, scale_sense)
         self.ema = ema
@@ -62,9 +62,9 @@ class TrainStep(nn.TrainOneStepWithLossScaleCell):
             self.weights_all = ms.ParameterTuple(list(network.get_parameters()))
             self.ema_weight = self.weights_all.clone("ema", init="same")
 
-        self.need_accumulate_grad = accumulate_grad_batches > 1
+        self.need_accumulate_grad = gradient_accumulation_steps > 1
         if self.need_accumulate_grad:
-            self.gradient_accumulation = GradientAccumulation(accumulate_grad_batches, optimizer, self.grad_reducer)
+            self.gradient_accumulation = GradientAccumulation(gradient_accumulation_steps, optimizer, self.grad_reducer)
 
     def ema_update(self):
         """Update EMA parameters."""

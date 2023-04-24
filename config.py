@@ -160,7 +160,7 @@ def create_parser():
                        help='Whether use clip grad (default=False)')
     group.add_argument('--clip_value', type=float, default=15.0,
                        help='Clip value (default=15.0)')
-    group.add_argument('--accumulate_grad_batches', type=int, default=1,
+    group.add_argument('--gradient_accumulation_steps', type=int, default=1,
                        help="Accumulate the gradients of n batches before update.")
 
     # Optimize parameters

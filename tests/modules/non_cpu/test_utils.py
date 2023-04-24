@@ -72,8 +72,8 @@ def test_ema(ema, ema_decay):
     assert cur_loss < begin_loss, "Loss does NOT decrease"
 
 
-@pytest.mark.parametrize("accumulate_grad_batches", [1, 4])
-def test_gradient_accumulation(accumulate_grad_batches):
+@pytest.mark.parametrize("gradient_accumulation_steps", [1, 4])
+def test_gradient_accumulation(gradient_accumulation_steps):
     network = SimpleCNN(in_channels=1, num_classes=10)
     net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
 
@@ -86,14 +86,14 @@ def test_gradient_accumulation(accumulate_grad_batches):
     net_with_loss = WithLossCell(network, net_loss)
     loss_scale_manager = Tensor(1, ms.float32)
     train_network = TrainStep(
-        net_with_loss, net_opt, scale_sense=loss_scale_manager, accumulate_grad_batches=accumulate_grad_batches
+        net_with_loss, net_opt, scale_sense=loss_scale_manager, gradient_accumulation_steps=gradient_accumulation_steps
     )
     train_network.set_train()
 
     # For accumulation batches = N, the weight is not updated for N - 1 steps,
     # Thus the loss should be same when data input is same.
     begin_loss = train_network(input_data, label)
-    for _ in range(accumulate_grad_batches - 1):
+    for _ in range(gradient_accumulation_steps - 1):
         cur_loss = train_network(input_data, label)
         assert cur_loss == begin_loss
     cur_loss = train_network(input_data, label)
