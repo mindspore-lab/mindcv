@@ -13,7 +13,7 @@ batch_size: 128
 drop_remainder: True
 
 # augmentation
-interpolation: BICUBIC
+interpolation: 'bicubic'
 re_prob: 0.25
 mixup: 0.8
 cutmix: 1.0

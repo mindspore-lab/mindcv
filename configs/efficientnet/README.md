@@ -35,7 +35,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model           | Context   | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                     | Download                                                                                           |
 |-----------------|-----------|-----------|-----------|------------|------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
-| efficientnet_b0 | D910x64-G | 76.95     | 93.16     | 5.33       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt) |
+| efficientnet_b0 | D910x64-G | 76.89     | 93.16     | 5.33       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt) |
 
 </div>
 

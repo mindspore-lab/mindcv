@@ -26,7 +26,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 |    Model    | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                           | Download                                                                                     |
 |:-----------:|:--------:|:---------:|:---------:|:----------:|--------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
-| repmlp_t224 | D910x8-G |   76.68   |   93.30   |   38.30    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repmlp/repmlp_t224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repmlp/repmlp_t224-8dbedd00.ckpt) |
+| repmlp_t224 | D910x8-G |   76.71   |   93.30   |   38.30    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repmlp/repmlp_t224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repmlp/repmlp_t224-8dbedd00.ckpt) |
 
 </div>
 

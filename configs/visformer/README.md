@@ -24,7 +24,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 |--------------------|----------|-----------|-----------|------------|------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
 | visformer_tiny     | D910x8-G | 78.28     | 94.15     | 10.33      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml)     | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny-daee0322.ckpt)     |
 | visformer_tiny_v2  | D910x8-G | 78.82     | 94.41     | 9.38       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_v2_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny_v2-6711a758.ckpt)  |
-| visformer_small    | D910x8-G | 81.73     | 95.88     | 40.25      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_ascend.yaml)    | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small-6c83b6db.ckpt)    |
+| visformer_small    | D910x8-G | 81.76     | 95.88     | 40.25      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_ascend.yaml)    | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small-6c83b6db.ckpt)    |
 | visformer_small_v2 | D910x8-G | 82.17     | 95.90     | 23.52      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_v2_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small_v2-63674ade.ckpt) |
 
 </div>
