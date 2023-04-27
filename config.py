@@ -96,7 +96,8 @@ def create_parser():
     group.add_argument('--re_ratio', type=tuple, default=(0.3, 3.3),
                        help='Range of aspect ratio of the erased area (default=(0.3, 3.3))')
     group.add_argument('--re_value', default=0,
-                       help='Pixel value used to pad the erased area (default=0)')
+                       help='Pixel value used to pad the erased area (default=0),'
+                            'please refer to mindspore.dataset.vision.RandomErasing.')
     group.add_argument('--re_max_attempts', type=int, default=10,
                        help='The maximum number of attempts to propose a valid erased area, '
                             'beyond which the original image will be returned (default=10)')
