@@ -38,7 +38,7 @@ default_cfgs = {
     "resnest14": _cfg(url=""),
     "resnest26": _cfg(url=""),
     "resnest50": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnest/resnest50-f2e7fc9c.ckpt"),
-    "resnest101": _cfg(url=""),
+    "resnest101": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnest/resnest101-7cc5c258.ckpt"),
     "resnest200": _cfg(url=""),
     "resnest269": _cfg(url=""),
 }
@@ -274,6 +274,7 @@ class ResNeSt(nn.Cell):
         self.radix = radix
         self.avd = avd
         self.avd_first = avd_first
+        self.drop_rate = drop_rate
 
         if deep_stem:
             self.conv1 = nn.SequentialCell([
@@ -308,7 +309,7 @@ class ResNeSt(nn.Cell):
             self.layer3 = self._make_layer(block, 256, layers[2], stride=2, norm_layer=norm_layer)
             self.layer4 = self._make_layer(block, 512, layers[3], stride=2, norm_layer=norm_layer)
         self.avgpool = GlobalAvgPooling()
-        self.drop = nn.Dropout(keep_prob=1.0 - drop_rate) if drop_rate > 0.0 else None
+        self.drop = nn.Dropout(keep_prob=1.0 - drop_rate) if self.drop_rate > 0.0 else None
         self.fc = nn.Dense(512 * block.expansion, num_classes)
 
         self._initialize_weights()
@@ -433,7 +434,7 @@ class ResNeSt(nn.Cell):
 
     def forward_head(self, x: Tensor) -> Tensor:
         x = self.avgpool(x)
-        if self.drop:
+        if self.drop_rate > 0:
             x = self.drop(x)
         x = self.fc(x)
         return x
