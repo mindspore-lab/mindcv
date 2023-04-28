@@ -32,15 +32,18 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model     | Context   | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                         | Download                                                           |
-|-----------|-----------|-----------|-----------|------------|------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
-| repvgg_a0 | D910x8-G  | 72.19     | 90.75     | 9.13       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a0-6e71139d.ckpt) |
-| repvgg_a1 | D910x8-G  | 74.19     | 91.89     | 14.12      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a1-539513ac.ckpt) |
-| repvgg_a2 | D910x8-G  | 76.63     | 93.42     | 28.25      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a2_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a2-cdc90b11.ckpt) |
-| repvgg_b0 | D910x8-G  | 74.99     | 92.40     | 15.85      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b0-54d5862c.ckpt) |
-| repvgg_b1 | D910x8-G  | 78.81     | 94.37     | 57.48      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b1-4673797.ckpt) |
-| repvgg_b2 | D910x64-G | 79.29     | 94.66     | 89.11      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b2_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b2-7c91ccd4.ckpt) |
-| repvgg_b3 | D910x64-G | 80.46     | 95.34     | 123.19     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b3_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b3-30b35f52.ckpt) |
+| Model       | Context   | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                           | Download                                                                                  |
+|-------------|-----------|-----------|-----------|------------|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
+| repvgg_a0   | D910x8-G  | 72.19     | 90.75     | 9.13       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a0_ascend.yaml)   | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a0-6e71139d.ckpt)   |
+| repvgg_a1   | D910x8-G  | 74.19     | 91.89     | 14.12      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a1_ascend.yaml)   | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a1-539513ac.ckpt)   |
+| repvgg_a2   | D910x8-G  | 76.63     | 93.42     | 28.25      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a2_ascend.yaml)   | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a2-cdc90b11.ckpt)   |
+| repvgg_b0   | D910x8-G  | 74.99     | 92.40     | 15.85      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b0_ascend.yaml)   | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b0-54d5862c.ckpt)   |
+| repvgg_b1   | D910x8-G  | 78.81     | 94.37     | 57.48      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b1_ascend.yaml)   | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b1-4673797.ckpt)    |
+| repvgg_b2   | D910x64-G | 79.29     | 94.66     | 89.11      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b2_ascend.yaml)   | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b2-7c91ccd4.ckpt)   |
+| repvgg_b3   | D910x64-G | 80.46     | 95.34     | 123.19     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b3_ascend.yaml)   | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b3-30b35f52.ckpt)   |
+| repvgg_b1g2 | D910x8-G  | 78.03     | 94.09     | 45.85      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b1g2_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b1g2-f0dc714f.ckpt) |
+| repvgg_b1g4 | D910x8-G  | 80.46     | 95.34     | 40.03      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b1g4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b1g4-bd93230e.ckpt) |
+| repvgg_b2g4 | D910x8-G  | 78.8      | 94.36     | 61.84      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b2g4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b2g4-e79eeadd.ckpt) |
 
 </div>
 
