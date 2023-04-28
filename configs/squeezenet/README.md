@@ -25,10 +25,10 @@ Middle: SqueezeNet with simple bypass; Right: SqueezeNet with complex bypass.
 
 | Model          | Context | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                               | Download                                                                                    |
 |----------------|---------|-----------|-----------|------------|------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
-| squeezenet_1.0 | D910x8-G | 59.01 | 81.01| 1.25 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_0-e2d78c4a.ckpt) |
-| squeezenet_1.0 | GPUx8-G | 59.49 | 81.22 | 1.25 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.0_gpu.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.0_224.ckpt) |
-| squeezenet_1.1 | D910x8-G | 58.44 | 80.84 | 1.24 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_1-da256d3a.ckpt) |
-| squeezenet_1.1 | GPUx8-G | 58.99 | 80.99 | 1.24 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.1_gpu.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet_1.1_224.ckpt) |
+| squeezenet_1.0 | D910x8-G | 59.01     | 81.01     | 1.25 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_0-e2d78c4a.ckpt) |
+| squeezenet_1.0 | GPUx8-G | 58.83     | 81.08     | 1.25 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.0_gpu.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_0_gpu-685f5941.ckpt) |
+| squeezenet_1.1 | D910x8-G | 58.44     | 80.84     | 1.24 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_1-da256d3a.ckpt) |
+| squeezenet_1.1 | GPUx8-G | 59.18     | 81.41     | 1.24 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.1_gpu.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_1_gpu-0e33234a.ckpt) |
 
 </div>
 

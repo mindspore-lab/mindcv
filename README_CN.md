@@ -332,6 +332,28 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
 ## 日志
 
 ### 更新
+- 2023/04/28
+1. 增添了一些新模型，列出如下：
+    - [VGG](configs/vgg)
+    - [DPN](configs/dpn)
+    - [ResNet v2](configs/resnetv2)
+    - [MnasNet](configs/mnasnet)
+    - [MixNet](configs/mixnet)
+    - [RepVGG](configs/repvgg)
+    - [ConvNeXt](configs/convnext)
+    - [Swin Transformer](configs/swintransformer)
+    - [EdgeNeXt](configs/edgenext)
+    - [CrossViT](configs/crossvit)
+    - [XCiT](configs/xcit)
+    - [CoAT](configs/coat)
+    - [PiT](configs/pit)
+    - [PVT v2](configs/pvt_v2)
+    - [MobileViT](configs/mobilevit)
+2. 错误修正:
+    - 分布式训练时，需对每个进程设置相同的随机数种子
+    - 检查YAML配置文件中的选项是否存在于命令行解析器
+    - 修正了优化器`Adan`中标志变量不为`Tensor`的错误
+
 - 2023/03/25
 1. 更新ResNet网络预训练权重，现在预训练权重有更高Top1精度
     - ResNet18精度从70.09提升到70.31

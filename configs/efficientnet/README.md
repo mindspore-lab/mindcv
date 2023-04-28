@@ -15,7 +15,7 @@ and resolution scaling could be found. EfficientNet could achieve better model p
   <img src="https://user-images.githubusercontent.com/77485245/225044036-d0344404-e86c-483c-971f-863ebe6decc6.jpeg" width=800 />
 </p>
 <p align="center">
-  <em>Figure 1. Architecture of DPN [<a href="#references">1</a>] </em>
+  <em>Figure 1. Architecture of Efficientent [<a href="#references">1</a>] </em>
 </p>
 
 ## Results
@@ -33,9 +33,10 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model           | Context   | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                     | Download                                                                                           |
-|-----------------|-----------|-----------|-----------|------------|------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
-| efficientnet_b0 | D910x64-G | 76.95     | 93.16     | 5.33       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt) |
+| Model           | Context   | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                     | Download                                                               |
+|-----------------|-----------|-----------|-----------|------------|------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|
+| efficientnet_b0 | D910x64-G | 76.89     | 93.16     | 5.33       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt) |
+| efficientnet_b1 | D910x64-G | 78.95     | 94.34     | 7.86       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b1-f8c6b13f.ckpt) |
 
 </div>
 

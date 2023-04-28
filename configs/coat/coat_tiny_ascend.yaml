@@ -1,0 +1,63 @@
+# system
+mode: 0
+distribute: True
+num_parallel_workers: 8
+val_while_train: True
+val_interval: 1
+
+# dataset
+dataset: 'imagenet'
+data_dir: '/path/to/imagenet/'
+shuffle: True
+dataset_download: False
+batch_size: 32
+drop_remainder: True
+
+# augmentation
+image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+interpolation: 'bicubic'
+auto_augment: 'randaug-m7-mstd0.5-inc1'
+re_prob: 0.1
+mixup: 0.2
+cutmix: 1.0
+cutmix_prob: 1.0
+crop_pct: 0.9
+color_jitter: 0.4
+
+# model config
+model: 'coat_tiny'
+drop_rate: 0.0
+drop_path_rate: 0.0
+num_classes: 1000
+pretrained: False
+ckpt_path: ''
+keep_checkpoint_max: 10
+ckpt_save_policy: 'top_k'
+ckpt_save_dir: './ckpt/'
+dataset_sink_mode: True
+amp_level: 'O2'
+ema: True
+ema_decay: 0.9995
+
+# loss config
+loss: 'CE'
+label_smoothing: 0.1
+
+# lr scheduler config
+scheduler: 'warmup_cosine_decay'
+lr: 0.00025
+min_lr: 0.000001
+warmup_epochs: 20
+decay_epochs: 280
+epoch_size: 300
+
+# optimizer config
+opt: 'lion'
+weight_decay: 0.15
+filter_bias_and_bn: True
+loss_scale: 4096
+use_nesterov: False
+loss_scale_type: dynamic
