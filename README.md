@@ -316,6 +316,28 @@ Please see [configs](./configs) for the details about model performance and pret
 
 ## Notes
 ### What is New
+- 2023/04/28
+1. Add some new models, listed as following
+    - [VGG](configs/vgg)
+    - [DPN](configs/dpn)
+    - [ResNet v2](configs/resnetv2)
+    - [MnasNet](configs/mnasnet)
+    - [MixNet](configs/mixnet)
+    - [RepVGG](configs/repvgg)
+    - [ConvNeXt](configs/convnext)
+    - [Swin Transformer](configs/swintransformer)
+    - [EdgeNeXt](configs/edgenext)
+    - [CrossViT](configs/crossvit)
+    - [XCiT](configs/xcit)
+    - [CoAT](configs/coat)
+    - [PiT](configs/pit)
+    - [PVT v2](configs/pvt_v2)
+    - [MobileViT](configs/mobilevit)
+2. Bug fix:
+    - Setting the same random seed for each rank
+    - Checking if options from yaml config exist in argument parser
+    - Initializing flag variable as `Tensor` in Optimizer `Adan`
+
 - 2023/03/25
 1. Update checkpoints for pretrained ResNet for better accuracy
     - ResNet18 (from 70.09 to 70.31 @Top1 accuracy)
