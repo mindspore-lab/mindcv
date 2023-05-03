@@ -600,7 +600,7 @@ class ViT(nn.Cell):
         if self.pool == "cls":
             x = x[:, 0]
         else:
-            x = self.mean(x, (1, 2))  # (1,) or (1,2)
+            x = self.mean(x, (1, ))  # (1,) or (1,2)
         return x
 
 
