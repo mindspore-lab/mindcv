@@ -188,17 +188,22 @@ def validate_with_ckpt_imagenet1k(args):
     ],
 )
 def test_val_ckpt_imagenet1k(config, ckpt_path, ckpt_link, data_dir, acc_target, length_target):
+    root = os.path.dirname(__file__)
     [ckpt_dir, ckpt_name] = os.path.split(ckpt_path)
-    ckpt_root = os.sep.join(ckpt_dir.split(os.sep)[:-1])
 
-    if not os.path.isdir(ckpt_root):
-        os.mkdir(ckpt_root)
-    if not os.path.isdir(ckpt_dir):
-        os.mkdir(ckpt_dir)
-    if not os.path.isfile(ckpt_path):
-        DownLoad().download_url(ckpt_link, ckpt_dir, ckpt_name)
+    abs_ckpt_root = os.path.normpath(os.path.join(root, os.sep.join(ckpt_dir.split(os.sep)[:-1])))
+    abs_ckpt_dir = os.path.normpath(os.path.join(root, ckpt_dir))
+    abs_ckpt_path = os.path.normpath(os.path.join(root, ckpt_path))
+    abs_config_path = os.path.normpath(os.path.join(root, config))
 
-    args = ["-c", config, "--ckpt_path", ckpt_path, "--data_dir", data_dir]
+    if not os.path.isdir(abs_ckpt_root):
+        os.mkdir(abs_ckpt_root)
+    if not os.path.isdir(abs_ckpt_dir):
+        os.mkdir(abs_ckpt_dir)
+    if not os.path.isfile(abs_ckpt_path):
+        DownLoad().download_url(ckpt_link, abs_ckpt_dir, ckpt_name)
+
+    args = ["-c", abs_config_path, "--ckpt_path", abs_ckpt_path, "--data_dir", data_dir]
     args = parse_args(args)
 
     length = output_feature(args)
