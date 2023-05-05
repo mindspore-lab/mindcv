@@ -28,7 +28,7 @@ model_name_list = [
     "densenet121",
     "dpn92",
     "edgenext_small",
-    "ghostnet_1x",
+    "ghostnet_100",
     "googlenet",
     "hrnet_w32",
     "inception_v3",
