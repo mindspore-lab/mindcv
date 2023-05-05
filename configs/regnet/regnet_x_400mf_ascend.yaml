@@ -1,0 +1,56 @@
+# system
+mode: 0
+distribute: True
+val_while_train: True
+val_interval: 1
+log_interval: 100
+
+# dataset
+dataset: 'imagenet'
+data_dir: '/path/to/imagenet'
+shuffle: True
+num_parallel_workers: 8
+batch_size: 64
+
+# augmentation
+image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+vflip: 0.0
+interpolation: 'bicubic'
+color_jitter: 0.4
+re_prob: 0.1
+
+# model
+model: 'regnet_x_400mf'
+num_classes: 1000
+keep_checkpoint_max: 10
+ckpt_save_dir: './ckpt'
+ckpt_save_interval: 1
+ckpt_save_policy: 'latest_k'
+epoch_size: 150
+dataset_sink_mode: True
+
+# loss
+loss: 'CE'
+label_smoothing: 0.1
+
+# lr scheduler
+scheduler: 'cosine_decay'
+min_lr: 0.0
+lr: 0.1
+warmup_epochs: 5
+warmup_factor: 0.01
+decay_epochs: 145
+
+# optimizer
+opt: 'momentum'
+momentum: 0.9
+weight_decay: 5e-5
+use_nesterov: False
+filter_bias_and_bn: True
+
+# amp
+amp_level: 'O2'
+loss_scale_type: 'auto'
