@@ -47,8 +47,7 @@ def _cfg(url="", **kwargs):
 default_cfgs = {
     "efficientnet_b0": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt"),
-    "efficientnet_b1": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b1-f8c6b13f.ckpt"),
+    "efficientnet_b1": _cfg(url=""),
     "efficientnet_b2": _cfg(url=""),
     "efficientnet_b3": _cfg(url=""),
     "efficientnet_b4": _cfg(url=""),
@@ -380,6 +379,9 @@ class EfficientNet(nn.Cell):
             Swish(),
         ])
 
+        total_reduction = 2
+        self.feature_info = [dict(chs=firstconv_output_channels, reduction=total_reduction, name=f'features.{len(layers) - 1}')]
+
         # building MBConv blocks
         total_stage_blocks = sum(cnf.num_layers for cnf in inverted_residual_setting)
         stage_block_id = 0
@@ -406,10 +408,14 @@ class EfficientNet(nn.Cell):
                 # adjust dropout rate of blocks based on the depth of the stage block
                 sd_prob = keep_prob * float(stage_block_id + 0.00001) / total_stage_blocks
 
+                total_reduction *= block_cnf.stride
+
                 stage.append(block(block_cnf, sd_prob, norm_layer))
                 stage_block_id += 1
 
             layers.append(nn.SequentialCell(stage))
+
+            self.feature_info.append(dict(chs=cnf.out_channels, reduction=total_reduction, name=f'features.{len(layers) - 1}'))
 
         # building last several layers
         lastconv_input_channels = inverted_residual_setting[-1].out_channels
@@ -419,6 +425,9 @@ class EfficientNet(nn.Cell):
             norm_layer(lastconv_output_channels),
             Swish(),
         ])
+
+        self.feature_info.append(dict(chs=lastconv_output_channels, reduction=total_reduction, name=f'features.{len(layers) - 1}'))
+        self.flatten_sequential = True
 
         self.features = nn.SequentialCell(layers)
         self.avgpool = GlobalAvgPooling()

@@ -138,20 +138,24 @@ class ConvNeXt(nn.Cell):
     ):
         super().__init__()
 
-        self.downsample_layers = nn.CellList()  # stem and 3 intermediate down_sampling conv layers
+        downsample_layers = []  # stem and 3 intermediate down_sampling conv layers
         stem = nn.SequentialCell(
             nn.Conv2d(in_channels, dims[0], kernel_size=4, stride=4, has_bias=True),
             ConvNextLayerNorm((dims[0],), epsilon=1e-6, norm_axis=1),
         )
-        self.downsample_layers.append(stem)
+        downsample_layers.append(stem)
         for i in range(3):
             downsample_layer = nn.SequentialCell(
                 ConvNextLayerNorm((dims[i],), epsilon=1e-6, norm_axis=1),
                 nn.Conv2d(dims[i], dims[i + 1], kernel_size=2, stride=2, has_bias=True),
             )
-            self.downsample_layers.append(downsample_layer)
+            downsample_layers.append(downsample_layer)
 
-        self.stages = nn.CellList()  # 4 feature resolution stages, each consisting of multiple residual blocks
+        total_reduction = 4
+        self.feature_info = []
+        self.flatten_sequential = True
+
+        stages = []  # 4 feature resolution stages, each consisting of multiple residual blocks
         dp_rates = list(np.linspace(0, drop_path_rate, sum(depths)))
         cur = 0
         for i in range(4):
@@ -160,21 +164,25 @@ class ConvNeXt(nn.Cell):
                 blocks.append(Block(dim=dims[i], drop_path=dp_rates[cur + j],
                                     layer_scale_init_value=layer_scale_init_value))
             stage = nn.SequentialCell(blocks)
-            self.stages.append(stage)
+            stages.append(stage)
             cur += depths[i]
 
+            if i > 0:
+                total_reduction *= 2
+            self.feature_info.append(dict(chs=dims[i], reduction=total_reduction, name=f'feature.{i * 2 + 1}'))
+
+        self.feature = nn.SequentialCell([
+            downsample_layers[0],
+            stages[0],
+            downsample_layers[1],
+            stages[1],
+            downsample_layers[2],
+            stages[2],
+            downsample_layers[3],
+            stages[3]
+        ])
         self.norm = ConvNextLayerNorm((dims[-1],), epsilon=1e-6)  # final norm layer
         self.classifier = nn.Dense(dims[-1], num_classes)  # classifier
-        self.feature = nn.SequentialCell([
-            self.downsample_layers[0],
-            self.stages[0],
-            self.downsample_layers[1],
-            self.stages[1],
-            self.downsample_layers[2],
-            self.stages[2],
-            self.downsample_layers[3],
-            self.stages[3]
-        ])
         self.head_init_scale = head_init_scale
         self._initialize_weights()
 

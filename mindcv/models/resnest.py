@@ -38,7 +38,7 @@ default_cfgs = {
     "resnest14": _cfg(url=""),
     "resnest26": _cfg(url=""),
     "resnest50": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnest/resnest50-f2e7fc9c.ckpt"),
-    "resnest101": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/resnest/resnest101-7cc5c258.ckpt"),
+    "resnest101": _cfg(url=""),
     "resnest200": _cfg(url=""),
     "resnest269": _cfg(url=""),
 }
@@ -274,7 +274,6 @@ class ResNeSt(nn.Cell):
         self.radix = radix
         self.avd = avd
         self.avd_first = avd_first
-        self.drop_rate = drop_rate
 
         if deep_stem:
             self.conv1 = nn.SequentialCell([
@@ -295,21 +294,22 @@ class ResNeSt(nn.Cell):
 
         self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.ReLU()
+        self.feature_info = [dict(chs=self.inplanes, reduction=2, name="relu")]
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")
 
-        self.layer1 = self._make_layer(block, 64, layers[0], norm_layer=norm_layer, is_first=False)
-        self.layer2 = self._make_layer(block, 128, layers[1], stride=2, norm_layer=norm_layer)
+        self.layer1 = self._make_layer(block, 64, layers[0], norm_layer=norm_layer, is_first=False, name='layer1', reduction=4)
+        self.layer2 = self._make_layer(block, 128, layers[1], stride=2, norm_layer=norm_layer, name='layer2', reduction=8)
         if dilated or dilation == 4:
-            self.layer3 = self._make_layer(block, 256, layers[2], stride=1, dilation=2, norm_layer=norm_layer)
-            self.layer4 = self._make_layer(block, 512, layers[3], stride=1, dilation=4, norm_layer=norm_layer)
+            self.layer3 = self._make_layer(block, 256, layers[2], stride=1, dilation=2, norm_layer=norm_layer, name='layer3', reduction=8)
+            self.layer4 = self._make_layer(block, 512, layers[3], stride=1, dilation=4, norm_layer=norm_layer, name='layer4', reduction=8)
         elif dilation == 2:
-            self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilation=1, norm_layer=norm_layer)
-            self.layer4 = self._make_layer(block, 512, layers[3], stride=1, dilation=2, norm_layer=norm_layer)
+            self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilation=1, norm_layer=norm_layer, name='layer3', reduction=16)
+            self.layer4 = self._make_layer(block, 512, layers[3], stride=1, dilation=2, norm_layer=norm_layer, name='layer4', reduction=16)
         else:
-            self.layer3 = self._make_layer(block, 256, layers[2], stride=2, norm_layer=norm_layer)
-            self.layer4 = self._make_layer(block, 512, layers[3], stride=2, norm_layer=norm_layer)
+            self.layer3 = self._make_layer(block, 256, layers[2], stride=2, norm_layer=norm_layer, name='layer3', reduction=16)
+            self.layer4 = self._make_layer(block, 512, layers[3], stride=2, norm_layer=norm_layer, name='layer4', reduction=32)
         self.avgpool = GlobalAvgPooling()
-        self.drop = nn.Dropout(keep_prob=1.0 - drop_rate) if self.drop_rate > 0.0 else None
+        self.drop = nn.Dropout(keep_prob=1.0 - drop_rate) if drop_rate > 0.0 else None
         self.fc = nn.Dense(512 * block.expansion, num_classes)
 
         self._initialize_weights()
@@ -346,6 +346,8 @@ class ResNeSt(nn.Cell):
         dilation: int = 1,
         norm_layer: Optional[nn.Cell] = None,
         is_first: bool = True,
+        name: str = "",
+        reduction: int = 1,
     ) -> nn.SequentialCell:
         downsample = None
         if stride != 1 or self.inplanes != planes * block.expansion:
@@ -418,6 +420,9 @@ class ResNeSt(nn.Cell):
                     norm_layer=norm_layer,
                 )
             )
+
+        self.feature_info.append(dict(chs=self.inplanes, reduction=reduction, name=name))
+
         return nn.SequentialCell(layers)
 
     def forward_features(self, x: Tensor) -> Tensor:
@@ -434,7 +439,7 @@ class ResNeSt(nn.Cell):
 
     def forward_head(self, x: Tensor) -> Tensor:
         x = self.avgpool(x)
-        if self.drop_rate > 0:
+        if self.drop:
             x = self.drop(x)
         x = self.fc(x)
         return x
