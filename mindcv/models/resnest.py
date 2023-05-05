@@ -297,17 +297,25 @@ class ResNeSt(nn.Cell):
         self.feature_info = [dict(chs=self.inplanes, reduction=2, name="relu")]
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")
 
-        self.layer1 = self._make_layer(block, 64, layers[0], norm_layer=norm_layer, is_first=False, name='layer1', reduction=4)
-        self.layer2 = self._make_layer(block, 128, layers[1], stride=2, norm_layer=norm_layer, name='layer2', reduction=8)
+        self.layer1 = self._make_layer(block, 64, layers[0], norm_layer=norm_layer, is_first=False,
+                                       name='layer1', reduction=4)
+        self.layer2 = self._make_layer(block, 128, layers[1], stride=2, norm_layer=norm_layer,
+                                       name='layer2', reduction=8)
         if dilated or dilation == 4:
-            self.layer3 = self._make_layer(block, 256, layers[2], stride=1, dilation=2, norm_layer=norm_layer, name='layer3', reduction=8)
-            self.layer4 = self._make_layer(block, 512, layers[3], stride=1, dilation=4, norm_layer=norm_layer, name='layer4', reduction=8)
+            self.layer3 = self._make_layer(block, 256, layers[2], stride=1, dilation=2, norm_layer=norm_layer,
+                                           name='layer3', reduction=8)
+            self.layer4 = self._make_layer(block, 512, layers[3], stride=1, dilation=4, norm_layer=norm_layer,
+                                           name='layer4', reduction=8)
         elif dilation == 2:
-            self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilation=1, norm_layer=norm_layer, name='layer3', reduction=16)
-            self.layer4 = self._make_layer(block, 512, layers[3], stride=1, dilation=2, norm_layer=norm_layer, name='layer4', reduction=16)
+            self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilation=1, norm_layer=norm_layer,
+                                           name='layer3', reduction=16)
+            self.layer4 = self._make_layer(block, 512, layers[3], stride=1, dilation=2, norm_layer=norm_layer,
+                                           name='layer4', reduction=16)
         else:
-            self.layer3 = self._make_layer(block, 256, layers[2], stride=2, norm_layer=norm_layer, name='layer3', reduction=16)
-            self.layer4 = self._make_layer(block, 512, layers[3], stride=2, norm_layer=norm_layer, name='layer4', reduction=32)
+            self.layer3 = self._make_layer(block, 256, layers[2], stride=2, norm_layer=norm_layer,
+                                           name='layer3', reduction=16)
+            self.layer4 = self._make_layer(block, 512, layers[3], stride=2, norm_layer=norm_layer,
+                                           name='layer4', reduction=32)
         self.avgpool = GlobalAvgPooling()
         self.drop = nn.Dropout(keep_prob=1.0 - drop_rate) if drop_rate > 0.0 else None
         self.fc = nn.Dense(512 * block.expansion, num_classes)

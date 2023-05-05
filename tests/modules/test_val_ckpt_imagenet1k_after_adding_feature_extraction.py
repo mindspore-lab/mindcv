@@ -8,8 +8,8 @@ Please specify 'imagenet1k_root' before running the test.
 import os
 import sys
 
-import pytest
 import numpy as np
+import pytest
 
 import mindspore as ms
 import mindspore.nn as nn
@@ -25,7 +25,7 @@ from mindcv.utils.download import DownLoad
 
 from config import parse_args  # isort: skip
 
-imagenet1k_root = '/path/to/ImageNet-1K/'
+imagenet1k_root = "/path/to/ImageNet-1K/"
 
 
 def output_feature(args):
@@ -37,7 +37,7 @@ def output_feature(args):
         pretrained=args.pretrained,
         checkpoint_path=args.ckpt_path,
         ema=args.ema,
-        features_only=True
+        features_only=True,
     )
 
     x = ms.Tensor(np.random.randn(8, 3, 32, 32), dtype=ms.float32)
@@ -126,35 +126,67 @@ def validate_with_ckpt_imagenet1k(args):
     return result
 
 
-@pytest.mark.parametrize('config, ckpt_path, ckpt_link, data_dir, acc_target, length_target',
-                         [('../../configs/resnet/resnet_18_ascend.yaml',
-                           '../../checkpoints/resnet/resnet18-1e65cd21.ckpt',
-                           'https://download.mindspore.cn/toolkits/mindcv/resnet/resnet18-1e65cd21.ckpt',
-                           imagenet1k_root, 0.7, 5),
-                          ('../../configs/mobilenetv3/mobilenet_v3_small_ascend.yaml',
-                           '../../checkpoints/mobilenetv3/mobilenet_v3_small_100-c884b105.ckpt',
-                           'https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-c884b105.ckpt',
-                           imagenet1k_root, 0.67, 5),
-                          ('../../configs/convnext/convnext_tiny_ascend.yaml',
-                           '../../checkpoints/convnext/convnext_tiny-ae5ff8d7.ckpt',
-                           'https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_tiny-ae5ff8d7.ckpt',
-                           imagenet1k_root, 0.8, 4),
-                          ('../../configs/resnest/resnest50_ascend.yaml',
-                           '../../checkpoints/resnest/resnest50-f2e7fc9c.ckpt',
-                           'https://download.mindspore.cn/toolkits/mindcv/resnest/resnest50-f2e7fc9c.ckpt',
-                           imagenet1k_root, 0.8, 5),
-                          ('../../configs/efficientnet/efficientnet_b0_ascend.yaml',
-                           '../../checkpoints/efficientnet/efficientnet_b0-103ec70c.ckpt',
-                           'https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt',
-                           imagenet1k_root, 0.76, 5),
-                          ('../../configs/repvgg/repvgg_a0_ascend.yaml',
-                           '../../checkpoints/repvgg/repvgg_a0-6e71139d.ckpt',
-                           'https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a0-6e71139d.ckpt',
-                           imagenet1k_root, 0.72, 5),
-                          ('../../configs/rexnet/rexnet_x10_ascend.yaml',
-                           '../../checkpoints/rexnet/rexnet_10-c5fb2dc7.ckpt',
-                           'https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_10-c5fb2dc7.ckpt',
-                           imagenet1k_root, 0.77, 5)])
+@pytest.mark.parametrize(
+    "config, ckpt_path, ckpt_link, data_dir, acc_target, length_target",
+    [
+        (
+            "../../configs/resnet/resnet_18_ascend.yaml",
+            "../../checkpoints/resnet/resnet18-1e65cd21.ckpt",
+            "https://download.mindspore.cn/toolkits/mindcv/resnet/resnet18-1e65cd21.ckpt",
+            imagenet1k_root,
+            0.7,
+            5,
+        ),
+        (
+            "../../configs/mobilenetv3/mobilenet_v3_small_ascend.yaml",
+            "../../checkpoints/mobilenetv3/mobilenet_v3_small_100-c884b105.ckpt",
+            "https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-c884b105.ckpt",
+            imagenet1k_root,
+            0.67,
+            5,
+        ),
+        (
+            "../../configs/convnext/convnext_tiny_ascend.yaml",
+            "../../checkpoints/convnext/convnext_tiny-ae5ff8d7.ckpt",
+            "https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_tiny-ae5ff8d7.ckpt",
+            imagenet1k_root,
+            0.8,
+            4,
+        ),
+        (
+            "../../configs/resnest/resnest50_ascend.yaml",
+            "../../checkpoints/resnest/resnest50-f2e7fc9c.ckpt",
+            "https://download.mindspore.cn/toolkits/mindcv/resnest/resnest50-f2e7fc9c.ckpt",
+            imagenet1k_root,
+            0.8,
+            5,
+        ),
+        (
+            "../../configs/efficientnet/efficientnet_b0_ascend.yaml",
+            "../../checkpoints/efficientnet/efficientnet_b0-103ec70c.ckpt",
+            "https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt",
+            imagenet1k_root,
+            0.76,
+            5,
+        ),
+        (
+            "../../configs/repvgg/repvgg_a0_ascend.yaml",
+            "../../checkpoints/repvgg/repvgg_a0-6e71139d.ckpt",
+            "https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a0-6e71139d.ckpt",
+            imagenet1k_root,
+            0.72,
+            5,
+        ),
+        (
+            "../../configs/rexnet/rexnet_x10_ascend.yaml",
+            "../../checkpoints/rexnet/rexnet_10-c5fb2dc7.ckpt",
+            "https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_10-c5fb2dc7.ckpt",
+            imagenet1k_root,
+            0.77,
+            5,
+        ),
+    ],
+)
 def test_val_ckpt_imagenet1k(config, ckpt_path, ckpt_link, data_dir, acc_target, length_target):
     [ckpt_dir, ckpt_name] = os.path.split(ckpt_path)
     ckpt_root = os.sep.join(ckpt_dir.split(os.sep)[:-1])
@@ -166,11 +198,11 @@ def test_val_ckpt_imagenet1k(config, ckpt_path, ckpt_link, data_dir, acc_target,
     if not os.path.isfile(ckpt_path):
         DownLoad().download_url(ckpt_link, ckpt_dir, ckpt_name)
 
-    args = ['-c', config, '--ckpt_path', ckpt_path, '--data_dir', data_dir]
+    args = ["-c", config, "--ckpt_path", ckpt_path, "--data_dir", data_dir]
     args = parse_args(args)
 
     length = output_feature(args)
     assert length == length_target, "Wrong feature extraction"
 
     result = validate_with_ckpt_imagenet1k(args)
-    assert result['Top_1_Accuracy'] > acc_target, "Top_1_Accuracy is abnormal"
+    assert result["Top_1_Accuracy"] > acc_target, "Top_1_Accuracy is abnormal"

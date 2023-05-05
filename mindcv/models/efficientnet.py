@@ -380,7 +380,8 @@ class EfficientNet(nn.Cell):
         ])
 
         total_reduction = 2
-        self.feature_info = [dict(chs=firstconv_output_channels, reduction=total_reduction, name=f'features.{len(layers) - 1}')]
+        self.feature_info = [dict(chs=firstconv_output_channels, reduction=total_reduction,
+                                  name=f'features.{len(layers) - 1}')]
 
         # building MBConv blocks
         total_stage_blocks = sum(cnf.num_layers for cnf in inverted_residual_setting)
@@ -415,7 +416,8 @@ class EfficientNet(nn.Cell):
 
             layers.append(nn.SequentialCell(stage))
 
-            self.feature_info.append(dict(chs=cnf.out_channels, reduction=total_reduction, name=f'features.{len(layers) - 1}'))
+            self.feature_info.append(dict(chs=cnf.out_channels, reduction=total_reduction,
+                                          name=f'features.{len(layers) - 1}'))
 
         # building last several layers
         lastconv_input_channels = inverted_residual_setting[-1].out_channels
@@ -426,7 +428,8 @@ class EfficientNet(nn.Cell):
             Swish(),
         ])
 
-        self.feature_info.append(dict(chs=lastconv_output_channels, reduction=total_reduction, name=f'features.{len(layers) - 1}'))
+        self.feature_info.append(dict(chs=lastconv_output_channels, reduction=total_reduction,
+                                      name=f'features.{len(layers) - 1}'))
         self.flatten_sequential = True
 
         self.features = nn.SequentialCell(layers)

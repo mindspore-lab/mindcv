@@ -181,7 +181,8 @@ class MobileNetV3(nn.Cell):
             input_channels = output_channels
 
             total_reduction *= s
-            self.feature_info.append(dict(chs=input_channels, reduction=total_reduction, name=f'features.{len(features) - 1}'))
+            self.feature_info.append(dict(chs=input_channels, reduction=total_reduction,
+                                          name=f'features.{len(features) - 1}'))
 
         # Building last point-wise conv layers.
         output_channels = input_channels * 6
@@ -191,7 +192,8 @@ class MobileNetV3(nn.Cell):
             nn.HSwish(),
         ])
 
-        self.feature_info.append(dict(chs=output_channels, reduction=total_reduction, name=f'features.{len(features) - 1}'))
+        self.feature_info.append(dict(chs=output_channels, reduction=total_reduction,
+                                      name=f'features.{len(features) - 1}'))
         self.flatten_sequential = True
 
         self.features = nn.SequentialCell(features)
