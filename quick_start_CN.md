@@ -181,6 +181,10 @@ network = create_model(model_name='densenet121', num_classes=num_classes, pretra
 
 - checkpoint_path：checkpoint的路径。默认值：“ ”。
 
+- features_only：进行多尺度的特征提取。默认值：False。
+
+- out_indices：当features_only为True时，多尺度特征提取的对应索引值。默认值：[0, 1, 2, 3, 4]
+
 - ema：是否使用ema方法 默认值: False。
 
 使用[mindcv.loss.create_loss](https://mindcv.readthedocs.io/en/latest/api/mindcv.loss.html#mindcv.loss.create_loss)接口创建损失函数（cross_entropy loss）。

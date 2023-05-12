@@ -120,6 +120,8 @@ class MixerBlock(nn.Cell):
 - `forward_head`函数。在函数内对模型的分类器的运算进行定义。
 - `construct`函数。在函数调用特征网络和分类器的运算。
 - `_initialize_weights`函数。我们约定模型参数的随机初始化由该成员函数完成。详见下方代码。
+- `feature_info`属性。此属性提供了网络特征的具体信息，通常用来做下游任务中的多特征提取。此属性为一个字典列表，每一个字典包含["chs", "reduction", “name”]三個Key, 分别代表该特征的channel大小，向下采样倍率和对应的网络节点名字。例如，{"chs": 64, "reduction": 4, "name": "layer1"}代表该特征有64个channel，为输入图片的4倍下采样，并且代表的网络节点为“.layer1”。如果主模型没有feature_info属性，代表该网络尚未支持多特征提取。已支持模型可参考resnet。
+- `flatten_sequential`属性。此属性为一个bool常量，代表该模型在做多特征提取时是否需要做结构平坦化，缺省值为False。当特征提取节点为网络的最外层时（如resnet的实现），该属性为False；当特征提取为网络结构的内二层时（如vgg的实现），该属性必须为True。
 
 示例如下：
 
