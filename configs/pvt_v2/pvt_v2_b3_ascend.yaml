@@ -1,0 +1,57 @@
+# system
+mode: 0
+distribute: True
+num_parallel_workers: 16
+val_while_train: True
+
+# dataset
+dataset: "imagenet"
+data_dir: "/path/to/imagenet"
+shuffle: True
+dataset_download: False
+batch_size: 128
+drop_remainder: True
+
+# augmentation
+image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+re_value: "random"
+hflip: 0.5
+interpolation: "bicubic"
+auto_augment: "randaug-m9-mstd0.5-inc1"
+re_prob: 0.25
+crop_pct: 0.9
+mixup: 0.8
+cutmix: 1.0
+
+# model
+model: "pvt_v2_b3"
+num_classes: 1000
+pretrained: False
+ckpt_path: ""
+keep_checkpoint_max: 10
+ckpt_save_dir: "./ckpt"
+epoch_size: 550
+drop_path_rate: 0.3
+dataset_sink_mode: True
+amp_level: "O2"
+
+# loss
+loss: "ce"
+label_smoothing: 0.1
+
+# lr scheduler
+scheduler: "cosine_decay"
+lr: 0.002
+min_lr: 0.000001
+decay_epochs: 530
+warmup_epochs: 20
+
+# optimizer
+opt: "adamw"
+filter_bias_and_bn: True
+momentum: 0.9
+weight_decay: 0.05
+loss_scale_type: "auto"
+use_nesterov: False

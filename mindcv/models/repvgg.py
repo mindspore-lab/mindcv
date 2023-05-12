@@ -23,6 +23,9 @@ __all__ = [
     "repvgg_b1",
     "repvgg_b2",
     "repvgg_b3",
+    "repvgg_b1g2",
+    "repvgg_b1g4",
+    "repvgg_b2g4"
 ]
 
 
@@ -44,6 +47,9 @@ default_cfgs = {
     "repvgg_b1": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b1-4673797.ckpt"),
     "repvgg_b2": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b2-7c91ccd4.ckpt"),
     "repvgg_b3": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b3-30b35f52.ckpt"),
+    "repvgg_b1g2": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b1g2-f0dc714f.ckpt"),
+    "repvgg_b1g4": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b1g4-bd93230e.ckpt"),
+    "repvgg_b2g4": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b2g4-e79eeadd.ckpt"),
 }
 
 
@@ -60,6 +66,7 @@ def conv_bn(in_channels: int, out_channels: int, kernel_size: int,
 
 class RepVGGBlock(nn.Cell):
     """Basic Block of RepVGG"""
+
     def __init__(self, in_channels: int, out_channels: int, kernel_size: int,
                  stride: int = 1, padding: int = 0, dilation: int = 1,
                  group: int = 1, padding_mode: str = "zeros",
@@ -120,9 +127,9 @@ class RepVGGBlock(nn.Cell):
               ((self.rbr_1x1.bn.moving_variance + self.rbr_1x1.bn.eps).sqrt()))
         t1 = ops.reshape(t1, (-1, 1, 1, 1))
 
-        l2_loss_circle = ops.reduce_sum(k3**2) - ops.reduce_sum(k3[:, :, 1:2, 1:2] ** 2)
+        l2_loss_circle = ops.reduce_sum(k3 ** 2) - ops.reduce_sum(k3[:, :, 1:2, 1:2] ** 2)
         eq_kernel = k3[:, :, 1:2, 1:2] * t3 + k1 * t1
-        l2_loss_eq_kernel = ops.reduce_sum(eq_kernel**2 / (t3**2 + t1**2))
+        l2_loss_eq_kernel = ops.reduce_sum(eq_kernel ** 2 / (t3 ** 2 + t1 ** 2))
         return l2_loss_eq_kernel + l2_loss_circle
 
     #   This func derives the equivalent kernel and bias in a DIFFERENTIABLE way.
@@ -382,6 +389,53 @@ def repvgg_b3(pretrained: bool = False, num_classes: int = 1000, in_channels=3, 
     if pretrained:
         load_pretrained(model, default_cfg,
                         num_classes=num_classes, in_channels=in_channels)
+
+    return model
+
+
+optional_groupwise_layers = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26]
+g2_map = {g_layer: 2 for g_layer in optional_groupwise_layers}
+g4_map = {g_layer: 4 for g_layer in optional_groupwise_layers}
+
+
+@register_model
+def repvgg_b1g2(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> RepVGG:
+    """Get RepVGG model with num_blocks=[4, 6, 16, 1], width_multiplier=[2.0, 2.0, 2.0, 4.0].
+    Refer to the base class `models.RepVGG` for more details.
+    """
+    default_cfg = default_cfgs["repvgg_b1g2"]
+    model = RepVGG(num_blocks=[4, 6, 16, 1], num_classes=num_classes, in_channels=in_channels,
+                   width_multiplier=[2.0, 2.0, 2.0, 4.0], override_group_map=g2_map, deploy=False, **kwargs)
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
+    return model
+
+
+@register_model
+def repvgg_b1g4(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> RepVGG:
+    """Get RepVGG model with num_blocks=[4, 6, 16, 1], width_multiplier=[2.0, 2.0, 2.0, 4.0].
+    Refer to the base class `models.RepVGG` for more details.
+    """
+    default_cfg = default_cfgs["repvgg_b1g4"]
+    model = RepVGG(num_blocks=[4, 6, 16, 1], num_classes=num_classes, in_channels=in_channels,
+                   width_multiplier=[2.0, 2.0, 2.0, 4.0], override_group_map=g4_map, deploy=False, **kwargs)
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
+
+    return model
+
+
+@register_model
+def repvgg_b2g4(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> RepVGG:
+    """Get RepVGG model with num_blocks=[4, 6, 16, 1], width_multiplier=[2.5, 2.5, 2.5, 5.0].
+    Refer to the base class `models.RepVGG` for more details.
+    """
+    default_cfg = default_cfgs["repvgg_b2g4"]
+    model = RepVGG(num_blocks=[4, 6, 16, 1], num_classes=num_classes, in_channels=in_channels,
+                   width_multiplier=[2.5, 2.5, 2.5, 5.0], override_group_map=g4_map, deploy=False, **kwargs)
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
     return model
 

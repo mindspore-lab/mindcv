@@ -27,6 +27,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 | PVTV2_b0 | D910x8-G | 71.50     | 90.60     | 3.67       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt_v2/pvt_v2_b0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b0-1c4f6683.ckpt) |
 | PVTV2_b1 | D910x8-G | 78.91     | 94.49     | 14.01      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt_v2/pvt_v2_b1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b1-3ceb171a.ckpt) |
 | PVTV2_b2 | D910x8-G | 81.99     | 95.74     | 25.35      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt_v2/pvt_v2_b2_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b2-0565d18e.ckpt) |
+| PVTV2_b3 | D910x8-G | 82.84     | 96.24     | 45.24      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt_v2/pvt_v2_b3_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b3-feaae3fc.ckpt) |
+| PVTV2_b4 | D910x8-G | 83.14     | 96.27     | 62.56      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt_v2/pvt_v2_b4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b4-1cf4bc03.ckpt) |
 
 </div>
 
