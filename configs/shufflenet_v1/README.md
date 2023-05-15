@@ -22,8 +22,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model                 | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                        | Download                                                                                                             |
 |-----------------------|----------|-----------|-----------|------------|---------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
-| shufflenet_v1_g3_x0_5 | D910x8-G | 57.05     | 79.73     | 0.73       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v1/shufflenet_v1_0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_05-42cfe109.ckpt) |
-| shufflenet_v1_g3_x1_0 | D910x8-G | 67.77     | 87.73     | 1.89       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v1/shufflenet_v1_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_10-245f0ccf.ckpt) |
+| shufflenet_v1_g3_x0.5 | D910x8-G | 57.05     | 79.73     | 0.73       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v1/shufflenet_v1_g3_x0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_05-42cfe109.ckpt) |
+| shufflenet_v1_g3_x1.0 | D910x8-G | 67.77     | 87.73     | 1.89       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v1/shufflenet_v1_g3_x1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_10-245f0ccf.ckpt) |
 
 </div>
 
@@ -50,7 +50,7 @@ It is easy to reproduce the reported results with the pre-defined training recip
 
 ```shell
 # distributed training on multiple GPU/Ascend devices
-mpirun -n 8 python train.py --config configs/shufflenet_v1/shufflenet_v1_0.5_ascend.yaml --data_dir /path/to/imagenet
+mpirun -n 8 python train.py --config configs/shufflenet_v1/shufflenet_v1_g3_x0.5_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
@@ -67,7 +67,7 @@ If you want to train or finetune the model on a smaller dataset without distribu
 
 ```shell
 # standalone training on a CPU/GPU/Ascend device
-python train.py --config configs/shufflenet_v1/shufflenet_v1_0.5_ascend.yaml --data_dir /path/to/dataset --distribute False
+python train.py --config configs/shufflenet_v1/shufflenet_v1_g3_x0.5_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 ### Validation
@@ -75,7 +75,7 @@ python train.py --config configs/shufflenet_v1/shufflenet_v1_0.5_ascend.yaml --d
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```shell
-python validate.py -c configs/shufflenet_v1/shufflenet_v1_0.5_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+python validate.py -c configs/shufflenet_v1/shufflenet_v1_g3_x0.5_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 ### Deployment

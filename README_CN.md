@@ -118,7 +118,7 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 # 创建模型
 >>> network = mindcv.create_model('swin_tiny', pretrained=True)
 # 验证模型的准确率
->>> !python validate.py - -model = swin_tiny - -pretrained - -dataset = imagenet - -val_split = validation
+>>> !python validate.py --model = swin_tiny --pretrained --data_dir = '/path/to/imagenet' --val_split = validation
 {'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
 ```
 
@@ -131,7 +131,7 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 使用加载了预训练参数的SoTA模型对一张图片进行推理。
 
 ```python
->>> !python infer.py - -model = swin_tiny - -image_path = './tutorials/data/test/dog/dog.jpg'
+>>> !python infer.py --model = swin_tiny --image_path = './tutorials/data/test/dog/dog.jpg'
 {'Labrador retriever': 0.5700152, 'golden retriever': 0.034551315, 'kelpie': 0.010108651,
  'Chesapeake Bay retriever': 0.008229004, 'Walker hound, Walker foxhound': 0.007791956}
 ```
