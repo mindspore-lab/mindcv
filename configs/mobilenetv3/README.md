@@ -20,10 +20,10 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model                 | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                       | Download                                                                                                          |
-|-----------------------|----------|-----------|-----------|------------|--------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| MobileNetV3_small_100 | D910x8-G | 67.81     | 87.82     | 2.55       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-c884b105.ckpt) |
-| MobileNetV3_large_100 | D910x8-G | 75.14     | 92.33     | 5.51       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_large_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-6f5bf961.ckpt) |
+| Model                 | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                           | Download                                                                                                          |
+|-----------------------|----------|-----------|-----------|------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| MobileNetV3_small_100 | D910x8-G | 67.81     | 87.82     | 2.55       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_small_100_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-c884b105.ckpt) |
+| MobileNetV3_large_100 | D910x8-G | 75.14     | 92.33     | 5.51       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_large_100_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-6f5bf961.ckpt) |
 
 </div>
 
@@ -50,7 +50,7 @@ It is easy to reproduce the reported results with the pre-defined training recip
 
 ```shell
 # distributed training on multiple GPU/Ascend devices
-mpirun -n 8 python train.py --config configs/mobilenetv3/mobilenet_v3_small_ascend.yaml --data_dir /path/to/imagenet
+mpirun -n 8 python train.py --config configs/mobilenetv3/mobilenet_v3_small_100_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
@@ -67,7 +67,7 @@ If you want to train or finetune the model on a smaller dataset without distribu
 
 ```shell
 # standalone training on a CPU/GPU/Ascend device
-python train.py --config configs/mobilenetv3/mobilenet_v3_small_ascend.yaml --data_dir /path/to/dataset --distribute False
+python train.py --config configs/mobilenetv3/mobilenet_v3_small_100_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 ### Validation
@@ -75,7 +75,7 @@ python train.py --config configs/mobilenetv3/mobilenet_v3_small_ascend.yaml --da
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```shell
-python validate.py -c configs/mobilenetv3/mobilenet_v3_small_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+python validate.py -c configs/mobilenetv3/mobilenet_v3_small_100_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 ### Deployment
