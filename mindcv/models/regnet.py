@@ -54,9 +54,9 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "regnet_x_200mf": _cfg(url=""),
-    "regnet_x_400mf": _cfg(url=""),
-    "regnet_x_600mf": _cfg(url=""),
+    "regnet_x_200mf": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_200mf-0c2b1eb5.ckpt"),
+    "regnet_x_400mf": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_400mf-4848837d.ckpt"),
+    "regnet_x_600mf": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_600mf-ccd76c94.ckpt"),
     "regnet_x_800mf": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_800mf-617227f4.ckpt"),
     "regnet_x_1_6gf": _cfg(url=""),
     "regnet_x_3_2gf": _cfg(url=""),
@@ -66,10 +66,10 @@ default_cfgs = {
     "regnet_x_12gf": _cfg(url=""),
     "regnet_x_16gf": _cfg(url=""),
     "regnet_x_32gf": _cfg(url=""),
-    "regnet_y_200mf": _cfg(url=""),
-    "regnet_y_400mf": _cfg(url=""),
-    "regnet_y_600mf": _cfg(url=""),
-    "regnet_y_800mf": _cfg(url=""),
+    "regnet_y_200mf": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_200mf-76a2f720.ckpt"),
+    "regnet_y_400mf": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_400mf-d496799d.ckpt"),
+    "regnet_y_600mf": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_600mf-a84e19b2.ckpt"),
+    "regnet_y_800mf": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_800mf-9b5211bd.ckpt"),
     "regnet_y_1_6gf": _cfg(url=""),
     "regnet_y_3_2gf": _cfg(url=""),
     "regnet_y_4_0gf": _cfg(url=""),
@@ -494,7 +494,6 @@ class RegNet(AnyNet):
                  block_type="res_bottleneck_block", head_w=0, num_classes=1000, se_r=0.0, in_channels=3):
         params = RegNet.regnet_get_params(w_a, w_0, w_m, d, stride, bot_mul, group_w, stem_type, stem_w, block_type,
                                           head_w, num_classes, se_r)
-        print(params)
         super(RegNet, self).__init__(params["depths"], params["stem_type"], params["stem_w"], params["block_type"],
                                      params["widths"], params["strides"], params["bot_muls"], params["group_ws"],
                                      params["head_w"], params["num_classes"], params["se_r"], in_channels)
