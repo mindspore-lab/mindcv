@@ -16,7 +16,14 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 |     Model      | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                              | Download                                                                                     |
 |:--------------:|:--------:|:---------:|:---------:|:----------:|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| regnet_x_200mf | D910x8-G |   68.74   |   88.38   |    2.68    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_200mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_200mf-0c2b1eb5.ckpt) |
+| regnet_x_400mf | D910x8-G |   73.16   |   91.35   |    5.16    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_400mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_400mf-4848837d.ckpt) |
+| regnet_x_600mf | D910x8-G |   74.34   |   92.00   |    6.20    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_600mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_600mf-ccd76c94.ckpt) |
 | regnet_x_800mf | D910x8-G |   76.04   |   92.97   |    7.26    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_800mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_800mf-617227f4.ckpt) |
+| regnet_y_200mf | D910x8-G |   70.30   |   89.61   |    3.16    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_y_200mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_200mf-76a2f720.ckpt) |
+| regnet_y_400mf | D910x8-G |   73.91   |   91.84   |    4.34    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_y_400mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_400mf-d496799d.ckpt) |
+| regnet_y_600mf | D910x8-G |   75.69   |   92.50   |    6.06    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_y_600mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_600mf-a84e19b2.ckpt) |
+| regnet_y_800mf | D910x8-G |   76.52   |   93.10   |    6.26    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_y_800mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_800mf-9b5211bd.ckpt) |
 
 </div>
 
