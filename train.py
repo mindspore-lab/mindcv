@@ -64,6 +64,12 @@ def train(args):
         num_classes = args.num_classes
 
     # create transforms
+    num_aug_splits = 0
+    if args.aug_splits > 0:
+        assert args.aug_splits == 3, "Currently, only support 3 splits of augmentation"
+        assert args.auto_augment is not None, "aug_splits should be set with one auto_augment"
+        num_aug_splits = args.aug_splits
+
     transform_list = create_transforms(
         dataset_name=args.dataset,
         is_training=True,
@@ -82,6 +88,7 @@ def train(args):
         re_ratio=args.re_ratio,
         re_value=args.re_value,
         re_max_attempts=args.re_max_attempts,
+        separate=num_aug_splits > 0,
     )
 
     # load dataset
@@ -96,6 +103,7 @@ def train(args):
         num_classes=num_classes,
         transform=transform_list,
         num_parallel_workers=args.num_parallel_workers,
+        separate=num_aug_splits > 0,
     )
 
     if args.val_while_train:

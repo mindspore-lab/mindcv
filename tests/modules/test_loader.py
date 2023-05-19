@@ -11,7 +11,7 @@ from mindspore.dataset.transforms import OneHot
 from mindcv.data import create_dataset, create_loader, get_dataset_download_root
 from mindcv.utils.download import DownLoad
 
-num_classes = 1
+num_classes = 2
 
 
 @pytest.mark.parametrize("mode", [0, 1])

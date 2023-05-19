@@ -18,7 +18,9 @@ from mindcv.utils.download import DownLoad
 @pytest.mark.parametrize("image_resize", [224, 256])
 @pytest.mark.parametrize("is_training", [True, False])
 @pytest.mark.parametrize("auto_augment", [None, "autoaug", "autoaugr", "3a", "randaug", "augmix", "trivialaugwide"])
-def test_transforms_standalone_imagenet(mode, name, image_resize, is_training, auto_augment):
+@pytest.mark.parametrize("batch_size", [32, 64, 128])
+@pytest.mark.parametrize("aug_splits", [0, 3])
+def test_transforms_standalone_imagenet(mode, name, image_resize, is_training, auto_augment, batch_size, aug_splits):
     """
     test transform_list API(distribute)
     command: pytest -s test_transforms.py::test_transforms_standalone_imagenet
@@ -27,6 +29,7 @@ def test_transforms_standalone_imagenet(mode, name, image_resize, is_training, a
         dataset_name='',
         image_resize=224,
         is_training=False,
+        auto_augment=None
         **kwargs
     """
     ms.set_context(mode=mode)
@@ -49,25 +52,35 @@ def test_transforms_standalone_imagenet(mode, name, image_resize, is_training, a
         download=False,
     )
 
+    num_aug_splits = 0
+    if aug_splits > 0 and auto_augment is not None:
+        assert aug_splits == 3, "Currently, only support 3 splits of augmentation"
+        num_aug_splits = aug_splits
+
     # create transforms
     transform_list = create_transforms(
         dataset_name=name,
         image_resize=image_resize,
         is_training=is_training,
         auto_augment=auto_augment,
+        separate=num_aug_splits > 0,
     )
 
     # load dataset
     loader = create_loader(
         dataset=dataset,
-        batch_size=32,
+        batch_size=batch_size,
         drop_remainder=True,
         is_training=is_training,
         transform=transform_list,
         num_parallel_workers=2,
+        separate=num_aug_splits > 0,
     )
 
-    assert loader.output_shapes()[0][2] == image_resize, "image_resize error !"
+    output_shape = loader.output_shapes()
+    assert output_shape[0][2] == image_resize, "image_resize error !"
+    if num_aug_splits == 3 and is_training:
+        assert output_shape[0][0] == 3 * batch_size and output_shape[1][0] == 3 * batch_size, "augment splits error!"
 
 
 # test mnist cifar10

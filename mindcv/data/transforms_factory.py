@@ -36,6 +36,7 @@ def transforms_imagenet_train(
     re_ratio=(0.3, 3.3),
     re_value=0,
     re_max_attempts=10,
+    separate=False,
 ):
     """Transform operation list when training on ImageNet."""
     # Define map operations for training dataset
@@ -44,7 +45,7 @@ def transforms_imagenet_train(
     else:
         interpolation = Inter.BILINEAR
 
-    trans_list = [
+    primary_tfl = [
         vision.RandomCropDecodeResize(
             size=image_resize,
             scale=scale,
@@ -53,10 +54,11 @@ def transforms_imagenet_train(
         )
     ]
     if hflip > 0.0:
-        trans_list += [vision.RandomHorizontalFlip(prob=hflip)]
+        primary_tfl += [vision.RandomHorizontalFlip(prob=hflip)]
     if vflip > 0.0:
-        trans_list += [vision.RandomVerticalFlip(prob=vflip)]
+        primary_tfl += [vision.RandomVerticalFlip(prob=vflip)]
 
+    secondary_tfl = []
     if auto_augment is not None:
         assert isinstance(auto_augment, str)
         if isinstance(image_resize, (tuple, list)):
@@ -69,14 +71,14 @@ def transforms_imagenet_train(
         )
         augement_params["interpolation"] = interpolation
         if auto_augment.startswith("randaug"):
-            trans_list += [rand_augment_transform(auto_augment, augement_params)]
+            secondary_tfl += [rand_augment_transform(auto_augment, augement_params)]
         elif auto_augment.startswith("autoaug") or auto_augment.startswith("3a"):
-            trans_list += [auto_augment_transform(auto_augment, augement_params)]
+            secondary_tfl += [auto_augment_transform(auto_augment, augement_params)]
         elif auto_augment.startswith("trivialaugwide"):
-            trans_list += [trivial_augment_wide_transform(auto_augment, augement_params)]
+            secondary_tfl += [trivial_augment_wide_transform(auto_augment, augement_params)]
         elif auto_augment.startswith("augmix"):
             augement_params["translate_pct"] = 0.3
-            trans_list += [augment_and_mix_transform(auto_augment, augement_params)]
+            secondary_tfl += [augment_and_mix_transform(auto_augment, augement_params)]
         else:
             assert False, "Unknown auto augment policy (%s)" % auto_augment
     elif color_jitter is not None:
@@ -86,14 +88,15 @@ def transforms_imagenet_train(
             assert len(color_jitter) in (3, 4)
         else:
             color_jitter = (float(color_jitter),) * 3
-        trans_list += [vision.RandomColorAdjust(*color_jitter)]
+        secondary_tfl += [vision.RandomColorAdjust(*color_jitter)]
 
-    trans_list += [
+    final_tfl = []
+    final_tfl += [
         vision.Normalize(mean=mean, std=std),
         vision.HWC2CHW(),
     ]
     if re_prob > 0.0:
-        trans_list.append(
+        final_tfl.append(
             vision.RandomErasing(
                 prob=re_prob,
                 scale=re_scale,
@@ -103,7 +106,9 @@ def transforms_imagenet_train(
             )
         )
 
-    return trans_list
+    if separate:
+        return primary_tfl, secondary_tfl, final_tfl
+    return primary_tfl + secondary_tfl + final_tfl
 
 
 def transforms_imagenet_eval(
@@ -179,6 +184,7 @@ def create_transforms(
     image_resize=224,
     is_training=False,
     auto_augment=None,
+    separate=False,
     **kwargs,
 ):
     r"""Creates a list of transform operation on image data.
@@ -189,6 +195,8 @@ def create_transforms(
             Default: ''.
         image_resize (int): the image size after resize for adapting to network. Default: 224.
         is_training (bool): if True, augmentation will be applied if support. Default: False.
+        auto_augment(str)：augmentation strategies, such as "augmix", "autoaug" etc.
+        separate: separate the image origin and the image been transformed.
         **kwargs: additional args parsed to `transforms_imagenet_train` and `transforms_imagenet_eval`
 
     Returns:
@@ -200,7 +208,7 @@ def create_transforms(
     if dataset_name in ("imagenet", ""):
         trans_args = dict(image_resize=image_resize, **kwargs)
         if is_training:
-            return transforms_imagenet_train(auto_augment=auto_augment, **trans_args)
+            return transforms_imagenet_train(auto_augment=auto_augment, separate=separate, **trans_args)
 
         return transforms_imagenet_eval(**trans_args)
     elif dataset_name in ("cifar10", "cifar100"):
