@@ -1,7 +1,8 @@
 # system
 mode: 0
 distribute: True
-num_parallel_workers: 32
+num_parallel_workers: 8
+val_while_train: True
 
 # dataset
 dataset: 'imagenet'
@@ -27,9 +28,9 @@ pretrained: False
 ckpt_path: ''
 keep_checkpoint_max: 100
 ckpt_save_dir: './ckpt'
-epoch_size: 300
+epoch_size: 320
 dataset_sink_mode: True
-amp_level: 'O0'
+amp_level: 'O3'
 
 # loss
 loss: 'CE'
@@ -40,7 +41,7 @@ scheduler: 'cosine_decay'
 min_lr: 0.0
 lr: 0.4
 warmup_epochs: 4
-decay_epochs: 296
+decay_epochs: 316
 
 # optimizer
 opt: 'momentum'
