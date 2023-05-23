@@ -12,6 +12,7 @@ Papers:
 
 import random
 import re
+from functools import partial
 
 import numpy as np
 
@@ -28,6 +29,8 @@ _HPARAMS_DEFAULT = dict(
 
 _RANDOM_INTERPOLATION = (Inter.BILINEAR, Inter.NEAREST, Inter.BICUBIC, Inter.AREA)
 _DEFAULT_INTERPOLATION = Inter.BICUBIC
+
+_GUASSS_KERNEL_SIZE = 3
 
 
 def _interpolation(kwargs):
@@ -104,6 +107,19 @@ def sharpness(img, degrees, **__):
     return vision.RandomSharpness(degrees=(degrees, degrees))(img)
 
 
+def gaussian_blur_rand(img, factor, **__):
+    radius_min = 0.1
+    radius_max = 2.0
+    return vision.GaussianBlur(kernel_size=_GUASSS_KERNEL_SIZE, sigma=random.uniform(radius_min, radius_max * factor))(
+        img
+    )
+
+
+def desaturate(img, degrees, **_):
+    degrees = min(1.0, max(0.0, 1.0 - degrees))
+    return vision.RandomColor(degrees=(degrees, degrees))(img)
+
+
 def _randomly_negate(v):
     """With 50% probability, negate the value"""
     return -v if random.random() > 0.5 else v
@@ -111,14 +127,23 @@ def _randomly_negate(v):
 
 # fmt: off
 def _rotate_level_to_arg(level, _hparams):
-    # range [-30, 30]
-    level = (level / _LEVEL_DENOM) * 30.0
+    # ra: range [-30, 30]; ta: range[-135, 135]
+    trivial_aug_wide = _hparams.get("trivialaugwide", False)
+    if trivial_aug_wide:
+        level_denom = _hparams.get("magnitude_max", 31)
+        level = (level / level_denom) * 135.0
+    else:
+        level = (level / _LEVEL_DENOM) * 30.0
     level = _randomly_negate(level)
     return level,
 
 
 def _enhance_level_to_arg(level, _hparams):
-    # range [0.1, 1.9]
+    # ra: range [0.1, 1.9]; ta: range[0.01, 2.00]
+    trivial_aug_wide = _hparams.get("trivialaugwide", False)
+    if trivial_aug_wide:
+        level_denom = _hparams.get("magnitude_max", 31)
+        return (level / level_denom) * 1.99 + 0.01,
     return (level / _LEVEL_DENOM) * 1.8 + 0.1,
 
 
@@ -130,22 +155,44 @@ def _enhance_increasing_level_to_arg(level, _hparams):
     return level,
 
 
+def _minmax_level_to_arg(level, _hparams, min_val=0., max_val=1.0, clamp=True):
+    level = (level / _LEVEL_DENOM)
+    level = min_val + (max_val - min_val) * level
+    if clamp:
+        level = max(min_val, min(max_val, level))
+    return level,
+
+
 def _shear_level_to_arg(level, _hparams):
-    # range [-0.3, 0.3]
-    level = (level / _LEVEL_DENOM) * 0.3
+    # ra: range [-0.3, 0.3]; ta: range [-0.99, 0.99]
+    trivial_aug_wide = _hparams.get("trivialaugwide", False)
+    if trivial_aug_wide:
+        level_denom = _hparams.get("magnitude_max", 31)
+        level = (level / level_denom) * 0.99
+    else:
+        level = (level / _LEVEL_DENOM) * 0.3
     level = _randomly_negate(level)
     return level,
 
 
-def _translate_level_to_arg(level, hparams):
-    # default range [-0.45, 0.45]
-    translate_pct = hparams.get("translate_pct", 0.45)
-    level = (level / _LEVEL_DENOM) * translate_pct
-    level = _randomly_negate(level)
+def _translate_level_to_arg(level, _hparams):
+    # default ra: range [-0.45, 0.45]; ta: 32/224
+    trivial_aug_wide = _hparams.get("trivialaugwide", False)
+    if trivial_aug_wide:
+        translate_pct = _hparams.get("translate_pct", 0.15)
+        level_denom = _hparams.get("magnitude_max", 31)
+        level = (level / level_denom) * translate_pct
+    else:
+        translate_pct = _hparams.get("translate_pct", 0.45)
+        level = (level / _LEVEL_DENOM) * translate_pct
+        level = _randomly_negate(level)
     return level,
 
 
 def _posterize_level_to_arg(level, _hparams):
+    trivial_aug_wide = _hparams.get("trivialaugwide", False)
+    if trivial_aug_wide:
+        return _posterize_original_level_to_arg(level, _hparams)
     return int((level / _LEVEL_DENOM) * 4),
 
 
@@ -157,12 +204,21 @@ def _posterize_original_level_to_arg(level, _hparams):
     # According to the original AutoAugment paper instructions
     # range [4, 8], 'keep 4 up to 8 MSB of image'
     # augmented intensity/severity decreases with level
+    # ta: range [2, 8]
+    trivial_aug_wide = _hparams.get("trivialaugwide", False)
+    if trivial_aug_wide:
+        level_denom = _hparams.get("magnitude_max", 31)
+        return int((level / level_denom) * 6) + 2,
     return int((level / _LEVEL_DENOM) * 4) + 4,
 
 
 def _solarize_level_to_arg(level, _hparams):
     # range [0, 255]
     # augmented intensity/severity decreases with level
+    trivial_aug_wide = _hparams.get("trivialaugwide", False)
+    if trivial_aug_wide:
+        level_denom = _hparams.get("magnitude_max", 31)
+        return int((level/level_denom)*255),
     return int((level / _LEVEL_DENOM) * 255),
 
 
@@ -195,6 +251,8 @@ LEVEL_TO_ARG = {
     "ShearY": _shear_level_to_arg,
     "TranslateX": _translate_level_to_arg,
     "TranslateY": _translate_level_to_arg,
+    "Desaturate": partial(_minmax_level_to_arg, min_val=0.5, max_val=1.0),
+    "GaussianBlurRand": _minmax_level_to_arg,
 }
 
 NAME_TO_OP = {
@@ -219,6 +277,8 @@ NAME_TO_OP = {
     "ShearY": shear_y,
     "TranslateX": translate_x,
     "TranslateY": translate_y,
+    "Desaturate": desaturate,
+    "GaussianBlurRand": gaussian_blur_rand,
 }
 
 
@@ -323,12 +383,24 @@ def auto_augment_policy_posterize_increasing(hparams):
     return pc
 
 
+def auto_augment_policy_3a(hparams):
+    policy = [
+        [("Solarize", 1.0, 5)],  # 128 solarize threshold @ 5 magnitude
+        [("Desaturate", 1.0, 10)],  # grayscale at 10 magnitude
+        [("GaussianBlurRand", 1.0, 10)],
+    ]
+    pc = [[AugmentOp(*a, hparams=hparams) for a in sp] for sp in policy]
+    return pc
+
+
 def auto_augment_policy(name="autoaug", hparams=None):
     hparams = hparams or _HPARAMS_DEFAULT
     if name == "autoaug":
         return auto_augment_policy_posterize_original(hparams)
     elif name == "autoaugr":
         return auto_augment_policy_posterize_increasing(hparams)
+    elif name == "3a":
+        return auto_augment_policy_3a(hparams)
     else:
         assert False, "Unknown auto augment policy (%s)" % name
 
@@ -350,9 +422,10 @@ def auto_augment_transform(configs, hparams):
     Args:
         configs: A string that defines the automatic augmentation configuration.
             It is composed of multiple parts separated by dashes ("-"). The first part defines
-            the AutoAugment policy ('autoaug' or 'autoaugr',
+            the AutoAugment policy ('autoaug', 'autoaugr' or '3a':
             'autoaug' for the original AutoAugment policy with PosterizeOriginal,
-            'autoaugr' for the AutoAugment policy with PosterizeIncreasing operation).
+            'autoaugr' for the AutoAugment policy with PosterizeIncreasing operation,
+             '3a' for the AutoAugment only with 3 augmentations.)
             There is no order requirement for the remaining config parts.
 
             - mstd: Float standard deviation of applied magnitude noise.
@@ -521,3 +594,161 @@ def rand_augment_transform(configs, hparams):
     ra_ops = rand_augment_ops(magnitude=magnitude, hparams=hparams, transforms=transforms)
     choice_weights = None if weight_idx is None else _select_rand_weights(weight_idx)
     return RandAugment(ra_ops, num_layers, choice_weights=choice_weights)
+
+
+_TRIVIALAUGMENT_WIDE_TRANSFORMS = _RAND_TRANSFORMS
+
+
+def trivial_augment_wide_ops(magnitude=31, hparams=None, transforms=None):
+    hparams = hparams or _HPARAMS_DEFAULT
+    transforms = transforms or _RAND_TRANSFORMS
+    return [AugmentOp(name, prob=1.0, magnitude=magnitude, hparams=hparams) for name in transforms]
+
+
+class TrivialAugmentWide:
+    def __init__(self, ops):
+        self.ops = ops
+
+    def __call__(self, img):
+        op = np.random.choice(self.ops)
+        img = op(img)
+        return img
+
+
+def trivial_augment_wide_transform(configs, hparams):
+    """
+    Create a TrivialAugmentWide transform
+    Args:
+        configs: A string that defines the TrivialAugmentWide configuration.
+            It is composed of multiple parts separated by dashes ("-").
+            The first part defines the AutoAugment name, it should be 'trivialaugwide'.
+            the second part(not necessary) the maximum value of magnitude.
+
+            - m: final magnitude of a operation will uniform sampling from [0, m] . Default: 31
+
+            Example: 'trivialaugwide-m20' will be TrivialAugmentWide
+            with mgnitude uniform sampling from [0, 20],
+        hparams: Other hparams (kwargs) for the TrivialAugment scheme.
+    Returns:
+        A Mindspore compatible Transform
+    """
+    magnitude = 31
+    transforms = _TRIVIALAUGMENT_WIDE_TRANSFORMS
+    config = configs.split("-")
+    assert config[0] == "trivialaugwide"
+    config = config[1:]
+    for c in config:
+        cs = re.split(r"(\d.*)", c)
+        if len(cs) < 2:
+            continue
+        key, val = cs[:2]
+        if key == "m":
+            magnitude = int(val)
+        else:
+            assert False, "Unknown TrivialAugmentWide config section"
+    if not hparams:
+        hparams = dict()
+    hparams["magnitude_max"] = magnitude
+    hparams["magnitude_std"] = float("inf")  # default to uniform sampling
+    hparams["trivialaugwide"] = True
+    ta_ops = trivial_augment_wide_ops(magnitude=magnitude, hparams=hparams, transforms=transforms)
+    return TrivialAugmentWide(ta_ops)
+
+
+_AUGMIX_TRANSFORMS = [
+    "AutoContrast",
+    "ColorIncreasing",  # not in paper
+    "ContrastIncreasing",  # not in paper
+    "BrightnessIncreasing",  # not in paper
+    "SharpnessIncreasing",  # not in paper
+    "Equalize",
+    "Rotate",
+    "PosterizeIncreasing",
+    "SolarizeIncreasing",
+    "ShearX",
+    "ShearY",
+    "TranslateX",
+    "TranslateY",
+]
+
+
+def augmix_ops(magnitude=10, hparams=None, transforms=None):
+    hparams = hparams or _HPARAMS_DEFAULT
+    transforms = transforms or _AUGMIX_TRANSFORMS
+    return [AugmentOp(name, prob=1.0, magnitude=magnitude, hparams=hparams) for name in transforms]
+
+
+class AugMixAugment:
+    """AugMix Transform
+    according the  paper: "AugMix: A Simple Data Processing Method to Improve Robustness and Uncertainty -
+    https://arxiv.org/abs/1912.02781
+    """
+
+    def __init__(self, ops, alpha=1.0, width=3, depth=-1):
+        self.ops = ops
+        self.alpha = alpha
+        self.width = width
+        self.depth = depth
+
+    def __call__(self, img):
+        mixing_weights = np.float32(np.random.dirichlet([self.alpha] * self.width))
+        m = np.float32(np.random.beta(self.alpha, self.alpha))
+        mixed = np.zeros(img.shape, dtype=np.float32)
+        for mw in mixing_weights:
+            depth = self.depth if self.depth > 0 else np.random.randint(1, 4)
+            ops = np.random.choice(self.ops, depth, replace=True)
+            img_aug = img  # no ops are in-place, deep copy not necessary
+            for op in ops:
+                img_aug = op(img_aug)
+            mixed += mw * img_aug.astype(np.float32)
+        np.clip(mixed, 0, 255.0, out=mixed)
+        mixed = mixed.astype(np.uint8)
+        img = img * (1 - m) + mixed * m
+        return img
+
+
+def augment_and_mix_transform(configs, hparams=None):
+    """Create AugMix PyTorch transform
+
+    Args:
+        configs (str): String defining configuration of AugMix augmentation. Consists of multiple sections separated
+            by dashes ('-'). The first section defines the specific name of augment, it should be 'augmix'.
+            The remaining sections, not order sepecific determine
+                'm' - integer magnitude (severity) of augmentation mix (default: 3)
+                'w' - integer width of augmentation chain (default: 3)
+                'd' - integer depth of augmentation chain (-1 is random [1, 3], default: -1)
+                'a' - integer or float, the args of beta deviation of beta for generate the weight, default 1..
+            Ex 'augmix-m5-w4-d2' results in AugMix with severity 5, chain width 4, chain depth 2
+
+        hparams: Other hparams (kwargs) for the Augmentation transforms
+
+    Returns:
+         A Mindspore compatible Transform
+    """
+    magnitude = 3
+    width = 3
+    depth = -1
+    alpha = 1.0
+    config = configs.split("-")
+    assert config[0] == "augmix"
+    config = config[1:]
+    for c in config:
+        cs = re.split(r"(\d.*)", c)
+        if len(cs) < 2:
+            continue
+        key, val = cs[:2]
+        if key == "m":
+            magnitude = int(val)
+        elif key == "w":
+            width = int(val)
+        elif key == "d":
+            depth = int(val)
+        elif key == "a":
+            alpha = float(val)
+        else:
+            assert False, "Unknown AugMix config section"
+    if not hparams:
+        hparams = dict()
+    hparams["magnitude_std"] = float("inf")  # default to uniform sampling (if not set via mstd arg)
+    ops = augmix_ops(magnitude=magnitude, hparams=hparams)
+    return AugMixAugment(ops, alpha=alpha, width=width, depth=depth)

@@ -17,7 +17,8 @@ from mindcv.utils.download import DownLoad
 @pytest.mark.parametrize("name", ["ImageNet"])
 @pytest.mark.parametrize("image_resize", [224, 256])
 @pytest.mark.parametrize("is_training", [True, False])
-def test_transforms_standalone_imagenet(mode, name, image_resize, is_training):
+@pytest.mark.parametrize("auto_augment", [None, "autoaug", "autoaugr", "3a", "randaug", "augmix", "trivialaugwide"])
+def test_transforms_standalone_imagenet(mode, name, image_resize, is_training, auto_augment):
     """
     test transform_list API(distribute)
     command: pytest -s test_transforms.py::test_transforms_standalone_imagenet
@@ -53,6 +54,7 @@ def test_transforms_standalone_imagenet(mode, name, image_resize, is_training):
         dataset_name=name,
         image_resize=image_resize,
         is_training=is_training,
+        auto_augment=auto_augment,
     )
 
     # load dataset
