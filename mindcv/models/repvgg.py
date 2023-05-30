@@ -10,9 +10,9 @@ import numpy as np
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops, save_checkpoint
 
+from .helpers import load_pretrained
 from .layers import GlobalAvgPooling, Identity, SqueezeExcite
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "RepVGG",

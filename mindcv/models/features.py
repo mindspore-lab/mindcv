@@ -60,16 +60,22 @@ class FeatureExtractWrapper(nn.Cell):
         super().__init__(auto_prefix=False)
 
         feature_info = self._get_feature_info(net)
+        self.is_rewritten = getattr(net, "is_rewritten", False)
         flatten_sequetial = getattr(net, "flatten_sequential", False)
-        cells = _cell_list(net, flatten_sequential=flatten_sequetial)
         return_layers = _get_return_layers(feature_info, out_indices)
-        self.net, updated_return_layers = self._create_net(cells, return_layers)
-
-        # calculate the return index
         self.return_index = list()
-        for i, name in enumerate(self.net.name_cells().keys()):
-            if name in updated_return_layers:
-                self.return_index.append(i)
+
+        if not self.is_rewritten:
+            cells = _cell_list(net, flatten_sequential=flatten_sequetial)
+            self.net, updated_return_layers = self._create_net(cells, return_layers)
+
+            # calculate the return index
+            for i, name in enumerate(self.net.name_cells().keys()):
+                if name in updated_return_layers:
+                    self.return_index.append(i)
+        else:
+            self.net = net
+            self.return_index = out_indices
 
         # calculate the out_channels
         self._out_channels = list()
@@ -111,8 +117,17 @@ class FeatureExtractWrapper(nn.Cell):
 
     def _collect(self, x: Tensor) -> List[Tensor]:
         out = list()
-        for i, cell in enumerate(self.net.cell_list):
-            x = cell(x)
-            if i in self.return_index:
-                out.append(x)
+
+        if self.is_rewritten:
+            xs = self.net(x)
+
+            for i, x in enumerate(xs):
+                if i in self.return_index:
+                    out.append(x)
+        else:
+            for i, cell in enumerate(self.net.cell_list):
+                x = cell(x)
+                if i in self.return_index:
+                    out.append(x)
+
         return out

@@ -10,10 +10,10 @@ import numpy as np
 import mindspore.common.initializer as init
 from mindspore import nn
 
+from .helpers import load_pretrained
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExcite
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "regnet_x_200mf",

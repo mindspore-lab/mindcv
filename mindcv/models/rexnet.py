@@ -9,9 +9,9 @@ from typing import Any
 import mindspore.common.initializer as init
 import mindspore.nn as nn
 
+from .helpers import load_pretrained, make_divisible
 from .layers import Conv2dNormActivation, DropPath, GlobalAvgPooling, SqueezeExcite
 from .registry import register_model
-from .utils import load_pretrained, make_divisible
 
 __all__ = [
     "ReXNetV1",

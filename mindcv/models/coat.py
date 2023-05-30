@@ -13,10 +13,10 @@ import mindspore.ops as ops
 from mindspore import Tensor, ms_function
 from mindspore.numpy import split
 
+from .helpers import load_pretrained
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "coat_tiny",

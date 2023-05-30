@@ -6,8 +6,8 @@ Refer to MLP-Mixer: An all-MLP Architecture for Vision.
 import mindspore.nn as nn
 import mindspore.ops as ops
 
+from .helpers import load_pretrained
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "MLPMixer",

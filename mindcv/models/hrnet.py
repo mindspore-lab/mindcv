@@ -8,9 +8,9 @@ import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore import Tensor
 
+from .helpers import load_pretrained
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = ["HRNet", "hrnet_w32", "hrnet_w48"]
 

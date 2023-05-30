@@ -9,9 +9,9 @@ from typing import Dict, Optional, Tuple, Union
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
+from .helpers import load_pretrained, make_divisible
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
-from .utils import load_pretrained, make_divisible
 
 __all__ = [
     "mobilevit_xx_small",

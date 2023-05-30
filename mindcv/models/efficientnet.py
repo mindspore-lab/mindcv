@@ -11,12 +11,12 @@ from mindspore import Tensor, nn
 from mindspore.common import initializer as weight_init
 from mindspore.common.initializer import Normal, Uniform
 
+from .helpers import load_pretrained, make_divisible
 from .layers.activation import Swish
 from .layers.drop_path import DropPath
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExcite
 from .registry import register_model
-from .utils import load_pretrained, make_divisible
 
 __all__ = [
     "EfficientNet",  # registration mechanism to use yaml configuration

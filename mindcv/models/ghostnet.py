@@ -6,10 +6,10 @@ import numpy as np
 
 from mindspore import Tensor, nn, ops
 
+from .helpers import load_pretrained, make_divisible
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExcite
 from .registry import register_model
-from .utils import load_pretrained, make_divisible
 
 __all__ = [
     "GhostNet",

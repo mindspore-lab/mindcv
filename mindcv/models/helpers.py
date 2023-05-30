@@ -5,10 +5,12 @@ import collections.abc
 import logging
 import os
 from itertools import repeat
-from typing import List, Optional
+from typing import List, Optional, Callable, Dict
 
+import mindspore.nn as nn
 from mindspore import load_checkpoint, load_param_into_net
 
+from .features import FeatureExtractWrapper
 from mindcv.utils.download import DownLoad, get_default_download_root
 
 
@@ -97,3 +99,63 @@ def _search_param_name(params_names: List, param_name: str) -> str:
         if param_name in pi:
             return pi
     return ""
+
+
+def load_model_checkpoint(model: nn.Cell, checkpoint_path: str = "", ema: bool = False):
+    """Model loads checkpoint.
+
+    Args:
+        model (nn.Cell): The model which loads the checkpoint.
+        checkpoint_path (str): The path of checkpoint files. Default: "".
+        ema (bool): Whether use ema method. Default: False.
+    """
+
+    if os.path.exists(checkpoint_path):
+        checkpoint_param = load_checkpoint(checkpoint_path)
+        ema_param_dict = dict()
+
+        for param in checkpoint_param:
+            if param.startswith("ema"):
+                new_name = param.split("ema.")[1]
+                ema_data = checkpoint_param[param]
+                ema_data.name = new_name
+                ema_param_dict[new_name] = ema_data
+
+        if ema_param_dict and ema:
+            load_param_into_net(model, ema_param_dict)
+        elif bool(ema_param_dict) is False and ema:
+            raise ValueError("chekpoint_param does not contain ema_parameter, please set ema is False.")
+        else:
+            load_param_into_net(model, checkpoint_param)
+
+
+def build_model_with_cfg(
+        model_cls: Callable,
+        pretrained: bool,
+        default_cfg: Dict,
+        features_only: bool = False,
+        out_indices: List[int] = [0, 1, 2, 3, 4],
+        **kwargs,
+):
+    """Build model with specific model configurations
+
+    Args:
+        model_cls (nn.Cell): model class
+        pretrained (bool): whether to load pretrained weights
+        features_only (bool): Output the features at different strides instead. Default: False
+        out_indices (list[int]): The indicies of the output features when `features_only` is `True`.
+            Default: [0, 1, 2, 3, 4]
+    """
+    model = model_cls(**kwargs)
+
+    if pretrained:
+        load_pretrained(model, default_cfg, kwargs["num_classes"], kwargs["in_channels"])
+
+    if features_only:
+        # wrap the model, output the feature pyramid instead
+        try:
+            model = FeatureExtractWrapper(model, out_indices=out_indices)
+        except AttributeError as e:
+            raise RuntimeError(f"`feature_only` is not implemented for `{model_cls.__name__}` model.") from e
+
+    return model

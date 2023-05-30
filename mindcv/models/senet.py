@@ -9,10 +9,10 @@ from typing import List, Optional, Type, Union
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn
 
+from .helpers import load_pretrained
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExciteV2
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "SENet",

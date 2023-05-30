@@ -13,12 +13,12 @@ from mindspore import Tensor
 from mindspore import dtype as mstype
 from mindspore.common.initializer import TruncatedNormal
 
+from .helpers import load_pretrained
 from .layers.drop_path import DropPath
 from .layers.helpers import to_2tuple
 from .layers.identity import Identity
 from .layers.mlp import Mlp
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "crossvit9",

@@ -9,8 +9,8 @@ from typing import Dict, List, Union
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn
 
+from .helpers import load_pretrained
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "VGG",
