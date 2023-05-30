@@ -5,7 +5,7 @@
 [![CI](https://github.com/mindspore-lab/mindcv/actions/workflows/ci.yml/badge.svg)](https://github.com/mindspore-lab/mindcv/actions/workflows/ci.yml)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/mindcv)](https://pypi.org/project/mindcv)
 [![PyPI](https://img.shields.io/pypi/v/mindcv)](https://pypi.org/project/mindcv)
-[![docs](https://img.shields.io/badge/docs-latest-blue)](https://mindcv.readthedocs.io/en/latest)
+[![docs](https://github.com/mindspore-lab/mindcv/actions/workflows/docs.yml/badge.svg)](https://mindspore-lab.github.io/mindcv)
 [![license](https://img.shields.io/github/license/mindspore-lab/mindcv.svg)](https://github.com/mindspore-lab/mindcv/blob/main/LICENSE.md)
 [![open issues](https://img.shields.io/github/issues/mindspore-lab/mindcv)](https://github.com/mindspore-lab/mindcv/issues)
 [![PRs](https://img.shields.io/badge/PRs-welcome-pink.svg)](https://github.com/mindspore-lab/mindcv/pulls)
@@ -28,7 +28,7 @@ English | [中文](README_CN.md)
 ## Introduction
 MindCV is an open-source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pre-trained weights and training strategies. SoTA methods such as auto augmentation are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks.
 
-<details open>
+<details open markdown>
 <summary> Major Features </summary>
 
 - **Easy-to-Use.** MindCV decomposes the vision framework into various configurable components. It is easy to customize your data pipeline, models, and learning pipeline with MindCV:
@@ -100,7 +100,7 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 
 ### Hands-on Tutorial
 
-To get started with MindCV, please see the [transfer learning tutorial](tutorials/finetune.md), which will give you a quick tour on each key component and the train/validate/predict pipelines.
+To get started with MindCV, please see the [Quick Start](docs/en/tutorials/quick_start.md), which will give you a quick tour on each key component and the train/validate/predict pipelines.
 
 Below are a few code snippets for your taste.
 
@@ -217,12 +217,12 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
 ## Tutorials
 We provide the following jupyter notebook tutorials to help users learn to use MindCV.
 
-- [Learn about configs](tutorials/learn_about_config.md)
-- [Inference with a pretrained model](tutorials/inference.md)
-- [Finetune a pretrained model on custom datasets](tutorials/finetune.md)
+- [Learn about configs](docs/en/tutorials/configuration.md)
+- [Inference with a pretrained model](docs/en/tutorials/inference.md)
+- [Finetune a pretrained model on custom datasets](docs/en/tutorials/finetune.md)
 - [Customize your model]() //coming soon
 - [Optimizing performance for vision transformer]() //coming soon
-- [Deployment demo](tutorials/deployment.md)
+- [Deployment demo](docs/en/tutorials/deployment.md)
 
 ## Model List
 
@@ -387,7 +387,7 @@ Please see [configs](./configs) for the details about model performance and pret
 
 We appreciate all kind of contributions including issues and PRs to make MindCV better.
 
-Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline. Please follow the [Model Template and Guideline](mindcv/models/model_template.md) for contributing a model that fits the overall interface :)
+Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline. Please follow the [Model Template and Guideline](docs/en/how_to_guides/write_a_new_model.md) for contributing a model that fits the overall interface :)
 
 ### License
 

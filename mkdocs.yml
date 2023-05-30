@@ -1,0 +1,152 @@
+site_name: MindCV Docs
+site_url: https://mindspore-lab.github.io/mindcv
+repo_url: https://github.com/mindspore-lab/mindcv
+repo_name: mindspore-lab/mindcv
+copyright: Copyright &copy; 2022 - 2023 MindSpore Lab
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Model Zoo: modelzoo.md
+  - Tutorials:  # Learning Oriented
+      - Quick Start: tutorials/quick_start.md
+      - Configuration: tutorials/configuration.md
+      - Finetune: tutorials/finetune.md
+      - Inference: tutorials/inference.md
+      - Deployment: tutorials/deployment.md
+  - How-To Guides:  # Problem Oriented
+      - Write A New Model: how_to_guides/write_a_new_model.md
+  - Reference:
+      - data: reference/data.md
+      - loss: reference/loss.md
+      - models.layers: reference/models.layers.md
+      - models: reference/models.md
+      - optim: reference/optim.md
+      - scheduler: reference/scheduler.md
+      - utils: reference/utils.md
+  - Notes:
+      - Change Log: notes/changelog.md
+      - Contributing: notes/contributing.md
+      - Code of Conduct: notes/code_of_conduct.md
+      - FAQ: notes/faq.md
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  features:
+    # - navigation.instant  # see https://github.com/ultrabug/mkdocs-static-i18n/issues/62
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.highlight
+    - search.share
+    - search.suggest
+    - content.action.view
+    - content.action.edit
+    - content.tabs.link
+    - content.code.copy
+    - content.code.select
+    - content.code.annotations
+
+markdown_extensions:
+  # Officially Supported Extensions
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - meta
+  - sane_lists
+  - tables
+  - toc:
+      permalink: true
+  - wikilinks
+  # Third Party Extensions(Bundles, PyMdown Extensions)
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+hooks:
+  - docs/gen_ref_pages.py
+
+plugins:
+  - search
+  - include-markdown
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            # Headings
+            show_root_heading: true
+            show_root_toc_entry: true
+            show_object_full_path: true
+            # Members
+            show_submodules: false
+            # Docstrings
+            docstring_section_style: spacy
+  - i18n:
+      default_language: en
+      docs_structure: folder
+      languages:
+        en:
+          name: English
+        zh:
+          name: 中文
+      nav_translations:
+        zh:
+          Home: 主页
+          Installation: 安装
+          Model Zoo: 模型仓库
+          Tutorials: 教程
+          Quick Start: 快速开始
+          Configuration: 配置
+          Finetune: 微调
+          Inference: 推理
+          Deployment: 部署
+          Notes: 说明
+          Change Log: 更新日志
+          Code of Conduct: 行为准则
+          FAQ: 常见问题
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/solid/paper-plane
+      link: mailto:mindspore-lab@huawei.com
+    - icon: fontawesome/brands/github
+      link: https://github.com/mindspore-lab/mindcv
+    - icon: fontawesome/brands/zhihu
+      link: https://www.zhihu.com/people/mindsporelab

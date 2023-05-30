@@ -5,7 +5,7 @@
 [![CI](https://github.com/mindspore-lab/mindcv/actions/workflows/ci.yml/badge.svg)](https://github.com/mindspore-lab/mindcv/actions/workflows/ci.yml)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/mindcv)](https://pypi.org/project/mindcv)
 [![PyPI](https://img.shields.io/pypi/v/mindcv)](https://pypi.org/project/mindcv)
-[![docs](https://img.shields.io/badge/docs-latest-blue)](https://mindcv.readthedocs.io/en/latest)
+[![docs](https://github.com/mindspore-lab/mindcv/actions/workflows/docs.yml/badge.svg)](https://mindspore-lab.github.io/mindcv)
 [![license](https://img.shields.io/github/license/mindspore-lab/mindcv.svg)](https://github.com/mindspore-lab/mindcv/blob/main/LICENSE.md)
 [![open issues](https://img.shields.io/github/issues/mindspore-lab/mindcv)](https://github.com/mindspore-lab/mindcv/issues)
 [![PRs](https://img.shields.io/badge/PRs-welcome-pink.svg)](https://github.com/mindspore-lab/mindcv/pulls)
@@ -30,7 +30,7 @@
 MindCV是一个基于 [MindSpore](https://www.mindspore.cn/)
 开发的，致力于计算机视觉相关技术研发的开源工具箱。它提供大量的计算机视觉领域的经典模型和SoTA模型以及它们的预训练权重和训练策略。同时，还提供了自动增强等SoTA算法来提高模型性能。通过解耦的模块设计，您可以轻松地将MindCV应用到您自己的CV任务中。
 
-<details open>
+<details open markdown>
 <summary> 主要特性 </summary>
 
 - **高易用性** MindCV将视觉任务分解为各种可配置的组件，用户可以轻松地构建自己的数据处理和模型训练流程。
@@ -106,7 +106,7 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 
 ### 上手教程
 
-在开始上手MindCV前，可以阅读MindCV的[迁移学习教程](tutorials/finetune_CN.md)，该教程可以帮助用户快速了解MindCV的各个重要组件以及训练、验证、测试流程。
+在开始上手MindCV前，可以阅读MindCV的[快速开始](docs/en/tutorials/quick_start.md)，该教程可以帮助用户快速了解MindCV的各个重要组件以及训练、验证、测试流程。
 
 以下是一些供您快速体验的代码样例。
 
@@ -228,12 +228,12 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
 
 我们提供了系列教程，帮助用户学习如何使用MindCV.
 
-- [了解模型配置](tutorials/learn_about_config_CN.md)
-- [模型推理](tutorials/inference_CN.md)
-- [自定义数据集上的模型微调训练](tutorials/finetune_CN.md)
+- [了解模型配置](docs/zh/tutorials/configuration.md)
+- [模型推理](docs/zh/tutorials/inference.md)
+- [自定义数据集上的模型微调训练](docs/zh/tutorials/finetune.md)
 - [如何自定义模型]() //coming soon
 - [视觉ransformer性能优化]() //coming soon
-- [部署推理服务](tutorials/deployment_CN.md)
+- [部署推理服务](docs/zh/tutorials/deployment.md)
 
 ## 模型列表
 
@@ -410,11 +410,11 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
 
 欢迎开发者用户提issue或提交代码PR，或贡献更多的算法和模型，一起让MindCV变得更好。
 
-有关贡献指南，请参阅[CONTRIBUTING.md](CONTRIBUTING.md)。请遵循[模型编写指南](mindcv/models/model_template_CN.md)所规定的规则来贡献模型接口：)
+有关贡献指南，请参阅[CONTRIBUTING.md](CONTRIBUTING.md)。请遵循[模型编写指南](docs/zh/how_to_guides/write_a_new_model.md)所规定的规则来贡献模型接口：)
 
 ### 许可证
 
-本项目遵循[Apache License 2.0](License.md)开源协议。
+本项目遵循[Apache License 2.0](LICENSE.md)开源协议。
 
 ### 致谢
 
