@@ -20,9 +20,9 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model       | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                  | Download                                                                              |
 |-------------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| mobilevit_xx_small | D910x8-G | 68.90 | 88.92 | 1.27 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_xx_small-af9da8a0.ckpt) |
-| mobilevit_x_small | D910x8-G | 74.98 | 92.33 | 2.32 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_x_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_x_small-673fc6f2.ckpt) |
-| mobilevit_small | D910x8-G | 78.48 | 94.18 | 5.59 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_small-caf79638.ckpt) |
+| mobilevit_xx_small | D910x8-G | 68.91 | 88.91 | 1.27 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_xx_small-af9da8a0.ckpt) |
+| mobilevit_x_small | D910x8-G | 74.99 | 92.32 | 2.32 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_x_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_x_small-673fc6f2.ckpt) |
+| mobilevit_small | D910x8-G | 78.47 | 94.18 | 5.59 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_small-caf79638.ckpt) |
 
 </div>
 
