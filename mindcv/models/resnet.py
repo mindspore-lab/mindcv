@@ -8,7 +8,7 @@ from typing import List, Optional, Type, Union
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn
 
-from .helpers import load_pretrained, build_model_with_cfg
+from .helpers import build_model_with_cfg
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
 
