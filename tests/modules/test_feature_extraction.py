@@ -9,7 +9,7 @@ import mindspore.nn as nn
 
 sys.path.append("../..")
 
-from mindcv.mindcv.models.features import FeatureExtractWrapper
+from mindcv.models.features import FeatureExtractWrapper
 from mindcv.models import create_model
 from mindcv.utils.download import DownLoad
 
