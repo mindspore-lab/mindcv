@@ -11,6 +11,7 @@ import mindspore.nn as nn
 from mindspore import load_checkpoint, load_param_into_net
 
 from mindcv.utils.download import DownLoad, get_default_download_root
+
 from .features import FeatureExtractWrapper
 
 
