@@ -32,12 +32,12 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                   | Download                                                                     |
-|-------|----------|-----------|-----------|------------|------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
-| vgg11 | D910x8-G | 72.00  | 90.50     | 132.86      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg11_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vgg/vgg11-59a09738.ckpt)|
-| vgg13 | D910x8-G | 72.75  | 91.03     | 133.04      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg13_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vgg/vgg13-d30c46b7.ckpt)|
-| vgg16 | D910x8-G | 74.53  | 92.05     | 138.35      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg16_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vgg/vgg16-22d7d708.ckpt) |
-| vgg19 | D910x8-G | 75.20  | 92.52     | 143.66      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg19_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vgg/vgg19-0c442461.ckpt) |
+| Model | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                   | Download                                                                         |
+|-------|----------|-----------|-----------|------------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| vgg11 | D910x8-G | 71.86     | 90.50     | 132.86      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg11_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vgg/vgg11-ef31d161.ckpt) |
+| vgg13 | D910x8-G | 72.87     | 91.02     | 133.04      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg13_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vgg/vgg13-da805e6e.ckpt) |
+| vgg16 | D910x8-G | 74.61     | 91.87     | 138.35      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg16_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vgg/vgg16-95697531.ckpt) |
+| vgg19 | D910x8-G | 75.21     | 92.56     | 143.66      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg19_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vgg/vgg19-bedee7b6.ckpt) |
 
 </div>
 
