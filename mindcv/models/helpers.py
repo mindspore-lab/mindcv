@@ -5,13 +5,13 @@ import collections.abc
 import logging
 import os
 from itertools import repeat
-from typing import List, Optional, Callable, Dict
+from typing import Callable, Dict, List, Optional
 
 import mindspore.nn as nn
 from mindspore import load_checkpoint, load_param_into_net
 
-from .features import FeatureExtractWrapper
 from mindcv.utils.download import DownLoad, get_default_download_root
+from .features import FeatureExtractWrapper
 
 
 def get_checkpoint_download_root():
