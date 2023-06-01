@@ -8,7 +8,7 @@ from typing import List, Optional, Type
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
-from .helpers import load_pretrained, make_divisible
+from .helpers import build_model_with_cfg, make_divisible
 from .layers.identity import Identity
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
@@ -458,85 +458,65 @@ class ResNeSt(nn.Cell):
         return x
 
 
+def _create_resnest(pretrained=False, **kwargs):
+    return build_model_with_cfg(ResNeSt, pretrained, **kwargs)
+
+
 @register_model
 def resnest14(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     default_cfg = default_cfgs["resnest14"]
-    model = ResNeSt(Bottleneck, [1, 1, 1, 1], radix=2, group=1,
-                    bottleneck_width=64, num_classes=num_classes,
-                    deep_stem=True, stem_width=32, avg_down=True,
-                    avd=True, avd_first=False, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=Bottleneck, layers=[1, 1, 1, 1], radix=2, group=1,
+                      bottleneck_width=64, num_classes=num_classes,
+                      deep_stem=True, stem_width=32, avg_down=True,
+                      avd=True, avd_first=False, **kwargs)
+    return _create_resnest(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
 def resnest26(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     default_cfg = default_cfgs["resnest26"]
-    model = ResNeSt(Bottleneck, [2, 2, 2, 2], radix=2, group=1,
-                    bottleneck_width=64, num_classes=num_classes,
-                    deep_stem=True, stem_width=32, avg_down=True,
-                    avd=True, avd_first=False, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=Bottleneck, layers=[2, 2, 2, 2], radix=2, group=1,
+                      bottleneck_width=64, num_classes=num_classes,
+                      deep_stem=True, stem_width=32, avg_down=True,
+                      avd=True, avd_first=False, **kwargs)
+    return _create_resnest(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
 def resnest50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     default_cfg = default_cfgs["resnest50"]
-    model = ResNeSt(Bottleneck, [3, 4, 6, 3], radix=2, group=1,
-                    bottleneck_width=64, num_classes=num_classes,
-                    deep_stem=True, stem_width=32, avg_down=True,
-                    avd=True, avd_first=False, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=Bottleneck, layers=[3, 4, 6, 3], radix=2, group=1,
+                      bottleneck_width=64, num_classes=num_classes,
+                      deep_stem=True, stem_width=32, avg_down=True,
+                      avd=True, avd_first=False, **kwargs)
+    return _create_resnest(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
 def resnest101(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     default_cfg = default_cfgs["resnest101"]
-    model = ResNeSt(Bottleneck, [3, 4, 23, 3], radix=2, group=1,
-                    bottleneck_width=64, num_classes=num_classes,
-                    deep_stem=True, stem_width=64, avg_down=True,
-                    avd=True, avd_first=False, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=Bottleneck, layers=[3, 4, 23, 3], radix=2, group=1,
+                      bottleneck_width=64, num_classes=num_classes,
+                      deep_stem=True, stem_width=64, avg_down=True,
+                      avd=True, avd_first=False, **kwargs)
+    return _create_resnest(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
 def resnest200(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     default_cfg = default_cfgs["resnest200"]
-    model = ResNeSt(Bottleneck, [3, 24, 36, 3], radix=2, group=1,
-                    bottleneck_width=64, num_classes=num_classes,
-                    deep_stem=True, stem_width=64, avg_down=True,
-                    avd=True, avd_first=False, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=Bottleneck, layers=[3, 24, 36, 3], radix=2, group=1,
+                      bottleneck_width=64, num_classes=num_classes,
+                      deep_stem=True, stem_width=64, avg_down=True,
+                      avd=True, avd_first=False, **kwargs)
+    return _create_resnest(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
 def resnest269(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     default_cfg = default_cfgs["resnest269"]
-    model = ResNeSt(Bottleneck, [3, 30, 48, 8], radix=2, group=1,
-                    bottleneck_width=64, num_classes=num_classes,
-                    deep_stem=True, stem_width=64, avg_down=True,
-                    avd=True, avd_first=False, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=Bottleneck, layers=[3, 30, 48, 8], radix=2, group=1,
+                      bottleneck_width=64, num_classes=num_classes,
+                      deep_stem=True, stem_width=64, avg_down=True,
+                      avd=True, avd_first=False, **kwargs)
+    return _create_resnest(pretrained, **dict(default_cfg=default_cfg, **model_args))

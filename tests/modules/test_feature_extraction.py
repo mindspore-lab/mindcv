@@ -205,6 +205,12 @@ def test_feature_extraction_indices_using_feature_wrapper(mode):
             5,
         ),
         (
+            "../../configs/hrnet/hrnet_w32_ascend.yaml",
+            "../../checkpoints/hrnet/hrnet_w32-cc4fbd91.ckpt",
+            "https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w32-cc4fbd91.ckpt",
+            5,
+        ),
+        (
             "../../configs/rexnet/rexnet_x10_ascend.yaml",
             "../../checkpoints/rexnet/rexnet_10-c5fb2dc7.ckpt",
             "https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_10-c5fb2dc7.ckpt",

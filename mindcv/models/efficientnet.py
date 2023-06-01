@@ -11,7 +11,7 @@ from mindspore import Tensor, nn
 from mindspore.common import initializer as weight_init
 from mindspore.common.initializer import Normal, Uniform
 
-from .helpers import load_pretrained, make_divisible
+from .helpers import build_model_with_cfg, make_divisible
 from .layers.activation import Swish
 from .layers.drop_path import DropPath
 from .layers.pooling import GlobalAvgPooling
@@ -485,14 +485,10 @@ def _efficientnet(
 ) -> EfficientNet:
     """EfficientNet architecture."""
 
-    model = EfficientNet(arch, dropout, width_mult, depth_mult, in_channels, num_classes, **kwargs)
     default_cfg = default_cfgs[arch]
-
-    if pretrained:
-        # Download the pretrained checkpoint file from url, and load
-        # checkpoint file.
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-    return model
+    model_args = dict(arch=arch, dropout_rate=dropout, width_mult=width_mult, depth_mult=depth_mult,
+                      in_channels=in_channels, num_classes=num_classes, **kwargs)
+    return build_model_with_cfg(EfficientNet, pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model

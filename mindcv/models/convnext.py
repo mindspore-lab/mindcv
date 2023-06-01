@@ -11,7 +11,7 @@ from mindspore import Parameter, Tensor
 from mindspore import dtype as mstype
 from mindspore import nn, ops
 
-from .helpers import load_pretrained
+from .helpers import build_model_with_cfg
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
 from .registry import register_model
@@ -212,20 +212,20 @@ class ConvNeXt(nn.Cell):
         return x
 
 
+def _create_convnext(pretrained=False, **kwargs):
+    return build_model_with_cfg(ConvNeXt, pretrained, **kwargs)
+
+
 @register_model
 def convnext_tiny(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ConvNeXt:
     """Get ConvNeXt tiny model.
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnext_tiny"]
-    model = ConvNeXt(
+    model_args = dict(
         in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 9, 3], dims=[96, 192, 384, 768], **kwargs
     )
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -234,14 +234,10 @@ def convnext_small(pretrained: bool = False, num_classes: int = 1000, in_channel
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnext_small"]
-    model = ConvNeXt(
+    model_args = dict(
         in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3], dims=[96, 192, 384, 768], **kwargs
     )
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -250,14 +246,10 @@ def convnext_base(pretrained: bool = False, num_classes: int = 1000, in_channels
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnext_base"]
-    model = ConvNeXt(
+    model_args = dict(
         in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3], dims=[128, 256, 512, 1024], **kwargs
     )
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -266,14 +258,10 @@ def convnext_large(pretrained: bool = False, num_classes: int = 1000, in_channel
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnext_large"]
-    model = ConvNeXt(
+    model_args = dict(
         in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3], dims=[192, 384, 768, 1536], **kwargs
     )
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -282,11 +270,7 @@ def convnext_xlarge(pretrained: bool = False, num_classes: int = 1000, in_channe
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnext_xlarge"]
-    model = ConvNeXt(
+    model_args = dict(
         in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3], dims=[256, 512, 1024, 2048], **kwargs
     )
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))

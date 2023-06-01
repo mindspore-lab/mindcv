@@ -149,7 +149,7 @@ def build_model_with_cfg(
     model = model_cls(**kwargs)
 
     if pretrained:
-        load_pretrained(model, default_cfg, kwargs["num_classes"], kwargs["in_channels"])
+        load_pretrained(model, default_cfg, kwargs.get("num_classes"), kwargs.get("in_channels"))
 
     if features_only:
         # wrap the model, output the feature pyramid instead

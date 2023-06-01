@@ -9,7 +9,7 @@ from typing import Any
 import mindspore.common.initializer as init
 import mindspore.nn as nn
 
-from .helpers import load_pretrained, make_divisible
+from .helpers import build_model_with_cfg, make_divisible
 from .layers import Conv2dNormActivation, DropPath, GlobalAvgPooling, SqueezeExcite
 from .registry import register_model
 
@@ -261,12 +261,8 @@ def _rexnet(
 ) -> ReXNetV1:
     """ReXNet architecture."""
     default_cfg = default_cfgs[arch]
-    model = ReXNetV1(width_mult=width_mult, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(width_mult=width_mult, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return build_model_with_cfg(ReXNetV1, pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
