@@ -9,8 +9,8 @@ import mindspore.nn as nn
 
 sys.path.append("../..")
 
-from mindcv.models.features import FeatureExtractWrapper
 from mindcv.models import create_model
+from mindcv.models.features import FeatureExtractWrapper
 from mindcv.utils.download import DownLoad
 
 from config import parse_args  # isort: skip
