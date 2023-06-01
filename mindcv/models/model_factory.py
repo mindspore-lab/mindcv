@@ -1,5 +1,3 @@
-from typing import List
-
 from .helpers import load_model_checkpoint
 from .registry import is_model, model_entrypoint
 
