@@ -292,19 +292,9 @@ Please see [configs](./configs) for the details about model performance and pret
 
 ## What is New
 
-- 2023/5/30
-1. New Models:
-    - AMP(O2) version of [VGG](configs/vgg)
-    - [GhostNet](configs/ghostnet)
-    - AMP(O3) version of [MobileNetV2](configs/mobilenetv2) and [MobileNetV3](configs/mobilenetv3)
-    - (x,y)_(200,400,600,800)mf of [RegNet](configs/regnet)
-    - b1g2, b1g4 & b2g4 of [RepVGG](configs/repvgg)
-    - 0.5 of [MnasNet](configs/mnasnet)
-    - b3 & b4 of [PVTv2](configs/pvt_v2)
-2. New Features:
-    - 3-Augment, Augmix, TrivialAugmentWide
-3. Bug Fixes:
-    - ViT pooling mode
+- 2023/6/2
+1. New version: `0.2.1` is released!
+2. New [documents](https://mindspore-lab.github.io/mindcv/) is online!
 
 See [RELEASE](RELEASE.md) for detailed history.
 
