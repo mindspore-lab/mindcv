@@ -294,6 +294,10 @@ python train.py --model=resnet50 --dataset=cifar10 \
 
 ## 更新
 
+- 2023/6/2
+1. 新版本：`0.2.1` 发布
+2. 新[文档](https://mindspore-lab.github.io/mindcv/zh/)上线
+
 - 2023/5/30
 1. 新模型:
     - [VGG](configs/vgg)混合精度(O2)版本

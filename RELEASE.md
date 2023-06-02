@@ -1,5 +1,11 @@
 # Release Note
 
+## 0.2.1
+
+- 2023/6/2
+1. New version: `0.2.1` is released!
+2. New [documents](https://mindspore-lab.github.io/mindcv/) is online!
+
 - 2023/5/30
 1. New Models:
     - AMP(O2) version of [VGG](configs/vgg)
