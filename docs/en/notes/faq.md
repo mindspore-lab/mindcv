@@ -1,3 +1,3 @@
-# FAQs
+# FAQ
 
 Coming soon.
