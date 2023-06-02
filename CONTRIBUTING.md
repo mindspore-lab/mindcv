@@ -3,23 +3,6 @@
 Contributions are welcome, and they are greatly appreciated! Every little bit
 helps, and credit will always be given.
 
-<!-- TOC -->
-
-- [MindCV Contributing Guidelines](#mindcv-contributing-guidelines)
-    - [Contributor License Agreement](#contributor-license-agreement)
-    - [Types of Contributions](#types-of-contributions)
-      - [Report Bugs](#report-bugs)
-      - [Fix Bugs](#fix-bugs)
-      - [Implement Features](#implement-features)
-      - [Write Documentation](#write-documentation)
-      - [Submit Feedback](#submit-feedback)
-    - [Getting Started](#getting-started)
-    - [Pull Request Guidelines](#pull-request-guidelines)
-    - [Tips](#tips)
-    - [Releasing](#releasing)
-
-<!-- /TOC -->
-
 ## Contributor License Agreement
 
 It's required to sign CLA before your first code submission to MindCV community.
