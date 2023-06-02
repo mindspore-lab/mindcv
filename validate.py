@@ -60,6 +60,7 @@ def validate(args):
         ema=args.ema,
     )
     network.set_train(False)
+    ms.amp.auto_mixed_precision(network, amp_level=args.amp_level)
 
     # create loss
     loss = create_loss(
