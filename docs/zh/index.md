@@ -55,7 +55,7 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
 
 ## 安装
 
-详情请见[安装](./installation.md)页面
+详情请见[安装](./installation.md)页面。
 
 ## 快速入门
 
@@ -73,7 +73,7 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
 # 创建模型
 >>> network = mindcv.create_model('swin_tiny', pretrained=True)
 # 验证模型的准确率
->>> !python validate.py - -model = swin_tiny - -pretrained - -dataset = imagenet - -val_split = validation
+>>> !python validate.py --model=swin_tiny --pretrained --dataset=imagenet --val_split=validation
 {'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
 ```
 
@@ -96,7 +96,7 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
 
 ### 模型训练
 
-通过`train.py`，用户可以很容易地在标准数据集或自定义数据集上训练模型，用户可以通过外部变量或者yaml配文件来设置训练策略（如数据增强、学习路策略）。
+通过`train.py`，用户可以很容易地在标准数据集或自定义数据集上训练模型，用户可以通过外部变量或者yaml配文件来设置训练策略（如数据增强、学习率策略）。
 
 - 单卡训练
 
@@ -133,18 +133,17 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
     !!! tip "预定义的训练策略"
         MindCV目前提前了超过20种模型训练策略，在ImageNet取得SoTA性能。
         具体的参数配置和详细精度性能汇总请见[`configs`](https://github.com/mindspore-lab/mindcv/tree/main/configs)文件夹。
-        您可以便捷将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）
-
+        您可以便捷将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）。
 
 - 在ModelArts/OpenI平台上训练
 
-    在[ModelArts](https://www.huaweicloud.com/intl/en-us/product/modelarts.html)或[OpenI](https://openi.pcl.ac.cn/)云平台上进行训练，需要执行以下操作，：
+    在[ModelArts](https://www.huaweicloud.com/intl/en-us/product/modelarts.html)或[OpenI](https://openi.pcl.ac.cn/)云平台上进行训练，需要执行以下操作：
 
     ```text
     1、在云平台上创建新的训练任务。
     2、在网站UI界面添加运行参数`config`，并指定yaml配置文件的路径。
     3、在网站UI界面添加运行参数`enable_modelarts`并设置为True。
-    4、在网站上填写其他训练信息并启动培训任务。
+    4、在网站上填写其他训练信息并启动训练任务。
     ```
 
 !!! tip "静态图和动态图模式"
@@ -160,7 +159,7 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
     python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download --epoch_size=10
     ```
 
-    > 注：此为试验性质的训练脚本，仍在改进，在1.8.1或更早版本的MindSpore上使用此模式目前并不稳定。
+    > 注：此为试验性质的训练脚本，仍在改进，在MindSpore 1.8.1或更早版本上使用此模式目前并不稳定。
 
 ### 模型验证
 
@@ -177,7 +176,7 @@ python validate.py --model=resnet50 --dataset=imagenet --data_dir=/path/to/data 
 
     ```shell
     python train.py --model=resnet50 --dataset=cifar10 \
-            --val_while_train --val_split=test --val_interval=1
+        --val_while_train --val_split=test --val_interval=1
     ```
 
     各轮次的训练损失和测试精度将保存在`{ckpt_save_dir}/results.log`中。
@@ -206,13 +205,13 @@ python validate.py --model=resnet50 --dataset=imagenet --data_dir=/path/to/data 
     * [Repeated Augmentation](https://openaccess.thecvf.com/content_CVPR_2020/papers/Hoffer_Augment_Your_Batch_Improving_Generalization_Through_Instance_Repetition_CVPR_2020_paper.pdf)
     * RandErasing (Cutout)
     * CutMix
-    * Mixup
+    * MixUp
     * RandomResizeCrop
     * Color Jitter, Flip, etc
 * 优化器
     * Adam
     * AdamW
-	* [Lion](https://arxiv.org/abs/2302.06675)
+    * [Lion](https://arxiv.org/abs/2302.06675)
     * Adan (experimental)
     * AdaGrad
     * LAMB
