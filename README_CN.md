@@ -1,4 +1,4 @@
-<div align="center">
+<div align="center" markdown>
 
 # MindCV
 
@@ -20,87 +20,46 @@
 [快速入门](#快速入门) |
 [教程](#教程) |
 [模型列表](#模型列表) |
-[支持算法](#支持算法) |
-[日志](#日志)
+[支持算法](#支持算法)
 
 </div>
 
 ## 简介
 
-MindCV是一个基于 [MindSpore](https://www.mindspore.cn/)
-开发的，致力于计算机视觉相关技术研发的开源工具箱。它提供大量的计算机视觉领域的经典模型和SoTA模型以及它们的预训练权重和训练策略。同时，还提供了自动增强等SoTA算法来提高模型性能。通过解耦的模块设计，您可以轻松地将MindCV应用到您自己的CV任务中。
+MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力于计算机视觉相关技术研发的开源工具箱。它提供大量的计算机视觉领域的经典模型和SoTA模型以及它们的预训练权重和训练策略。同时，还提供了自动增强等SoTA算法来提高模型性能。通过解耦的模块设计，您可以轻松地将MindCV应用到您自己的CV任务中。
 
-<details open markdown>
-<summary> 主要特性 </summary>
+### 主要特性
 
 - **高易用性** MindCV将视觉任务分解为各种可配置的组件，用户可以轻松地构建自己的数据处理和模型训练流程。
 
-```python
->>> import mindcv
-# 创建数据集
->>> dataset = mindcv.create_dataset('cifar10', download=True)
-# 创建模型
->>> network = mindcv.create_model('resnet50', pretrained=True)
-```
+    ```pycon
+    >>> import mindcv
+    # 创建数据集
+    >>> dataset = mindcv.create_dataset('cifar10', download=True)
+    # 创建模型
+    >>> network = mindcv.create_model('resnet50', pretrained=True)
+    ```
 
-用户可通过预定义的训练和微调脚本，快速配置并完成训练或迁移学习任务。
+    用户可通过预定义的训练和微调脚本，快速配置并完成训练或迁移学习任务。
 
-```shell
-# 配置和启动迁移学习任务
-python train.py --model swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir=/path/to/dataset
-```
+    ```shell
+    # 配置和启动迁移学习任务
+    python train.py --model swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir=/path/to/dataset
+    ```
 
 - **高性能** MindCV集成了大量基于CNN和和Transformer的高性能模型, 如SwinTransformer，并提供预训练权重、训练策略和性能报告，帮助用户快速选型并将其应用于视觉模型。
 
 - **灵活高效** MindCV基于高效的深度学习框架MindSpore开发，具有自动并行和自动微分等特性，支持不同硬件平台上（CPU/GPU/Ascend），同时支持效率优化的静态图模式和调试灵活的动态图模式。
 
-</details>
+## 模型支持
 
-### 性能结果
-
-
-基于MindCV进行模型实现和重训练的汇总结果详见[benchmark_results.md](./benchmark_results.md), 所用到的训练策略和训练后的模型权重均可通过表中链接获取。
+基于MindCV进行模型实现和重训练的汇总结果详见[模型仓库](https://mindspore-lab.github.io/mindcv/zh/modelzoo/), 所用到的训练策略和训练后的模型权重均可通过表中链接获取。
 
 各模型讲解和训练说明详见[configs](configs)目录。
 
-
 ## 安装
 
-### 依赖
-
-- mindspore >= 1.8.1
-- numpy >= 1.17.0
-- pyyaml >= 5.3
-- tqdm
-- openmpi 4.0.3 (分布式模式需要使用)
-
-运行以下脚本，安装相关依赖。
-
-```shell
-pip install -r requirements.txt
-```
-
-用户可遵从[官方指导](https://www.mindspore.cn/install) 并根据自身使用的硬件平台选择最适合您的MindSpore版本来进行安装。如果需要在分布式条件下使用，还需安装[openmpi](https://www.open-mpi.org/software/ompi/v4.0/) 。
-
-之后的说明将默认用户已正确安装好相关依赖。
-
-### PyPI安装
-
-MindCV的已发布版本可以通过PyPI安装。
-
-```shell
-pip install mindcv
-```
-
-### 源码安装
-
-Git上最新的MindCV可以通过以下指令安装。
-
-```shell
-pip install git+https://github.com/mindspore-lab/mindcv.git
-```
-
-> 注：MindCV可以在Linux和Mac系统安装，但是目前还不能在Windows系统上安装。
+详情请见[安装](https://mindspore-lab.github.io/mindcv/zh/installation/)页面。
 
 ## 快速入门
 
@@ -110,7 +69,7 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 
 以下是一些供您快速体验的代码样例。
 
-```python
+```pycon
 >>> import mindcv
 # 列出满足条件的预训练模型名称
 >>> mindcv.list_models("swin*", pretrained=True)
@@ -118,77 +77,93 @@ pip install git+https://github.com/mindspore-lab/mindcv.git
 # 创建模型
 >>> network = mindcv.create_model('swin_tiny', pretrained=True)
 # 验证模型的准确率
->>> !python validate.py - -model = swin_tiny - -pretrained - -dataset = imagenet - -val_split = validation
+>>> !python validate.py --model=swin_tiny --pretrained --dataset=imagenet --val_split=validation
 {'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
 ```
 
 **图片分类示例**
 
+右键点击如下图片，另存为`dog.jpg`。
+
 <p align="left">
   <img src="https://user-images.githubusercontent.com/8156835/210049681-89f68b9f-eb44-44e2-b689-4d30c93c6191.jpg" width=360 />
 </p>
 
-使用加载了预训练参数的SoTA模型对一张图片进行推理。
+使用加载了预训练参数的SoTA模型对图片进行推理。
 
-```python
->>> !python infer.py - -model = swin_tiny - -image_path = './tutorials/data/test/dog/dog.jpg'
-{'Labrador retriever': 0.5700152, 'golden retriever': 0.034551315, 'kelpie': 0.010108651,
- 'Chesapeake Bay retriever': 0.008229004, 'Walker hound, Walker foxhound': 0.007791956}
+```pycon
+>>> !python infer.py --model=swin_tiny --image_path='./dog.jpg'
+{'Labrador retriever': 0.5700152, 'golden retriever': 0.034551315, 'kelpie': 0.010108651, 'Chesapeake Bay retriever': 0.008229004, 'Walker hound, Walker foxhound': 0.007791956}
 ```
 
 预测结果排名前1的是拉布拉多犬，正是这张图片里的狗狗的品种。
 
 ### 模型训练
 
-通过`train.py`，用户可以很容易地在标准数据集或自定义数据集上训练模型，用户可以通过外部变量或者yaml配文件来设置训练策略（如数据增强、学习路策略）。
+通过`train.py`，用户可以很容易地在标准数据集或自定义数据集上训练模型，用户可以通过外部变量或者yaml配置文件来设置训练策略（如数据增强、学习率策略）。
 
 - 单卡训练
 
-```shell
-# 单卡训练
-python train.py --model resnet50 --dataset cifar10 --dataset_download
-```
+    ```shell
+    # 单卡训练
+    python train.py --model resnet50 --dataset cifar10 --dataset_download
+    ```
 
-以上代码是在CIFAR10数据集上单卡（CPU/GPU/Ascend）训练ResNet的示例，通过`model`和`dataset`参数分别指定需要训练的模型和数据集。
+    以上代码是在CIFAR10数据集上单卡（CPU/GPU/Ascend）训练ResNet的示例，通过`model`和`dataset`参数分别指定需要训练的模型和数据集。
 
 - 分布式训练
 
-对于像ImageNet这样的大型数据集，有必要在多个设备上以分布式模式进行训练。基于MindSpore对分布式相关功能的良好支持，用户可以使用`mpirun`来进行模型的分布式训练。
+    对于像ImageNet这样的大型数据集，有必要在多个设备上以分布式模式进行训练。基于MindSpore对分布式相关功能的良好支持，用户可以使用`mpirun`来进行模型的分布式训练。
 
-```shell
-# 分布式训练
-# 假设你有4张GPU或者NPU卡
-mpirun --allow-run-as-root -n 4 python train.py --distribute \
-	--model densenet121 --dataset imagenet --data_dir ./datasets/imagenet
-```
+    ```shell
+    # 分布式训练
+    # 假设你有4张GPU或者NPU卡
+    mpirun --allow-run-as-root -n 4 python train.py --distribute \
+        --model densenet121 --dataset imagenet --data_dir ./datasets/imagenet
+    ```
 
-完整的参数列表及说明在`config.py`中定义，可运行`python train.py --help`快速查看。
+    完整的参数列表及说明在`config.py`中定义，可运行`python train.py --help`快速查看。
 
-如需恢复训练，请指定`--ckpt_path`和`--ckpt_save_dir`参数，脚本将加载路径中的模型权重和优化器状态，并恢复中断的训练进程。
-
+    如需恢复训练，请指定`--ckpt_path`和`--ckpt_save_dir`参数，脚本将加载路径中的模型权重和优化器状态，并恢复中断的训练进程。
 
 - 超参配置和预训练策略
 
+    您可以编写yaml文件或设置外部参数来指定配置数据、模型、优化器等组件及其超参。以下是使用预设的训练策略（yaml文件）进行模型训练的示例。
 
-您可以编写yaml文件或设置外部参数来指定配置数据、模型、优化器等组件及其超参。以下是使用预设的训练策略（yaml文件）进行模型训练的示例。
+    ```shell
+    mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml
+    ```
 
-```shell
-mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml
-```
-
-**预定义的训练策略** MindCV目前提前了超过20种模型训练策略，在ImageNet取得SoTA性能。具体的参数配置和详细精度性能汇总请见[`configs`](configs)文件夹。您可以便捷将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）
-
+    **预定义的训练策略**
+    MindCV目前提前了超过20种模型训练策略，在ImageNet取得SoTA性能。
+    具体的参数配置和详细精度性能汇总请见[`configs`](configs)文件夹。
+    您可以便捷地将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）。
 
 - 在ModelArts/OpenI平台上训练
 
-在[ModelArts](https://www.huaweicloud.com/intl/en-us/product/modelarts.html)或[OpenI](https://openi.pcl.ac.cn/)云平台上进行训练，需要执行以下操作，：
+    在[ModelArts](https://www.huaweicloud.com/intl/en-us/product/modelarts.html)或[OpenI](https://openi.pcl.ac.cn/)云平台上进行训练，需要执行以下操作：
 
+    ```text
+    1、在云平台上创建新的训练任务。
+    2、在网站UI界面添加运行参数`config`，并指定yaml配置文件的路径。
+    3、在网站UI界面添加运行参数`enable_modelarts`并设置为True。
+    4、在网站上填写其他训练信息并启动训练任务。
+    ```
+
+**静态图和动态图模式**
+
+在默认情况下，模型训练（`train.py`）在MindSpore上以[图模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html) 运行，该模式对使用静态图编译对性能和并行计算进行了优化。
+相比之下，[pynative模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html#%E5%8A%A8%E6%80%81%E5%9B%BE)的优势在于灵活性和易于调试。为了方便调试，您可以将参数`--mode`设为1以将运行模式设置为调试模式。
+
+**混合模式**
+
+[基于ms_function的混合模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) 是兼顾了MindSpore的效率和灵活的混合模式。用户可通过使用`train_with_func.py`文件来使用该混合模式进行训练。
+
+```shell
+python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download --epoch_size=10
 ```
-1、在云平台上创建新的训练任务。
-2、在网站UI界面添加运行参数`config`，并指定yaml配置文件的路径。
-3、在网站UI界面添加运行参数`enable_modelarts`并设置为True。
-4、在网站上填写其他训练信息并启动培训任务。
-```
+
+> 注：此为试验性质的训练脚本，仍在改进，在MindSpore 1.8.1或更早版本上使用此模式目前并不稳定。
 
 ### 模型验证
 
@@ -199,30 +174,18 @@ mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet
 python validate.py --model=resnet50 --dataset=imagenet --data_dir=/path/to/data --ckpt_path=/path/to/model.ckpt
 ```
 
-- 训练过程中进行验证
+**训练过程中进行验证**
 
 当需要在训练过程中，跟踪模型在测试集上精度的变化时，请启用参数`--val_while_train`，如下
 
 ```shell
 python train.py --model=resnet50 --dataset=cifar10 \
-		--val_while_train --val_split=test --val_interval=1
+    --val_while_train --val_split=test --val_interval=1
 ```
 
 各轮次的训练损失和测试精度将保存在`{ckpt_save_dir}/results.log`中。
 
-
-- 静态图和动态图模式
-
-在默认情况下，模型训练（`train.py`）在MindSpore上以[图模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html) 运行，该模式对使用静态图编译对性能和并行计算进行了优化。相比之下，[pynative模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html#%E5%8A%A8%E6%80%81%E5%9B%BE)的优势在于灵活性和易于调试。
-为了方便调试，您可以将参数`--mode`设为1以将运行模式设置为调试模式。
-
-[基于ms_function的混合模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) 是兼顾了MindSpore的效率和灵活的混合模式。用户可通过使用`train_with_func.py`文件来使用该混合模式进行训练。
-
-```shell
-python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download --epoch_size=10
-```
-
-> 注：此为试验性质的训练脚本，仍在改进，在1.8.1或更早版本的MindSpore上使用此模式目前并不稳定。
+更多训练和验证的示例请见[示例](examples/scripts)。
 
 ## 教程
 
@@ -232,14 +195,14 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
 - [模型推理](docs/zh/tutorials/inference.md)
 - [自定义数据集上的模型微调训练](docs/zh/tutorials/finetune.md)
 - [如何自定义模型]() //coming soon
-- [视觉ransformer性能优化]() //coming soon
+- [视觉transformer性能优化]() //coming soon
 - [部署推理服务](docs/zh/tutorials/deployment.md)
 
 ## 模型列表
 
 目前，MindCV支持以下模型。
 
-<details open>
+<details open markdown>
 <summary> 支持模型 </summary>
 
 * Big Transfer ResNetV2 (BiT) - https://arxiv.org/abs/1912.11370
@@ -286,7 +249,7 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
 
 ## 支持算法
 
-<details open>
+<details open markdown>
 <summary> 支持算法列表 </summary>
 
 * 数据增强
@@ -295,13 +258,13 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
     * [Repeated Augmentation](https://openaccess.thecvf.com/content_CVPR_2020/papers/Hoffer_Augment_Your_Batch_Improving_Generalization_Through_Instance_Repetition_CVPR_2020_paper.pdf)
     * RandErasing (Cutout)
     * CutMix
-    * Mixup
+    * MixUp
     * RandomResizeCrop
     * Color Jitter, Flip, etc
 * 优化器
     * Adam
-    * Adamw
-	* [Lion](https://arxiv.org/abs/2302.06675)
+    * AdamW
+    * [Lion](https://arxiv.org/abs/2302.06675)
     * Adan (experimental)
     * AdaGrad
     * LAMB
@@ -329,9 +292,26 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
 
 </details>
 
-## 日志
+## 更新
 
-### 更新
+- 2023/6/2
+1. 新版本：`0.2.1` 发布
+2. 新[文档](https://mindspore-lab.github.io/mindcv/zh/)上线
+
+- 2023/5/30
+1. 新模型:
+    - [VGG](configs/vgg)混合精度(O2)版本
+    - [GhostNet](configs/ghostnet)
+    - [MobileNetV2](configs/mobilenetv2) 和 [MobileNetV3](configs/mobilenetv3)混合精度(O3)版本
+    - [RegNet](configs/regnet)的(x,y)_(200,400,600,800)mf版本
+    - [RepVGG](configs/repvgg)的b1g2, b1g4 & b2g4版本
+    - [MnasNet](configs/mnasnet)的0.5版本
+    - [PVTv2](configs/pvt_v2)的b3 & b4版本
+2. 新特性:
+    - 3-Augment, Augmix, TrivialAugmentWide
+3. 错误修复:
+    - ViT 池化模式
+
 - 2023/04/28
 1. 增添了一些新模型，列出如下：
     - [VGG](configs/vgg)
@@ -361,68 +341,64 @@ python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download 
     - ResNet50精度从76.64提升到76.69
     - ResNet101精度从77.63提升到78.24
     - ResNet152精度从78.63提升到78.72
-2. 按照规则(model_scale-sha256sum.ckpt)更新预训练权重名字和相应下载URL链接。
+2. 按照规则(model_scale-sha256sum.ckpt)更新预训练权重名字和相应下载URL链接
 
 - 2023/03/05
 1. 增加Lion (EvoLved Sign Momentum)优化器，论文 https://arxiv.org/abs/2302.06675
-	- Lion所使用的学习率一般比Adamw小3到10倍，而权重衰减(weigt_decay)要大3到10倍.
+    - Lion所使用的学习率一般比Adamw小3到10倍，而权重衰减(weigt_decay)要大3到10倍
 2. 增加6个模型及其训练策略、预训练权重：
-	- [HRNet](configs/hrnet)
-	- [SENet](configs/senet)
-	- [GoogLeNet](configs/googlenet)
-	- [Inception V3](configs/inception_v3)
-	- [Inception V4](configs/inception_v4)
-	- [Xception](configs/xception)
-3. Support gradient clip
+    - [HRNet](configs/hrnet)
+    - [SENet](configs/senet)
+    - [GoogLeNet](configs/googlenet)
+    - [Inception V3](configs/inception_v3)
+    - [Inception V4](configs/inception_v4)
+    - [Xception](configs/xception)
+3. 支持梯度裁剪
 
 - 2023/01/10
-1. MindCV v0.1发布! 支持通过PyPI安装 (`pip install mindcv`).
+1. MindCV v0.1发布! 支持通过PyPI安装 (`pip install mindcv`)
 2. 新增4个模型的预训练权重及其策略： googlenet, inception_v3, inception_v4, xception
 
 - 2022/12/09
-
-1. 支持在所有学习率策略中添加学习率预热操作，除cosine decay策略外。
-2. 支持`Repeated Augmenation`操作，可以通过`--aug_repeats`对其进行设置，设置值应大于1(通常为3或4)。
-3. 支持EMA。
-4. 通过支持mixup和cutmix操作进一步优化BCE损失函数。
+1. 支持在所有学习率策略中添加学习率预热操作，除cosine decay策略外
+2. 支持`Repeated Augmenation`操作，可以通过`--aug_repeats`对其进行设置，设置值应大于1(通常为3或4)
+3. 支持EMA
+4. 通过支持mixup和cutmix操作进一步优化BCE损失函数
 
 - 2022/11/21
-
-1. 支持模型损失和正确率的可视化。
-2. 支持伦次维度的cosine decay策略的学习率预热操作（之前仅支持步维度）。
+1. 支持模型损失和正确率的可视化
+2. 支持轮次维度的cosine decay策略的学习率预热操作（之前仅支持步维度）
 
 - 2022/11/09
-
-1. 支持2个ViT预训练模型。
-2. 支持RandAugment augmentation操作。
-3. 提高了CutMix操作的可用性，CutMix和Mixup目前可以一起使用。
-4. 解决了学习率画图的bug。
+1. 支持2个ViT预训练模型
+2. 支持RandAugment augmentation操作
+3. 提高了CutMix操作的可用性，CutMix和Mixup目前可以一起使用
+4. 解决了学习率画图的bug
 
 - 2022/10/12
-
-1. BCE和CE损失函数目前都支持class-weight config操作、label smoothing操作、auxilary logit input操作（适用于类似Inception模型）。
+1. BCE和CE损失函数目前都支持class-weight config操作、label smoothing操作、auxilary logit input操作（适用于类似Inception模型）
 
 - 2022/09/13
+1. 支持Adan优化器(试用版)
 
-1. 支持Adan优化器(试用版)。
-
-### 贡献方式
+## 贡献方式
 
 欢迎开发者用户提issue或提交代码PR，或贡献更多的算法和模型，一起让MindCV变得更好。
 
-有关贡献指南，请参阅[CONTRIBUTING.md](CONTRIBUTING.md)。请遵循[模型编写指南](docs/zh/how_to_guides/write_a_new_model.md)所规定的规则来贡献模型接口：)
+有关贡献指南，请参阅[CONTRIBUTING.md](CONTRIBUTING.md)。
+请遵循[模型编写指南](docs/zh/how_to_guides/write_a_new_model.md)所规定的规则来贡献模型接口：)
 
-### 许可证
+## 许可证
 
 本项目遵循[Apache License 2.0](LICENSE.md)开源协议。
 
-### 致谢
+## 致谢
 
 MindCV是由MindSpore团队、西安电子科技大学、西安交通大学联合开发的开源项目。
 衷心感谢所有参与的研究人员和开发人员为这个项目所付出的努力。
 十分感谢 [OpenI](https://openi.pcl.ac.cn/) 平台所提供的算力资源。
 
-### 引用
+## 引用
 
 如果你觉得MindCV对你的项目有帮助，请考虑引用：
 
