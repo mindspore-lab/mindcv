@@ -157,7 +157,7 @@ In contrast, [pynative mode](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advan
 
 **Mixed Mode**:
 
-[Pynative mode with ms_function ](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) is a mixed mode for comprising flexibility and efficiency in MindSpore. To apply pynative mode with ms_function for training, please run `train_with_func.py`, e.g.,
+[PyNative mode with mindspore.jit](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) is a mixed mode for comprising flexibility and efficiency in MindSpore. To apply pynative mode with mindspore.jit for training, please run `train_with_func.py`, e.g.,
 
 ```shell
 python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download  --epoch_size=10

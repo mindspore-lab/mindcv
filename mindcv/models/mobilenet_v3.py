@@ -9,6 +9,7 @@ import mindspore.common.initializer as init
 from mindspore import Tensor, nn
 
 from .helpers import build_model_with_cfg, make_divisible
+from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExcite
 from .registry import register_model
@@ -202,7 +203,7 @@ class MobileNetV3(nn.Cell):
         self.classifier = nn.SequentialCell([
             nn.Dense(output_channels, last_channels),
             nn.HSwish(),
-            nn.Dropout(keep_prob=0.8),
+            Dropout(p=0.2),
             nn.Dense(last_channels, num_classes),
         ])
         self._initialize_weights()

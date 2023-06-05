@@ -11,6 +11,7 @@ from mindspore import Tensor, nn, ops
 
 from .helpers import load_pretrained
 from .layers import GlobalAvgPooling
+from .layers.compatibility import Dropout
 from .registry import register_model
 
 __all__ = [
@@ -424,7 +425,7 @@ class Pnasnet(nn.Cell):
 
         self.relu = nn.ReLU()
         self.pool = GlobalAvgPooling()
-        self.dropout = nn.Dropout(keep_prob=0.5)
+        self.dropout = Dropout(p=0.5)
         self.last_linear = nn.Dense(in_channels=1080, out_channels=num_classes)
 
         self._initialize_weights()

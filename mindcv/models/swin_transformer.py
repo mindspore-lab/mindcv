@@ -10,6 +10,7 @@ from mindspore import nn, numpy, ops
 
 from .helpers import _ntuple, load_pretrained
 from .layers import DropPath, Identity
+from .layers.compatibility import Dropout
 from .registry import register_model
 
 __all__ = [
@@ -50,7 +51,7 @@ class Mlp(nn.Cell):
         self.fc1 = nn.Dense(in_channels=in_features, out_channels=hidden_features, has_bias=True)
         self.act = act_layer()
         self.fc2 = nn.Dense(in_channels=hidden_features, out_channels=out_features, has_bias=True)
-        self.drop = nn.Dropout(keep_prob=1.0 - drop)
+        self.drop = Dropout(p=drop)
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.fc1(x)
@@ -150,9 +151,11 @@ class RelativeBias(nn.Cell):
         self.relative_position_bias_table = Parameter(
             Tensor(np.random.randn((2 * window_size[0] - 1) * (2 * window_size[1] - 1), num_heads),
                    dtype=mstype.float32))  # 2*Wh-1 * 2*Ww-1, nH
-        self.one_hot = nn.OneHot(axis=-1, depth=(2 * window_size[0] - 1) * (2 * window_size[1] - 1),
-                                 dtype=mstype.float32)
-        self.index = Parameter(self.one_hot(self.relative_position_index), requires_grad=False)
+        self.one_hot = ops.OneHot()
+        self.index = Parameter(self.one_hot(self.relative_position_index,
+                                            (2 * window_size[0] - 1) * (2 * window_size[1] - 1),
+                                            Tensor(1.0), Tensor(0.0)),
+                               requires_grad=False)
 
     def construct(self) -> Tensor:
         out = ops.matmul(self.index, self.relative_position_bias_table)
@@ -202,9 +205,9 @@ class WindowAttention(nn.Cell):
         self.k = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.v = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
 
-        self.attn_drop = nn.Dropout(keep_prob=1.0 - attn_drop)
+        self.attn_drop = Dropout(p=attn_drop)
         self.proj = nn.Dense(in_channels=dim, out_channels=dim, has_bias=True)
-        self.proj_drop = nn.Dropout(keep_prob=1.0 - proj_drop)
+        self.proj_drop = Dropout(p=proj_drop)
         self.softmax = nn.Softmax(axis=-1)
         self.batch_matmul = ops.BatchMatMul()
 
@@ -627,7 +630,7 @@ class SwinTransformer(nn.Cell):
         if self.ape:
             self.absolute_pos_embed = Parameter(Tensor(np.zeros(1, num_patches, embed_dim), dtype=mstype.float32))
 
-        self.pos_drop = nn.Dropout(keep_prob=1.0 - drop_rate)
+        self.pos_drop = Dropout(p=drop_rate)
 
         # stochastic depth
         dpr = [x for x in np.linspace(0, drop_path_rate, sum(depths))]  # stochastic depth decay rule

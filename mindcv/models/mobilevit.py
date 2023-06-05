@@ -10,6 +10,7 @@ import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
 from .helpers import load_pretrained, make_divisible
+from .layers.compatibility import Dropout, Interpolate
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
 
@@ -211,7 +212,7 @@ class MultiHeadAttention(nn.Cell):
 
         self.qkv_proj = nn.Dense(in_channels=embed_dim, out_channels=embed_dim * 3, has_bias=bias)
 
-        self.attn_dropout = nn.Dropout(keep_prob=1.0 - attn_dropout)
+        self.attn_dropout = Dropout(p=attn_dropout)
         self.out_proj = nn.Dense(in_channels=embed_dim, out_channels=embed_dim, has_bias=bias)
 
         self.head_dim = embed_dim // num_heads
@@ -279,16 +280,16 @@ class TransformerEncoder(nn.Cell):
         self.pre_norm_mha = nn.SequentialCell(
             nn.LayerNorm((embed_dim,)),
             attn_unit,
-            nn.Dropout(keep_prob=1.0 - dropout)
+            Dropout(p=dropout)
         )
 
         self.pre_norm_ffn = nn.SequentialCell(
             nn.LayerNorm((embed_dim,)),
             nn.Dense(in_channels=embed_dim, out_channels=ffn_latent_dim, has_bias=True),
             nn.SiLU(),
-            nn.Dropout(keep_prob=1.0 - ffn_dropout),
+            Dropout(p=ffn_dropout),
             nn.Dense(in_channels=ffn_latent_dim, out_channels=embed_dim, has_bias=True),
-            nn.Dropout(keep_prob=1.0 - dropout)
+            Dropout(p=dropout)
         )
         self.embed_dim = embed_dim
         self.ffn_dim = ffn_latent_dim
@@ -412,6 +413,7 @@ class MobileViTBlock(nn.Cell):
         self.ffn_dropout = ffn_dropout
         self.n_blocks = n_transformer_blocks
         self.conv_ksize = conv_ksize
+        self.interpolate = Interpolate(mode="bilinear", align_corners=True)
 
     def unfolding(self, x: Tensor) -> Tuple[Tensor, Dict]:
         patch_w, patch_h = self.patch_w, self.patch_h
@@ -424,7 +426,7 @@ class MobileViTBlock(nn.Cell):
         interpolate = False
         if new_w != orig_w or new_h != orig_h:
             # Note: Padding can be done, but then it needs to be handled in attention function.
-            x = ops.interpolate(x, size=(new_h, new_w), coordinate_transformation_mode="align_corners", mode="bilinear")
+            x = self.interpolate(x, size=(new_h, new_w))
             interpolate = True
 
         # number of patches along width and height
@@ -477,12 +479,7 @@ class MobileViTBlock(nn.Cell):
         # [B*C*n_h, p_h, n_w, p_w] -> [B, C, H, W]
         x = ops.reshape(x, (batch_size, channels, num_patch_h * self.patch_h, num_patch_w * self.patch_w))
         if info_dict["interpolate"]:
-            x = ops.interpolate(
-                x,
-                size=info_dict["orig_size"],
-                coordinate_transformation_mode="align_corners",
-                mode="bilinear",
-            )
+            x = self.interpolate(x, size=info_dict["orig_size"])
         return x
 
     def construct(self, x: Tensor) -> Tensor:
@@ -534,7 +531,7 @@ class MobileViT(nn.Cell):
         classifier.append(GlobalAvgPooling())
         classifier.append(nn.Flatten())
         if 0.0 < model_cfg["cls_dropout"] < 1.0:
-            classifier.append(nn.Dropout(keep_prob=1 - model_cfg["cls_dropout"]))
+            classifier.append(Dropout(p=model_cfg["cls_dropout"]))
         classifier.append(nn.Dense(in_channels=exp_channels, out_channels=num_classes))
         self.classifier = nn.SequentialCell(classifier)
         self._initialize_weights()

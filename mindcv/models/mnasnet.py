@@ -9,6 +9,7 @@ import mindspore.common.initializer as init
 from mindspore import Tensor, nn
 
 from .helpers import load_pretrained, make_divisible
+from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
 
@@ -137,7 +138,7 @@ class Mnasnet(nn.Cell):
         ])
         self.features = nn.SequentialCell(features)
         self.pool = GlobalAvgPooling()
-        self.dropout = nn.Dropout(keep_prob=1 - drop_rate)
+        self.dropout = Dropout(p=drop_rate)
         self.classifier = nn.Dense(1280, num_classes)
         self._initialize_weights()
 

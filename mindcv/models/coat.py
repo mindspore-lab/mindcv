@@ -10,10 +10,11 @@ import mindspore
 import mindspore.common.initializer as init
 import mindspore.nn as nn
 import mindspore.ops as ops
-from mindspore import Tensor, ms_function
+from mindspore import Tensor
 from mindspore.numpy import split
 
 from .helpers import load_pretrained
+from .layers.compatibility import Dropout, Interpolate
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
 from .registry import register_model
@@ -70,7 +71,7 @@ class Mlp(nn.Cell):
         self.fc1 = nn.Dense(in_channels=in_features, out_channels=hidden_features, has_bias=True)
         self.act = nn.GELU(approximate=False)
         self.fc2 = nn.Dense(in_channels=hidden_features, out_channels=out_features, has_bias=True)
-        self.drop = nn.Dropout(keep_prob=1.0 - drop)
+        self.drop = Dropout(p=drop)
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.fc1(x)
@@ -118,7 +119,6 @@ class ConvRelPosEnc(nn.Cell):
         self.idx1 = self.channel_splits[0]
         self.idx2 = self.channel_splits[0] + self.channel_splits[1]
 
-    @ms_function
     def construct(self, q, v, size) -> Tensor:
 
         B, h, N, Ch = q.shape
@@ -167,9 +167,9 @@ class FactorAtt_ConvRelPosEnc(nn.Cell):
         self.q = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.k = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.v = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(keep_prob=1 - attn_drop)
+        self.attn_drop = Dropout(p=attn_drop)
         self.proj = nn.Dense(dim, dim)
-        self.proj_drop = nn.Dropout(keep_prob=1 - proj_drop)
+        self.proj_drop = Dropout(p=proj_drop)
         self.softmax = nn.Softmax(axis=-1)
         self.batch_matmul = ops.BatchMatMul()
 
@@ -323,6 +323,7 @@ class ParallelBlock(nn.Cell):
                                                        shared_crpe=shared_crpes[3]
                                                        )
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
+        self.interpolate_fn = Interpolate(mode="bilinear", align_corners=True)
 
         self.norm22 = nn.LayerNorm((dims[1],), epsilon=1e-6)
         self.norm23 = nn.LayerNorm((dims[2],), epsilon=1e-6)
@@ -349,10 +350,7 @@ class ParallelBlock(nn.Cell):
 
         img_tokens = ops.transpose(img_tokens, (0, 2, 1))
         img_tokens = ops.reshape(img_tokens, (B, C, H, W))
-        img_tokens = ops.interpolate(img_tokens,
-                                     sizes=output_size,
-                                     mode='bilinear'
-                                     )
+        img_tokens = self.interpolate_fn(img_tokens, size=output_size)
         img_tokens = ops.reshape(img_tokens, (B, C, -1))
         img_tokens = ops.transpose(img_tokens, (0, 2, 1))
 

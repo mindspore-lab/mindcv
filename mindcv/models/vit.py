@@ -11,6 +11,7 @@ from mindspore.common.initializer import Normal, initializer
 from mindspore.common.parameter import Parameter
 
 from .helpers import ConfigDict, load_pretrained
+from .layers.compatibility import Dropout
 from .registry import register_model
 
 __all__ = [
@@ -127,9 +128,9 @@ class Attention(nn.Cell):
         self.scale = Tensor(head_dim**-0.5)
 
         self.qkv = nn.Dense(dim, dim * 3)
-        self.attn_drop = nn.Dropout(attention_keep_prob)
+        self.attn_drop = Dropout(p=1.0-attention_keep_prob)
         self.out = nn.Dense(dim, dim)
-        self.out_drop = nn.Dropout(keep_prob)
+        self.out_drop = Dropout(p=1.0-keep_prob)
 
         self.mul = ops.Mul()
         self.reshape = ops.Reshape()
@@ -194,7 +195,7 @@ class FeedForward(nn.Cell):
         self.dense1 = nn.Dense(in_features, hidden_features)
         self.activation = activation()
         self.dense2 = nn.Dense(hidden_features, out_features)
-        self.dropout = nn.Dropout(keep_prob)
+        self.dropout = Dropout(p=1.0-keep_prob)
 
     def construct(self, x):
         """Feed Forward construct."""
@@ -364,7 +365,7 @@ class DenseHead(nn.Cell):
     ) -> None:
         super().__init__()
 
-        self.dropout = nn.Dropout(keep_prob)
+        self.dropout = Dropout(p=1.0-keep_prob)
         self.classifier = nn.Dense(input_channel, num_classes, has_bias=has_bias, activation=activation)
 
     def construct(self, x):
@@ -568,7 +569,7 @@ class ViT(nn.Cell):
             self.mean = ops.ReduceMean(keep_dims=False)
 
         self.pool = pool
-        self.pos_dropout = nn.Dropout(keep_prob)
+        self.pos_dropout = Dropout(p=1.0-keep_prob)
         self.norm = norm((embed_dim,))
         self.tile = ops.Tile()
         self.transformer = TransformerEncoder(

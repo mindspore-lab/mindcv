@@ -21,6 +21,11 @@ from mindcv.utils.random import set_seed
 
 from config import parse_args  # isort: skip
 
+try:
+    from mindspore import jit
+except ImportError:
+    from mindspore import ms_function as jit
+
 logger = logging.getLogger("train")
 logger.setLevel(logging.INFO)
 h1 = logging.StreamHandler()
@@ -366,7 +371,7 @@ def train_epoch(
         grad_reducer = ops.functional.identity
 
     # Define function of one-step training
-    @ms.ms_function
+    @jit
     def train_step(data, label):
         (loss, logits), grads = grad_fn(data, label)
         grads = grad_reducer(grads)

@@ -132,3 +132,9 @@ dmypy.json
 # IDEs
 .idea/
 .vscode/
+
+# outputs
+rank_*/
+ckpt/
+output/
+outputs/
