@@ -1,20 +1,22 @@
 """
 Vision OutLOoker (VOLO) implementation
 """
-import mindspore as ms
-import mindspore.nn as nn
-from mindspore import ops
-from mindspore import Parameter
-from mindspore import Tensor
-from mindspore import dtype as mstype
-import mindspore.common.initializer as init
-import mindspore.ops.functional as F
-from mindspore import numpy as msnp
-from .registry import register_model
-from .layers.identity import Identity
-from .layers.drop_path import DropPath
-
 import numpy as np
+
+import mindspore as ms
+import mindspore.common.initializer as init
+import mindspore.nn as nn
+
+# from mindspore import numpy as msnp
+# import mindspore.ops.functional as F
+# from mindspore import Tensor
+from mindspore import Parameter
+from mindspore import dtype as mstype
+from mindspore import ops
+
+from .layers.drop_path import DropPath
+from .layers.identity import Identity
+from .registry import register_model
 
 
 def _cfg(url='', **kwargs):
@@ -34,22 +36,27 @@ default_cfgs = {
     'volo_large': _cfg(crop_pct=1.15),
 }
 
+
 class Fold(nn.Cell):
     def __init__(self, channels, output_size, kernel_size, dilation=1, padding=0, stride=1) -> None:
         """Alternative implementation of fold layer via transposed convolution.
-        All parameters are the same as `"torch.nn.Fold" <https://pytorch.org/docs/stable/generated/torch.nn.Fold.html>`_,
-        except for the additional `channels` parameter. We need `channels` to calculate the pre-allocated memory size of the convolution kernel.
-        :param channels: same as the `C` in the document of `"torch.nn.Fold" <https://pytorch.org/docs/stable/generated/torch.nn.Fold.html>`_
+        We need `channels` to calculate the pre-allocated memory size of the convolution kernel.
+        :param channels: same as the `C`
         :type channels: int
         """
         super().__init__()
+
         def int2tuple(a):
             if isinstance(a, int):
                 return (a, a)
             return a
-        self.output_size, self.kernel_size, self.dilation, self.padding, self.stride = map(int2tuple, (output_size, kernel_size, dilation, padding, stride))
-        self.h = int((self.output_size[0] + 2 * self.padding[0] - self.dilation[0] * (self.kernel_size[0] - 1) - 1) / self.stride[0] + 1)
-        self.w = int((self.output_size[1] + 2 * self.padding[1] - self.dilation[1] * (self.kernel_size[1] - 1) - 1) / self.stride[1] + 1)
+
+        self.output_size, self.kernel_size, self.dilation, self.padding, self.stride = map(int2tuple, (
+            output_size, kernel_size, dilation, padding, stride))
+        self.h = int((self.output_size[0] + 2 * self.padding[0] - self.dilation[0] * (self.kernel_size[0] - 1) - 1) /
+                     self.stride[0] + 1)
+        self.w = int((self.output_size[1] + 2 * self.padding[1] - self.dilation[1] * (self.kernel_size[1] - 1) - 1) /
+                     self.stride[1] + 1)
         self.k = self.kernel_size[0] * self.kernel_size[1]
         self.c = channels
         self.ck = self.c * self.k
@@ -59,15 +66,17 @@ class Fold(nn.Cell):
             x = xy // self.kernel_size[1]
             y = xy % self.kernel_size[1]
             init_weight[i, 0, x, y] = 1
-        
+
         self.weight = ms.Tensor(init_weight, ms.float16)
         self.conv_transpose2d = ops.Conv2DTranspose(self.ck, self.kernel_size,
-                                                    pad_mode="pad", pad=(self.padding[0], self.padding[0], self.padding[1], self.padding[1]),
+                                                    pad_mode="pad", pad=(
+                                                        self.padding[0], self.padding[0], self.padding[1],
+                                                        self.padding[1]),
                                                     stride=stride, dilation=dilation, group=self.c)
         self.reshape = ops.Reshape()
 
     def construct(self, tensor):
-        b, ck, l = tensor.shape
+        b, ck, _ = tensor.shape
         tensor = self.reshape(tensor, (b, ck, self.h, self.w))
         out = self.conv_transpose2d(tensor, self.weight, (b, self.c, self.output_size[0], self.output_size[1]))
         return out
@@ -90,10 +99,10 @@ class OutlookAttention(nn.Cell):
         self.kernel_size = kernel_size
         self.padding = padding
         self.stride = stride
-        self.scale = qk_scale or head_dim**-0.5
+        self.scale = qk_scale or head_dim ** -0.5
 
         self.v = nn.Dense(dim, dim, has_bias=qkv_bias)
-        self.attn = nn.Dense(dim, kernel_size**4 * num_heads)
+        self.attn = nn.Dense(dim, kernel_size ** 4 * num_heads)
 
         self.attn_drop = nn.Dropout(1.0 - attn_drop)
         self.proj = nn.Dense(dim, dim)
@@ -114,26 +123,26 @@ class OutlookAttention(nn.Cell):
 
         h = int((H - 1) / self.stride + 1)
         w = int((W - 1) / self.stride + 1)
-        v = ops.pad(v, ((0, 0), (0, 0), (1, 1), (1,1)))
+        v = ops.pad(v, ((0, 0), (0, 0), (1, 1), (1, 1)))
         v = self.unfold(v)
         v = self.reshape(v, (B, self.num_heads, C // self.num_heads,
-                                   self.kernel_size * self.kernel_size,
-                                   h * w))
+                             self.kernel_size * self.kernel_size,
+                             h * w))
         v = self.transpose(v, (0, 1, 4, 3, 2))  # B,H,N,kxk,C/H
 
         attn = self.pool(self.transpose(x, (0, 3, 1, 2)))
         attn = self.transpose(attn, (0, 2, 3, 1))
-        attn = self.reshape(self.attn(attn), 
-            (B, h * w, self.num_heads, self.kernel_size * self.kernel_size,
-            self.kernel_size * self.kernel_size))
+        attn = self.reshape(self.attn(attn),
+                            (B, h * w, self.num_heads, self.kernel_size * self.kernel_size,
+                             self.kernel_size * self.kernel_size))
         attn = self.transpose(attn, (0, 2, 1, 3, 4))  # B,H,N,kxk,kxk
         attn = attn * self.scale
         attn = self.softmax(attn)
         attn = self.attn_drop(attn)
 
         x = self.transpose(self.batch_mat_mul(attn, v), (0, 1, 4, 3, 2))
-        x = self.reshape(x, 
-            (B, C * self.kernel_size * self.kernel_size, h * w))
+        x = self.reshape(x,
+                         (B, C * self.kernel_size * self.kernel_size, h * w))
         fold = Fold(C, (H, W), self.kernel_size, padding=self.padding, stride=self.stride)
         x = fold(x)
         x = self.proj(self.transpose(x, (0, 2, 3, 1)))
@@ -152,8 +161,9 @@ class Outlooker(nn.Cell):
     --kernel_size: kernel size in each window for outlook attention
     return: outlooker layer
     """
+
     def __init__(self, dim, kernel_size, padding, stride=1,
-                 num_heads=1,mlp_ratio=3., attn_drop=0.,
+                 num_heads=1, mlp_ratio=3., attn_drop=0.,
                  drop_path=0., act_layer=nn.GELU,
                  norm_layer=nn.LayerNorm, qkv_bias=False,
                  qk_scale=None):
@@ -205,30 +215,29 @@ class Mlp(nn.Cell):
 class Attention(nn.Cell):
     "Implementation of self-attention"
 
-    def __init__(self, dim,  num_heads=8, qkv_bias=False,
+    def __init__(self, dim, num_heads=8, qkv_bias=False,
                  qk_scale=None, attn_drop=0., proj_drop=0.):
         super().__init__()
         self.num_heads = num_heads
         head_dim = dim // num_heads
-        self.scale = qk_scale or head_dim**-0.5
+        self.scale = qk_scale or head_dim ** -0.5
 
         self.qkv = nn.Dense(dim, dim * 3, has_bias=qkv_bias)
         self.attn_drop = nn.Dropout(1.0 - attn_drop)
         self.proj = nn.Dense(dim, dim)
         self.proj_drop = nn.Dropout(1.0 - proj_drop)
         self.reshape = ops.Reshape()
-        self.transpose = ops.Transpose() 
+        self.transpose = ops.Transpose()
         self.softmax = nn.Softmax(axis=-1)
         self.batch_mat_mul_transpose = ops.BatchMatMul(transpose_b=True)
         self.batch_mat_mul = ops.BatchMatMul()
-
 
     def construct(self, x):
         B, H, W, C = x.shape
 
         qkv = self.qkv(x)
         qkv = self.reshape(qkv, (B, H * W, 3, self.num_heads,
-                                  C // self.num_heads))
+                                 C // self.num_heads))
         qkv = self.transpose(qkv, (2, 0, 3, 1, 4))
         q, k, v = qkv[0], qkv[1], qkv[2]
 
@@ -248,6 +257,7 @@ class Transformer(nn.Cell):
     Implementation of Transformer,
     Transformer is the second stage in our VOLO
     """
+
     def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False,
                  qk_scale=None, attn_drop=0., drop_path=0.,
                  act_layer=nn.GELU, norm_layer=nn.LayerNorm):
@@ -277,6 +287,7 @@ class ClassAttention(nn.Cell):
     Class attention layer from CaiT, see details in CaiT
     Class attention is the post stage in our VOLO, which is optional.
     """
+
     def __init__(self, dim, num_heads=8, head_dim=None, qkv_bias=False,
                  qk_scale=None, attn_drop=0., proj_drop=0.):
         super().__init__()
@@ -286,11 +297,11 @@ class ClassAttention(nn.Cell):
         else:
             head_dim = dim // num_heads
             self.head_dim = head_dim
-        self.scale = qk_scale or head_dim**-0.5
+        self.scale = qk_scale or head_dim ** -0.5
 
         self.kv = nn.Dense(dim,
-                            self.head_dim * self.num_heads * 2,
-                            has_bias=qkv_bias)
+                           self.head_dim * self.num_heads * 2,
+                           has_bias=qkv_bias)
         self.q = nn.Dense(dim, self.head_dim * self.num_heads, has_bias=qkv_bias)
         self.attn_drop = nn.Dropout(1.0 - attn_drop)
         self.proj = nn.Dense(self.head_dim * self.num_heads, dim)
@@ -306,12 +317,12 @@ class ClassAttention(nn.Cell):
 
         kv = self.kv(x)
         kv = self.reshape(kv, (B, N, 2, self.num_heads,
-                                self.head_dim))
+                               self.head_dim))
         kv = self.transpose(kv, (2, 0, 3, 1, 4))
         k, v = kv[0], kv[1]
         q = self.q(x[:, :1, :])
         q = self.reshape(q, (B, self.num_heads, 1, self.head_dim))
-        attn =self.batch_mat_mul_transpose(q * self.scale, k)
+        attn = self.batch_mat_mul_transpose(q * self.scale, k)
         attn = self.softmax(attn)
         attn = self.attn_drop(attn)
 
@@ -353,6 +364,7 @@ class ClassBlock(nn.Cell):
         cls_embed = cls_embed + self.drop_path(self.mlp(self.norm2(cls_embed)))
         x = self.concat([cls_embed, x[:, 1:]])
         return x
+
 
 def get_block(block_type, **kargs):
     """
@@ -407,6 +419,7 @@ class Downsample(nn.Cell):
     """
     Image to Patch Embedding, downsampling between stage1 and stage2
     """
+
     def __init__(self, in_embed_dim, out_embed_dim, patch_size):
         super().__init__()
         self.proj = nn.Conv2d(in_embed_dim, out_embed_dim,
@@ -421,7 +434,7 @@ class Downsample(nn.Cell):
 
 
 def outlooker_blocks(block_fn, index, dim, layers, num_heads=1, kernel_size=3,
-                     padding=1,stride=1, mlp_ratio=3., qkv_bias=False, qk_scale=None,
+                     padding=1, stride=1, mlp_ratio=3., qkv_bias=False, qk_scale=None,
                      attn_drop=0, drop_path_rate=0., **kwargs):
     """
     generate outlooker layer in stage1
@@ -490,6 +503,7 @@ class VOLO(nn.Cell):
     --out_kernel, --out_stride, --out_padding: kerner size,
                                                stride, and padding for outlook attention
     """
+
     def __init__(self, layers, img_size=224, in_channels=3, num_classes=1000, patch_size=8,
                  stem_hidden_dim=64, embed_dims=None, num_heads=None, downsamples=None,
                  outlook_attention=None, mlp_ratios=None, qkv_bias=False, qk_scale=None,
@@ -505,8 +519,8 @@ class VOLO(nn.Cell):
         # inital positional encoding, we add positional encoding after outlooker blocks
         self.pos_embed = Parameter(
             ops.Zeros()((1, img_size // patch_size // pooling_scale,
-                        img_size // patch_size // pooling_scale,
-                        embed_dims[-1]), mstype.float32))
+                         img_size // patch_size // pooling_scale,
+                         embed_dims[-1]), mstype.float32))
 
         self.pos_drop = nn.Dropout(1.0 - drop_rate)
 
@@ -594,7 +608,7 @@ class VOLO(nn.Cell):
         x = self.patch_embed(x)
         # B,C,H,W-> B,H,W,C
         x = ops.Transpose()(x, (0, 2, 3, 1))
-        return x          
+        return x
 
     def forward_tokens(self, x):
         for idx, block in enumerate(self.network):
@@ -635,6 +649,7 @@ class VOLO(nn.Cell):
 
         return x_cls
 
+
 @register_model
 def volo_d1(pretrained=False, **kwargs):
     """
@@ -653,8 +668,8 @@ def volo_d1(pretrained=False, **kwargs):
     embed_dims = [192, 384, 384, 384]
     num_heads = [6, 12, 12, 12]
     mlp_ratios = [3, 3, 3, 3]
-    downsamples = [True, False, False, False] # do downsampling after first block
-    outlook_attention = [True, False, False, False ]
+    downsamples = [True, False, False, False]  # do downsampling after first block
+    outlook_attention = [True, False, False, False]
     # first block is outlooker (stage1), the other three are transformer (stage2)
     model = VOLO(layers,
                  embed_dims=embed_dims,
@@ -666,6 +681,7 @@ def volo_d1(pretrained=False, **kwargs):
                  **kwargs)
     model.default_cfg = default_cfgs['volo']
     return model
+
 
 @register_model
 def volo_d2(pretrained=False, **kwargs):
@@ -689,6 +705,7 @@ def volo_d2(pretrained=False, **kwargs):
     model.default_cfg = default_cfgs['volo']
     return model
 
+
 @register_model
 def volo_d3(pretrained=False, **kwargs):
     """
@@ -711,6 +728,7 @@ def volo_d3(pretrained=False, **kwargs):
     model.default_cfg = default_cfgs['volo']
     return model
 
+
 @register_model
 def volo_d4(pretrained=False, **kwargs):
     """
@@ -732,6 +750,7 @@ def volo_d4(pretrained=False, **kwargs):
                  **kwargs)
     model.default_cfg = default_cfgs['volo_large']
     return model
+
 
 @register_model
 def volo_d5(pretrained=False, **kwargs):
