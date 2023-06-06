@@ -273,4 +273,3 @@ def convnext_xlarge(pretrained: bool = False, num_classes: int = 1000, in_channe
     model_args = dict(
         in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3], dims=[256, 512, 1024, 2048], **kwargs
     )
-    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
