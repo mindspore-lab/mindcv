@@ -12,10 +12,10 @@ from mindspore import Parameter, Tensor
 from mindspore import dtype as mstype
 from mindspore import nn, ops
 
+from .helpers import build_model_with_cfg
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "ConvNeXt",
@@ -182,20 +182,24 @@ class ConvNeXt(nn.Cell):
     ):
         super().__init__()
 
-        self.downsample_layers = nn.CellList()  # stem and 3 intermediate down_sampling conv layers
+        downsample_layers = []  # stem and 3 intermediate down_sampling conv layers
         stem = nn.SequentialCell(
             nn.Conv2d(in_channels, dims[0], kernel_size=4, stride=4, has_bias=True),
             ConvNextLayerNorm((dims[0],), epsilon=1e-6, norm_axis=1),
         )
-        self.downsample_layers.append(stem)
+        downsample_layers.append(stem)
         for i in range(3):
             downsample_layer = nn.SequentialCell(
                 ConvNextLayerNorm((dims[i],), epsilon=1e-6, norm_axis=1),
                 nn.Conv2d(dims[i], dims[i + 1], kernel_size=2, stride=2, has_bias=True),
             )
-            self.downsample_layers.append(downsample_layer)
+            downsample_layers.append(downsample_layer)
 
-        self.stages = nn.CellList()  # 4 feature resolution stages, each consisting of multiple residual blocks
+        total_reduction = 4
+        self.feature_info = []
+        self.flatten_sequential = True
+
+        stages = []  # 4 feature resolution stages, each consisting of multiple residual blocks
         dp_rates = list(np.linspace(0, drop_path_rate, sum(depths)))
         cur = 0
         for i in range(4):
@@ -204,21 +208,25 @@ class ConvNeXt(nn.Cell):
                 blocks.append(Block(dim=dims[i], drop_path=dp_rates[cur + j],
                                     layer_scale_init_value=layer_scale_init_value, use_grn=use_grn))
             stage = nn.SequentialCell(blocks)
-            self.stages.append(stage)
+            stages.append(stage)
             cur += depths[i]
 
+            if i > 0:
+                total_reduction *= 2
+            self.feature_info.append(dict(chs=dims[i], reduction=total_reduction, name=f'feature.{i * 2 + 1}'))
+
+        self.feature = nn.SequentialCell([
+            downsample_layers[0],
+            stages[0],
+            downsample_layers[1],
+            stages[1],
+            downsample_layers[2],
+            stages[2],
+            downsample_layers[3],
+            stages[3]
+        ])
         self.norm = ConvNextLayerNorm((dims[-1],), epsilon=1e-6)  # final norm layer
         self.classifier = nn.Dense(dims[-1], num_classes)  # classifier
-        self.feature = nn.SequentialCell([
-            self.downsample_layers[0],
-            self.stages[0],
-            self.downsample_layers[1],
-            self.stages[1],
-            self.downsample_layers[2],
-            self.stages[2],
-            self.downsample_layers[3],
-            self.stages[3]
-        ])
         self.head_init_scale = head_init_scale
         self._initialize_weights()
 
@@ -248,20 +256,20 @@ class ConvNeXt(nn.Cell):
         return x
 
 
+def _create_convnext(pretrained=False, **kwargs):
+    return build_model_with_cfg(ConvNeXt, pretrained, **kwargs)
+
+
 @register_model
 def convnext_tiny(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ConvNeXt:
     """Get ConvNeXt tiny model.
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnext_tiny"]
-    model = ConvNeXt(
+    model_args = dict(
         in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 9, 3], dims=[96, 192, 384, 768], **kwargs
     )
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -270,14 +278,10 @@ def convnext_small(pretrained: bool = False, num_classes: int = 1000, in_channel
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnext_small"]
-    model = ConvNeXt(
+    model_args = dict(
         in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3], dims=[96, 192, 384, 768], **kwargs
     )
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -286,14 +290,10 @@ def convnext_base(pretrained: bool = False, num_classes: int = 1000, in_channels
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnext_base"]
-    model = ConvNeXt(
+    model_args = dict(
         in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3], dims=[128, 256, 512, 1024], **kwargs
     )
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -302,14 +302,10 @@ def convnext_large(pretrained: bool = False, num_classes: int = 1000, in_channel
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnext_large"]
-    model = ConvNeXt(
+    model_args = dict(
         in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3], dims=[192, 384, 768, 1536], **kwargs
     )
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -318,14 +314,10 @@ def convnext_xlarge(pretrained: bool = False, num_classes: int = 1000, in_channe
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnext_xlarge"]
-    model = ConvNeXt(
+    model_args = dict(
         in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3], dims=[256, 512, 1024, 2048], **kwargs
     )
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -334,13 +326,9 @@ def convnextv2_atto(pretrained: bool = False, num_classes: int = 1000, in_channe
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnextv2_atto"]
-    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[2, 2, 6, 2],
-                     dims=[40, 80, 160, 320], use_grn=True, layer_scale_init_value=0.0, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(in_channels=in_channels, num_classes=num_classes, depths=[2, 2, 6, 2],
+                      dims=[40, 80, 160, 320], use_grn=True, layer_scale_init_value=0.0, **kwargs)
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -349,13 +337,9 @@ def convnextv2_femto(pretrained: bool = False, num_classes: int = 1000, in_chann
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnextv2_femto"]
-    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[2, 2, 6, 2],
-                     dims=[48, 96, 192, 384], use_grn=True, layer_scale_init_value=0.0, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(in_channels=in_channels, num_classes=num_classes, depths=[2, 2, 6, 2],
+                      dims=[48, 96, 192, 384], use_grn=True, layer_scale_init_value=0.0, **kwargs)
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -364,13 +348,9 @@ def convnextv2_pico(pretrained: bool = False, num_classes: int = 1000, in_channe
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnextv2_pico"]
-    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[2, 2, 6, 2],
-                     dims=[64, 128, 256, 512], use_grn=True, layer_scale_init_value=0.0, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(in_channels=in_channels, num_classes=num_classes, depths=[2, 2, 6, 2],
+                      dims=[64, 128, 256, 512], use_grn=True, layer_scale_init_value=0.0, **kwargs)
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -379,13 +359,9 @@ def convnextv2_nano(pretrained: bool = False, num_classes: int = 1000, in_channe
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnextv2_nano"]
-    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[2, 2, 8, 2],
-                     dims=[80, 160, 320, 640], use_grn=True, layer_scale_init_value=0.0, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(in_channels=in_channels, num_classes=num_classes, depths=[2, 2, 8, 2],
+                      dims=[80, 160, 320, 640], use_grn=True, layer_scale_init_value=0.0, **kwargs)
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -394,13 +370,9 @@ def convnextv2_tiny(pretrained: bool = False, num_classes: int = 1000, in_channe
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnextv2_tiny"]
-    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 9, 3],
-                     dims=[96, 192, 384, 768], use_grn=True, layer_scale_init_value=0.0, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 9, 3],
+                      dims=[96, 192, 384, 768], use_grn=True, layer_scale_init_value=0.0, **kwargs)
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -409,13 +381,9 @@ def convnextv2_base(pretrained: bool = False, num_classes: int = 1000, in_channe
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnextv2_base"]
-    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
-                     dims=[128, 256, 512, 1024], use_grn=True, layer_scale_init_value=0.0, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
+                      dims=[128, 256, 512, 1024], use_grn=True, layer_scale_init_value=0.0, **kwargs)
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -424,13 +392,9 @@ def convnextv2_large(pretrained: bool = False, num_classes: int = 1000, in_chann
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnextv2_large"]
-    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
-                     dims=[192, 384, 768, 1536], use_grn=True, layer_scale_init_value=0.0, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
+                      dims=[192, 384, 768, 1536], use_grn=True, layer_scale_init_value=0.0, **kwargs)
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -439,10 +403,6 @@ def convnextv2_huge(pretrained: bool = False, num_classes: int = 1000, in_channe
     Refer to the base class 'models.ConvNeXt' for more details.
     """
     default_cfg = default_cfgs["convnextv2_huge"]
-    model = ConvNeXt(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
-                     dims=[352, 704, 1408, 2816], use_grn=True, layer_scale_init_value=0.0, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(in_channels=in_channels, num_classes=num_classes, depths=[3, 3, 27, 3],
+                      dims=[352, 704, 1408, 2816], use_grn=True, layer_scale_init_value=0.0, **kwargs)
+    return _create_convnext(pretrained, **dict(default_cfg=default_cfg, **model_args))

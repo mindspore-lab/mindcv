@@ -11,6 +11,7 @@ def create_model(
     in_channels: int = 3,
     checkpoint_path: str = "",
     ema: bool = False,
+    auto_mapping: bool = False,
     **kwargs,
 ):
     r"""Creates model by name.
@@ -22,6 +23,8 @@ def create_model(
         in_channels (int): The input channels. Default: 3.
         checkpoint_path (str): The path of checkpoint files. Default: "".
         ema (bool): Whether use ema method. Default: False.
+        auto_mapping (bool): Whether to map the names of checkpoint weights
+            to the names of model weights. Default: False.
     """
 
     if checkpoint_path != "" and pretrained:
@@ -37,6 +40,6 @@ def create_model(
     model = create_fn(**model_args, **kwargs)
 
     if checkpoint_path:
-        load_model_checkpoint(model, checkpoint_path, ema)
+        load_model_checkpoint(model, checkpoint_path, ema, auto_mapping)
 
     return model

@@ -2,8 +2,10 @@
 Some utils while building models
 """
 import collections.abc
+import difflib
 import logging
 import os
+from copy import deepcopy
 from itertools import repeat
 from typing import Callable, Dict, List, Optional
 
@@ -102,17 +104,50 @@ def _search_param_name(params_names: List, param_name: str) -> str:
     return ""
 
 
-def load_model_checkpoint(model: nn.Cell, checkpoint_path: str = "", ema: bool = False):
+def auto_map(model, param_dict):
+    """Raname part of the param_dict such that names from checkpoint and model are consistent"""
+    updated_param_dict = deepcopy(param_dict)
+    net_param = model.get_parameters()
+    ckpt_param = list(updated_param_dict.keys())
+    remap = {}
+
+    for param in net_param:
+        if param.name not in ckpt_param:
+            print('Cannot find a param to load: ', param.name)
+            poss = difflib.get_close_matches(param.name, ckpt_param, n=3, cutoff=0.6)
+            if len(poss) > 0:
+                print('=> Find most matched param: ', poss[0], ', loaded')
+                updated_param_dict[param.name] = updated_param_dict.pop(poss[0])  # replace
+                remap[param.name] = poss[0]
+            else:
+                raise ValueError('Cannot find any matching param from: ', ckpt_param)
+
+    if remap != {}:
+        print('WARNING: Auto mapping succeed. Please check the found mapping names to ensure correctness')
+        print('\tNet Param\t<---\tCkpt Param')
+        for k in remap:
+            print(f'\t{k}\t<---\t{remap[k]}')
+
+    return updated_param_dict
+
+
+def load_model_checkpoint(model: nn.Cell, checkpoint_path: str = "", ema: bool = False, auto_mapping: bool = False):
     """Model loads checkpoint.
 
     Args:
         model (nn.Cell): The model which loads the checkpoint.
         checkpoint_path (str): The path of checkpoint files. Default: "".
         ema (bool): Whether use ema method. Default: False.
+        auto_mapping (bool): Whether to map the names of checkpoint weights
+            to the names of model weights. Default: False.
     """
 
     if os.path.exists(checkpoint_path):
         checkpoint_param = load_checkpoint(checkpoint_path)
+
+        if auto_mapping:
+            checkpoint_param = auto_map(model, checkpoint_param)
+
         ema_param_dict = dict()
 
         for param in checkpoint_param:
