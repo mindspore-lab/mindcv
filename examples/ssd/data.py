@@ -1,13 +1,13 @@
 import os
-import numpy as np
+
 import cv2
+import numpy as np
+from utils import jaccard_numpy, ssd_bboxes_encode
 
 import mindspore.dataset as de
 
-from box_utils import jaccard_numpy, ssd_bboxes_encode
 
-
-def _rand(a=0., b=1.):
+def _rand(a=0.0, b=1.0):
     """Generate random."""
     return np.random.rand() * (b - a) + a
 
@@ -45,7 +45,7 @@ def random_sample_crop(image, boxes):
         if overlap[drop_mask].min() < min_iou and overlap[drop_mask].max() > (min_iou + 0.2):
             continue
 
-        image_t = image_t[rect[0]:rect[2], rect[1]:rect[3], :]
+        image_t = image_t[rect[0] : rect[2], rect[1] : rect[3], :]
 
         centers = (boxes[:, :2] + boxes[:, 2:4]) / 2.0
 
@@ -105,7 +105,7 @@ def preprocess_fn(img_id, image, box, is_training, args):
         image = cv2.resize(image, (w, h))
 
         # Flip image or not
-        flip = _rand() < .5
+        flip = _rand() < 0.5
         if flip:
             image = cv2.flip(image, 1, dst=None)
 
@@ -127,10 +127,10 @@ def preprocess_fn(img_id, image, box, is_training, args):
 
 
 def create_ssd_dataset(
-        args,
-        num_shards=1,
-        shard_id=0,
-        is_training=True,
+    args,
+    num_shards=1,
+    shard_id=0,
+    is_training=True,
 ):
     """Create SSD dataset with MindDataset."""
     if args.dataset == "coco":
@@ -153,11 +153,13 @@ def create_ssd_dataset(
         change_swap_op = de.vision.HWC2CHW()
 
         # Computed from random subset of ImageNet training images
-        normalize_op = de.vision.Normalize(mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
-                                           std=[0.229 * 255, 0.224 * 255, 0.225 * 255])
+        normalize_op = de.vision.Normalize(
+            mean=[0.485 * 255, 0.456 * 255, 0.406 * 255], std=[0.229 * 255, 0.224 * 255, 0.225 * 255]
+        )
         color_adjust_op = de.vision.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4)
-        compose_map_func = (lambda img_id, image, annotation: preprocess_fn(img_id, image, annotation,
-                                                                            is_training, args))
+
+        def compose_map_func(img_id, image, annotation):
+            return preprocess_fn(img_id, image, annotation, is_training, args)
 
         if is_training:
             output_columns = ["image", "box", "label", "num_match"]
@@ -166,15 +168,20 @@ def create_ssd_dataset(
             output_columns = ["img_id", "image", "image_shape"]
             trans = [normalize_op, change_swap_op]
 
-        ds = ds.map(operations=compose_map_func,
-                    input_columns=["img_id", "image", "annotation"],
-                    output_columns=output_columns,
-                    column_order=output_columns,
-                    python_multiprocessing=True,
-                    num_parallel_workers=args.num_parallel_workers)
-        ds = ds.map(operations=trans, input_columns=["image"],
-                    python_multiprocessing=True,
-                    num_parallel_workers=args.num_parallel_workers)
+        ds = ds.map(
+            operations=compose_map_func,
+            input_columns=["img_id", "image", "annotation"],
+            output_columns=output_columns,
+            column_order=output_columns,
+            python_multiprocessing=True,
+            num_parallel_workers=args.num_parallel_workers,
+        )
+        ds = ds.map(
+            operations=trans,
+            input_columns=["image"],
+            python_multiprocessing=True,
+            num_parallel_workers=args.num_parallel_workers,
+        )
         ds = ds.batch(args.batch_size, drop_remainder=args.drop_remainder)
 
         return ds

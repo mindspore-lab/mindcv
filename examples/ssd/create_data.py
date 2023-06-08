@@ -5,22 +5,89 @@ import numpy as np
 
 from mindspore.mindrecord import FileWriter
 
-
-coco_classes = ["background", "person", "bicycle", "car", "motorcycle", "airplane", "bus",
-                "train", "truck", "boat", "traffic light", "fire hydrant",
-                "stop sign", "parking meter", "bench", "bird", "cat", "dog",
-                "horse", "sheep", "cow", "elephant", "bear", "zebra",
-                "giraffe", "backpack", "umbrella", "handbag", "tie",
-                "suitcase", "frisbee", "skis", "snowboard", "sports ball",
-                "kite", "baseball bat", "baseball glove", "skateboard",
-                "surfboard", "tennis racket", "bottle", "wine glass", "cup",
-                "fork", "knife", "spoon", "bowl", "banana", "apple",
-                "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza",
-                "donut", "cake", "chair", "couch", "potted plant", "bed",
-                "dining table", "toilet", "tv", "laptop", "mouse", "remote",
-                "keyboard", "cell phone", "microwave", "oven", "toaster", "sink",
-                "refrigerator", "book", "clock", "vase", "scissors",
-                "teddy bear", "hair drier", "toothbrush"]
+coco_classes = [
+    "background",
+    "person",
+    "bicycle",
+    "car",
+    "motorcycle",
+    "airplane",
+    "bus",
+    "train",
+    "truck",
+    "boat",
+    "traffic light",
+    "fire hydrant",
+    "stop sign",
+    "parking meter",
+    "bench",
+    "bird",
+    "cat",
+    "dog",
+    "horse",
+    "sheep",
+    "cow",
+    "elephant",
+    "bear",
+    "zebra",
+    "giraffe",
+    "backpack",
+    "umbrella",
+    "handbag",
+    "tie",
+    "suitcase",
+    "frisbee",
+    "skis",
+    "snowboard",
+    "sports ball",
+    "kite",
+    "baseball bat",
+    "baseball glove",
+    "skateboard",
+    "surfboard",
+    "tennis racket",
+    "bottle",
+    "wine glass",
+    "cup",
+    "fork",
+    "knife",
+    "spoon",
+    "bowl",
+    "banana",
+    "apple",
+    "sandwich",
+    "orange",
+    "broccoli",
+    "carrot",
+    "hot dog",
+    "pizza",
+    "donut",
+    "cake",
+    "chair",
+    "couch",
+    "potted plant",
+    "bed",
+    "dining table",
+    "toilet",
+    "tv",
+    "laptop",
+    "mouse",
+    "remote",
+    "keyboard",
+    "cell phone",
+    "microwave",
+    "oven",
+    "toaster",
+    "sink",
+    "refrigerator",
+    "book",
+    "clock",
+    "vase",
+    "scissors",
+    "teddy bear",
+    "hair drier",
+    "toothbrush",
+]
 
 
 def create_coco_label(data_path, is_training):
@@ -120,12 +187,10 @@ def convert_dataset(dataset="coco", data_path="", out_path=""):
     if dataset == "coco":
         if os.path.isdir(data_path):
             print("Start converting training dataset...")
-            data_to_mindrecord_byte_image(dataset=dataset, data_path=data_path,
-                                          out_path=out_path, is_training=True)
+            data_to_mindrecord_byte_image(dataset=dataset, data_path=data_path, out_path=out_path, is_training=True)
             print("Training dataset conversion done.")
             print("Start converting evaluation dataset...")
-            data_to_mindrecord_byte_image(dataset=dataset, data_path=data_path,
-                                          out_path=out_path, is_training=False)
+            data_to_mindrecord_byte_image(dataset=dataset, data_path=data_path, out_path=out_path, is_training=False)
             print("Evaluation dataset conversion done.")
         else:
             print("data path not exits.")
@@ -135,17 +200,10 @@ def convert_dataset(dataset="coco", data_path="", out_path=""):
 
 parser = argparse.ArgumentParser(description="Data converter arg parser")
 parser.add_argument("dataset", metavar="coco", help="name of the dataset")
+parser.add_argument("--data_path", type=str, default="./data/coco/", help="specify the root path of dataset")
 parser.add_argument(
-    "--data_path",
-    type=str,
-    default="./data/coco/",
-    help="specify the root path of dataset")
-parser.add_argument(
-    "--out_path",
-    type=str,
-    default="./data/coco/",
-    required=False,
-    help="specify the path of the coverted dataset")
+    "--out_path", type=str, default="./data/coco/", required=False, help="specify the path of the coverted dataset"
+)
 args = parser.parse_args()
 
 

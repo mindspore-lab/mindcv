@@ -218,7 +218,8 @@ class MobileNetV2(nn.Cell):
                 total_reduction *= stride
 
                 if len(features) == 16:
-                    self.feature_info.append(dict(chs=output_channel, reduction=total_reduction, name=f'features.{len(features) - 1}'))
+                    self.feature_info.append(dict(chs=output_channel, reduction=total_reduction,
+                                                  name=f'features.{len(features) - 1}'))
 
         # Building last point-wise layers.
         features.extend([
@@ -227,7 +228,8 @@ class MobileNetV2(nn.Cell):
             nn.ReLU6(),
         ])
 
-        self.feature_info.append(dict(chs=last_channels, reduction=total_reduction, name=f'features.{len(features) - 1}'))
+        self.feature_info.append(dict(chs=last_channels, reduction=total_reduction,
+                                      name=f'features.{len(features) - 1}'))
 
         self.features = nn.SequentialCell(features)
 

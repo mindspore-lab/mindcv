@@ -1,6 +1,5 @@
 from addict import Dict
 import argparse
-import logging
 import os
 import sys
 import yaml
@@ -8,20 +7,15 @@ import yaml
 import mindspore as ms
 from mindspore.communication import get_group_size, get_rank, init
 
+from callbacks import get_ssd_callbacks, get_ssd_eval_callback
 from data import create_ssd_dataset
+from ssd_model import SSD, SSDWithLossCell, get_ssd_trainer, SSDInferWithDecoder
+from utils import get_ssd_lr_scheduler, get_ssd_optimizer
 
 sys.path.append("../..")
 
 from mindcv.models import create_model
 from mindcv.utils import set_seed
-
-# TODO: arg parser already has a logger
-logger = logging.getLogger("train")
-logger.setLevel(logging.INFO)
-h1 = logging.StreamHandler()
-formatter1 = logging.Formatter("%(message)s")
-logger.addHandler(h1)
-h1.setFormatter(formatter1)
 
 
 def train(args):
@@ -38,6 +32,7 @@ def train(args):
             gradients_mean=True,
             # we should but cannot set parameter_broadcast=True, which will cause error on gpu.
         )
+        ms.set_auto_parallel_context(all_reduce_fusion_config=args.all_reduce_fusion_config)
     else:
         device_num = None
         rank_id = None
@@ -51,7 +46,7 @@ def train(args):
         is_training=True,
     )
 
-    dataset_size = dataset.get_dataset_size()
+    steps_per_epoch = dataset.get_dataset_size()
 
     # use mindcv models as backbone for SSD
     backbone = create_model(
@@ -61,7 +56,23 @@ def train(args):
         features_only=args.backbone_features_only,
     )
 
-    # ssd = SSD(backbone=backbone, args)
+    ssd = SSD(backbone, args)
+    model = SSDWithLossCell(ssd, args)
+
+    lr_scheduler = get_ssd_lr_scheduler(args, steps_per_epoch)
+    optimizer = get_ssd_optimizer(model, lr_scheduler, args)
+
+    trainer = get_ssd_trainer(model, optimizer, args.loss_scale)
+
+    callbacks = get_ssd_callbacks(args, steps_per_epoch)
+
+    if args.eval_while_train:
+        eval_model = SSDInferWithDecoder(ssd, args)
+        eval_dataset = create_ssd_dataset(args, is_training=False)
+        eval_callback = get_ssd_eval_callback(eval_model, eval_dataset, rank_id, args)
+        callbacks.append(eval_callback)
+
+    trainer.train(args.epoch_size, dataset, callbacks=callbacks, dataset_sink_mode=args.dataset_sink_mode)
 
 
 def parse_args():
