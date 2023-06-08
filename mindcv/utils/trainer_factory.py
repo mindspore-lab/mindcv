@@ -28,10 +28,14 @@ def get_metrics(num_classes):
     return metrics
 
 
-def _require_customized_train_step(ema: bool = False, clip_grad: bool = False):
+def _require_customized_train_step(
+    ema: bool = False, clip_grad: bool = False, gradient_accumulation_steps: bool = False
+):
     if ema:
         return True
     if clip_grad:
+        return True
+    if gradient_accumulation_steps > 1:
         return True
     return False
 
@@ -49,6 +53,7 @@ def create_trainer(
     ema_decay: float = 0.9999,
     clip_grad: bool = False,
     clip_value: float = 15.0,
+    gradient_accumulation_steps: int = 1,
 ):
     """Create Trainer.
 
@@ -65,6 +70,7 @@ def create_trainer(
         ema_decay: Decay factor for model weights moving average.
         clip_grad: whether to gradient clip.
         clip_value: The value at which to clip gradients.
+        gradient_accumulation_steps: Accumulate the gradients of n batches before update.
 
     Returns:
         mindspore.Model
@@ -76,7 +82,10 @@ def create_trainer(
     if drop_overflow_update is False and loss_scale_type.lower() == "dynamic":
         raise ValueError("DynamicLossScale ALWAYS drop overflow!")
 
-    if not _require_customized_train_step(ema, clip_grad):
+    if gradient_accumulation_steps < 1:
+        raise ValueError("`gradient_accumulation_steps` must be >= 1!")
+
+    if not _require_customized_train_step(ema, clip_grad, gradient_accumulation_steps):
         mindspore_kwargs = dict(
             network=network,
             loss_fn=loss,
@@ -112,6 +121,7 @@ def create_trainer(
             ema_decay=ema_decay,
             clip_grad=clip_grad,
             clip_value=clip_value,
+            gradient_accumulation_steps=gradient_accumulation_steps,
         )
         if loss_scale_type.lower() == "fixed":
             # todo: drop_overflow_update. If drop_overflow_update is False, scale_sense should be a number
