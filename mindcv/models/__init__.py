@@ -4,6 +4,7 @@ from . import (
     cait,
     coat,
     convit,
+    convmixer,
     convnext,
     crossvit,
     densenet,
@@ -55,6 +56,7 @@ from .bit import *
 from .cait import *
 from .coat import *
 from .convit import *
+from .convmixer import *
 from .convnext import *
 from .crossvit import *
 from .densenet import *
@@ -110,6 +112,7 @@ __all__.extend(bit.__all__)
 __all__.extend(cait.__all__)
 __all__.extend(coat.__all__)
 __all__.extend(convit.__all__)
+__all__.extend(convmixer.__all__)
 __all__.extend(convnext.__all__)
 __all__.extend(crossvit.__all__)
 __all__.extend(densenet.__all__)
