@@ -36,7 +36,7 @@ default_cfgs = {
     "mnasnet0.5": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_050-7d8bf4db.ckpt"),
     "mnasnet0.75": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_075-465d366d.ckpt"),
     "mnasnet1.0": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_100-1bcf43f8.ckpt"),
-    "mnasnet1.3": _cfg(url=""),
+    "mnasnet1.3": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_130-a43a150a.ckpt"),
     "mnasnet1.4": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_140-7e20bb30.ckpt"),
 }
 
