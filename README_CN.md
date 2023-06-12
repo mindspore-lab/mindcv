@@ -306,7 +306,7 @@ python train.py --model=resnet50 --dataset=cifar10 \
     - [RegNet](configs/regnet)的(x,y)_(200,400,600,800)mf版本
     - [RepVGG](configs/repvgg)的b1g2, b1g4 & b2g4版本
     - [MnasNet](configs/mnasnet)的0.5版本
-    - [PVTv2](configs/pvt_v2)的b3 & b4版本
+    - [PVTv2](configs/pvtv2)的b3 & b4版本
 2. 新特性:
     - 3-Augment, Augmix, TrivialAugmentWide
 3. 错误修复:
@@ -327,7 +327,7 @@ python train.py --model=resnet50 --dataset=cifar10 \
     - [XCiT](configs/xcit)
     - [CoAT](configs/coat)
     - [PiT](configs/pit)
-    - [PVT v2](configs/pvt_v2)
+    - [PVT v2](configs/pvtv2)
     - [MobileViT](configs/mobilevit)
 2. 错误修正:
     - 分布式训练时，需对每个进程设置相同的随机数种子
@@ -350,8 +350,8 @@ python train.py --model=resnet50 --dataset=cifar10 \
     - [HRNet](configs/hrnet)
     - [SENet](configs/senet)
     - [GoogLeNet](configs/googlenet)
-    - [Inception V3](configs/inception_v3)
-    - [Inception V4](configs/inception_v4)
+    - [Inception V3](configs/inceptionv3)
+    - [Inception V4](configs/inceptionv4)
     - [Xception](configs/xception)
 3. 支持梯度裁剪
 
