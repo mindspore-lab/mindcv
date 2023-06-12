@@ -88,11 +88,14 @@ class EvalCallBack(Callback):
                                                                                      self.best_epoch), flush=True)
 
 
-def get_ssd_callbacks(args, steps_per_epoch):
+def get_ssd_callbacks(args, steps_per_epoch, rank_id):
     ckpt_config = CheckpointConfig(keep_checkpoint_max=args.keep_checkpoint_max)
     ckpt_cb = ModelCheckpoint(prefix="ssd", directory=args.ckpt_save_dir, config=ckpt_config)
 
-    return [TimeMonitor(data_size=steps_per_epoch), LossMonitor(), ckpt_cb]
+    if rank_id == 0:
+        return [TimeMonitor(data_size=steps_per_epoch), LossMonitor(), ckpt_cb]
+
+    return [TimeMonitor(data_size=steps_per_epoch), LossMonitor()]
 
 
 def get_ssd_eval_callback(eval_net, eval_dataset, rank_id, args):

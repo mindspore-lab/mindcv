@@ -210,10 +210,6 @@ class SSD(nn.Cell):
         super(SSD, self).__init__()
 
         self.backbone = backbone
-
-        # for param in backbone.net.classifier.trainable_params():
-        #     param.requires_grad = False
-
         feature1_output_channels = backbone.out_channels[0]
         self.feature1_expand_layer = ConvBNReLU(feature1_output_channels,
                                                 int(round(feature1_output_channels * 6)), kernel_size=1)

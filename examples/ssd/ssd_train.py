@@ -64,7 +64,7 @@ def train(args):
 
     trainer = get_ssd_trainer(model, optimizer, args.loss_scale)
 
-    callbacks = get_ssd_callbacks(args, steps_per_epoch)
+    callbacks = get_ssd_callbacks(args, steps_per_epoch, rank_id)
 
     if args.eval_while_train:
         eval_model = SSDInferWithDecoder(ssd, args)
