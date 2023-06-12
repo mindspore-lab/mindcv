@@ -14,7 +14,7 @@
     - (x,y)_(200,400,600,800)mf of [RegNet](configs/regnet)
     - b1g2, b1g4 & b2g4 of [RepVGG](configs/repvgg)
     - 0.5 of [MnasNet](configs/mnasnet)
-    - b3 & b4 of [PVTv2](configs/pvt_v2)
+    - b3 & b4 of [PVTv2](configs/pvtv2)
 2. New Features:
     - 3-Augment, Augmix, TrivialAugmentWide
 3. Bug Fixes:
@@ -35,7 +35,7 @@
     - [XCiT](configs/xcit)
     - [CoAT](configs/coat)
     - [PiT](configs/pit)
-    - [PVT v2](configs/pvt_v2)
+    - [PVT v2](configs/pvtv2)
     - [MobileViT](configs/mobilevit)
 2. Bug fix:
     - Setting the same random seed for each rank
@@ -60,8 +60,8 @@
     - [HRNet](configs/hrnet)
     - [SENet](configs/senet)
     - [GoogLeNet](configs/googlenet)
-    - [Inception V3](configs/inception_v3)
-    - [Inception V4](configs/inception_v4)
+    - [Inception V3](configs/inceptionv3)
+    - [Inception V4](configs/inceptionv4)
     - [Xception](configs/xception)
 3. Support gradient clip
 4. Arg name `use_ema` changed to **`ema`**, add `ema: True` in yaml to enable EMA.

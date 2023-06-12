@@ -11,7 +11,14 @@ from mindcv.loss import create_loss
 from mindcv.models import create_model
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
-from mindcv.utils import AllReduceSum, StateMonitor, create_trainer, get_metrics, set_seed
+from mindcv.utils import (
+    AllReduceSum,
+    StateMonitor,
+    create_trainer,
+    get_metrics,
+    require_customized_train_step,
+    set_seed,
+)
 
 from config import parse_args  # isort: skip
 
@@ -190,7 +197,11 @@ def train(args):
 
     # create optimizer
     # TODO: consistent naming opt, name, dataset_name
-    if args.loss_scale_type == "fixed" and args.drop_overflow_update is False:
+    if (
+        args.loss_scale_type == "fixed"
+        and args.drop_overflow_update is False
+        and not require_customized_train_step(args.ema, args.clip_grad, args.gradient_accumulation_steps)
+    ):
         optimizer_loss_scale = args.loss_scale
     else:
         optimizer_loss_scale = 1.0
