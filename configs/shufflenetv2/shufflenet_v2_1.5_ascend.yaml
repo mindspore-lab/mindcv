@@ -2,6 +2,7 @@
 mode: 0
 distribute: True
 num_parallel_workers: 8
+val_while_train: True
 
 # dataset
 dataset: 'imagenet'
@@ -28,7 +29,7 @@ keep_checkpoint_max: 30
 ckpt_save_dir: './ckpt'
 epoch_size: 300
 dataset_sink_mode: True
-amp_level: 'O0'
+amp_level: 'O3'
 
 # loss
 loss: 'CE'
@@ -38,13 +39,13 @@ label_smoothing: 0.1
 scheduler: 'cosine_decay'
 min_lr: 0.0
 lr: 0.5
-warmup_epochs: 4
-decay_epochs: 246
+warmup_epochs: 5
+decay_epochs: 295
 
 # optimizer
 opt: 'momentum'
 filter_bias_and_bn: False
 momentum: 0.9
 weight_decay: 0.00004
-loss_scale: 1
+loss_scale: 1024
 use_nesterov: False
