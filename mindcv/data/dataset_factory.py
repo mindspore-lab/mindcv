@@ -2,6 +2,7 @@
 Create dataset by name
 """
 
+import logging
 import os
 from typing import Optional
 
@@ -14,6 +15,8 @@ from .distributed_sampler import RepeatAugSampler
 __all__ = [
     "create_dataset",
 ]
+
+_logger = logging.getLogger(__name__)
 
 _MINDSPORE_BASIC_DATASET = dict(
     mnist=(MnistDataset, MnistDownload),
@@ -89,7 +92,7 @@ def create_dataset(
     if num_samples is not None and num_samples > 0:
         # TODO: rewrite ordered distributed sampler (subset sampling in distributed mode is not tested)
         if num_shards is not None and num_shards > 1:  # distributed
-            print("ns", num_shards, "num_samples", num_samples)
+            _logger.info(f"number of shards: {num_shards}, number of samples: {num_samples}")
             sampler = DistributedSampler(num_shards, shard_id, shuffle=shuffle, num_samples=num_samples)
         else:  # standalone
             if shuffle:
@@ -116,8 +119,8 @@ def create_dataset(
     # sampler for repeated augmentation
     if num_aug_repeats > 0:
         dataset_size = get_dataset_size(name, root, split)
-        print(
-            f"INFO: Repeated augmentation is enabled, num_aug_repeats: {num_aug_repeats}, "
+        _logger.info(
+            f"Repeated augmentation is enabled, num_aug_repeats: {num_aug_repeats}, "
             f"original dataset size: {dataset_size}."
         )
         # since drop_remainder is usually True, we don't need to do rounding in sampling
