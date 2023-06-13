@@ -40,7 +40,14 @@ def train(args):
     set_seed(args.seed)
 
     dataset = create_ssd_dataset(
-        args,
+        name=args.dataset,
+        root=args.data_dir,
+        shuffle=args.shuffle,
+        batch_size=args.batch_size,
+        python_multiprocessing=True,
+        num_parallel_workers=args.num_parallel_workers,
+        drop_remainder=args.drop_remainder,
+        args=args,
         num_shards=device_num,
         shard_id=rank_id,
         is_training=True,
@@ -62,13 +69,23 @@ def train(args):
     lr_scheduler = get_ssd_lr_scheduler(args, steps_per_epoch)
     optimizer = get_ssd_optimizer(model, lr_scheduler, args)
 
-    trainer = get_ssd_trainer(model, optimizer, args.loss_scale)
+    trainer = get_ssd_trainer(model, optimizer, args)
 
     callbacks = get_ssd_callbacks(args, steps_per_epoch, rank_id)
 
     if args.eval_while_train:
         eval_model = SSDInferWithDecoder(ssd, args)
-        eval_dataset = create_ssd_dataset(args, is_training=False)
+        eval_dataset = create_ssd_dataset(
+            name=args.dataset,
+            root=args.data_dir,
+            shuffle=False,
+            batch_size=1,
+            python_multiprocessing=False,
+            num_parallel_workers=args.num_parallel_workers,
+            drop_remainder=False,
+            args=args,
+            is_training=False
+        )
         eval_callback = get_ssd_eval_callback(eval_model, eval_dataset, rank_id, args)
         callbacks.append(eval_callback)
 

@@ -427,5 +427,5 @@ class SSDInferWithDecoder(nn.Cell):
         return pred_xy, pred_label
 
 
-def get_ssd_trainer(model, optimizer, loss_scale):
-    return ms.Model(TrainingWrapper(model, optimizer, loss_scale))
+def get_ssd_trainer(model, optimizer, args):
+    return ms.Model(TrainingWrapper(model, optimizer, args.loss_scale), amp_level=args.amp_level)

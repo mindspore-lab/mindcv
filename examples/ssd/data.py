@@ -127,25 +127,32 @@ def preprocess_fn(img_id, image, box, is_training, args):
 
 
 def create_ssd_dataset(
+    name,
+    root,
+    shuffle,
+    batch_size,
+    python_multiprocessing,
+    num_parallel_workers,
+    drop_remainder,
     args,
     num_shards=1,
     shard_id=0,
     is_training=True,
 ):
     """Create SSD dataset with MindDataset."""
-    if args.dataset == "coco":
+    if name == "coco":
         if is_training:
-            mindrecord_file = os.path.join(args.data_dir, "train", "coco0")
+            mindrecord_file = os.path.join(root, "train", "coco0")
         else:
-            mindrecord_file = os.path.join(args.data_dir, "val", "coco0")
+            mindrecord_file = os.path.join(root, "val", "coco0")
 
         ds = de.MindDataset(
             mindrecord_file,
             columns_list=["img_id", "image", "annotation"],
             num_shards=num_shards,
             shard_id=shard_id,
-            num_parallel_workers=args.num_parallel_workers,
-            shuffle=args.shuffle,
+            num_parallel_workers=num_parallel_workers,
+            shuffle=shuffle,
         )
 
         decode = de.vision.Decode()
@@ -173,16 +180,16 @@ def create_ssd_dataset(
             input_columns=["img_id", "image", "annotation"],
             output_columns=output_columns,
             column_order=output_columns,
-            python_multiprocessing=True,
-            num_parallel_workers=args.num_parallel_workers,
+            python_multiprocessing=python_multiprocessing,
+            num_parallel_workers=num_parallel_workers,
         )
         ds = ds.map(
             operations=trans,
             input_columns=["image"],
-            python_multiprocessing=True,
-            num_parallel_workers=args.num_parallel_workers,
+            python_multiprocessing=python_multiprocessing,
+            num_parallel_workers=num_parallel_workers,
         )
-        ds = ds.batch(args.batch_size, drop_remainder=args.drop_remainder)
+        ds = ds.batch(batch_size, drop_remainder=drop_remainder)
 
         return ds
     else:
