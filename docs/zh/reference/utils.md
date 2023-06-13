@@ -1,6 +1,11 @@
 # Utility
 
 
+## Logger
+
+### ::: mindcv.utils.logger.set_logger
+
+
 ## Callbacks
 
 ### ::: mindcv.utils.callbacks.StateMonitor
