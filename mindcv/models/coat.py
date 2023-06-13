@@ -45,7 +45,7 @@ def _cfg(url='', **kwargs):
 
 default_cfgs = {
     'coat_tiny': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/coat/coat_tiny-071cb792.ckpt'),
-    'coat_mini': _cfg(url=''),
+    'coat_mini': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/coat/coat_mini-57c5bce7.ckpt'),
     'coat_small': _cfg(url=''),
     'coat_lite_tiny': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_tiny-fa7bf894.ckpt'),
     'coat_lite_mini': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_mini-55a52f05.ckpt'),
