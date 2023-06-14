@@ -1,30 +1,33 @@
+from utils import GeneratDefaultBoxes
+
 import mindspore as ms
-from mindspore import Tensor
-from mindspore.common.initializer import initializer, TruncatedNormal
-from mindspore.context import ParallelMode
-from mindspore.communication.management import get_group_size
-from mindspore.parallel._auto_parallel_context import auto_parallel_context
 import mindspore.nn as nn
 import mindspore.ops as ops
-
-from utils import GeneratDefaultBoxes
+from mindspore import Tensor
+from mindspore.common.initializer import TruncatedNormal, initializer
+from mindspore.communication.management import get_group_size
+from mindspore.context import ParallelMode
+from mindspore.parallel._auto_parallel_context import auto_parallel_context
 
 
 def _conv2d(in_channel, out_channel, kernel_size=3, stride=1, pad_mod="same"):
-    return nn.Conv2d(in_channel, out_channel, kernel_size=kernel_size, stride=stride,
-                     padding=0, pad_mode=pad_mod, has_bias=True)
+    return nn.Conv2d(
+        in_channel, out_channel, kernel_size=kernel_size, stride=stride, padding=0, pad_mode=pad_mod, has_bias=True
+    )
 
 
 def _bn(channel):
-    return nn.BatchNorm2d(channel, eps=1e-3, momentum=0.97,
-                          gamma_init=1, beta_init=0, moving_mean_init=0, moving_var_init=1)
+    return nn.BatchNorm2d(
+        channel, eps=1e-3, momentum=0.97, gamma_init=1, beta_init=0, moving_mean_init=0, moving_var_init=1
+    )
 
 
 def _last_conv2d(in_channel, out_channel, kernel_size=3, stride=1, pad_mod="same", pad=0):
     in_channels = in_channel
     out_channels = in_channel
-    depthwise_conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, pad_mode=pad_mod,
-                               padding=pad, group=in_channels)
+    depthwise_conv = nn.Conv2d(
+        in_channels, out_channels, kernel_size, stride, pad_mode=pad_mod, padding=pad, group=in_channels
+    )
     conv = _conv2d(in_channel, out_channel, kernel_size=1)
     return nn.SequentialCell([depthwise_conv, _bn(in_channel), nn.ReLU6(), conv])
 
@@ -47,6 +50,7 @@ class ConvBNReLU(nn.Cell):
     Examples:
         >>> ConvBNReLU(16, 256, kernel_size=1, stride=1, groups=1)
     """
+
     def __init__(self, in_planes, out_planes, kernel_size=3, stride=1, groups=1, shared_conv=None):
         super(ConvBNReLU, self).__init__()
         padding = 0
@@ -57,8 +61,9 @@ class ConvBNReLU(nn.Cell):
                 conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, pad_mode="same", padding=padding)
             else:
                 out_channels = in_planes
-                conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, pad_mode="same",
-                                 padding=padding, group=in_channels)
+                conv = nn.Conv2d(
+                    in_channels, out_channels, kernel_size, stride, pad_mode="same", padding=padding, group=in_channels
+                )
             layers = [conv, _bn(out_planes), nn.ReLU6()]
         else:
             layers = [shared_conv, _bn(out_planes), nn.ReLU6()]
@@ -85,6 +90,7 @@ class InvertedResidual(nn.Cell):
     Examples:
         >>> ResidualBlock(3, 256, 1, 1)
     """
+
     def __init__(self, inp, oup, stride, expand_ratio, last_relu=False):
         super(InvertedResidual, self).__init__()
         assert stride in [1, 2]
@@ -95,13 +101,15 @@ class InvertedResidual(nn.Cell):
         layers = []
         if expand_ratio != 1:
             layers.append(ConvBNReLU(inp, hidden_dim, kernel_size=1))
-        layers.extend([
-            # dw
-            ConvBNReLU(hidden_dim, hidden_dim, stride=stride, groups=hidden_dim),
-            # pw-linear
-            nn.Conv2d(hidden_dim, oup, kernel_size=1, stride=1, has_bias=False),
-            _bn(oup),
-        ])
+        layers.extend(
+            [
+                # dw
+                ConvBNReLU(hidden_dim, hidden_dim, stride=stride, groups=hidden_dim),
+                # pw-linear
+                nn.Conv2d(hidden_dim, oup, kernel_size=1, stride=1, has_bias=False),
+                _bn(oup),
+            ]
+        )
         self.conv = nn.SequentialCell(layers)
         self.cast = ops.Cast()
         self.last_relu = last_relu
@@ -130,6 +138,7 @@ class FlattenConcat(nn.Cell):
     Returns:
         Tensor, flatten predictions.
     """
+
     def __init__(self, config):
         super(FlattenConcat, self).__init__()
         self.num_ssd_boxes = config.num_ssd_boxes
@@ -160,6 +169,7 @@ class MultiBox(nn.Cell):
         Tensor, localization predictions.
         Tensor, class conf scores.
     """
+
     def __init__(self, args):
         super(MultiBox, self).__init__()
         num_classes = args.num_classes
@@ -170,10 +180,12 @@ class MultiBox(nn.Cell):
         cls_layers = []
 
         for k, out_channel in enumerate(out_channels):
-            loc_layers += [_last_conv2d(out_channel, 4 * num_default[k],
-                                        kernel_size=3, stride=1, pad_mod="same", pad=0)]
-            cls_layers += [_last_conv2d(out_channel, num_classes * num_default[k],
-                                        kernel_size=3, stride=1, pad_mod="same", pad=0)]
+            loc_layers += [
+                _last_conv2d(out_channel, 4 * num_default[k], kernel_size=3, stride=1, pad_mod="same", pad=0)
+            ]
+            cls_layers += [
+                _last_conv2d(out_channel, num_classes * num_default[k], kernel_size=3, stride=1, pad_mod="same", pad=0)
+            ]
 
         self.multi_loc_layers = nn.CellList(loc_layers)
         self.multi_cls_layers = nn.CellList(cls_layers)
@@ -206,13 +218,15 @@ class SSD(nn.Cell):
          SSD300(backbone=resnet34(num_classes=None),
                 config=config).
     """
+
     def __init__(self, backbone, args, is_training=True):
         super(SSD, self).__init__()
 
         self.backbone = backbone
         feature1_output_channels = backbone.out_channels[0]
-        self.feature1_expand_layer = ConvBNReLU(feature1_output_channels,
-                                                int(round(feature1_output_channels * 6)), kernel_size=1)
+        self.feature1_expand_layer = ConvBNReLU(
+            feature1_output_channels, int(round(feature1_output_channels * 6)), kernel_size=1
+        )
 
         in_channels = args.extras_in_channels
         out_channels = args.extras_out_channels
@@ -221,8 +235,9 @@ class SSD(nn.Cell):
         residual_list = []
 
         for i in range(2, len(in_channels)):
-            residual = InvertedResidual(in_channels[i], out_channels[i], stride=strides[i],
-                                        expand_ratio=ratios[i], last_relu=True)
+            residual = InvertedResidual(
+                in_channels[i], out_channels[i], stride=strides[i], expand_ratio=ratios[i], last_relu=True
+            )
             residual_list.append(residual)
 
         self.multi_residual = nn.CellList(residual_list)
@@ -240,7 +255,7 @@ class SSD(nn.Cell):
         params.extend(self.multi_box.trainable_params())
 
         for p in params:
-            if 'beta' not in p.name and 'gamma' not in p.name and 'bias' not in p.name:
+            if "beta" not in p.name and "gamma" not in p.name and "bias" not in p.name:
                 p.set_data(initializer(TruncatedNormal(0.02), p.data.shape, p.data.dtype))
 
     def construct(self, x):
@@ -265,7 +280,7 @@ class SSD(nn.Cell):
 
 
 class SigmoidFocalClassificationLoss(nn.Cell):
-    """"
+    """ "
     Sigmoid focal-loss for classification.
 
     Args:
@@ -275,6 +290,7 @@ class SigmoidFocalClassificationLoss(nn.Cell):
     Returns:
         Tensor, the focal loss.
     """
+
     def __init__(self, gamma=2.0, alpha=0.25):
         super(SigmoidFocalClassificationLoss, self).__init__()
         self.sigmiod_cross_entropy = ops.SigmoidCrossEntropyWithLogits()
@@ -299,7 +315,7 @@ class SigmoidFocalClassificationLoss(nn.Cell):
 
 
 class SSDWithLossCell(nn.Cell):
-    """"
+    """ "
     Provide SSD training loss through network.
 
     Args:
@@ -309,6 +325,7 @@ class SSDWithLossCell(nn.Cell):
     Returns:
         Tensor, the loss of the network.
     """
+
     def __init__(self, network, args):
         super(SSDWithLossCell, self).__init__()
         self.network = network
@@ -349,6 +366,7 @@ class TrainingWrapper(nn.Cell):
         sens (Number): The adjust parameter. Default: 1.0.
         use_global_nrom(bool): Whether apply global norm before optimizer. Default: False
     """
+
     def __init__(self, network, optimizer, sens=1.0):
         super(TrainingWrapper, self).__init__(auto_prefix=False)
         self.network = network
@@ -404,6 +422,7 @@ class SSDInferWithDecoder(nn.Cell):
         Tensor, the prediction labels.
 
     """
+
     def __init__(self, network, args):
         super(SSDInferWithDecoder, self).__init__()
         self.network = network

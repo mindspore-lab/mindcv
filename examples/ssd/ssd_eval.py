@@ -1,14 +1,14 @@
-from addict import Dict
 import argparse
 import os
 import sys
+
 import yaml
-
-from mindspore import load_checkpoint, load_param_into_net
-
+from addict import Dict
 from data import create_ssd_dataset
 from ssd_model import SSD, SSDInferWithDecoder
 from utils import apply_eval
+
+from mindspore import load_checkpoint, load_param_into_net
 
 sys.path.append(".")
 
@@ -25,7 +25,7 @@ def eval(args):
         num_parallel_workers=args.num_parallel_workers,
         drop_remainder=False,
         args=args,
-        is_training=False
+        is_training=False,
     )
 
     backbone = create_model(
@@ -58,11 +58,9 @@ def eval(args):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Training Config',
-                                     add_help=False)
+    parser = argparse.ArgumentParser(description="Training Config", add_help=False)
     parser.add_argument(
-        '-c', '--config', type=str, default='',
-        help='YAML config file specifying default arguments (default='')'
+        "-c", "--config", type=str, default="", help="YAML config file specifying default arguments (default=" ")"
     )
 
     args = parser.parse_args()

@@ -1,36 +1,20 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ============================================================================
-
-"""Bbox utils"""
-
+import itertools as it
 import json
 import math
-import itertools as it
+
 import numpy as np
+from pycocotools.coco import COCO
+from pycocotools.cocoeval import COCOeval
 
 import mindspore.nn as nn
 from mindspore import Tensor
-
-from pycocotools.coco import COCO
-from pycocotools.cocoeval import COCOeval
 
 
 class GridAnchorGenerator:
     """
     Anchor Generator
     """
+
     def __init__(self, image_shape, scale, scales_per_octave, aspect_ratios):
         super(GridAnchorGenerator, self).__init__()
         self.scale = scale
@@ -39,8 +23,9 @@ class GridAnchorGenerator:
         self.image_shape = image_shape
 
     def generate(self, step):
-        scales = np.array([2**(float(scale) / self.scales_per_octave)
-                           for scale in range(self.scales_per_octave)]).astype(np.float32)
+        scales = np.array(
+            [2 ** (float(scale) / self.scales_per_octave) for scale in range(self.scales_per_octave)]
+        ).astype(np.float32)
         aspects = np.array(list(self.aspect_ratios)).astype(np.float32)
 
         scales_grid, aspect_ratios_grid = np.meshgrid(scales, aspects)
@@ -99,12 +84,13 @@ class GridAnchorGenerator:
         return self.bbox_centers, self.bbox_corners
 
 
-class GeneratDefaultBoxes():
+class GeneratDefaultBoxes:
     """
     Generate Default boxes for SSD, follows the order of (W, H, archor_sizes).
     `self.default_boxes` has a shape of [archor_sizes, H, W, 4], the last dimension is [y, x, h, w].
     `self.default_boxes_tlbr` has a shape as `self.default_boxes`, the last dimension is [y1, x1, y2, x2].
     """
+
     def __init__(self, args):
         fk = args.image_size[0] / np.array(args.steps)
         scale_rate = (args.max_scale - args.min_scale) / (len(args.num_default) - 1)
@@ -136,8 +122,8 @@ class GeneratDefaultBoxes():
             return cy - h / 2, cx - w / 2, cy + h / 2, cx + w / 2
 
         # For IoU calculation
-        self.default_boxes_tlbr = np.array(tuple(to_tlbr(*i) for i in self.default_boxes), dtype='float32')
-        self.default_boxes = np.array(self.default_boxes, dtype='float32')
+        self.default_boxes_tlbr = np.array(tuple(to_tlbr(*i) for i in self.default_boxes), dtype="float32")
+        self.default_boxes = np.array(self.default_boxes, dtype="float32")
 
 
 def ssd_bboxes_encode(boxes, args):
@@ -152,7 +138,7 @@ def ssd_bboxes_encode(boxes, args):
         gt_label: class ground truth with shape [num_anchors, 1].
         num_matched_boxes: number of positives in an image.
     """
-    if hasattr(args, 'use_anchor_generator') and args.use_anchor_generator:
+    if hasattr(args, "use_anchor_generator") and args.use_anchor_generator:
         generator = GridAnchorGenerator(args.image_size, 4, 2, [1.0, 2.0, 0.5])
         default_boxes, default_boxes_tlbr = generator.generate_multi_levels(args.steps)
     else:
@@ -170,8 +156,8 @@ def ssd_bboxes_encode(boxes, args):
         xmin = np.maximum(x1, bbox[1])
         ymax = np.minimum(y2, bbox[2])
         xmax = np.minimum(x2, bbox[3])
-        w = np.maximum(xmax - xmin, 0.)
-        h = np.maximum(ymax - ymin, 0.)
+        w = np.maximum(xmax - xmin, 0.0)
+        h = np.maximum(ymax - ymin, 0.0)
 
         # Volumes.
         inter_vol = h * w
@@ -187,7 +173,7 @@ def ssd_bboxes_encode(boxes, args):
         scores = jaccard_with_anchors(bbox)
         idx = np.argmax(scores)
         scores[idx] = 2.0
-        mask = (scores > args.match_threshold)
+        mask = scores > args.match_threshold
         mask = mask & (scores > pre_scores)
         pre_scores = np.maximum(pre_scores, scores * mask)
         t_label = mask * label + (1 - mask) * t_label
@@ -215,7 +201,7 @@ def ssd_bboxes_encode(boxes, args):
 
 def ssd_bboxes_decode(boxes, args):
     """Decode predict boxes to [y, x, h, w]"""
-    if hasattr(args, 'use_anchor_generator') and args.use_anchor_generator:
+    if hasattr(args, "use_anchor_generator") and args.use_anchor_generator:
         generator = GridAnchorGenerator(args.image_size, 4, 2, [1.0, 2.0, 0.5])
         default_boxes, _ = generator.generate_multi_levels(args.steps)
     else:
@@ -245,10 +231,8 @@ def intersect(box_a, box_b):
 def jaccard_numpy(box_a, box_b):
     """Compute the jaccard overlap of two sets of boxes."""
     inter = intersect(box_a, box_b)
-    area_a = ((box_a[:, 2] - box_a[:, 0]) *
-              (box_a[:, 3] - box_a[:, 1]))
-    area_b = ((box_b[2] - box_b[0]) *
-              (box_b[3] - box_b[1]))
+    area_a = (box_a[:, 2] - box_a[:, 0]) * (box_a[:, 3] - box_a[:, 1])
+    area_b = (box_b[2] - box_b[0]) * (box_b[3] - box_b[1])
     union = area_a + area_b - inter
     return inter / union
 
@@ -271,9 +255,12 @@ def get_ssd_lr_scheduler(args, steps_per_epoch):
         if i < warmup_steps:
             lr = lr_init + (lr_max - lr_init) * i / warmup_steps
         else:
-            lr = lr_end + \
-                 (lr_max - lr_end) * \
-                 (1. + math.cos(math.pi * (i - warmup_steps) / (total_steps - warmup_steps))) / 2.
+            lr = (
+                lr_end
+                + (lr_max - lr_end)
+                * (1.0 + math.cos(math.pi * (i - warmup_steps) / (total_steps - warmup_steps)))
+                / 2.0
+            )
 
         if lr < 0.0:
             lr = 0.0
@@ -286,8 +273,9 @@ def get_ssd_lr_scheduler(args, steps_per_epoch):
 
 
 def get_ssd_optimizer(model, lr, args):
-    optimizer = nn.Momentum(filter(lambda x: x.requires_grad, model.get_parameters()),
-                            lr, args.momentum, args.weight_decay, args.loss_scale)
+    optimizer = nn.Momentum(
+        filter(lambda x: x.requires_grad, model.get_parameters()), lr, args.momentum, args.weight_decay, args.loss_scale
+    )
     return optimizer
 
 
@@ -340,16 +328,16 @@ class COCOMetrics:
         self.val_cls_dict = {i: cls for i, cls in enumerate(classes)}
         self.coco_gt = COCO(anno_json)
         cat_ids = self.coco_gt.loadCats(self.coco_gt.getCatIds())
-        self.class_dict = {cat['name']: cat['id'] for cat in cat_ids}
+        self.class_dict = {cat["name"]: cat["id"] for cat in cat_ids}
 
         self.predictions = []
         self.img_ids = []
 
     def update(self, batch):
-        pred_boxes = batch['boxes']
-        box_scores = batch['box_scores']
-        img_id = batch['img_id']
-        h, w = batch['image_shape']
+        pred_boxes = batch["boxes"]
+        box_scores = batch["box_scores"]
+        img_id = batch["img_id"]
+        h, w = batch["image_shape"]
 
         final_boxes = []
         final_label = []
@@ -373,18 +361,18 @@ class COCOMetrics:
 
         for loc, label, score in zip(final_boxes, final_label, final_score):
             res = {}
-            res['image_id'] = img_id
-            res['bbox'] = [loc[1], loc[0], loc[3] - loc[1], loc[2] - loc[0]]
-            res['score'] = score
-            res['category_id'] = label
+            res["image_id"] = img_id
+            res["bbox"] = [loc[1], loc[0], loc[3] - loc[1], loc[2] - loc[0]]
+            res["score"] = score
+            res["category_id"] = label
             self.predictions.append(res)
 
     def get_metrics(self):
-        with open('predictions.json', 'w') as f:
+        with open("predictions.json", "w") as f:
             json.dump(self.predictions, f)
 
-        coco_dt = self.coco_gt.loadRes('predictions.json')
-        E = COCOeval(self.coco_gt, coco_dt, iouType='bbox')
+        coco_dt = self.coco_gt.loadRes("predictions.json")
+        E = COCOeval(self.coco_gt, coco_dt, iouType="bbox")
         E.params.imgIds = self.img_ids
         E.evaluate()
         E.accumulate()
@@ -398,17 +386,19 @@ def apply_eval(eval_param_dict):
     ds = eval_param_dict["dataset"]
     anno_json = eval_param_dict["anno_json"]
     args = eval_param_dict["args"]
-    coco_metrics = COCOMetrics(anno_json=anno_json,
-                               classes=args.classes,
-                               num_classes=args.num_classes,
-                               max_boxes=args.max_boxes,
-                               nms_threshold=args.nms_threshold,
-                               min_score=args.min_score)
+    coco_metrics = COCOMetrics(
+        anno_json=anno_json,
+        classes=args.classes,
+        num_classes=args.num_classes,
+        max_boxes=args.max_boxes,
+        nms_threshold=args.nms_threshold,
+        min_score=args.min_score,
+    )
 
     for data in ds.create_dict_iterator(output_numpy=True, num_epochs=1):
-        img_id = data['img_id']
-        img_np = data['image']
-        image_shape = data['image_shape']
+        img_id = data["img_id"]
+        img_np = data["image"]
+        image_shape = data["image_shape"]
 
         output = net(Tensor(img_np))
 
@@ -417,7 +407,7 @@ def apply_eval(eval_param_dict):
                 "boxes": output[0].asnumpy()[batch_idx],
                 "box_scores": output[1].asnumpy()[batch_idx],
                 "img_id": int(np.squeeze(img_id[batch_idx])),
-                "image_shape": image_shape[batch_idx]
+                "image_shape": image_shape[batch_idx],
             }
             coco_metrics.update(pred_batch)
 

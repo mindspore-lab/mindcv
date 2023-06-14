@@ -1,16 +1,16 @@
-from addict import Dict
 import argparse
 import os
 import sys
+
 import yaml
+from addict import Dict
+from callbacks import get_ssd_callbacks, get_ssd_eval_callback
+from data import create_ssd_dataset
+from ssd_model import SSD, SSDInferWithDecoder, SSDWithLossCell, get_ssd_trainer
+from utils import get_ssd_lr_scheduler, get_ssd_optimizer
 
 import mindspore as ms
 from mindspore.communication import get_group_size, get_rank, init
-
-from callbacks import get_ssd_callbacks, get_ssd_eval_callback
-from data import create_ssd_dataset
-from ssd_model import SSD, SSDWithLossCell, get_ssd_trainer, SSDInferWithDecoder
-from utils import get_ssd_lr_scheduler, get_ssd_optimizer
 
 sys.path.append(".")
 
@@ -84,7 +84,7 @@ def train(args):
             num_parallel_workers=args.num_parallel_workers,
             drop_remainder=False,
             args=args,
-            is_training=False
+            is_training=False,
         )
         eval_callback = get_ssd_eval_callback(eval_model, eval_dataset, args)
         callbacks.append(eval_callback)
@@ -93,11 +93,9 @@ def train(args):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Training Config',
-                                     add_help=False)
+    parser = argparse.ArgumentParser(description="Training Config", add_help=False)
     parser.add_argument(
-        '-c', '--config', type=str, default='',
-        help='YAML config file specifying default arguments (default='')'
+        "-c", "--config", type=str, default="", help="YAML config file specifying default arguments (default=" ")"
     )
 
     args = parser.parse_args()

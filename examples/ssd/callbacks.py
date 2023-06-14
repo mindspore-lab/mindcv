@@ -1,11 +1,11 @@
 import os
 import stat
 
+from utils import apply_eval
+
 from mindspore import log as logger
 from mindspore import save_checkpoint
-from mindspore.train.callback import Callback, CheckpointConfig, ModelCheckpoint, LossMonitor, TimeMonitor
-
-from utils import apply_eval
+from mindspore.train.callback import Callback, CheckpointConfig, LossMonitor, ModelCheckpoint, TimeMonitor
 
 
 class EvalCallBack(Callback):
@@ -28,8 +28,17 @@ class EvalCallBack(Callback):
         >>> EvalCallBack(eval_function, eval_param_dict)
     """
 
-    def __init__(self, eval_function, eval_param_dict, interval=1, eval_start_epoch=1,
-                 save_best_ckpt=True, ckpt_directory="./", best_ckpt_name="best.ckpt", metrics_name="acc"):
+    def __init__(
+        self,
+        eval_function,
+        eval_param_dict,
+        interval=1,
+        eval_start_epoch=1,
+        save_best_ckpt=True,
+        ckpt_directory="./",
+        best_ckpt_name="best.ckpt",
+        metrics_name="acc",
+    ):
         super(EvalCallBack, self).__init__()
         self.eval_function = eval_function
         self.eval_param_dict = eval_param_dict
@@ -81,9 +90,12 @@ class EvalCallBack(Callback):
                     print("update best checkpoint at: {}".format(self.best_ckpt_path), flush=True)
 
     def on_train_end(self, run_context):
-        print("End training, the best {0} is: {1}, the best {0} epoch is {2}".format(self.metrics_name,
-                                                                                     self.best_res,
-                                                                                     self.best_epoch), flush=True)
+        print(
+            "End training, the best {0} is: {1}, the best {0} epoch is {2}".format(
+                self.metrics_name, self.best_res, self.best_epoch
+            ),
+            flush=True,
+        )
 
 
 def get_ssd_callbacks(args, steps_per_epoch, rank_id):
@@ -102,12 +114,17 @@ def get_ssd_eval_callback(eval_net, eval_dataset, args):
     else:
         raise NotImplementedError
 
-    eval_param_dict = {"net": eval_net, "dataset": eval_dataset,
-                       "anno_json": anno_json, "args": args}
+    eval_param_dict = {"net": eval_net, "dataset": eval_dataset, "anno_json": anno_json, "args": args}
 
-    eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=args.eval_interval,
-                           eval_start_epoch=args.eval_start_epoch, save_best_ckpt=True,
-                           ckpt_directory=args.ckpt_save_dir, best_ckpt_name="best.ckpt",
-                           metrics_name="mAP")
+    eval_cb = EvalCallBack(
+        apply_eval,
+        eval_param_dict,
+        interval=args.eval_interval,
+        eval_start_epoch=args.eval_start_epoch,
+        save_best_ckpt=True,
+        ckpt_directory=args.ckpt_save_dir,
+        best_ckpt_name="best.ckpt",
+        metrics_name="mAP",
+    )
 
     return eval_cb
