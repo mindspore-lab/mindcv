@@ -48,6 +48,7 @@ from . import (
     vgg,
     visformer,
     vit,
+    volo,
     xception,
     xcit,
 )
@@ -63,7 +64,6 @@ from .edgenext import *
 from .efficientnet import *
 from .ghostnet import *
 from .googlenet import *
-from .helpers import *
 from .hrnet import *
 from .inception_v3 import *
 from .inception_v4 import *
@@ -97,9 +97,11 @@ from .shufflenetv2 import *
 from .sknet import *
 from .squeezenet import *
 from .swin_transformer import *
+from .utils import *
 from .vgg import *
 from .visformer import *
 from .vit import *
+from .volo import *
 from .xception import *
 from .xcit import *
 
@@ -154,5 +156,6 @@ __all__.extend(swin_transformer.__all__)
 __all__.extend(vgg.__all__)
 __all__.extend(visformer.__all__)
 __all__.extend(vit.__all__)
+__all__.extend(volo.__all__)
 __all__.extend(["Xception", "xception"])
 __all__.extend(xcit.__all__)
