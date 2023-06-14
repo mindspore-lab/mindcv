@@ -7,7 +7,7 @@ Supported algorithms are list as follows:
 """
 
 import mindspore as ms
-from mindspore import RowTensor, boost, nn, ops
+from mindspore import Parameter, RowTensor, Tensor, boost, nn, ops
 from mindspore.boost.grad_accumulation import gradient_accumulation_op, gradient_clear_op
 from mindspore.ops import functional as F
 
@@ -108,6 +108,7 @@ class TrainStep(nn.TrainOneStepWithLossScaleCell):
         super(TrainStep, self).__init__(network, optimizer, scale_sense)
         self.ema = ema
         self.ema_decay = ema_decay
+        self.updates = Parameter(Tensor(0.0, ms.float32))
         self.clip_grad = clip_grad
         self.clip_value = clip_value
         if self.ema:
@@ -119,8 +120,9 @@ class TrainStep(nn.TrainOneStepWithLossScaleCell):
             self.gradient_accumulation = GradientAccumulation(gradient_accumulation_steps, optimizer, self.grad_reducer)
 
     def ema_update(self):
+        self.updates += 1
         # ema factor is corrected by (1 - exp(-t/T)), where `t` means time and `T` means temperature.
-        ema_decay = self.ema_decay * (1 - F.exp(-self.optimizer.global_step / 2000))
+        ema_decay = self.ema_decay * (1 - F.exp(-self.updates / 2000))
         # update trainable parameters
         success = self.hyper_map(F.partial(_ema_op, ema_decay), self.ema_weight, self.weights_all)
         return success
