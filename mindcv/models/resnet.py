@@ -199,10 +199,14 @@ class ResNet(nn.Cell):
         self.relu = nn.ReLU()
         self.feature_info = [dict(chs=self.input_channels, reduction=2, name="relu")]
         self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")
-        self.layer1 = self._make_layer(block, 64, layers[0], name="layer1", reduction=4)
-        self.layer2 = self._make_layer(block, 128, layers[1], stride=2, name="layer2", reduction=8)
-        self.layer3 = self._make_layer(block, 256, layers[2], stride=2, name="layer3", reduction=16)
-        self.layer4 = self._make_layer(block, 512, layers[3], stride=2, name="layer4", reduction=32)
+        self.layer1 = self._make_layer(block, 64, layers[0])
+        self.feature_info.append(dict(chs=block.expansion * 64, reduction=4, name="layer1"))
+        self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
+        self.feature_info.append(dict(chs=block.expansion * 128, reduction=8, name="layer2"))
+        self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
+        self.feature_info.append(dict(chs=block.expansion * 256, reduction=16, name="layer3"))
+        self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
+        self.feature_info.append(dict(chs=block.expansion * 512, reduction=32, name="layer4"))
 
         self.pool = GlobalAvgPooling()
         self.num_features = 512 * block.expansion
@@ -236,8 +240,6 @@ class ResNet(nn.Cell):
         channels: int,
         block_nums: int,
         stride: int = 1,
-        name: str = "",
-        reduction: int = 1,
     ) -> nn.SequentialCell:
         """build model depending on cfgs"""
         down_sample = None
@@ -272,8 +274,6 @@ class ResNet(nn.Cell):
                     norm=self.norm
                 )
             )
-
-        self.feature_info.append(dict(chs=self.input_channels, reduction=reduction, name=name))
 
         return nn.SequentialCell(layers)
 

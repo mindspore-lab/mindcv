@@ -12,8 +12,7 @@ from typing import Callable, Dict, List, Optional
 import mindspore.nn as nn
 from mindspore import load_checkpoint, load_param_into_net
 
-from mindcv.utils.download import DownLoad, get_default_download_root
-
+from ..utils.download import DownLoad, get_default_download_root
 from .features import FeatureExtractWrapper
 
 
@@ -138,8 +137,8 @@ def load_model_checkpoint(model: nn.Cell, checkpoint_path: str = "", ema: bool =
         model (nn.Cell): The model which loads the checkpoint.
         checkpoint_path (str): The path of checkpoint files. Default: "".
         ema (bool): Whether use ema method. Default: False.
-        auto_mapping (bool): Whether to map the names of checkpoint weights
-            to the names of model weights. Default: False.
+        auto_mapping (bool): Whether to automatically map the names of checkpoint weights
+            to the names of model weights when there are differences in names. Default: False.
     """
 
     if os.path.exists(checkpoint_path):
@@ -176,8 +175,9 @@ def build_model_with_cfg(
     """Build model with specific model configurations
 
     Args:
-        model_cls (nn.Cell): model class
-        pretrained (bool): whether to load pretrained weights
+        model_cls (nn.Cell): Model class
+        pretrained (bool): Whether to load pretrained weights.
+        default_cfg (Dict): Configuration for pretrained weights.
         features_only (bool): Output the features at different strides instead. Default: False
         out_indices (list[int]): The indicies of the output features when `features_only` is `True`.
             Default: [0, 1, 2, 3, 4]
@@ -185,7 +185,7 @@ def build_model_with_cfg(
     model = model_cls(**kwargs)
 
     if pretrained:
-        load_pretrained(model, default_cfg, kwargs.get("num_classes"), kwargs.get("in_channels"))
+        load_pretrained(model, default_cfg, kwargs.get("num_classes", 1000), kwargs.get("in_channels", 3))
 
     if features_only:
         # wrap the model, output the feature pyramid instead
