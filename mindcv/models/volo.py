@@ -77,7 +77,7 @@ class Fold(nn.Cell):
             return a
 
         self.output_size, self.kernel_size, self.dilation, self.padding, self.stride = map(int2tuple, (
-        output_size, kernel_size, dilation, padding, stride))
+                output_size, kernel_size, dilation, padding, stride))
         self.h = int((self.output_size[0] + 2 * self.padding[0] - self.dilation[0] * (self.kernel_size[0] - 1) - 1) /
                      self.stride[0] + 1)
         self.w = int((self.output_size[1] + 2 * self.padding[1] - self.dilation[1] * (self.kernel_size[1] - 1) - 1) /
@@ -92,16 +92,16 @@ class Fold(nn.Cell):
             y = xy % self.kernel_size[1]
             init_weight[i, 0, x, y] = 1
 
-        # print("self.c", channels, "kernel_size", self.kernel_size, "padding", self.padding, "stride", self.stride, "dilation", self.dilation)
         self.weight = ms.Tensor(init_weight, ms.float16)
         self.conv_transpose2d = ops.Conv2DTranspose(self.ck, self.kernel_size,
                                                     pad_mode="pad", pad=(
-            self.padding[0], self.padding[0], self.padding[1], self.padding[1]),
+                                                        self.padding[0], self.padding[0],
+                                                        self.padding[1], self.padding[1]),
                                                     stride=stride, dilation=dilation, group=self.c)
         self.reshape = ops.Reshape()
 
     def construct(self, x: Tensor) -> Tensor:
-        b, ck, l = x.shape
+        b, ck, _ = x.shape
         # todo: assert is not allowed in construct, how to check the shape?
         # assert ck == self.c * self.k
         # assert l == self.h * self.w
