@@ -11,9 +11,9 @@ import mindspore.ops as ops
 from mindspore import Tensor
 from mindspore.common import initializer as weight_init
 
+from .helpers import load_pretrained
 from .layers import DropPath, Identity
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "PyramidVisionTransformerV2",

@@ -12,10 +12,10 @@ from mindspore import Parameter, Tensor
 from mindspore import dtype as mstype
 from mindspore import nn, numpy, ops
 
+from .helpers import _ntuple, load_pretrained
 from .layers import DropPath
 from .layers.mlp import Mlp
 from .registry import register_model
-from .utils import _ntuple, load_pretrained
 
 __all__ = [
     'XCiT',

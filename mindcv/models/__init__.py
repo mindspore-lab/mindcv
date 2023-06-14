@@ -63,6 +63,7 @@ from .edgenext import *
 from .efficientnet import *
 from .ghostnet import *
 from .googlenet import *
+from .helpers import *
 from .hrnet import *
 from .inception_v3 import *
 from .inception_v4 import *
@@ -96,7 +97,6 @@ from .shufflenetv2 import *
 from .sknet import *
 from .squeezenet import *
 from .swin_transformer import *
-from .utils import *
 from .vgg import *
 from .visformer import *
 from .vit import *

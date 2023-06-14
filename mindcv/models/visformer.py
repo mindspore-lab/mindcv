@@ -11,9 +11,9 @@ import mindspore
 from mindspore import Tensor, nn, ops
 from mindspore.common.initializer import Constant, HeNormal, TruncatedNormal, initializer
 
+from .helpers import _ntuple, load_pretrained
 from .layers import DropPath, GlobalAvgPooling, Identity
 from .registry import register_model
-from .utils import _ntuple, load_pretrained
 
 __all__ = [
     "Visformer",

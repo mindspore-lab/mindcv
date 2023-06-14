@@ -12,9 +12,9 @@ import mindspore
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
+from .helpers import load_pretrained
 from .layers import DropPath, Identity
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "PoolFormer",

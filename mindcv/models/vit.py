@@ -10,8 +10,8 @@ from mindspore import ops as P
 from mindspore.common.initializer import Normal, initializer
 from mindspore.common.parameter import Parameter
 
+from .helpers import ConfigDict, load_pretrained
 from .registry import register_model
-from .utils import ConfigDict, load_pretrained
 
 __all__ = [
     "ViT",

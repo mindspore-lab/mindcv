@@ -12,11 +12,11 @@ import mindspore.ops as ops
 from mindspore import Parameter, Tensor
 from mindspore.common.initializer import TruncatedNormal
 
+from .helpers import load_pretrained
 from .layers.drop_path import DropPath
 from .layers.mlp import Mlp
 from .layers.patch_embed import PatchEmbed
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "CaiT",

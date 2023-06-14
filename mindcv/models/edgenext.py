@@ -12,10 +12,10 @@ import mindspore as ms
 import mindspore.common.initializer as init
 from mindspore import Parameter, Tensor, nn, ops
 
+from .helpers import load_pretrained
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "EdgeNeXt",

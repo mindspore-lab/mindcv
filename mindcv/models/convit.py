@@ -10,12 +10,12 @@ import mindspore.common.initializer as init
 from mindspore import Parameter, Tensor, nn, ops
 from mindspore.ops import constexpr
 
+from .helpers import load_pretrained
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
 from .layers.mlp import Mlp
 from .layers.patch_embed import PatchEmbed
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "ConViT",

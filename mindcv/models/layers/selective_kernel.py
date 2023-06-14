@@ -5,7 +5,7 @@ from typing import List, Optional, Union
 
 from mindspore import Tensor, nn, ops
 
-from ..utils import make_divisible
+from ..helpers import make_divisible
 from .conv_norm_act import Conv2dNormActivation
 from .pooling import GlobalAvgPooling
 

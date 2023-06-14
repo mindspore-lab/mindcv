@@ -11,12 +11,12 @@ from mindspore import Tensor, nn
 from mindspore.common import initializer as weight_init
 from mindspore.common.initializer import Normal, Uniform
 
+from .helpers import build_model_with_cfg, make_divisible
 from .layers.activation import Swish
 from .layers.drop_path import DropPath
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExcite
 from .registry import register_model
-from .utils import load_pretrained, make_divisible
 
 __all__ = [
     "EfficientNet",  # registration mechanism to use yaml configuration
@@ -40,6 +40,7 @@ def _cfg(url="", **kwargs):
         "url": url,
         "num_classes": 1000,
         # 'first_conv': 'features.0.features.0', 'classifier': 'classifier',
+        "classifier": "mlp_head",
         **kwargs,
     }
 
@@ -380,6 +381,10 @@ class EfficientNet(nn.Cell):
             Swish(),
         ])
 
+        total_reduction = 2
+        self.feature_info = [dict(chs=firstconv_output_channels, reduction=total_reduction,
+                                  name=f'features.{len(layers) - 1}')]
+
         # building MBConv blocks
         total_stage_blocks = sum(cnf.num_layers for cnf in inverted_residual_setting)
         stage_block_id = 0
@@ -406,10 +411,15 @@ class EfficientNet(nn.Cell):
                 # adjust dropout rate of blocks based on the depth of the stage block
                 sd_prob = keep_prob * float(stage_block_id + 0.00001) / total_stage_blocks
 
+                total_reduction *= block_cnf.stride
+
                 stage.append(block(block_cnf, sd_prob, norm_layer))
                 stage_block_id += 1
 
             layers.append(nn.SequentialCell(stage))
+
+            self.feature_info.append(dict(chs=cnf.out_channels, reduction=total_reduction,
+                                          name=f'features.{len(layers) - 1}'))
 
         # building last several layers
         lastconv_input_channels = inverted_residual_setting[-1].out_channels
@@ -419,6 +429,10 @@ class EfficientNet(nn.Cell):
             norm_layer(lastconv_output_channels),
             Swish(),
         ])
+
+        self.feature_info.append(dict(chs=lastconv_output_channels, reduction=total_reduction,
+                                      name=f'features.{len(layers) - 1}'))
+        self.flatten_sequential = True
 
         self.features = nn.SequentialCell(layers)
         self.avgpool = GlobalAvgPooling()
@@ -473,14 +487,10 @@ def _efficientnet(
 ) -> EfficientNet:
     """EfficientNet architecture."""
 
-    model = EfficientNet(arch, dropout, width_mult, depth_mult, in_channels, num_classes, **kwargs)
     default_cfg = default_cfgs[arch]
-
-    if pretrained:
-        # Download the pretrained checkpoint file from url, and load
-        # checkpoint file.
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-    return model
+    model_args = dict(arch=arch, dropout_rate=dropout, width_mult=width_mult, depth_mult=depth_mult,
+                      in_channels=in_channels, num_classes=num_classes, **kwargs)
+    return build_model_with_cfg(EfficientNet, pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
