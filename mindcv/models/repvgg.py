@@ -247,7 +247,7 @@ class RepVGG(nn.Cell):
         self.linear = nn.Dense(int(512 * width_multiplier[3]), num_classes)
         self._initialize_weights()
 
-    def _make_stage(self, planes, num_blocks, stride, name: str = "", reduction: int = 1):
+    def _make_stage(self, planes, num_blocks, stride):
         strides = [stride] + [1] * (num_blocks - 1)
         blocks = []
         for s in strides:
