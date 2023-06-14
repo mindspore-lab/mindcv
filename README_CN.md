@@ -157,7 +157,7 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
 
 **混合模式**
 
-[基于ms_function的混合模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) 是兼顾了MindSpore的效率和灵活的混合模式。用户可通过使用`train_with_func.py`文件来使用该混合模式进行训练。
+[基于mindspore.jit的混合模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) 是兼顾了MindSpore的效率和灵活的混合模式。用户可通过使用`train_with_func.py`文件来使用该混合模式进行训练。
 
 ```shell
 python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download --epoch_size=10

@@ -4,6 +4,8 @@ from typing import Optional
 
 from mindspore import Tensor, nn
 
+from .compatibility import Dropout
+
 
 class Mlp(nn.Cell):
     def __init__(
@@ -20,7 +22,7 @@ class Mlp(nn.Cell):
         self.fc1 = nn.Dense(in_channels=in_features, out_channels=hidden_features, has_bias=True)
         self.act = act_layer()
         self.fc2 = nn.Dense(in_channels=hidden_features, out_channels=out_features, has_bias=True)
-        self.drop = nn.Dropout(keep_prob=1.0 - drop)
+        self.drop = Dropout(p=drop)
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.fc1(x)

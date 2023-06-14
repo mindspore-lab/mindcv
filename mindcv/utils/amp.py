@@ -1,10 +1,13 @@
 """ auto mixed precision related functions """
 
 # from mindspore.amp import LossScaler  # this line of code leads to “get rank id error” in modelarts
-from mindspore.common.api import ms_class
+try:
+    from mindspore import jit_class
+except ImportError:
+    from mindspore import ms_class as jit_class
 
 
-@ms_class
+@jit_class
 class LossScaler:
     r"""
     Loss scaler abstract class when using mixed precision.

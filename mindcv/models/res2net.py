@@ -10,6 +10,7 @@ import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
 from .helpers import load_pretrained
+from .layers.compatibility import Split
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
 
@@ -93,6 +94,7 @@ class Bottle2neck(nn.Cell):
         self.stype = stype
         self.scale = scale
         self.width = width
+        self.split = Split(split_size_or_sections=self.width, output_num=self.scale, axis=1)
 
     def construct(self, x: Tensor) -> Tensor:
         identity = x
@@ -101,7 +103,7 @@ class Bottle2neck(nn.Cell):
         out = self.bn1(out)
         out = self.relu(out)
 
-        spx = ops.split(out, axis=1, output_num=self.scale)
+        spx = self.split(out)
 
         sp = self.convs[0](spx[0])
         sp = self.bns[0](sp)

@@ -8,6 +8,7 @@ from mindspore import Tensor, nn, ops
 
 from .helpers import load_pretrained
 from .layers import GlobalAvgPooling
+from .layers.compatibility import Dropout
 from .registry import register_model
 
 __all__ = [
@@ -156,7 +157,7 @@ class Xception(nn.Cell):
         self.bn4 = nn.BatchNorm2d(2048)
 
         self.pool = GlobalAvgPooling()
-        self.dropout = nn.Dropout()
+        self.dropout = Dropout(p=0.5)
         self.classifier = nn.Dense(2048, num_classes)
 
         self._initialize_weights()

@@ -9,6 +9,7 @@ import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
 from .helpers import build_model_with_cfg, make_divisible
+from .layers.compatibility import Dropout
 from .layers.identity import Identity
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
@@ -319,7 +320,7 @@ class ResNeSt(nn.Cell):
             self.feature_info.append(dict(chs=block.expansion * 512, reduction=32, name='layer4'))
 
         self.avgpool = GlobalAvgPooling()
-        self.drop = nn.Dropout(keep_prob=1.0 - drop_rate) if drop_rate > 0.0 else None
+        self.drop = Dropout(p=drop_rate) if drop_rate > 0.0 else None
         self.fc = nn.Dense(512 * block.expansion, num_classes)
 
         self._initialize_weights()

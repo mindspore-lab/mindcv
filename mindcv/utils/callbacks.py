@@ -269,9 +269,16 @@ class StateMonitor(Callback):
 
     def _get_lr_from_cbp(self, cb_params):
         optimizer = self._get_optimizer_from_cbp(cb_params)
-        step = optimizer.global_step
+        if optimizer.global_step < 1:
+            _logger.warning(
+                "`global_step` of optimizer is less than 1. It seems to be a overflow at the first step. "
+                "If you keep seeing this message, it means that the optimizer never actually called."
+            )
+            optim_step = Tensor((0,), ms.int32)
+        else:  # if the optimizer is successfully called, the global_step will actually be the value of next step.
+            optim_step = optimizer.global_step - 1
         if optimizer.dynamic_lr:
-            lr = optimizer.learning_rate(step - 1)[0]
+            lr = optimizer.learning_rate(optim_step)[0]
         else:
             lr = optimizer.learning_rate
         return lr

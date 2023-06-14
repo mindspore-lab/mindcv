@@ -11,6 +11,7 @@ import mindspore.nn as nn
 
 from .helpers import build_model_with_cfg, make_divisible
 from .layers import Conv2dNormActivation, DropPath, GlobalAvgPooling, SqueezeExcite
+from .layers.compatibility import Dropout
 from .registry import register_model
 
 __all__ = [
@@ -212,11 +213,11 @@ class ReXNetV1(nn.Cell):
         self.features = nn.SequentialCell(*features)
         if self.useconv:
             self.cls = nn.SequentialCell(
-                nn.Dropout(1.0 - drop_rate),
+                Dropout(p=drop_rate),
                 nn.Conv2d(pen_channels, num_classes, 1, has_bias=True))
         else:
             self.cls = nn.SequentialCell(
-                nn.Dropout(1.0 - drop_rate),
+                Dropout(p=drop_rate),
                 nn.Dense(pen_channels, num_classes))
         self._initialize_weights()
 

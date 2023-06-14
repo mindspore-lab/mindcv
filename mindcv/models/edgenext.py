@@ -13,6 +13,7 @@ import mindspore.common.initializer as init
 from mindspore import Parameter, Tensor, nn, ops
 
 from .helpers import load_pretrained
+from .layers.compatibility import Dropout, Split
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
 from .registry import register_model
@@ -51,20 +52,6 @@ default_cfgs = {
         url="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_base-4335e9dc.ckpt",
         input_size=(3, 256, 256)),
 }
-
-
-def ssplit(x: Tensor, dim, width):
-    B, C, H, W = x.shape
-    if C % width == 0:
-        return ops.split(x, dim, C // width)
-    else:
-        begin = 0
-        temp = []
-        while begin + width < C:
-            temp.append(x[:, begin : begin + width, :, :])
-            begin += width
-        temp.append(x[:, begin:, :, :])
-        return temp
 
 
 class LayerNorm(nn.LayerNorm):
@@ -209,11 +196,25 @@ class SDTAEncoder(nn.Cell):
         self.gamma = Parameter(Tensor(layer_scale_init_value * np.ones((dim)), ms.float32),
                                requires_grad=True) if layer_scale_init_value > 0 else None
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
+        self.split = Split(split_size_or_sections=width, output_num=dim // width, axis=1)
+
+    def ssplit(self, x: Tensor, width):
+        B, C, H, W = x.shape
+        if C % width == 0:
+            return self.split(x)
+        else:
+            begin = 0
+            temp = []
+            while begin + width < C:
+                temp.append(x[:, begin: begin + width, :, :])
+                begin += width
+            temp.append(x[:, begin:, :, :])
+            return temp
 
     def construct(self, x: Tensor) -> Tensor:
         input = x
 
-        spx = ssplit(x, 1, self.width)
+        spx = self.ssplit(x, self.width)
         sp = None
         out = None
         for i in range(self.nums):
@@ -264,9 +265,9 @@ class XCA(nn.Cell):
         self.temperature = Parameter(Tensor(np.ones((num_heads, 1, 1)), ms.float32))
 
         self.qkv = nn.Dense(dim, dim * 3, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(1 - attn_drop)
+        self.attn_drop = Dropout(p=attn_drop)
         self.proj = nn.Dense(dim, dim)
-        self.proj_drop = nn.Dropout(1 - proj_drop)
+        self.proj_drop = Dropout(p=proj_drop)
 
     def construct(self, x: Tensor) -> Tensor:
         B, N, C = x.shape
@@ -362,8 +363,8 @@ class EdgeNeXt(nn.Cell):
         self.norm = nn.LayerNorm((dims[-1],), epsilon=1e-6)  # Final norm layer
         self.head = nn.Dense(dims[-1], num_classes)
 
-        # self.head_dropout = nn.Dropout(kwargs["classifier_dropout"])
-        self.head_dropout = nn.Dropout(1.0)
+        # self.head_dropout = Dropout(kwargs["classifier_dropout"])
+        self.head_dropout = Dropout(p=0.0)
         self.head_init_scale = head_init_scale
         self._initialize_weights()
 
@@ -408,6 +409,7 @@ def edgenext_xx_small(pretrained: bool = False, num_classes: int = 1000, in_chan
         depths=[2, 2, 6, 2],
         dims=[24, 48, 88, 168],
         expan_ratio=4,
+        num_classes=num_classes,
         global_block=[0, 1, 1, 1],
         global_block_type=['None', 'SDTA', 'SDTA', 'SDTA'],
         use_pos_embd_xca=[False, True, False, False],

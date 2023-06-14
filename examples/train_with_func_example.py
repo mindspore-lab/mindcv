@@ -12,6 +12,11 @@ from mindcv.loss import create_loss
 from mindcv.models import create_model
 from mindcv.optim import create_optimizer
 
+try:
+    from mindspore import jit
+except ImportError:
+    from mindspore import ms_function as jit
+
 
 def main():
     ms.set_seed(1)
@@ -96,7 +101,7 @@ def train_epoch(network, dataset, loss_fn, optimizer):
     grad_fn = ops.value_and_grad(forward_fn, None, optimizer.parameters, has_aux=True)
 
     # Define function of one-step training,
-    @ms.ms_function
+    @jit
     def train_step(data, label):
         (loss, _), grads = grad_fn(data, label)
         loss = ops.depend(loss, optimizer(grads))

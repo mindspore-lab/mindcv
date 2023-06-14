@@ -14,7 +14,12 @@ from mindcv.data import create_dataset, create_loader, create_transforms
 from mindcv.loss import create_loss
 from mindcv.models import create_model
 from mindcv.optim import create_optimizer
-from mindcv.utils import Allreduce
+from mindcv.utils import AllReduceSum
+
+try:
+    from mindspore import jit
+except ImportError:
+    from mindspore import ms_function as jit
 
 
 def main():
@@ -117,7 +122,7 @@ def train_epoch(network, dataset, loss_fn, optimizer):
     grad_reducer = nn.DistributedGradReducer(optimizer.parameters, mean, degree)
 
     # Define function of one-step training,
-    @ms.ms_function
+    @jit
     def train_step_parallel(data, label):
         (loss, _), grads = grad_fn(data, label)
         grads = grad_reducer(grads)
@@ -143,7 +148,7 @@ def test_epoch(network, dataset):
             correct += (pred.argmax(1) == label).asnumpy().sum()
         else:  # one-hot or soft label
             correct += (pred.argmax(1) == label.argmax(1)).asnumpy().sum()
-    all_reduce = Allreduce()
+    all_reduce = AllReduceSum()
     correct = all_reduce(Tensor(correct, ms.float32))
     total = all_reduce(Tensor(total, ms.float32))
     correct /= total
