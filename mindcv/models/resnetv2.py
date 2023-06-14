@@ -7,9 +7,9 @@ from typing import Optional
 
 from mindspore import Tensor, nn
 
+from .helpers import load_pretrained
 from .registry import register_model
 from .resnet import ResNet
-from .utils import load_pretrained
 
 __all__ = [
     "resnetv2_50",

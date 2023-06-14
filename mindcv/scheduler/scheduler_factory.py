@@ -1,18 +1,24 @@
 """Scheduler Factory"""
+import logging
+
 from .dynamic_lr import (
     cosine_decay_lr,
     cosine_decay_refined_lr,
+    cyclic_lr,
     exponential_lr,
     exponential_refined_lr,
     linear_lr,
     linear_refined_lr,
     multi_step_lr,
+    one_cycle_lr,
     polynomial_lr,
     polynomial_refined_lr,
     step_lr,
 )
 
 __all__ = ["create_scheduler"]
+
+_logger = logging.getLogger(__name__)
 
 
 def create_scheduler(
@@ -44,12 +50,14 @@ def create_scheduler(
             and the ending lr in the warmup phase is lr. Default: 0.0
         decay_epochs: for 'cosine_decay' schedulers, decay LR to min_lr in `decay_epochs`.
             For 'step_decay' scheduler, decay LR by a factor of `decay_rate` every `decay_epochs`. Default: 10.
-        decay_rate: LR decay rate (default: 0.9)
-        milestones: list of epoch milestones for 'multi_step_decay' scheduler. Must be increasing.
-        num_epochs: number of total epochs.
+        decay_rate: LR decay rate. Default: 0.9.
+        milestones: list of epoch milestones for 'multi_step_decay' scheduler. Must be increasing. Default: None
+        num_epochs: Number of total epochs. Default: 200.
+        num_cycles: Number of cycles for cosine decay and cyclic. Default: 1.
+        cycle_decay: Decay rate of lr max in each cosine cycle. Default: 1.0.
         lr_epoch_stair: If True, LR will be updated in the beginning of each new epoch
             and the LR will be consistent for each batch in one epoch.
-            Otherwise, learning rate will be updated dynamically in each step. (default=False)
+            Otherwise, learning rate will be updated dynamically in each step. Default: False.
     Returns:
         Cell object for computing LR with input of current global steps
     """
@@ -58,14 +66,14 @@ def create_scheduler(
         milestones = []
 
     if warmup_epochs + decay_epochs > num_epochs:
-        print("[WARNING]: warmup_epochs + decay_epochs > num_epochs. Please check and reduce decay_epochs!")
+        _logger.warning("warmup_epochs + decay_epochs > num_epochs. Please check and reduce decay_epochs!")
 
     # lr warmup phase
     warmup_lr_scheduler = []
     if warmup_epochs > 0:
         if warmup_factor == 0 and lr_epoch_stair:
-            print(
-                "[WARNING]: The warmup factor is set to 0, lr of 0-th epoch is always zero! " "Recommend value is 0.01."
+            _logger.warning(
+                "The warmup factor is set to 0, lr of 0-th epoch is always zero! " "Recommend value is 0.01."
             )
         warmup_func = linear_lr if lr_epoch_stair else linear_refined_lr
         warmup_lr_scheduler = warmup_func(
@@ -89,6 +97,32 @@ def create_scheduler(
             epochs=main_epochs,
             num_cycles=num_cycles,
             cycle_decay=cycle_decay,
+        )
+    elif scheduler == "one_cycle":
+        if lr_epoch_stair or warmup_epochs > 0:
+            raise ValueError(
+                "OneCycle scheduler doesn't support learning rate varies with epoch and warmup_epochs > 0."
+            )
+        div_factor = 25.0
+        initial_lr = lr / div_factor
+        final_div_factor = initial_lr / min_lr
+        main_lr_scheduler = one_cycle_lr(
+            max_lr=lr,
+            final_div_factor=final_div_factor,
+            steps_per_epoch=steps_per_epoch,
+            epochs=main_epochs,
+        )
+    elif scheduler == "cyclic":
+        if lr_epoch_stair or warmup_epochs > 0:
+            raise ValueError("Cyclic scheduler doesn't support learning rate varies with epoch and warmup_epochs > 0.")
+        num_steps = steps_per_epoch * main_epochs
+        step_size_up = int(num_steps / num_cycles / 2)
+        main_lr_scheduler = cyclic_lr(
+            base_lr=min_lr,
+            max_lr=lr,
+            step_size_up=step_size_up,
+            steps_per_epoch=steps_per_epoch,
+            epochs=main_epochs,
         )
     elif scheduler == "exponential_decay":
         exponential_func = exponential_lr if lr_epoch_stair else exponential_refined_lr

@@ -26,7 +26,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model        | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                  | Download                                                                                    |
 |--------------|----------|-----------|-----------|------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
-| Inception_v3 | D910x8-G | 79.11     | 94.40     | 27.20      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inception_v3/inception_v3_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/inception_v3/inception_v3-38f67890.ckpt) |
+| Inception_v3 | D910x8-G | 79.11     | 94.40     | 27.20      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv3/inception_v3_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/inception_v3/inception_v3-38f67890.ckpt) |
 
 </div>
 
@@ -53,7 +53,7 @@ It is easy to reproduce the reported results with the pre-defined training recip
 
 ```shell
 # distributed training on multiple GPU/Ascend devices
-mpirun -n 8 python train.py --config configs/inception_v3/inception_v3_ascend.yaml --data_dir /path/to/imagenet
+mpirun -n 8 python train.py --config configs/inceptionv3/inception_v3_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
@@ -70,7 +70,7 @@ If you want to train or finetune the model on a smaller dataset without distribu
 
 ```shell
 # standalone training on a CPU/GPU/Ascend device
-python train.py --config configs/inception_v3/inception_v3_ascend.yaml --data_dir /path/to/dataset --distribute False
+python train.py --config configs/inceptionv3/inception_v3_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 ### Validation
@@ -78,7 +78,7 @@ python train.py --config configs/inception_v3/inception_v3_ascend.yaml --data_di
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```shell
-python validate.py -c configs/inception_v3/inception_v3_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+python validate.py -c configs/inceptionv3/inception_v3_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 ### Deployment

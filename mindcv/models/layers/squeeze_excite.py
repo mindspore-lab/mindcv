@@ -7,7 +7,7 @@ from typing import Optional
 
 from mindspore import Tensor, nn, ops
 
-from ..utils import make_divisible
+from ..helpers import make_divisible
 from .pooling import GlobalAvgPooling
 
 

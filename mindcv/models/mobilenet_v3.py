@@ -8,10 +8,10 @@ import math
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn
 
+from .helpers import build_model_with_cfg, make_divisible
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExcite
 from .registry import register_model
-from .utils import load_pretrained, make_divisible
 
 __all__ = [
     "MobileNetV3",
@@ -168,6 +168,10 @@ class MobileNetV3(nn.Cell):
             nn.BatchNorm2d(input_channels),
             nn.HSwish(),
         ]
+
+        total_reduction = 2
+        self.feature_info = [dict(chs=input_channels, reduction=total_reduction, name=f'features.{len(features) - 1}')]
+
         # Building bottleneck blocks.
         for k, e, c, se, nl, s in bottleneck_setting:
             exp_channels = make_divisible(alpha * e, round_nearest)
@@ -175,6 +179,11 @@ class MobileNetV3(nn.Cell):
             features.append(Bottleneck(input_channels, exp_channels, output_channels,
                                        kernel_size=k, stride=s, activation=nl, use_se=se))
             input_channels = output_channels
+
+            total_reduction *= s
+            self.feature_info.append(dict(chs=input_channels, reduction=total_reduction,
+                                          name=f'features.{len(features) - 1}'))
+
         # Building last point-wise conv layers.
         output_channels = input_channels * 6
         features.extend([
@@ -182,6 +191,11 @@ class MobileNetV3(nn.Cell):
             nn.BatchNorm2d(output_channels),
             nn.HSwish(),
         ])
+
+        self.feature_info.append(dict(chs=output_channels, reduction=total_reduction,
+                                      name=f'features.{len(features) - 1}'))
+        self.flatten_sequential = True
+
         self.features = nn.SequentialCell(features)
 
         self.pool = GlobalAvgPooling()
@@ -227,18 +241,18 @@ class MobileNetV3(nn.Cell):
         return x
 
 
+def _create_mobilenet_v3(pretrained=False, **kwargs):
+    return build_model_with_cfg(MobileNetV3, pretrained, **kwargs)
+
+
 @register_model
 def mobilenet_v3_small_100(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV3:
     """Get small MobileNetV3 model without width scaling.
     Refer to the base class `models.MobileNetV3` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v3_small_1.0"]
-    model = MobileNetV3(arch="small", alpha=1.0, in_channels=in_channels, num_classes=num_classes, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(arch="small", alpha=1.0, in_channels=in_channels, num_classes=num_classes, **kwargs)
+    return _create_mobilenet_v3(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -247,12 +261,8 @@ def mobilenet_v3_large_100(pretrained: bool = False, num_classes: int = 1000, in
     Refer to the base class `models.MobileNetV3` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v3_large_1.0"]
-    model = MobileNetV3(arch="large", alpha=1.0, in_channels=in_channels, num_classes=num_classes, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(arch="large", alpha=1.0, in_channels=in_channels, num_classes=num_classes, **kwargs)
+    return _create_mobilenet_v3(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -261,12 +271,8 @@ def mobilenet_v3_small_075(pretrained: bool = False, num_classes: int = 1000, in
     Refer to the base class `models.MobileNetV3` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v3_small_0.75"]
-    model = MobileNetV3(arch="small", alpha=0.75, in_channels=in_channels, num_classes=num_classes, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(arch="small", alpha=0.75, in_channels=in_channels, num_classes=num_classes, **kwargs)
+    return _create_mobilenet_v3(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -275,9 +281,5 @@ def mobilenet_v3_large_075(pretrained: bool = False, num_classes: int = 1000, in
     Refer to the base class `models.MobileNetV3` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v3_large_0.75"]
-    model = MobileNetV3(arch="large", alpha=0.75, in_channels=in_channels, num_classes=num_classes, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(arch="large", alpha=0.75, in_channels=in_channels, num_classes=num_classes, **kwargs)
+    return _create_mobilenet_v3(pretrained, **dict(default_cfg=default_cfg, **model_args))
