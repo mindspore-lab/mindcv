@@ -39,6 +39,7 @@ def _cfg(url="", **kwargs):
     return {
         "url": url,
         "num_classes": 1000,
+        # 'first_conv': 'features.0.features.0', 'classifier': 'classifier',
         "classifier": "mlp_head",
         **kwargs,
     }
