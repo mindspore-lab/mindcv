@@ -10,7 +10,7 @@ from data import create_ssd_dataset
 from ssd_model import SSD, SSDInferWithDecoder
 from utils import apply_eval
 
-sys.path.append("../..")
+sys.path.append(".")
 
 from mindcv.models import create_model
 
@@ -20,8 +20,8 @@ def eval(args):
         name=args.dataset,
         root=args.data_dir,
         shuffle=False,
-        batch_size=1,
-        python_multiprocessing=False,
+        batch_size=args.batch_size,
+        python_multiprocessing=True,
         num_parallel_workers=args.num_parallel_workers,
         drop_remainder=False,
         args=args,
@@ -43,11 +43,12 @@ def eval(args):
     eval_model.set_train(False)
 
     print("\n========================================\n")
-    print("total images num: ", eval_dataset.get_dataset_size())
     print("Processing, please wait a moment.")
 
     if args.dataset == "coco":
         anno_json = os.path.join(args.data_dir, "annotations/instances_val2017.json")
+    else:
+        raise NotImplementedError
 
     eval_param_dict = {"net": eval_model, "dataset": eval_dataset, "anno_json": anno_json, "args": args}
     mAP = apply_eval(eval_param_dict)

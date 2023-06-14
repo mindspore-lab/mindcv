@@ -28,12 +28,11 @@ class EvalCallBack(Callback):
         >>> EvalCallBack(eval_function, eval_param_dict)
     """
 
-    def __init__(self, eval_function, eval_param_dict, rank_id, interval=1, eval_start_epoch=1,
+    def __init__(self, eval_function, eval_param_dict, interval=1, eval_start_epoch=1,
                  save_best_ckpt=True, ckpt_directory="./", best_ckpt_name="best.ckpt", metrics_name="acc"):
         super(EvalCallBack, self).__init__()
         self.eval_function = eval_function
         self.eval_param_dict = eval_param_dict
-        self.rank_id = rank_id
         self.eval_start_epoch = eval_start_epoch
 
         if interval < 1:
@@ -65,8 +64,7 @@ class EvalCallBack(Callback):
         cb_params = run_context.original_args()
         cur_epoch = cb_params.cur_epoch_num
 
-        if cur_epoch >= self.eval_start_epoch and (cur_epoch - self.eval_start_epoch) % self.interval == 0 \
-                and self.rank_id == 0:
+        if cur_epoch >= self.eval_start_epoch and (cur_epoch - self.eval_start_epoch) % self.interval == 0:
             res = self.eval_function(self.eval_param_dict)
             print("epoch: {}, {}: {}".format(cur_epoch, self.metrics_name, res), flush=True)
 
@@ -98,7 +96,7 @@ def get_ssd_callbacks(args, steps_per_epoch, rank_id):
     return [TimeMonitor(data_size=steps_per_epoch), LossMonitor()]
 
 
-def get_ssd_eval_callback(eval_net, eval_dataset, rank_id, args):
+def get_ssd_eval_callback(eval_net, eval_dataset, args):
     if args.dataset == "coco":
         anno_json = os.path.join(args.data_dir, "annotations/instances_val2017.json")
     else:
@@ -107,7 +105,7 @@ def get_ssd_eval_callback(eval_net, eval_dataset, rank_id, args):
     eval_param_dict = {"net": eval_net, "dataset": eval_dataset,
                        "anno_json": anno_json, "args": args}
 
-    eval_cb = EvalCallBack(apply_eval, eval_param_dict, rank_id, interval=args.eval_interval,
+    eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=args.eval_interval,
                            eval_start_epoch=args.eval_start_epoch, save_best_ckpt=True,
                            ckpt_directory=args.ckpt_save_dir, best_ckpt_name="best.ckpt",
                            metrics_name="mAP")

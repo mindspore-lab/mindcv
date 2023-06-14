@@ -12,7 +12,7 @@ from data import create_ssd_dataset
 from ssd_model import SSD, SSDWithLossCell, get_ssd_trainer, SSDInferWithDecoder
 from utils import get_ssd_lr_scheduler, get_ssd_optimizer
 
-sys.path.append("../..")
+sys.path.append(".")
 
 from mindcv.models import create_model
 from mindcv.utils import set_seed
@@ -30,9 +30,8 @@ def train(args):
             device_num=device_num,
             parallel_mode="data_parallel",
             gradients_mean=True,
-            # we should but cannot set parameter_broadcast=True, which will cause error on gpu.
+            all_reduce_fusion_config=args.all_reduce_fusion_config,
         )
-        ms.set_auto_parallel_context(all_reduce_fusion_config=args.all_reduce_fusion_config)
     else:
         device_num = None
         rank_id = None
@@ -64,6 +63,7 @@ def train(args):
     )
 
     ssd = SSD(backbone, args)
+    ms.amp.auto_mixed_precision(ssd, amp_level=args.amp_level)
     model = SSDWithLossCell(ssd, args)
 
     lr_scheduler = get_ssd_lr_scheduler(args, steps_per_epoch)
@@ -73,20 +73,20 @@ def train(args):
 
     callbacks = get_ssd_callbacks(args, steps_per_epoch, rank_id)
 
-    if args.eval_while_train:
+    if args.eval_while_train and rank_id == 0:
         eval_model = SSDInferWithDecoder(ssd, args)
         eval_dataset = create_ssd_dataset(
             name=args.dataset,
             root=args.data_dir,
             shuffle=False,
-            batch_size=1,
-            python_multiprocessing=False,
+            batch_size=args.batch_size,
+            python_multiprocessing=True,
             num_parallel_workers=args.num_parallel_workers,
             drop_remainder=False,
             args=args,
             is_training=False
         )
-        eval_callback = get_ssd_eval_callback(eval_model, eval_dataset, rank_id, args)
+        eval_callback = get_ssd_eval_callback(eval_model, eval_dataset, args)
         callbacks.append(eval_callback)
 
     trainer.train(args.epoch_size, dataset, callbacks=callbacks, dataset_sink_mode=args.dataset_sink_mode)
