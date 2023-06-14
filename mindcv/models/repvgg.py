@@ -229,21 +229,25 @@ class RepVGG(nn.Cell):
         self.stage0 = RepVGGBlock(in_channels=in_channels, out_channels=self.in_planes, kernel_size=3, stride=2,
                                   padding=1,
                                   deploy=self.deploy, use_se=self.use_se)
-        self.feature_info = [dict(chs=self.in_planes, reduction=2, name='stage0')]
+        self.feature_info = [dict(chs=self.in_planes, reduction=2, name="stage0")]
         self.cur_layer_idx = 1
         self.stage1 = self._make_stage(
-            int(64 * width_multiplier[0]), num_blocks[0], stride=2, name='stage1', reduction=4)
+            int(64 * width_multiplier[0]), num_blocks[0], stride=2)
+        self.feature_info.append(dict(chs=int(64 * width_multiplier[0]), reduction=4, name="stage1"))
         self.stage2 = self._make_stage(
-            int(128 * width_multiplier[1]), num_blocks[1], stride=2, name='stage2', reduction=8)
+            int(128 * width_multiplier[1]), num_blocks[1], stride=2)
+        self.feature_info.append(dict(chs=int(128 * width_multiplier[1]), reduction=8, name="stage2"))
         self.stage3 = self._make_stage(
-            int(256 * width_multiplier[2]), num_blocks[2], stride=2, name='stage3', reduction=16)
+            int(256 * width_multiplier[2]), num_blocks[2], stride=2)
+        self.feature_info.append(dict(chs=int(256 * width_multiplier[2]), reduction=16, name="stage3"))
         self.stage4 = self._make_stage(
-            int(512 * width_multiplier[3]), num_blocks[3], stride=2, name='stage4', reduction=32)
+            int(512 * width_multiplier[3]), num_blocks[3], stride=2)
+        self.feature_info.append(dict(chs=int(512 * width_multiplier[3]), reduction=32, name="stage4"))
         self.gap = GlobalAvgPooling()
         self.linear = nn.Dense(int(512 * width_multiplier[3]), num_classes)
         self._initialize_weights()
 
-    def _make_stage(self, planes, num_blocks, stride, name: str = "", reduction: int = 1):
+    def _make_stage(self, planes, num_blocks, stride):
         strides = [stride] + [1] * (num_blocks - 1)
         blocks = []
         for s in strides:
@@ -253,8 +257,6 @@ class RepVGG(nn.Cell):
                                       use_se=self.use_se))
             self.in_planes = planes
             self.cur_layer_idx += 1
-
-        self.feature_info.append(dict(chs=planes, reduction=reduction, name=name))
 
         return nn.SequentialCell(blocks)
 

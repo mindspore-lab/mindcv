@@ -1,4 +1,3 @@
-import os
 import sys
 
 import numpy as np
@@ -7,13 +6,10 @@ import pytest
 import mindspore as ms
 import mindspore.nn as nn
 
-sys.path.append("../..")
+sys.path.append(".")
 
 from mindcv.models import create_model
 from mindcv.models.features import FeatureExtractWrapper
-from mindcv.utils.download import DownLoad
-
-from config import parse_args  # isort: skip
 
 
 class Conv2dReLU(nn.Cell):
@@ -166,82 +162,52 @@ def test_feature_extraction_indices_using_feature_wrapper(mode):
 
 
 @pytest.mark.parametrize(
-    "config, ckpt_path, ckpt_link, length_target",
+    "model_name, length_target",
     [
         (
-            "../../configs/resnet/resnet_18_ascend.yaml",
-            "../../checkpoints/resnet/resnet18-1e65cd21.ckpt",
-            "https://download.mindspore.cn/toolkits/mindcv/resnet/resnet18-1e65cd21.ckpt",
+            "resnet18",
             5,
         ),
         (
-            "../../configs/mobilenetv3/mobilenet_v3_small_ascend.yaml",
-            "../../checkpoints/mobilenetv3/mobilenet_v3_small_100-c884b105.ckpt",
-            "https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-c884b105.ckpt",
+            "mobilenet_v3_small_100",
             5,
         ),
         (
-            "../../configs/convnext/convnext_tiny_ascend.yaml",
-            "../../checkpoints/convnext/convnext_tiny-ae5ff8d7.ckpt",
-            "https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_tiny-ae5ff8d7.ckpt",
+            "convnext_tiny",
             4,
         ),
         (
-            "../../configs/resnest/resnest50_ascend.yaml",
-            "../../checkpoints/resnest/resnest50-f2e7fc9c.ckpt",
-            "https://download.mindspore.cn/toolkits/mindcv/resnest/resnest50-f2e7fc9c.ckpt",
+            "resnest50",
             5,
         ),
         (
-            "../../configs/efficientnet/efficientnet_b0_ascend.yaml",
-            "../../checkpoints/efficientnet/efficientnet_b0-103ec70c.ckpt",
-            "https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt",
+            "efficientnet_b0",
             5,
         ),
         (
-            "../../configs/repvgg/repvgg_a0_ascend.yaml",
-            "../../checkpoints/repvgg/repvgg_a0-6e71139d.ckpt",
-            "https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a0-6e71139d.ckpt",
+            "repvgg_a0",
             5,
         ),
         (
-            "../../configs/hrnet/hrnet_w32_ascend.yaml",
-            "../../checkpoints/hrnet/hrnet_w32-cc4fbd91.ckpt",
-            "https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w32-cc4fbd91.ckpt",
+            "hrnet_w32",
             5,
         ),
         (
-            "../../configs/rexnet/rexnet_x10_ascend.yaml",
-            "../../checkpoints/rexnet/rexnet_10-c5fb2dc7.ckpt",
-            "https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_10-c5fb2dc7.ckpt",
+            "rexnet_x10",
             5,
-        ),
-        (
-            "../../configs/mobilenetv2/mobilenet_v2_1.0_ascend.yaml",
-            "../../checkpoints/mobilenetv2/mobilenet_v2_100-d5532038.ckpt",
-            "https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_100-d5532038.ckpt",
-            2,
         ),
     ],
 )
-def test_feature_extraction_with_checkpoint(config, ckpt_path, ckpt_link, length_target):
-    root = os.path.dirname(__file__)
-    [ckpt_dir, ckpt_name] = os.path.split(ckpt_path)
+def test_feature_extraction_with_checkpoint(model_name, length_target):
+    model = create_model(
+        model_name=model_name,
+        pretrained=True,
+        features_only=True,
+    )
 
-    abs_ckpt_root = os.path.normpath(os.path.join(root, os.sep.join(ckpt_dir.split(os.sep)[:-1])))
-    abs_ckpt_dir = os.path.normpath(os.path.join(root, ckpt_dir))
-    abs_ckpt_path = os.path.normpath(os.path.join(root, ckpt_path))
-    abs_config_path = os.path.normpath(os.path.join(root, config))
+    assert isinstance(model, nn.Cell), "Loading checkpoint error"
 
-    if not os.path.isdir(abs_ckpt_root):
-        os.mkdir(abs_ckpt_root)
-    if not os.path.isdir(abs_ckpt_dir):
-        os.mkdir(abs_ckpt_dir)
-    if not os.path.isfile(abs_ckpt_path):
-        DownLoad().download_url(ckpt_link, abs_ckpt_dir, ckpt_name)
+    x = ms.Tensor(np.random.randn(8, 3, 32, 32), dtype=ms.float32)
+    out = model(x)
 
-    args = ["-c", abs_config_path, "--ckpt_path", abs_ckpt_path]
-    args = parse_args(args)
-
-    length = output_feature(args)
-    assert length == length_target, "Wrong feature extraction"
+    assert len(out) == length_target, "Wrong feature extraction"

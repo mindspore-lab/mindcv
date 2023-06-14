@@ -40,6 +40,7 @@ def _cfg(url="", **kwargs):
         "url": url,
         "num_classes": 1000,
         # 'first_conv': 'features.0.features.0', 'classifier': 'classifier',
+        "classifier": "mlp_head",
         **kwargs,
     }
 
@@ -47,7 +48,8 @@ def _cfg(url="", **kwargs):
 default_cfgs = {
     "efficientnet_b0": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt"),
-    "efficientnet_b1": _cfg(url=""),
+    "efficientnet_b1": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b1-f8c6b13f.ckpt"),
     "efficientnet_b2": _cfg(url=""),
     "efficientnet_b3": _cfg(url=""),
     "efficientnet_b4": _cfg(url=""),
