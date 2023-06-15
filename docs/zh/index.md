@@ -74,7 +74,7 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
 >>> network = mindcv.create_model('swin_tiny', pretrained=True)
 # 验证模型的准确率
 >>> !python validate.py --model=swin_tiny --pretrained --dataset=imagenet --val_split=validation
-{'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
+{'Top_1_Accuracy': 0.80824, 'Top_5_Accuracy': 0.94802, 'loss': 1.7331367141008378}
 ```
 
 ???+ example "图片分类示例"

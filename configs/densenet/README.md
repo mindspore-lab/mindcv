@@ -99,7 +99,7 @@ python validate.py -c configs/densenet/densenet_121_ascend.yaml --data_dir /path
 
 ### Deployment
 
-Please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md) in MindCV.
+Please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/) in MindCV.
 
 ## References
 <!--- Guideline: Citation format GB/T 7714 is suggested. -->

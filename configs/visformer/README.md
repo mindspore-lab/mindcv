@@ -78,7 +78,7 @@ python validate.py -c configs/visformer/visformer_tiny_ascend.yaml --data_dir /p
 
 ### Deployment
 
-To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md).
+To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/).
 
 ## References
 [1] Chen Z, Xie L, Niu J, et al. Visformer: The vision-friendly transformer. Proceedings of the IEEE/CVF International Conference on Computer Vision. 2021: 589-598.

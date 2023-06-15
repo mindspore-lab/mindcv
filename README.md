@@ -17,7 +17,7 @@ English | [中文](README_CN.md)
 
 [Introduction](#introduction) |
 [Installation](#installation) |
-[Get Started](#get-started) |
+[Getting Started](#getting-started) |
 [Tutorials](#tutorials) |
 [Model List](#model-list) |
 [Supported Algorithms](#supported-algorithms)
@@ -76,9 +76,11 @@ Below are a few code snippets for your taste.
 ['swin_tiny']
 # Create the model object
 >>> network = mindcv.create_model('swin_tiny', pretrained=True)
+```
+```shell
 # Validate its accuracy
->>> !python validate.py --model=swin_tiny --pretrained --dataset=imagenet --val_split=validation
-{'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
+python validate.py --model=swin_tiny --pretrained --dataset=imagenet --val_split=validation
+# {'Top_1_Accuracy': 0.80824, 'Top_5_Accuracy': 0.94802, 'loss': 1.7331367141008378}
 ```
 
 **Image classification demo**
@@ -91,9 +93,9 @@ Right click on the image below and save as `dog.jpg`.
 
 Classify the downloaded image with a pretrained SoTA model:
 
-```pycon
->>> !python infer.py --model=swin_tiny --image_path='./dog.jpg'
-{'Labrador retriever': 0.5700152, 'golden retriever': 0.034551315, 'kelpie': 0.010108651, 'Chesapeake Bay retriever': 0.008229004, 'Walker hound, Walker foxhound': 0.007791956}
+```shell
+python infer.py --model=swin_tiny --image_path='./dog.jpg'
+# {'Labrador retriever': 0.5700152, 'golden retriever': 0.034551315, 'kelpie': 0.010108651, 'Chesapeake Bay retriever': 0.008229004, 'Walker hound, Walker foxhound': 0.007791956}
 ```
 The top-1 prediction result is labrador retriever, which is the breed of this cut dog.
 

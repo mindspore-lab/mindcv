@@ -81,7 +81,7 @@ python validate.py -c configs/mobilenetv2/mobilenet_v2_0.75_ascend.yaml --data_d
 
 ### Deployment
 
-Please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md) in MindCV.
+Please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/) in MindCV.
 
 ## References
 

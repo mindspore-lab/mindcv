@@ -86,7 +86,7 @@ python validate.py -c configs/senet/seresnet50_ascend.yaml --data_dir /path/to/i
 
 ### Deployment
 
-Please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md) in MindCV.
+Please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/) in MindCV.
 
 ## References
 
