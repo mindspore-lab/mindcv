@@ -80,7 +80,6 @@ class Fold(nn.Cell):
         self.conv_transpose2d = ops.Conv2DTranspose(self.ck, self.kernel_size,
                                                     pad_mode="pad", pad=(self.padding[0], self.padding[0], self.padding[1], self.padding[1]),
                                                     stride=stride, dilation=dilation, group=self.c)
-        self.reshape = ops.Reshape()
 
     def construct(self, x: Tensor) -> Tensor:
         b, ck, l = x.shape
@@ -89,7 +88,7 @@ class Fold(nn.Cell):
         # assert l == self.h * self.w
         # print("construct-b", b, "construct-ck", ck, "construct-l", l)
         # print("self.h", self.h, "self.w", self.w)
-        x = self.reshape(x, (b, ck, self.h, self.w))
+        x = ops.reshape(x, (b, ck, self.h, self.w))
         out = self.conv_transpose2d(x, self.weight, (b, self.c, self.output_size[0], self.output_size[1]))
         
         return out
@@ -135,7 +134,6 @@ class OutlookAttention(nn.Cell):
                                 rates=[1, 1, 1, 1])
         self.pool = nn.AvgPool2d(kernel_size=stride, stride=stride)
         self.softmax = nn.Softmax(axis=-1)
-        self.reshape = ops.Reshape()
         self.transpose = ops.Transpose()
         self.batch_mat_mul = ops.BatchMatMul()
 
@@ -148,14 +146,14 @@ class OutlookAttention(nn.Cell):
         w = int((W - 1) / self.stride + 1)
         v = ops.pad(v, ((0, 0), (0, 0), (1, 1), (1,1)))
         v = self.unfold(v)
-        v = self.reshape(v, (B, self.num_heads, C // self.num_heads,
+        v = ops.reshape(v, (B, self.num_heads, C // self.num_heads,
                                    self.kernel_size * self.kernel_size,
                                    h * w))
         v = self.transpose(v, (0, 1, 4, 3, 2))  # B,H,N,kxk,C/H
 
         attn = self.pool(self.transpose(x, (0, 3, 1, 2)))
         attn = self.transpose(attn, (0, 2, 3, 1))
-        attn = self.reshape(self.attn(attn), 
+        attn = ops.reshape(self.attn(attn), 
             (B, h * w, self.num_heads, self.kernel_size * self.kernel_size,
             self.kernel_size * self.kernel_size))
         attn = self.transpose(attn, (0, 2, 1, 3, 4))  # B,H,N,kxk,kxk
@@ -164,7 +162,7 @@ class OutlookAttention(nn.Cell):
         attn = self.attn_drop(attn)
 
         x = self.transpose(self.batch_mat_mul(attn, v), (0, 1, 4, 3, 2))
-        x = self.reshape(x, 
+        x = ops.reshape(x, 
             (B, C * self.kernel_size * self.kernel_size, h * w))
         fold = Fold(C, (H, W), self.kernel_size, padding=self.padding, stride=self.stride)
         x = fold(x)
@@ -270,7 +268,6 @@ class Attention(nn.Cell):
         self.attn_drop = nn.Dropout(1.0 - attn_drop)
         self.proj = nn.Dense(dim, dim)
         self.proj_drop = nn.Dropout(1.0 - proj_drop)
-        self.reshape = ops.Reshape()
         self.transpose = ops.Transpose() 
         self.softmax = nn.Softmax(axis=-1)
         self.batch_mat_mul_transpose = ops.BatchMatMul(transpose_b=True)
@@ -281,7 +278,7 @@ class Attention(nn.Cell):
         B, H, W, C = x.shape
 
         qkv = self.qkv(x)
-        qkv = self.reshape(qkv, (B, H * W, 3, self.num_heads,
+        qkv = ops.reshape(qkv, (B, H * W, 3, self.num_heads,
                                   C // self.num_heads))
         qkv = self.transpose(qkv, (2, 0, 3, 1, 4))
         q, k, v = qkv[0], qkv[1], qkv[2]
@@ -291,7 +288,7 @@ class Attention(nn.Cell):
         attn = self.attn_drop(attn)
 
         x = self.transpose(self.batch_mat_mul(attn, v), (0, 2, 1, 3))
-        x = self.reshape(x, (B, H, W, C))
+        x = ops.reshape(x, (B, H, W, C))
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
@@ -366,7 +363,6 @@ class ClassAttention(nn.Cell):
         self.attn_drop = nn.Dropout(1.0 - attn_drop)
         self.proj = nn.Dense(self.head_dim * self.num_heads, dim)
         self.proj_drop = nn.Dropout(1.0 - proj_drop)
-        self.reshape = ops.Reshape()
         self.transpose = ops.Transpose()
         self.batch_mat_mul_transpose = ops.BatchMatMul(transpose_b=True)
         self.batch_mat_mul = ops.BatchMatMul()
@@ -376,18 +372,18 @@ class ClassAttention(nn.Cell):
         B, N, C = x.shape
 
         kv = self.kv(x)
-        kv = self.reshape(kv, (B, N, 2, self.num_heads,
+        kv = ops.reshape(kv, (B, N, 2, self.num_heads,
                                 self.head_dim))
         kv = self.transpose(kv, (2, 0, 3, 1, 4))
         k, v = kv[0], kv[1]
         q = self.q(x[:, :1, :])
-        q = self.reshape(q, (B, self.num_heads, 1, self.head_dim))
+        q = ops.reshape(q, (B, self.num_heads, 1, self.head_dim))
         attn =self.batch_mat_mul_transpose(q * self.scale, k)
         attn = self.softmax(attn)
         attn = self.attn_drop(attn)
 
         cls_embed = self.transpose(self.batch_mat_mul(attn, v), (0, 2, 1, 3))
-        cls_embed = self.reshape(cls_embed, (B, 1, self.head_dim * self.num_heads))
+        cls_embed = ops.reshape(cls_embed, (B, 1, self.head_dim * self.num_heads))
         cls_embed = self.proj(cls_embed)
         cls_embed = self.proj_drop(cls_embed)
         return cls_embed

@@ -14,7 +14,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model           | Context   |  Top-1 (%)  |  Top-5 (%)  | Params (M) | Recipe                                                                                   | Weight                                                                            |
 |-----------------|-----------|-------|------------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| volo_d1 | D910x8-G | 77.01 | 93.35 | 27    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/volo/volo_d1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_tiny-fa7bf894.ckpt) |
+| volo_d1 | D910x8-G | 82.598 | 95.998 | 27    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/volo/volo_d1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/volo/volo_d1-c7efada9.ckpt) |
 
 </div>
 
