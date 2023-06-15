@@ -82,7 +82,7 @@ class CheckpointManager:
     def top_K_checkpoint(self, network, K=10, metric=None, save_path=""):
         """Save and return Top K checkpoint address and accuracy."""
         last_file = self._ckpoint_filelist[-1] if self._ckpoint_filelist else None
-        if type(metric) is not np.ndarray:
+        if isinstance(metric, ms.Tensor):
             metric = metric.asnumpy()
         if self.ckpoint_num < K or np.greater(metric, last_file[1]):
             if self.ckpoint_num >= K:
