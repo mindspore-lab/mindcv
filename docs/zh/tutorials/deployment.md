@@ -2,11 +2,11 @@
 
 MindSpore Serving是一个轻量级、高性能的推理服务模块，旨在帮助MindSpore开发者在生产环境中高效部署在线推理服务。当用户使用MindSpore完成模型训练后，导出MindSpore模型，即可使用MindSpore Serving创建该模型的推理服务。
 
-本文以mobilenet_v3_small_100网络为例，演示基于MindSpore Serving进行部署推理服务的方法。
+本文以mobilenet_v2_100网络为例，演示基于MindSpore Serving进行部署推理服务的方法。
 
 ## 环境准备
 
-进行部署前，需确保已经正确安装了MindSpore Serving，并配置了环境变量。MindSpore Serving安装和配置可以参考[MindSpore 安装页面](https://www.mindspore.cn/serving/docs/zh-CN/master/serving_install.html) 。
+进行部署前，需确保已经正确安装了MindSpore Serving，并配置了环境变量。MindSpore Serving安装和配置可以参考[MindSpore Serving安装页面](https://www.mindspore.cn/serving/docs/zh-CN/master/serving_install.html) 。
 
 ## 模型导出
 
@@ -17,19 +17,19 @@ MindSpore Serving是一个轻量级、高性能的推理服务模块，旨在帮
 - `file_name`：导出模型的文件名称，如果`file_name`没有包含对应的后缀名(如.mindir)，设置`file_format`后系统会为文件名自动添加后缀。
 - `file_format`：MindSpore目前支持导出”AIR”，”ONNX”和”MINDIR”格式的模型。
 
-下面代码以mobilenet_v3_small_100为例，导出MindCV的预训练网络模型，获得MindIR格式模型文件。
+下面代码以mobilenet_v2_100为例，导出MindCV的预训练网络模型，获得MindIR格式模型文件。
 
 ```python
 from mindcv.models import create_model
 import numpy as np
 import mindspore as ms
 
-model = create_model(model_name='mobilenet_v3_small_100', num_classes=1000, pretrained=True)
+model = create_model(model_name='mobilenet_v2_100_224', num_classes=1000, pretrained=True)
 
 input_np = np.random.uniform(0.0, 1.0, size=[1, 3, 224, 224]).astype(np.float32)
 
-# 导出文件mobilenet_v3_small_100.mindir到当前文件夹
-ms.export(model, ms.Tensor(input_np), file_name='mobilenet_v3_small_100', file_format='MINDIR')
+# 导出文件mobilenet_v2_100_224.mindir到当前文件夹
+ms.export(model, ms.Tensor(input_np), file_name='mobilenet_v2_100_224', file_format='MINDIR')
 ```
 
 ## 部署Serving推理服务
@@ -40,12 +40,13 @@ ms.export(model, ms.Tensor(input_np), file_name='mobilenet_v3_small_100', file_f
 
 ```text
 demo
-├── mobilenet_v3_small_100
+├── mobilenet_v2_100_224
 │   ├── 1
-│   │   └── mobilenet_v3_small_100.mindir
+│   │   └── mobilenet_v2_100_224.mindir
 │   └── servable_config.py
 │── serving_server.py
 ├── serving_client.py
+├── imagenet1000_clsidx_to_labels.txt
 └── test_image
     ├─ dog
     │   ├─ dog.jpg
@@ -53,12 +54,13 @@ demo
     └─ ……
 ```
 
-- `mobilenet_v3_small_100`为模型文件夹，文件夹名即为模型名。
-- `mobilenet_v3_small_100.mindir`为上一步网络生成的模型文件，放置在文件夹1下，1为版本号，不同的版本放置在不同的文件夹下，版本号需以纯数字串命名，默认配置下启动最大数值的版本号的模型文件。
+- `mobilenet_v2_100_224`为模型文件夹，文件夹名即为模型名。
+- `mobilenet_v2_100_224.mindir`为上一步网络生成的模型文件，放置在文件夹1下，1为版本号，不同的版本放置在不同的文件夹下，版本号需以纯数字串命名，默认配置下启动最大数值的版本号的模型文件。
 - `servable_config.py`为模型配置脚本，对模型进行声明、入参和出参定义。
 - `serving_server.py`为启动服务脚本文件。
 - `serving_client.py`为启动客户端脚本文件。
-- `test_image`中为测试图片。
+- `imagenet1000_clsidx_to_labels.txt`为ImageNet数据集1000个类别的索引，可以在[examples/data/](https://github.com/mindspore-lab/mindcv/tree/main/examples/data)中得到。
+- `test_image`中为测试图片，可以在[README](https://github.com/mindspore-lab/mindcv/blob/main/README.md)中得到。
 
 其中，模型配置文件`servable_config.py`内容如下：
 
@@ -66,7 +68,7 @@ demo
 from mindspore_serving.server import register
 
 # 进行模型声明，其中declare_model入参model_file指示模型的文件名称，model_format指示模型的模型类别
-model = register.declare_model(model_file="mobilenet_v3_small_100.mindir", model_format="MindIR")
+model = register.declare_model(model_file="mobilenet_v2_100_224.mindir", model_format="MindIR")
 
 # Servable方法的入参由Python方法的入参指定，Servable方法的出参由register_method的output_names指定
 @register.register_method(output_names=["score"])
@@ -77,7 +79,7 @@ def predict(image):
 
 ### 启动服务
 
-MindSpore的`server`函数提供两种服务部署，一种是gRPC方式，一种是通过RESTful方式，本教程以gRPC方式为例。服务启动脚本`serving_server.py`把本地目录下的`mobilenet_v3_small_100`部署到设备0，并启动地址为127.0.0.1:5500的gRPC服务器。脚本文件内容如下：
+MindSpore的`server`函数提供两种服务部署，一种是gRPC方式，一种是通过RESTful方式，本教程以gRPC方式为例。服务启动脚本`serving_server.py`把本地目录下的`mobilenet_v2_100_224`部署到设备0，并启动地址为127.0.0.1:5500的gRPC服务器。脚本文件内容如下：
 
 ```python
 import os
@@ -87,7 +89,7 @@ from mindspore_serving import server
 def start():
     servable_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
 
-    servable_config = server.ServableStartConfig(servable_directory=servable_dir, servable_name="mobilenet_v3_small_100",
+    servable_config = server.ServableStartConfig(servable_directory=servable_dir, servable_name="mobilenet_v2_100_224",
                                                  device_ids=0)
     server.start_servables(servable_configs=servable_config)
     server.start_grpc_server(address="127.0.0.1:5500")
@@ -135,7 +137,7 @@ def postprocess(score):
     return idx2label[max_idx]
 
 def predict():
-    client = Client("127.0.0.1:5500", "mobilenet_v3_small_100", "predict")
+    client = Client("127.0.0.1:5500", "mobilenet_v2_100_224", "predict")
     instances = []
     images, _ = next(data_loader.create_tuple_iterator())
     image_np = images.asnumpy().squeeze()
@@ -150,7 +152,7 @@ if __name__ == '__main__':
     predict()
 ```
 
-执行后显示如下返回值，说明Serving服务已正确执行mobilenet_v3_small_100网络模型的推理。
+执行后显示如下返回值，说明Serving服务已正确执行mobilenet_v2_100网络模型的推理。
 ```text
 Labrador retriever
 ```
