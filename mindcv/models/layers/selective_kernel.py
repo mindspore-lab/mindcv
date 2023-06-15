@@ -6,6 +6,7 @@ from typing import List, Optional, Union
 from mindspore import Tensor, nn, ops
 
 from ..helpers import make_divisible
+from .compatibility import Split
 from .conv_norm_act import Conv2dNormActivation
 from .pooling import GlobalAvgPooling
 
@@ -113,6 +114,7 @@ class SelectiveKernel(nn.Cell):
             assert in_channels % self.num_paths == 0
             in_channels = in_channels // self.num_paths
         groups = min(out_channels, groups)
+        self.split = Split(split_size_or_sections=self.in_channels // self.num_paths, output_num=self.num_paths, axis=1)
 
         self.paths = nn.CellList([
             Conv2dNormActivation(in_channels, out_channels, kernel_size=k, stride=stride, groups=groups,
@@ -126,7 +128,7 @@ class SelectiveKernel(nn.Cell):
     def construct(self, x: Tensor) -> Tensor:
         x_paths = []
         if self.split_input:
-            x_split = ops.split(x, axis=1, output_num=self.num_paths)
+            x_split = self.split(x)
             for i, op in enumerate(self.paths):
                 x_paths.append(op(x_split[i]))
         else:

@@ -13,6 +13,7 @@ from mindspore.common.initializer import Normal, Uniform
 
 from .helpers import build_model_with_cfg, make_divisible
 from .layers.activation import Swish
+from .layers.compatibility import Dropout
 from .layers.drop_path import DropPath
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExcite
@@ -436,7 +437,7 @@ class EfficientNet(nn.Cell):
 
         self.features = nn.SequentialCell(layers)
         self.avgpool = GlobalAvgPooling()
-        self.dropout = nn.Dropout(1 - dropout_rate)
+        self.dropout = Dropout(p=dropout_rate)
         self.mlp_head = nn.Dense(lastconv_output_channels, num_classes)
         self._initialize_weights()
 

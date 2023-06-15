@@ -8,6 +8,7 @@ import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
 from .helpers import load_pretrained
+from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
 
@@ -807,7 +808,7 @@ class NASNetAMobile(nn.Cell):
         )  # 24, 4
 
         self.relu = nn.ReLU()
-        self.dropout = nn.Dropout(keep_prob=0.5)
+        self.dropout = Dropout(p=0.5)
         self.classifier = nn.Dense(in_channels=24 * filters, out_channels=num_classes)
         self.pool = GlobalAvgPooling()
         self._initialize_weights()

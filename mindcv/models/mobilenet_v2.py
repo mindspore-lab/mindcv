@@ -8,7 +8,8 @@ import math
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn
 
-from .helpers import build_model_with_cfg, make_divisible
+from .helpers import load_pretrained, make_divisible
+from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
 
@@ -235,7 +236,7 @@ class MobileNetV2(nn.Cell):
 
         self.pool = GlobalAvgPooling()
         self.classifier = nn.SequentialCell([
-            nn.Dropout(keep_prob=0.8),  # confirmed by paper authors
+            Dropout(p=0.2),  # confirmed by paper authors
             nn.Dense(last_channels, num_classes),
         ])
         self._initialize_weights()

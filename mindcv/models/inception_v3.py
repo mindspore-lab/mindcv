@@ -9,6 +9,7 @@ import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
 from .helpers import load_pretrained
+from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
 
@@ -266,7 +267,7 @@ class InceptionV3(nn.Cell):
         self.inception7c = InceptionE(2048)
 
         self.pool = GlobalAvgPooling()
-        self.dropout = nn.Dropout(keep_prob=1 - drop_rate)
+        self.dropout = Dropout(p=drop_rate)
         self.num_features = 2048
         self.classifier = nn.Dense(self.num_features, num_classes)
         self._initialize_weights()

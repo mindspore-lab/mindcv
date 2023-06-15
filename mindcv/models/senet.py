@@ -10,6 +10,7 @@ import mindspore.common.initializer as init
 from mindspore import Tensor, nn
 
 from .helpers import load_pretrained
+from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExciteV2
 from .registry import register_model
@@ -310,7 +311,7 @@ class SENet(nn.Cell):
 
         self.pool = GlobalAvgPooling()
         if self.drop_rate > 0.:
-            self.dropout = nn.Dropout(keep_prob=1. - self.drop_rate)
+            self.dropout = Dropout(p=self.drop_rate)
         self.classifier = nn.Dense(self.num_features, self.num_classes)
 
         self._initialize_weights()

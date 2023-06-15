@@ -2,7 +2,6 @@
 import mindspore as ms
 from mindspore import ops
 from mindspore.common import dtype as mstype
-from mindspore.common.api import ms_function
 from mindspore.common.tensor import Tensor
 from mindspore.nn.optim.optimizer import Optimizer, opt_init_args_register
 
@@ -145,7 +144,6 @@ class Adan(Optimizer):
 
         self.weight_decay = Tensor(weight_decay, mstype.float32)
 
-    @ms_function
     def construct(self, gradients):
         params = self._parameters
         moment1 = self.moment1

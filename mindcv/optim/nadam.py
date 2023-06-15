@@ -3,7 +3,6 @@ import numpy as np
 
 import mindspore as ms
 from mindspore import ops
-from mindspore.common.api import ms_function
 from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
@@ -49,7 +48,6 @@ class NAdam(Optimizer):
         self.mu_schedule = Parameter(initializer(1, [1], ms.float32), name="mu_schedule")
         self.beta2_power = Parameter(initializer(1, [1], ms.float32), name="beta2_power")
 
-    @ms_function
     def construct(self, gradients):
         lr = self.get_lr()
         params = self.parameters
