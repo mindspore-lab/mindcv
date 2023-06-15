@@ -8,7 +8,7 @@ import math
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn
 
-from .helpers import load_pretrained, make_divisible
+from .helpers import build_model_with_cfg, make_divisible
 from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model

@@ -58,12 +58,12 @@ steps: [16, 32, 64, 100, 150, 300]
 prior_scaling: [0.1, 0.2]
 gamma: 2.0
 alpha: 0.75
-epoch_size: 800
+epoch_size: 500
 
 ckpt_save_dir: "./ckpt"
 keep_checkpoint_max: 10
 eval_interval: 1
-eval_start_epoch: 1
+eval_start_epoch: 350
 dataset_sink_mode: True
 amp_level: "O0"
 
