@@ -76,9 +76,12 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
 ['swin_tiny']
 # 创建模型
 >>> network = mindcv.create_model('swin_tiny', pretrained=True)
-# 验证模型的准确率
->>> !python validate.py --model=swin_tiny --pretrained --dataset=imagenet --val_split=validation
-{'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
+```
+
+```shell
+# 验证模型的准确度
+python validate.py --model=swin_tiny --pretrained --dataset=imagenet --val_split=validation
+# {'Top_1_Accuracy': 0.80824, 'Top_5_Accuracy': 0.94802, 'loss': 1.7331367141008378}
 ```
 
 **图片分类示例**
@@ -91,9 +94,9 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
 
 使用加载了预训练参数的SoTA模型对图片进行推理。
 
-```pycon
->>> !python infer.py --model=swin_tiny --image_path='./dog.jpg'
-{'Labrador retriever': 0.5700152, 'golden retriever': 0.034551315, 'kelpie': 0.010108651, 'Chesapeake Bay retriever': 0.008229004, 'Walker hound, Walker foxhound': 0.007791956}
+```shell
+python infer.py --model=swin_tiny --image_path='./dog.jpg'
+# {'Labrador retriever': 0.5700152, 'golden retriever': 0.034551315, 'kelpie': 0.010108651, 'Chesapeake Bay retriever': 0.008229004, 'Walker hound, Walker foxhound': 0.007791956}
 ```
 
 预测结果排名前1的是拉布拉多犬，正是这张图片里的狗狗的品种。

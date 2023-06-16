@@ -91,7 +91,7 @@ python validate.py -c configs/shufflenetv2/shufflenet_v2_0.5_ascend.yaml --data_
 
 ### Deployment
 
-To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md).
+To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/).
 
 ## References
 <!--- Guideline: Citation format GB/T 7714 is suggested. -->

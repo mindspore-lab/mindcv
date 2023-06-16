@@ -22,7 +22,7 @@ See [Installation](../installation.md) for details.
 
 ### Dataset
 
-Through the [create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset) module in [mindcv.data](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html), we can quickly load standard datasets or customized datasets.
+Through the `create_dataset` module in `mindcv.data`, we can quickly load standard datasets or customized datasets.
 
 ```python
 import os
@@ -40,7 +40,7 @@ dataset_train = create_dataset(
 
 ### Transform
 
-Through the [create_transforms](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_transforms) function, you can directly obtain the appropriate data processing augmentation strategies (transform list) for standard datasets, including common data processing strategies on Cifar10 and Imagenet.
+Through the `create_transforms` function, you can directly obtain the appropriate data processing augmentation strategies (transform list) for standard datasets, including common data processing strategies on Cifar10 and Imagenet.
 
 ```python
 # create transforms
@@ -49,7 +49,7 @@ trans = create_transforms(dataset_name='cifar10', image_resize=224)
 
 ### Loader
 
-The [mindcv.data.create_loader](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_loader) function is used for data conversion and batch split loading. We need to pass in the transform_list returned by [create_transforms](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_transforms).
+The `mindcv.data.create_loader` function is used for data conversion and batch split loading. We need to pass in the transform_list returned by `create_transforms`.
 
 ```python
 # Perform data augmentation operations to generate the required dataset.
@@ -63,11 +63,11 @@ loader_train = create_loader(dataset=dataset_train,
 num_batches = loader_train.get_dataset_size()
 ```
 
-> Avoid repeatedly executing a single cell of [create_loader](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_loader) in notebook, or execute again after executing [create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset).
+> Avoid repeatedly executing a single cell of `create_loader` in notebook, or execute again after executing `create_dataset`.
 
 ## Model
 
-Use the [create_model](https://mindcv.readthedocs.io/en/latest/api/mindcv.models.html#mindcv.models.create_model) interface to obtain the instantiated DenseNet and load the pretraining weight(obtained from ImageNet dataset training).
+Use the `create_model` interface to obtain the instantiated DenseNet and load the pretraining weight(obtained from ImageNet dataset training).
 
 ```python
 from mindcv.models import create_model
@@ -80,7 +80,7 @@ network = create_model(model_name='densenet121', num_classes=num_classes, pretra
 
 ## Loss
 
-By [create_loss](https://mindcv.readthedocs.io/en/latest/api/mindcv.loss.html#mindcv.loss.create_loss) interface obtains loss function.
+By `create_loss` interface obtains loss function.
 
 ```python
 from mindcv.loss import create_loss
@@ -90,7 +90,7 @@ loss = create_loss(name='CE')
 
 ## Learning Rate Scheduler
 
-Use [create_scheduler](https://mindcv.readthedocs.io/en/latest/api/mindcv.scheduler.html#mindcv.scheduler.create_scheduler) interface sets the learning rate scheduler.
+Use `create_scheduler` interface sets the learning rate scheduler.
 
 ```python
 from mindcv.scheduler import create_scheduler
@@ -103,7 +103,7 @@ lr_scheduler = create_scheduler(steps_per_epoch=num_batches,
 
 ## Optimizer
 
-Use [create_optimizer](https://mindcv.readthedocs.io/en/latest/api/mindcv.optim.html#mindcv.optim.create_optimizer) interface creates an optimizer.
+Use `create_optimizer` interface creates an optimizer.
 
 ```python
 from mindcv.optim import create_optimizer
