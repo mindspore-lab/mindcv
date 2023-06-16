@@ -164,6 +164,8 @@ def create_parser():
                        help='Whether use clip grad (default=False)')
     group.add_argument('--clip_value', type=float, default=15.0,
                        help='Clip value (default=15.0)')
+    group.add_argument('--gradient_accumulation_steps', type=int, default=1,
+                       help="Accumulate the gradients of n batches before update.")
 
     # Optimize parameters
     group = parser.add_argument_group('Optimizer parameters')
@@ -185,7 +187,8 @@ def create_parser():
     # Scheduler parameters
     group = parser.add_argument_group('Scheduler parameters')
     group.add_argument('--scheduler', type=str, default='cosine_decay',
-                       choices=['constant', 'cosine_decay', 'exponential_decay', 'step_decay', 'multi_step_decay'],
+                       choices=['constant', 'cosine_decay', 'exponential_decay', 'step_decay',
+                                'multi_step_decay', 'one_cycle', 'cyclic'],
                        help='Type of scheduler (default="cosine_decay")')
     group.add_argument('--lr', type=float, default=0.001,
                        help='Learning rate (default=0.001)')
@@ -207,7 +210,7 @@ def create_parser():
                             'LRs are the same in the remaining steps in the epoch. Otherwise, '
                             'learning rate is updated every step dynamically (default=False)')
     group.add_argument('--num_cycles', type=int, default=1,
-                       help='Num of cycles for cosine decay (default=1)')
+                       help='Num of cycles for cosine decay and cyclic (default=1)')
     group.add_argument('--cycle_decay', type=float, default=1.0,
                        help='Decay rate of lr max in each cosine cycle (default=1.0)')
 

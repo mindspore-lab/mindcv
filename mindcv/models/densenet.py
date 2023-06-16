@@ -10,9 +10,10 @@ from typing import Tuple
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
+from .helpers import load_pretrained
+from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "DenseNet",
@@ -61,7 +62,7 @@ class _DenseLayer(nn.Cell):
         self.conv2 = nn.Conv2d(bn_size * growth_rate, growth_rate, kernel_size=3, stride=1, pad_mode="pad", padding=1)
 
         self.drop_rate = drop_rate
-        self.dropout = nn.Dropout(keep_prob=1 - self.drop_rate)
+        self.dropout = Dropout(p=self.drop_rate)
 
     def construct(self, features: Tensor) -> Tensor:
         bottleneck = self.conv1(self.relu1(self.norm1(features)))

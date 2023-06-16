@@ -8,9 +8,9 @@ from typing import Tuple
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
+from .helpers import load_pretrained
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "ShuffleNetV2",
@@ -33,16 +33,16 @@ def _cfg(url="", **kwargs):
 
 default_cfgs = {
     "shufflenet_v2_0.5": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_05-a53c62b9.ckpt"
+        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x0_5-8c841061.ckpt"
     ),
     "shufflenet_v2_1.0": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_10-e6b8c4fe.ckpt"
+        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_0-0da4b7fa.ckpt"
     ),
     "shufflenet_v2_1.5": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_15-e717dd88.ckpt"
+        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_5-00b56131.ckpt"
     ),
     "shufflenet_v2_2.0": _cfg(
-        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_20-ada6a359.ckpt"
+        url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x2_0-ed8e698d.ckpt"
     ),
 }
 

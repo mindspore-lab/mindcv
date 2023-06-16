@@ -80,7 +80,7 @@ python validate.py -c configs/mobilenetv3/mobilenet_v3_small_ascend.yaml --data_
 
 ### Deployment
 
-Please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md) in MindCV.
+Please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/) in MindCV.
 
 ## References
 

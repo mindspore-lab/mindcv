@@ -8,9 +8,10 @@ from typing import List
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn
 
+from .helpers import load_pretrained, make_divisible
+from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
-from .utils import load_pretrained, make_divisible
 
 __all__ = [
     "Mnasnet",
@@ -36,7 +37,7 @@ default_cfgs = {
     "mnasnet0.5": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_050-7d8bf4db.ckpt"),
     "mnasnet0.75": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_075-465d366d.ckpt"),
     "mnasnet1.0": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_100-1bcf43f8.ckpt"),
-    "mnasnet1.3": _cfg(url=""),
+    "mnasnet1.3": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_130-a43a150a.ckpt"),
     "mnasnet1.4": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_140-7e20bb30.ckpt"),
 }
 
@@ -137,7 +138,7 @@ class Mnasnet(nn.Cell):
         ])
         self.features = nn.SequentialCell(features)
         self.pool = GlobalAvgPooling()
-        self.dropout = nn.Dropout(keep_prob=1 - drop_rate)
+        self.dropout = Dropout(p=drop_rate)
         self.classifier = nn.Dense(1280, num_classes)
         self._initialize_weights()
 

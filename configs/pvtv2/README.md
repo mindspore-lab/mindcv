@@ -24,11 +24,11 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model    | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                         | Download                                                                                |
 |----------|----------|-----------|-----------|------------|------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
-| PVTV2_b0 | D910x8-G | 71.50     | 90.60     | 3.67       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt_v2/pvt_v2_b0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b0-1c4f6683.ckpt) |
-| PVTV2_b1 | D910x8-G | 78.91     | 94.49     | 14.01      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt_v2/pvt_v2_b1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b1-3ceb171a.ckpt) |
-| PVTV2_b2 | D910x8-G | 81.99     | 95.74     | 25.35      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt_v2/pvt_v2_b2_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b2-0565d18e.ckpt) |
-| PVTV2_b3 | D910x8-G | 82.84     | 96.24     | 45.24      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt_v2/pvt_v2_b3_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b3-feaae3fc.ckpt) |
-| PVTV2_b4 | D910x8-G | 83.14     | 96.27     | 62.56      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt_v2/pvt_v2_b4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b4-1cf4bc03.ckpt) |
+| PVTV2_b0 | D910x8-G | 71.50     | 90.60     | 3.67       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b0-1c4f6683.ckpt) |
+| PVTV2_b1 | D910x8-G | 78.91     | 94.49     | 14.01      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b1-3ceb171a.ckpt) |
+| PVTV2_b2 | D910x8-G | 81.99     | 95.74     | 25.35      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b2_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b2-0565d18e.ckpt) |
+| PVTV2_b3 | D910x8-G | 82.84     | 96.24     | 45.24      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b3_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b3-feaae3fc.ckpt) |
+| PVTV2_b4 | D910x8-G | 83.14     | 96.27     | 62.56      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b4-1cf4bc03.ckpt) |
 
 </div>
 
@@ -55,7 +55,7 @@ It is easy to reproduce the reported results with the pre-defined training recip
 
 ```shell
 # distrubted training on multiple GPU/Ascend devices
-mpirun -n 8 python train.py --config configs/pvt_v2/pvt_v2_b0_ascend.yaml --data_dir /path/to/imagenet
+mpirun -n 8 python train.py --config configs/pvtv2/pvt_v2_b0_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
@@ -72,7 +72,7 @@ If you want to train or finetune the model on a smaller dataset without distribu
 
 ```shell
 # standalone training on a CPU/GPU/Ascend device
-python train.py --config configs/pvt_v2/pvt_v2_b0_ascend.yaml --data_dir /path/to/dataset --distribute False
+python train.py --config configs/pvtv2/pvt_v2_b0_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 ### Validation
@@ -80,12 +80,12 @@ python train.py --config configs/pvt_v2/pvt_v2_b0_ascend.yaml --data_dir /path/t
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```shell
-python validate.py -c configs/pvt_v2/pvt_v2_b0_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+python validate.py -c configs/pvtv2/pvt_v2_b0_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 ### Deployment
 
-Please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md) in MindCV.
+Please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/) in MindCV.
 
 ## References
 

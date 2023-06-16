@@ -9,9 +9,10 @@ from typing import Tuple, Union
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
+from .helpers import load_pretrained
+from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "GoogLeNet",
@@ -109,7 +110,7 @@ class InceptionAux(nn.Cell):
         self.fc2 = nn.Dense(1024, num_classes)
         self.flatten = nn.Flatten()
         self.relu = nn.ReLU()
-        self.dropout = nn.Dropout(1 - drop_rate)
+        self.dropout = Dropout(p=drop_rate)
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.avg_pool(x)
@@ -170,7 +171,7 @@ class GoogLeNet(nn.Cell):
             self.aux2 = InceptionAux(528, num_classes, drop_rate=drop_rate_aux)
 
         self.pool = GlobalAvgPooling()
-        self.dropout = nn.Dropout(keep_prob=1 - drop_rate)
+        self.dropout = Dropout(p=drop_rate)
         self.classifier = nn.Dense(1024, num_classes)
         self._initialize_weights()
 

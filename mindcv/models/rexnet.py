@@ -9,9 +9,10 @@ from typing import Any
 import mindspore.common.initializer as init
 import mindspore.nn as nn
 
+from .helpers import build_model_with_cfg, make_divisible
 from .layers import Conv2dNormActivation, DropPath, GlobalAvgPooling, SqueezeExcite
+from .layers.compatibility import Dropout
 from .registry import register_model
-from .utils import load_pretrained, make_divisible
 
 __all__ = [
     "ReXNetV1",
@@ -175,7 +176,7 @@ class ReXNetV1(nn.Cell):
         self.stem = Conv2dNormActivation(in_channels, stem_chs, stride=2, padding=1, activation=act_layer)
 
         feat_chs = [stem_chs]
-        feature_info = []
+        self.feature_info = []
         curr_stride = 2
         features = []
         num_blocks = len(in_channels_group)
@@ -184,8 +185,7 @@ class ReXNetV1(nn.Cell):
         ):
             if stride > 1:
                 fname = "stem" if block_idx == 0 else f"features.{block_idx - 1}"
-                feature_info += [dict(num_chs=feat_chs[-1], reduction=curr_stride, module=fname)]
-                curr_stride *= stride
+                self.feature_info += [dict(chs=feat_chs[-1], reduction=curr_stride, name=fname)]
             block_dpr = drop_path_rate * block_idx / (num_blocks - 1)  # stochastic depth linear decay rule
             drop_path = DropPath(block_dpr) if block_dpr > 0. else None
             features.append(LinearBottleneck(in_channels=in_c,
@@ -197,8 +197,12 @@ class ReXNetV1(nn.Cell):
                                              act_layer=act_layer,
                                              dw_act_layer=dw_act_layer,
                                              drop_path=drop_path))
+            curr_stride *= stride
+            feat_chs.append(out_c)
 
         pen_channels = make_divisible(int(1280 * width_mult), divisor=ch_div)
+        self.feature_info += [dict(chs=feat_chs[-1], reduction=curr_stride, name=f'features.{len(features) - 1}')]
+        self.flatten_sequential = True
         features.append(Conv2dNormActivation(out_channels_group[-1],
                                              pen_channels,
                                              kernel_size=1,
@@ -209,11 +213,11 @@ class ReXNetV1(nn.Cell):
         self.features = nn.SequentialCell(*features)
         if self.useconv:
             self.cls = nn.SequentialCell(
-                nn.Dropout(1.0 - drop_rate),
+                Dropout(p=drop_rate),
                 nn.Conv2d(pen_channels, num_classes, 1, has_bias=True))
         else:
             self.cls = nn.SequentialCell(
-                nn.Dropout(1.0 - drop_rate),
+                Dropout(p=drop_rate),
                 nn.Dense(pen_channels, num_classes))
         self._initialize_weights()
 
@@ -258,12 +262,8 @@ def _rexnet(
 ) -> ReXNetV1:
     """ReXNet architecture."""
     default_cfg = default_cfgs[arch]
-    model = ReXNetV1(width_mult=width_mult, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(width_mult=width_mult, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return build_model_with_cfg(ReXNetV1, pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model

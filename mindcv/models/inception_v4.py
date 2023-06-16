@@ -8,9 +8,10 @@ from typing import Tuple, Union
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
+from .helpers import load_pretrained
+from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "InceptionV4",
@@ -278,7 +279,7 @@ class InceptionV4(nn.Cell):
         self.features = nn.SequentialCell(blocks)
 
         self.pool = GlobalAvgPooling()
-        self.dropout = nn.Dropout(1 - drop_rate)
+        self.dropout = Dropout(p=drop_rate)
         self.num_features = 1536
         self.classifier = nn.Dense(self.num_features, num_classes)
         self._initialize_weights()

@@ -10,12 +10,13 @@ import mindspore.common.initializer as init
 from mindspore import Parameter, Tensor, nn, ops
 from mindspore.ops import constexpr
 
+from .helpers import load_pretrained
+from .layers.compatibility import Dropout
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
 from .layers.mlp import Mlp
 from .layers.patch_embed import PatchEmbed
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "ConViT",
@@ -85,10 +86,10 @@ class GPSA(nn.Cell):
         self.k = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.v = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
 
-        self.attn_drop = nn.Dropout(keep_prob=1.0 - attn_drop)
+        self.attn_drop = Dropout(p=attn_drop)
         self.proj = nn.Dense(in_channels=dim, out_channels=dim)
         self.pos_proj = nn.Dense(in_channels=3, out_channels=num_heads)
-        self.proj_drop = nn.Dropout(keep_prob=1.0 - proj_drop)
+        self.proj_drop = Dropout(p=proj_drop)
         self.gating_param = Parameter(ops.ones((num_heads), ms.float32))
         self.softmax = nn.Softmax(axis=-1)
         self.batch_matmul = ops.BatchMatMul()
@@ -144,9 +145,9 @@ class MHSA(nn.Cell):
         self.q = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.k = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.v = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(keep_prob=1.0 - attn_drop)
+        self.attn_drop = Dropout(p=attn_drop)
         self.proj = nn.Dense(in_channels=dim, out_channels=dim)
-        self.proj_drop = nn.Dropout(keep_prob=1.0 - proj_drop)
+        self.proj_drop = Dropout(p=proj_drop)
         self.softmax = nn.Softmax(axis=-1)
         self.batch_matmul = ops.BatchMatMul()
 
@@ -261,7 +262,7 @@ class ConViT(nn.Cell):
         self.num_patches = self.patch_embed.num_patches
 
         self.cls_token = Parameter(ops.Zeros()((1, 1, embed_dim), ms.float32))
-        self.pos_drop = nn.Dropout(keep_prob=1.0 - drop_rate)
+        self.pos_drop = Dropout(p=drop_rate)
 
         if self.use_pos_embed:
             self.pos_embed = Parameter(ops.Zeros()((1, self.num_patches, embed_dim), ms.float32))

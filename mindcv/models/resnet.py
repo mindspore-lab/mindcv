@@ -8,9 +8,9 @@ from typing import List, Optional, Type, Union
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn
 
+from .helpers import build_model_with_cfg
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "ResNet",
@@ -197,11 +197,16 @@ class ResNet(nn.Cell):
                                stride=2, pad_mode="pad", padding=3)
         self.bn1 = norm(self.input_channels)
         self.relu = nn.ReLU()
+        self.feature_info = [dict(chs=self.input_channels, reduction=2, name="relu")]
         self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")
         self.layer1 = self._make_layer(block, 64, layers[0])
+        self.feature_info.append(dict(chs=block.expansion * 64, reduction=4, name="layer1"))
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
+        self.feature_info.append(dict(chs=block.expansion * 128, reduction=8, name="layer2"))
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
+        self.feature_info.append(dict(chs=block.expansion * 256, reduction=16, name="layer3"))
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
+        self.feature_info.append(dict(chs=block.expansion * 512, reduction=32, name="layer4"))
 
         self.pool = GlobalAvgPooling()
         self.num_features = 512 * block.expansion
@@ -296,18 +301,19 @@ class ResNet(nn.Cell):
         return x
 
 
+def _create_resnet(pretrained=False, **kwargs):
+    return build_model_with_cfg(ResNet, pretrained, **kwargs)
+
+
 @register_model
 def resnet18(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 18 layers ResNet model.
     Refer to the base class `models.ResNet` for more details.
     """
     default_cfg = default_cfgs["resnet18"]
-    model = ResNet(BasicBlock, [2, 2, 2, 2], num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=BasicBlock, layers=[2, 2, 2, 2], num_classes=num_classes, in_channels=in_channels,
+                      **kwargs)
+    return _create_resnet(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -316,12 +322,9 @@ def resnet34(pretrained: bool = False, num_classes: int = 1000, in_channels=3, *
     Refer to the base class `models.ResNet` for more details.
     """
     default_cfg = default_cfgs["resnet34"]
-    model = ResNet(BasicBlock, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=BasicBlock, layers=[3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels,
+                      **kwargs)
+    return _create_resnet(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -330,12 +333,9 @@ def resnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, *
     Refer to the base class `models.ResNet` for more details.
     """
     default_cfg = default_cfgs["resnet50"]
-    model = ResNet(Bottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=Bottleneck, layers=[3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels,
+                      **kwargs)
+    return _create_resnet(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -344,12 +344,9 @@ def resnet101(pretrained: bool = False, num_classes: int = 1000, in_channels=3, 
     Refer to the base class `models.ResNet` for more details.
     """
     default_cfg = default_cfgs["resnet101"]
-    model = ResNet(Bottleneck, [3, 4, 23, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=Bottleneck, layers=[3, 4, 23, 3], num_classes=num_classes, in_channels=in_channels,
+                      **kwargs)
+    return _create_resnet(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -358,12 +355,9 @@ def resnet152(pretrained: bool = False, num_classes: int = 1000, in_channels=3, 
     Refer to the base class `models.ResNet` for more details.
     """
     default_cfg = default_cfgs["resnet152"]
-    model = ResNet(Bottleneck, [3, 8, 36, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=Bottleneck, layers=[3, 8, 36, 3], num_classes=num_classes, in_channels=in_channels,
+                      **kwargs)
+    return _create_resnet(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -372,13 +366,9 @@ def resnext50_32x4d(pretrained: bool = False, num_classes: int = 1000, in_channe
     Refer to the base class `models.ResNet` for more details.
     """
     default_cfg = default_cfgs["resnext50_32x4d"]
-    model = ResNet(Bottleneck, [3, 4, 6, 3], groups=32, base_width=4, num_classes=num_classes,
-                   in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=Bottleneck, layers=[3, 4, 6, 3], groups=32, base_width=4, num_classes=num_classes,
+                      in_channels=in_channels, **kwargs)
+    return _create_resnet(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -387,13 +377,9 @@ def resnext101_32x4d(pretrained: bool = False, num_classes: int = 1000, in_chann
     Refer to the base class `models.ResNet` for more details.
     """
     default_cfg = default_cfgs["resnext101_32x4d"]
-    model = ResNet(Bottleneck, [3, 4, 23, 3], groups=32, base_width=4, num_classes=num_classes,
-                   in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=Bottleneck, layers=[3, 4, 23, 3], groups=32, base_width=4, num_classes=num_classes,
+                      in_channels=in_channels, **kwargs)
+    return _create_resnet(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -402,22 +388,14 @@ def resnext101_64x4d(pretrained: bool = False, num_classes: int = 1000, in_chann
     Refer to the base class `models.ResNet` for more details.
     """
     default_cfg = default_cfgs["resnext101_64x4d"]
-    model = ResNet(Bottleneck, [3, 4, 23, 3], groups=64, base_width=4, num_classes=num_classes,
-                   in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=Bottleneck, layers=[3, 4, 23, 3], groups=64, base_width=4, num_classes=num_classes,
+                      in_channels=in_channels, **kwargs)
+    return _create_resnet(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
 def resnext152_64x4d(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     default_cfg = default_cfgs["resnext152_64x4d"]
-    model = ResNet(Bottleneck, [3, 8, 36, 3], groups=64, base_width=4, num_classes=num_classes,
-                   in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(block=Bottleneck, layers=[3, 8, 36, 3], groups=64, base_width=4, num_classes=num_classes,
+                      in_channels=in_channels, **kwargs)
+    return _create_resnet(pretrained, **dict(default_cfg=default_cfg, **model_args))

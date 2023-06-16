@@ -1,7 +1,10 @@
 """ distributed sampler """
+import logging
 import math
 
 import numpy as np
+
+_logger = logging.getLogger(__name__)
 
 
 class RepeatAugSampler:
@@ -31,7 +34,7 @@ class RepeatAugSampler:
         selected_round=256,
     ):
         if num_shards is None:
-            print("WARNING: num_shards is set to 1 in RepeatAugSampler since it is not passed in")
+            _logger.warning("num_shards is set to 1 in RepeatAugSampler since it is not passed in")
             num_shards = 1
         if rank_id is None:
             rank_id = 0

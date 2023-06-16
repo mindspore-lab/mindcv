@@ -8,9 +8,9 @@ import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore import Tensor
 
+from .helpers import build_model_with_cfg
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = ["HRNet", "hrnet_w32", "hrnet_w48"]
 
@@ -617,7 +617,7 @@ class HRNet(nn.Cell):
 
         return nn.SequentialCell(modules), num_inchannels
 
-    def forward_features(self, x: Tensor) -> Tensor:
+    def forward_features(self, x: Tensor) -> List[Tensor]:
         """Perform the feature extraction.
 
         Args:
@@ -681,10 +681,82 @@ class HRNet(nn.Cell):
         return x
 
 
+class HRNetFeatures(HRNet):
+    """
+    The feature extraction version of HRNet
+    """
+    def __init__(self, **kwargs) -> None:
+        super(HRNetFeatures, self).__init__(**kwargs)
+        head_channels = [32, 64, 128, 256]
+        curr_stride = 2
+        self.feature_info = [dict(chs=64, reduction=curr_stride, name="stem")]
+
+        for i, c in enumerate(head_channels):
+            curr_stride *= 2
+            c = c * 4
+            self.feature_info += [dict(chs=c, reduction=curr_stride, name=f'stage{i + 1}')]
+
+        self.is_rewritten = True
+
+    def construct(self, x: Tensor) -> List[Tensor]:
+        out = []
+
+        # stem
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        out.append(x)
+        x = self.conv2(x)
+        x = self.bn2(x)
+        x = self.relu(x)
+
+        # stage 1
+        x = self.layer1(x)
+
+        # stage 2
+        x_list = []
+        for i in range(self.stage2_cfg["num_branches"]):
+            if self.transition1_flags[i]:
+                x_list.append(self.transition1[i](x))
+            else:
+                x_list.append(x)
+        y_list = self.stage2(x_list)
+
+        # stage 3
+        x_list = []
+        for i in range(self.stage3_cfg["num_branches"]):
+            if self.transition2_flags[i]:
+                x_list.append(self.transition2[i](y_list[-1]))
+            else:
+                x_list.append(y_list[i])
+        y_list = self.stage3(x_list)
+
+        # stage 4
+        x_list = []
+        for i in range(self.stage4_cfg["num_branches"]):
+            if self.transition3_flags[i]:
+                x_list.append(self.transition3[i](y_list[-1]))
+            else:
+                x_list.append(y_list[i])
+        y_list = self.stage4(x_list)
+
+        for f, incre in zip(y_list, self.incre_modules):
+            out.append(incre(f))
+
+        return out
+
+
+def _create_hrnet(pretrained=False, **kwargs):
+    if not kwargs.get("features_only", False):
+        return build_model_with_cfg(HRNet, pretrained, **kwargs)
+    else:
+        return build_model_with_cfg(HRNetFeatures, pretrained, **kwargs)
+
+
 @register_model
 def hrnet_w32(
-    pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3
-) -> HRNet:
+    pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
+) -> Union[HRNet, HRNetFeatures]:
     """Get HRNet with width=32 model.
     Refer to the base class `models.HRNet` for more details.
 
@@ -727,19 +799,14 @@ def hrnet_w32(
             num_channels=[32, 64, 128, 256],
         ),
     )
-    model = HRNet(stage_cfg, num_classes=num_classes, in_channels=in_channels)
-    if pretrained:
-        load_pretrained(
-            model, default_cfg, num_classes=num_classes, in_channels=in_channels
-        )
-
-    return model
+    model_args = dict(stage_cfg=stage_cfg, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_hrnet(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
 def hrnet_w48(
-    pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3
-) -> HRNet:
+    pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
+) -> Union[HRNet, HRNetFeatures]:
     """Get HRNet with width=48 model.
     Refer to the base class `models.HRNet` for more details.
 
@@ -782,10 +849,5 @@ def hrnet_w48(
             num_channels=[48, 96, 192, 384],
         ),
     )
-    model = HRNet(stage_cfg, num_classes=num_classes, in_channels=in_channels)
-    if pretrained:
-        load_pretrained(
-            model, default_cfg, num_classes=num_classes, in_channels=in_channels
-        )
-
-    return model
+    model_args = dict(stage_cfg=stage_cfg, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_hrnet(pretrained, **dict(default_cfg=default_cfg, **model_args))

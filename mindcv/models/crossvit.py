@@ -13,12 +13,13 @@ from mindspore import Tensor
 from mindspore import dtype as mstype
 from mindspore.common.initializer import TruncatedNormal
 
+from .helpers import load_pretrained
+from .layers.compatibility import Dropout, Interpolate
 from .layers.drop_path import DropPath
 from .layers.helpers import to_2tuple
 from .layers.identity import Identity
 from .layers.mlp import Mlp
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "crossvit9",
@@ -55,9 +56,9 @@ class Attention(nn.Cell):
         self.scale = head_dim ** -0.5
 
         self.qkv = nn.Dense(dim, dim * 3, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(1.0 - attn_drop)
+        self.attn_drop = Dropout(p=attn_drop)
         self.proj = nn.Dense(dim, dim)
-        self.proj_drop = nn.Dropout(1.0 - proj_drop)
+        self.proj_drop = Dropout(p=proj_drop)
 
     def construct(self, x: Tensor) -> Tensor:
         B, N, C = x.shape
@@ -157,9 +158,9 @@ class CrossAttention(nn.Cell):
         self.wq = nn.Dense(dim, dim, has_bias=qkv_bias)
         self.wk = nn.Dense(dim, dim, has_bias=qkv_bias)
         self.wv = nn.Dense(dim, dim, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(1.0 - attn_drop)
+        self.attn_drop = Dropout(p=attn_drop)
         self.proj = nn.Dense(dim, dim)
-        self.proj_drop = nn.Dropout(1.0 - proj_drop)
+        self.proj_drop = Dropout(p=proj_drop)
 
     def construct(self, x: Tensor) -> Tensor:
         B, N, C = x.shape  # 3,3,16
@@ -325,6 +326,7 @@ class VisionTransformer(nn.Cell):
 
         num_patches = _compute_num_patches(img_size, patch_size)
         self.num_branches = len(patch_size)
+        self.interpolate = Interpolate(mode="bilinear", align_corners=True)
 
         patch_embed = []
         if hybrid_backbone is None:
@@ -346,7 +348,7 @@ class VisionTransformer(nn.Cell):
             d.append(c)
         d = tuple(d)
         self.cls_token = ms.ParameterTuple(d)
-        self.pos_drop = nn.Dropout(1.0 - drop_rate)
+        self.pos_drop = Dropout(p=drop_rate)
 
         total_depth = sum([sum(x[-2:]) for x in depth])
         dpr = np.linspace(0, drop_path_rate, total_depth)  # stochastic depth decay rule
@@ -403,8 +405,7 @@ class VisionTransformer(nn.Cell):
         xs = []
         # print(x)
         for i in range(self.num_branches):
-            x_ = ops.interpolate(x, sizes=(self.img_size[i], self.img_size[i]), mode='bilinear') if H != self.img_size[
-                i] else x
+            x_ = self.interpolate(x, size=(self.img_size[i], self.img_size[i])) if H != self.img_size[i] else x
             tmp = self.patch_embed[i](x_)
             z = self.cls_token[i].shape
             y = Tensor(np.ones((B, z[1], z[2])), dtype=mstype.float32)

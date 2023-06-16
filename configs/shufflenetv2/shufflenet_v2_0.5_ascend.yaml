@@ -2,10 +2,11 @@
 mode: 0
 distribute: True
 num_parallel_workers: 8
+val_while_train: True
 
 # dataset
 dataset: 'imagenet'
-data_dir: '/data/imagenet'
+data_dir: '/path/to/imagenet'
 shuffle: True
 dataset_download: False
 batch_size: 64
@@ -17,18 +18,18 @@ hflip: 0.5
 color_jitter: 0.4
 interpolation: 'bilinear'
 crop_pct: 0.875
-re_prob: 0.5
+# re_prob: 0.5
 
 # model
-model: 'shufflenet_v2_x2_0'
+model: 'shufflenet_v2_x0_5'
 num_classes: 1000
 pretrained: False
 ckpt_path: ""
 keep_checkpoint_max: 30
 ckpt_save_dir: './ckpt'
-epoch_size: 300
+epoch_size: 250
 dataset_sink_mode: True
-amp_level: 'O0'
+amp_level: 'O3'
 
 # loss
 loss: 'CE'
@@ -37,14 +38,14 @@ label_smoothing: 0.1
 # lr scheduler
 scheduler: 'cosine_decay'
 min_lr: 0.0
-lr: 0.5
-warmup_epochs: 5
-decay_epochs: 295
+lr: 0.35
+warmup_epochs: 4
+decay_epochs: 246
 
 # optimizer
 opt: 'momentum'
 filter_bias_and_bn: False
 momentum: 0.9
 weight_decay: 0.00004
-loss_scale: 1
+loss_scale: 1024
 use_nesterov: False

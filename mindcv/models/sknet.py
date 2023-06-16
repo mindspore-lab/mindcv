@@ -7,10 +7,10 @@ from typing import Dict, List, Optional, Type, Union
 
 from mindspore import Tensor, nn
 
+from .helpers import load_pretrained
 from .layers.selective_kernel import SelectiveKernel
 from .registry import register_model
 from .resnet import ResNet
-from .utils import load_pretrained
 
 __all__ = [
     "SKNet",

@@ -1,6 +1,6 @@
 """
 Test train and validate pipelines.
-For training, both graph mode and pynative mode with ms_function will be tested.
+For training, both graph mode and pynative mode with mindspore.jit will be tested.
 """
 import os
 import subprocess

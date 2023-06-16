@@ -6,6 +6,8 @@ Deep Networks with Stochastic Depth (https://arxiv.org/abs/1603.09382)
 from mindspore import Tensor, nn, ops
 from mindspore.numpy import ones
 
+from .compatibility import Dropout
+
 
 class DropPath(nn.Cell):
     """DropPath (Stochastic Depth) regularization layers"""
@@ -18,7 +20,7 @@ class DropPath(nn.Cell):
         super().__init__()
         self.keep_prob = 1.0 - drop_prob
         self.scale_by_keep = scale_by_keep
-        self.dropout = nn.Dropout(self.keep_prob)
+        self.dropout = Dropout(p=drop_prob)
 
     def construct(self, x: Tensor) -> Tensor:
         if self.keep_prob == 1.0 or not self.training:

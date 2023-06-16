@@ -11,12 +11,13 @@ from mindspore import Tensor, nn
 from mindspore.common import initializer as weight_init
 from mindspore.common.initializer import Normal, Uniform
 
+from .helpers import build_model_with_cfg, make_divisible
 from .layers.activation import Swish
+from .layers.compatibility import Dropout
 from .layers.drop_path import DropPath
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExcite
 from .registry import register_model
-from .utils import load_pretrained, make_divisible
 
 __all__ = [
     "EfficientNet",  # registration mechanism to use yaml configuration
@@ -40,6 +41,7 @@ def _cfg(url="", **kwargs):
         "url": url,
         "num_classes": 1000,
         # 'first_conv': 'features.0.features.0', 'classifier': 'classifier',
+        "classifier": "mlp_head",
         **kwargs,
     }
 
@@ -141,7 +143,7 @@ class MBConv(nn.Cell):
     Args:
         cnf (MBConvConfig): The class which contains the parameters(in_channels, out_channels, nums_layers) and
             the functions which help calculate the parameters after multipling the expand_ratio.
-        keep_prob: The dropout rate in MBConv. Default: 0.8.
+        drop_path_prob: The drop path rate in MBConv. Default: 0.2.
         norm (nn.Cell): The BatchNorm Method. Default: None.
         se_layer (nn.Cell): The squeeze-excite Module. Default: SqueezeExcite.
 
@@ -152,7 +154,7 @@ class MBConv(nn.Cell):
     def __init__(
         self,
         cnf: MBConvConfig,
-        keep_prob: float = 0.8,
+        drop_path_prob: float = 0.2,
         norm: Optional[nn.Cell] = None,
         se_layer: Callable[..., nn.Cell] = SqueezeExcite,
     ) -> None:
@@ -190,7 +192,7 @@ class MBConv(nn.Cell):
         ])
 
         self.block = nn.SequentialCell(layers)
-        self.dropout = DropPath(keep_prob)
+        self.dropout = DropPath(drop_path_prob)
         self.out_channels = cnf.out_channels
 
     def construct(self, x) -> Tensor:
@@ -223,7 +225,7 @@ class FusedMBConv(nn.Cell):
     def __init__(
         self,
         cnf: FusedMBConvConfig,
-        keep_prob: float,
+        drop_path_prob: float,
         norm: Optional[nn.Cell] = None,
     ) -> None:
         super().__init__()
@@ -259,7 +261,7 @@ class FusedMBConv(nn.Cell):
             ])
 
         self.block = nn.SequentialCell(layers)
-        self.dropout = DropPath(keep_prob)
+        self.dropout = DropPath(drop_path_prob)
         self.out_channels = cnf.out_channels
 
     def construct(self, x) -> Tensor:
@@ -284,7 +286,7 @@ class EfficientNet(nn.Cell):
         num_classes (int): The number of class. Default: 1000.
         inverted_residual_setting (Sequence[Union[MBConvConfig, FusedMBConvConfig]], optional): The settings of block.
             Default: None.
-        keep_prob (float): The dropout rate of MBConv. Default: 0.2.
+        drop_path_prob (float): The drop path rate of MBConv. Default: 0.2.
         norm_layer (nn.Cell, optional): The normalization layer. Default: None.
 
     Inputs:
@@ -303,7 +305,7 @@ class EfficientNet(nn.Cell):
         in_channels: int = 3,
         num_classes: int = 1000,
         inverted_residual_setting: Optional[Sequence[Union[MBConvConfig, FusedMBConvConfig]]] = None,
-        keep_prob: float = 0.2,
+        drop_path_prob: float = 0.2,
         norm_layer: Optional[nn.Cell] = None,
     ) -> None:
         super().__init__()
@@ -380,6 +382,10 @@ class EfficientNet(nn.Cell):
             Swish(),
         ])
 
+        total_reduction = 2
+        self.feature_info = [dict(chs=firstconv_output_channels, reduction=total_reduction,
+                                  name=f'features.{len(layers) - 1}')]
+
         # building MBConv blocks
         total_stage_blocks = sum(cnf.num_layers for cnf in inverted_residual_setting)
         stage_block_id = 0
@@ -404,12 +410,17 @@ class EfficientNet(nn.Cell):
                     block_cnf.stride = 1
 
                 # adjust dropout rate of blocks based on the depth of the stage block
-                sd_prob = keep_prob * float(stage_block_id + 0.00001) / total_stage_blocks
+                sd_prob = drop_path_prob * float(stage_block_id) / total_stage_blocks
+
+                total_reduction *= block_cnf.stride
 
                 stage.append(block(block_cnf, sd_prob, norm_layer))
                 stage_block_id += 1
 
             layers.append(nn.SequentialCell(stage))
+
+            self.feature_info.append(dict(chs=cnf.out_channels, reduction=total_reduction,
+                                          name=f'features.{len(layers) - 1}'))
 
         # building last several layers
         lastconv_input_channels = inverted_residual_setting[-1].out_channels
@@ -420,9 +431,13 @@ class EfficientNet(nn.Cell):
             Swish(),
         ])
 
+        self.feature_info.append(dict(chs=lastconv_output_channels, reduction=total_reduction,
+                                      name=f'features.{len(layers) - 1}'))
+        self.flatten_sequential = True
+
         self.features = nn.SequentialCell(layers)
         self.avgpool = GlobalAvgPooling()
-        self.dropout = nn.Dropout(1 - dropout_rate)
+        self.dropout = Dropout(p=dropout_rate)
         self.mlp_head = nn.Dense(lastconv_output_channels, num_classes)
         self._initialize_weights()
 
@@ -473,14 +488,10 @@ def _efficientnet(
 ) -> EfficientNet:
     """EfficientNet architecture."""
 
-    model = EfficientNet(arch, dropout, width_mult, depth_mult, in_channels, num_classes, **kwargs)
     default_cfg = default_cfgs[arch]
-
-    if pretrained:
-        # Download the pretrained checkpoint file from url, and load
-        # checkpoint file.
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-    return model
+    model_args = dict(arch=arch, dropout_rate=dropout, width_mult=width_mult, depth_mult=depth_mult,
+                      in_channels=in_channels, num_classes=num_classes, **kwargs)
+    return build_model_with_cfg(EfficientNet, pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model

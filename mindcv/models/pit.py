@@ -13,9 +13,10 @@ from mindspore import Parameter, Tensor
 from mindspore import dtype as mstype
 from mindspore import nn, ops
 
+from .helpers import load_pretrained
 from .layers import DropPath, Identity
+from .layers.compatibility import Dropout
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "pit_ti",
@@ -125,9 +126,9 @@ class Attention(nn.Cell):
         self.q = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.k = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.v = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(keep_prob=1 - attn_drop)
+        self.attn_drop = Dropout(p=attn_drop)
         self.proj = nn.Dense(dim, dim)
-        self.proj_drop = nn.Dropout(keep_prob=1 - proj_drop)
+        self.proj_drop = Dropout(p=proj_drop)
         self.softmax = nn.Softmax(axis=-1)
 
         self.batchmatmul = ops.BatchMatMul()
@@ -198,7 +199,7 @@ class Mlp(nn.Cell):
         self.fc1 = nn.Dense(in_channels=in_features, out_channels=hidden_features, has_bias=True)
         self.act = act_layer()
         self.fc2 = nn.Dense(in_channels=hidden_features, out_channels=out_features, has_bias=True)
-        self.drop = nn.Dropout(keep_prob=1.0 - drop)
+        self.drop = Dropout(p=drop)
 
     def construct(self, x):
         x = self.fc1(x)
@@ -312,7 +313,7 @@ class PoolingTransformer(nn.Cell):
         self.patch_embed = conv_embedding(in_chans, base_dims[0] * heads[0], patch_size, stride, padding)
         self.cls_token = Parameter(Tensor(np.random.randn(1, 1, base_dims[0] * heads[0]), mstype.float32))
 
-        self.pos_drop = nn.Dropout(keep_prob=1.0 - drop_rate)
+        self.pos_drop = Dropout(p=drop_rate)
         self.tile = ops.Tile()
 
         self.transformers = nn.CellList([])

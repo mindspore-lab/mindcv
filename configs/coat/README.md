@@ -17,6 +17,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 | coat_lite_tiny | D910x8-G | 77.35 | 93.43 | 5.72      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_tiny-fa7bf894.ckpt) |
 | coat_lite_mini | D910x8-G | 78.51 | 93.84 | 11.01 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_mini_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_mini-55a52f05.ckpt) |
 | coat_tiny | D910x8-G | 79.67 | 94.88 | 5.50 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_tiny-071cb792.ckpt) |
+| coat_mini | D910x8-G | 81.08 | 95.34 | 10.34 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_mini_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_mini-57c5bce7.ckpt) |
 
 </div>
 
@@ -73,7 +74,7 @@ python validate.py -c configs/coat/coat_lite_tiny_ascend.yaml --data_dir /path/t
 
 ### Deployment
 
-To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md).
+To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/).
 
 ## References
 

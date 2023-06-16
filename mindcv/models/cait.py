@@ -12,11 +12,12 @@ import mindspore.ops as ops
 from mindspore import Parameter, Tensor
 from mindspore.common.initializer import TruncatedNormal
 
+from .helpers import load_pretrained
+from .layers.compatibility import Dropout
 from .layers.drop_path import DropPath
 from .layers.mlp import Mlp
 from .layers.patch_embed import PatchEmbed
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "CaiT",
@@ -41,12 +42,12 @@ def _cfg(url='', **kwargs):
 
 default_cfgs = {
     "cait_xxs24_224": _cfg(url=''),
-    "cait_xs24_384": _cfg(url=''),
+    "cait_xs24_384": _cfg(url='', input_size=(3, 384, 384)),
     "cait_s24_224": _cfg(url=''),
-    "cait_s24_384": _cfg(url=''),
-    "cait_s36_384": _cfg(url=''),
-    "cait_m36_384": _cfg(url=''),
-    "cait_m48_448": _cfg(url=''),
+    "cait_s24_384": _cfg(url='', input_size=(3, 384, 384)),
+    "cait_s36_384": _cfg(url='', input_size=(3, 384, 384)),
+    "cait_m36_384": _cfg(url='', input_size=(3, 384, 384)),
+    "cait_m48_448": _cfg(url='', input_size=(3, 448, 448)),
 }
 
 
@@ -67,9 +68,9 @@ class ClassAttention(nn.Cell):
         self.q = nn.Dense(dim, dim, has_bias=qkv_bias)
         self.k = nn.Dense(dim, dim, has_bias=qkv_bias)
         self.v = nn.Dense(dim, dim, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(1 - attn_drop_rate)
+        self.attn_drop = Dropout(p=attn_drop_rate)
         self.proj = nn.Dense(dim, dim)
-        self.proj_drop = nn.Dropout(1 - proj_drop_rate)
+        self.proj_drop = Dropout(p=proj_drop_rate)
         self.softmax = nn.Softmax(axis=-1)
 
         self.attn_matmul_v = ops.BatchMatMul()
@@ -156,14 +157,14 @@ class AttentionTalkingHead(nn.Cell):
         self.scale = qk_scale or head_dim ** -0.5
 
         self.qkv = nn.Dense(dim, dim * 3, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(1 - attn_drop_rate)
+        self.attn_drop = Dropout(p=attn_drop_rate)
 
         self.proj = nn.Dense(dim, dim, has_bias=False)
 
         self.proj_l = nn.Dense(num_heads, num_heads, has_bias=False)
         self.proj_w = nn.Dense(num_heads, num_heads, has_bias=False)
 
-        self.proj_drop = nn.Dropout(1 - proj_drop_rate)
+        self.proj_drop = Dropout(p=proj_drop_rate)
 
         self.softmax = nn.Softmax(axis=-1)
 
@@ -271,7 +272,7 @@ class CaiT(nn.Cell):
         zeros = ops.Zeros()
         self.cls_token = Parameter(zeros((1, 1, embed_dim), ms.float32))
         self.pos_embed = Parameter(zeros((1, num_patches, embed_dim), ms.float32))
-        self.pos_drop = nn.Dropout(1 - drop_rate)
+        self.pos_drop = Dropout(p=drop_rate)
 
         dpr = [drop_path_rate for i in range(depth)]
 

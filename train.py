@@ -11,17 +11,19 @@ from mindcv.loss import create_loss
 from mindcv.models import create_model
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
-from mindcv.utils import AllReduceSum, StateMonitor, create_trainer, get_metrics, set_seed
+from mindcv.utils import (
+    AllReduceSum,
+    StateMonitor,
+    create_trainer,
+    get_metrics,
+    require_customized_train_step,
+    set_logger,
+    set_seed,
+)
 
-from config import parse_args  # isort: skip
+from config import parse_args, save_args  # isort: skip
 
-# TODO: arg parser already has a logger
-logger = logging.getLogger("train")
-logger.setLevel(logging.INFO)
-h1 = logging.StreamHandler()
-formatter1 = logging.Formatter("%(message)s")
-logger.addHandler(h1)
-h1.setFormatter(formatter1)
+logger = logging.getLogger("mindcv.train")
 
 
 def train(args):
@@ -43,6 +45,11 @@ def train(args):
         rank_id = None
 
     set_seed(args.seed)
+    set_logger(name="mindcv", output_dir=args.ckpt_save_dir, rank=rank_id, color=False)
+    logger.info(
+        "We recommend installing `termcolor` via `pip install termcolor` "
+        "and setup logger by `set_logger(..., color=True)`"
+    )
 
     # create dataset
     dataset_train = create_dataset(
@@ -177,9 +184,9 @@ def train(args):
         decay_rate=args.decay_rate,
         milestones=args.multi_step_decay_milestones,
         num_epochs=args.epoch_size,
-        lr_epoch_stair=args.lr_epoch_stair,
         num_cycles=args.num_cycles,
         cycle_decay=args.cycle_decay,
+        lr_epoch_stair=args.lr_epoch_stair,
     )
 
     # resume training if ckpt_path is given
@@ -190,7 +197,11 @@ def train(args):
 
     # create optimizer
     # TODO: consistent naming opt, name, dataset_name
-    if args.loss_scale_type == "fixed" and args.drop_overflow_update is False:
+    if (
+        args.loss_scale_type == "fixed"
+        and args.drop_overflow_update is False
+        and not require_customized_train_step(args.ema, args.clip_grad, args.gradient_accumulation_steps)
+    ):
         optimizer_loss_scale = args.loss_scale
     else:
         optimizer_loss_scale = 1.0
@@ -224,6 +235,7 @@ def train(args):
         ema_decay=args.ema_decay,
         clip_grad=args.clip_grad,
         clip_value=args.clip_value,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
     )
 
     # callback
@@ -242,53 +254,57 @@ def train(args):
     ), "ckpt_save_policy is top_k, val_while_train must be True."
     state_cb = StateMonitor(
         trainer,
-        summary_dir=summary_dir,
+        model_name=args.model,
+        model_ema=args.ema,
+        last_epoch=begin_epoch,
+        dataset_sink_mode=args.dataset_sink_mode,
         dataset_val=loader_eval,
-        val_interval=args.val_interval,
         metric_name=list(metrics.keys()),
-        ckpt_dir=args.ckpt_save_dir,
+        val_interval=args.val_interval,
+        ckpt_save_dir=args.ckpt_save_dir,
         ckpt_save_interval=args.ckpt_save_interval,
-        best_ckpt_name=args.model + "_best.ckpt",
+        ckpt_save_policy=args.ckpt_save_policy,
+        ckpt_keep_max=args.keep_checkpoint_max,
+        summary_dir=summary_dir,
+        log_interval=args.log_interval,
         rank_id=rank_id,
         device_num=device_num,
-        log_interval=args.log_interval,
-        keep_checkpoint_max=args.keep_checkpoint_max,
-        model_name=args.model,
-        last_epoch=begin_epoch,
-        ckpt_save_policy=args.ckpt_save_policy,
-        ema=args.ema,
-        dataset_sink_mode=args.dataset_sink_mode,
     )
 
     callbacks = [state_cb]
-    # log
-    if rank_id in [None, 0]:
-        logger.info("-" * 40)
-        logger.info(
-            f"Num devices: {device_num if device_num is not None else 1} \n"
-            f"Distributed mode: {args.distribute} \n"
-            f"Num training samples: {train_count}"
-        )
-        if args.val_while_train:
-            logger.info(f"Num validation samples: {eval_count}")
-        logger.info(
-            f"Num classes: {num_classes} \n"
-            f"Num batches: {num_batches} \n"
-            f"Batch size: {args.batch_size} \n"
-            f"Auto augment: {args.auto_augment} \n"
-            f"Model: {args.model} \n"
-            f"Model param: {num_params} \n"
-            f"Num epochs: {args.epoch_size} \n"
-            f"Optimizer: {args.opt} \n"
-            f"LR: {args.lr} \n"
-            f"LR Scheduler: {args.scheduler}"
-        )
-        logger.info("-" * 40)
+    essential_cfg_msg = "\n".join(
+        [
+            "Essential Experiment Configurations:",
+            f"MindSpore mode[GRAPH(0)/PYNATIVE(1)]: {args.mode}",
+            f"Distributed mode: {args.distribute}",
+            f"Number of devices: {device_num if device_num is not None else 1}",
+            f"Number of training samples: {train_count}",
+            f"Number of validation samples: {eval_count}",
+            f"Number of classes: {num_classes}",
+            f"Number of batches: {num_batches}",
+            f"Batch size: {args.batch_size}",
+            f"Auto augment: {args.auto_augment}",
+            f"MixUp: {args.mixup}",
+            f"CutMix: {args.cutmix}",
+            f"Model: {args.model}",
+            f"Model parameters: {num_params}",
+            f"Number of epochs: {args.epoch_size}",
+            f"Optimizer: {args.opt}",
+            f"Learning rate: {args.lr}",
+            f"LR Scheduler: {args.scheduler}",
+            f"Momentum: {args.momentum}",
+            f"Weight decay: {args.weight_decay}",
+            f"Auto mixed precision: {args.amp_level}",
+            f"Loss scale: {args.loss_scale}({args.loss_scale_type})",
+        ]
+    )
+    logger.info(essential_cfg_msg)
+    save_args(args, os.path.join(args.ckpt_save_dir, f"{args.model}.yaml"), rank_id)
 
-        if args.ckpt_path != "":
-            logger.info(f"Resume training from {args.ckpt_path}, last step: {begin_step}, last epoch: {begin_epoch}")
-        else:
-            logger.info("Start training")
+    if args.ckpt_path != "":
+        logger.info(f"Resume training from {args.ckpt_path}, last step: {begin_step}, last epoch: {begin_epoch}")
+    else:
+        logger.info("Start training")
 
     trainer.train(args.epoch_size, loader_train, callbacks=callbacks, dataset_sink_mode=args.dataset_sink_mode)
 

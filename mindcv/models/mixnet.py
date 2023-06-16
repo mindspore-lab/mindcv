@@ -9,10 +9,11 @@ from typing import Optional
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
+from .helpers import load_pretrained
+from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExcite
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "MixNet",
@@ -339,7 +340,7 @@ class MixNet(nn.Cell):
         ])
 
         self.pool = GlobalAvgPooling()
-        self.dropout = nn.Dropout(keep_prob=1 - drop_rate)
+        self.dropout = Dropout(p=drop_rate)
         self.classifier = nn.Dense(feature_size, num_classes)
 
         self._initialize_weights()

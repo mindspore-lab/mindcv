@@ -26,12 +26,12 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model           | Context   |  Top-1 (%) | Top-5 (%)  |  Params (M) | Recipe  | Download |
-|-----------------|-----------|------------|------------|-------------|---------|----------|
-| shufflenet_v2_x0_5 | D910x8-G |  60.68     | 82.44     | 1.37    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v2/shufflenet_v2_0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_05-a53c62b9.ckpt)  |
-| shufflenet_v2_x1_0 | D910x8-G | 69.51     | 88.67     | 2.29     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v2/shufflenet_v2_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_10-e6b8c4fe.ckpt)  |
-| shufflenet_v2_x1_5 | D910x8-G | 72.59     | 90.79     | 3.53    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v2/shufflenet_v2_1.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_15-e717dd88.ckpt)  |
-| shufflenet_v2_x2_0 | D910x8-G |  75.14     | 92.13     | 7.44    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenet_v2/shufflenet_v2_2.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_20-ada6a359.ckpt)  |
+| Model              | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                       | Download                                                                                                          |
+|--------------------|----------|-----------|-----------|------------|--------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| shufflenet_v2_x0_5 | D910x8-G | 60.53     | 82.11     | 1.37       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv2/shufflenet_v2_0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x0_5-8c841061.ckpt) |
+| shufflenet_v2_x1_0 | D910x8-G | 69.47     | 88.88     | 2.29       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv2/shufflenet_v2_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_0-0da4b7fa.ckpt) |
+| shufflenet_v2_x1_5 | D910x8-G | 72.79     | 90.93     | 3.53       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv2/shufflenet_v2_1.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_5-00b56131.ckpt) |
+| shufflenet_v2_x2_0 | D910x8-G | 75.07     | 92.08     | 7.44       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv2/shufflenet_v2_2.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x2_0-ed8e698d.ckpt) |
 
 </div>
 
@@ -63,7 +63,7 @@ It is easy to reproduce the reported results with the pre-defined training recip
 
 ```shell
 # distributed training on multiple GPU/Ascend devices
-mpirun -n 8 python train.py --config configs/shufflenet_v2/shufflenet_v2_0.5_ascend.yaml --data_dir /path/to/imagenet
+mpirun -n 8 python train.py --config configs/shufflenetv2/shufflenet_v2_0.5_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
@@ -78,7 +78,7 @@ If you want to train or finetune the model on a smaller dataset without distribu
 
 ```shell
 # standalone training on a CPU/GPU/Ascend device
-python train.py --config configs/shufflenet_v2/shufflenet_v2_0.5_ascend.yaml --data_dir /path/to/dataset --distribute False
+python train.py --config configs/shufflenetv2/shufflenet_v2_0.5_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 ### Validation
@@ -86,12 +86,12 @@ python train.py --config configs/shufflenet_v2/shufflenet_v2_0.5_ascend.yaml --d
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```
-python validate.py -c configs/shufflenet_v2/shufflenet_v2_0.5_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+python validate.py -c configs/shufflenetv2/shufflenet_v2_0.5_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 ### Deployment
 
-To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md).
+To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/).
 
 ## References
 <!--- Guideline: Citation format GB/T 7714 is suggested. -->

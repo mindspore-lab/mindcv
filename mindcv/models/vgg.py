@@ -9,8 +9,9 @@ from typing import Dict, List, Union
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn
 
+from .helpers import load_pretrained
+from .layers.compatibility import Dropout
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "VGG",
@@ -95,10 +96,10 @@ class VGG(nn.Cell):
         self.classifier = nn.SequentialCell([
             nn.Dense(512 * 7 * 7, 4096),
             nn.ReLU(),
-            nn.Dropout(keep_prob=1 - drop_rate),
+            Dropout(p=drop_rate),
             nn.Dense(4096, 4096),
             nn.ReLU(),
-            nn.Dropout(keep_prob=1 - drop_rate),
+            Dropout(p=drop_rate),
             nn.Dense(4096, num_classes),
         ])
         self._initialize_weights()

@@ -12,10 +12,11 @@ from mindspore import Parameter, Tensor
 from mindspore import dtype as mstype
 from mindspore import nn, numpy, ops
 
-from .layers import DropPath
+from .helpers import _ntuple, load_pretrained
+from .layers.compatibility import Dropout
+from .layers.drop_path import DropPath
 from .layers.mlp import Mlp
 from .registry import register_model
-from .utils import _ntuple, load_pretrained
 
 __all__ = [
     'XCiT',
@@ -193,9 +194,9 @@ class ClassAttention(nn.Cell):
 
         self.qkv = nn.Dense(
             in_channels=dim, out_channels=dim * 3, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(keep_prob=1 - attn_drop)
+        self.attn_drop = Dropout(p=attn_drop)
         self.proj = nn.Dense(in_channels=dim, out_channels=dim)
-        self.proj_drop = nn.Dropout(keep_prob=1 - proj_drop)
+        self.proj_drop = Dropout(p=proj_drop)
         self.softmax = nn.Softmax(axis=-1)
 
         self.attn_matmul_v = ops.BatchMatMul()
@@ -286,10 +287,10 @@ class XCA(nn.Cell):
             in_channels=dim, out_channels=dim * 3, has_bias=qkv_bias)
         self.q_matmul_k = ops.BatchMatMul(transpose_b=True)
         self.softmax = nn.Softmax(axis=-1)
-        self.attn_drop = nn.Dropout(keep_prob=1.0 - attn_drop)
+        self.attn_drop = Dropout(p=attn_drop)
         self.attn_matmul_v = ops.BatchMatMul()
         self.proj = nn.Dense(in_channels=dim, out_channels=dim)
-        self.proj_drop = nn.Dropout(keep_prob=1.0 - proj_drop)
+        self.proj_drop = Dropout(p=proj_drop)
 
     def construct(self, x):
         B, N, C = x.shape
@@ -407,7 +408,7 @@ class XCiT(nn.Cell):
 
         self.cls_token = Parameter(
             ops.zeros((1, 1, embed_dim), mstype.float32))
-        self.pos_drop = nn.Dropout(keep_prob=1.0 - drop_rate)
+        self.pos_drop = Dropout(p=drop_rate)
 
         dpr = [drop_path_rate for i in range(depth)]
         self.blocks = nn.CellList([

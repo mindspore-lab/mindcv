@@ -6,8 +6,9 @@ Refer to MLP-Mixer: An all-MLP Architecture for Vision.
 import mindspore.nn as nn
 import mindspore.ops as ops
 
+from .helpers import load_pretrained
+from .layers.compatibility import Dropout
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "MLPMixer",
@@ -50,9 +51,9 @@ class FeedForward(nn.Cell):
         self.net = nn.SequentialCell(
             nn.Dense(dim, hidden_dim),
             nn.GELU(),
-            nn.Dropout(keep_prob=1 - dropout),
+            Dropout(p=dropout),
             nn.Dense(hidden_dim, dim),
-            nn.Dropout(keep_prob=1 - dropout)
+            Dropout(p=dropout)
         )
 
     def construct(self, x):

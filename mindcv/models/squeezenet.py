@@ -6,9 +6,10 @@ Refer to SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
+from .helpers import load_pretrained
+from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "SqueezeNet",
@@ -117,7 +118,7 @@ class SqueezeNet(nn.Cell):
 
         self.final_conv = nn.Conv2d(512, num_classes, kernel_size=1, has_bias=True)
         self.classifier = nn.SequentialCell([
-            nn.Dropout(keep_prob=1 - drop_rate),
+            Dropout(p=drop_rate),
             self.final_conv,
             nn.ReLU(),
             GlobalAvgPooling()

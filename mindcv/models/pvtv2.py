@@ -11,9 +11,10 @@ import mindspore.ops as ops
 from mindspore import Tensor
 from mindspore.common import initializer as weight_init
 
+from .helpers import load_pretrained
 from .layers import DropPath, Identity
+from .layers.compatibility import Dropout
 from .registry import register_model
-from .utils import load_pretrained
 
 __all__ = [
     "PyramidVisionTransformerV2",
@@ -73,7 +74,7 @@ class Mlp(nn.Cell):
         self.dwconv = DWConv(hidden_features)
         self.act = act_layer()
         self.fc2 = nn.Dense(hidden_features, out_features)
-        self.drop = nn.Dropout(1 - drop)
+        self.drop = Dropout(p=drop)
         self.linear = linear
         if self.linear:
             self.relu = nn.ReLU()
@@ -105,9 +106,9 @@ class Attention(nn.Cell):
 
         self.q = nn.Dense(dim, dim, has_bias=qkv_bias)
         self.kv = nn.Dense(dim, dim * 2, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(1 - attn_drop)
+        self.attn_drop = Dropout(p=attn_drop)
         self.proj = nn.Dense(dim, dim)
-        self.proj_drop = nn.Dropout(1 - proj_drop)
+        self.proj_drop = Dropout(p=proj_drop)
         self.qk_batmatmul = ops.BatchMatMul(transpose_b=True)
         self.batmatmul = ops.BatchMatMul()
         self.softmax = nn.Softmax(axis=-1)
