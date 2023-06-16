@@ -1,5 +1,23 @@
 # Release Note
 
+## 0.2.2 (2023/6/16)
+
+1. New version `0.2.2` is released! We upgrade to support `MindSpore` v2.0 while maintaining compatibility of v1.8
+2. New models:
+   - [ConvNextV2](configs/convnextv2)
+   - mini of [CoAT](configs/coat)
+   - 1.3 of [MnasNet](configs/mnasnet)
+   - AMP(O3) version of [ShuffleNetV2](configs/shufflenetv2)
+3. New features:
+   - Gradient Accumulation
+   - DynamicLossScale for customized [TrainStep](mindcv/utils/train_step.py)
+   - OneCycleLR and CyclicLR learning rate scheduler
+   - Refactored Logging
+   - Pyramid Feature Extraction
+4. Bug fixes:
+   - Serving Deployment Tutorial(mobilenet_v3 doesn't work on ms1.8 when using Ascend backend)
+   - Some broken links on our documentation website.
+
 ## 0.2.1
 
 - 2023/6/2

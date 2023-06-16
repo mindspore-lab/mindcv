@@ -13,20 +13,21 @@
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-[English](README.md) | 中文
+[📝使用文档](https://mindspore-lab.github.io/mindcv/zh/) |
+[🚀安装教程](https://mindspore-lab.github.io/mindcv/zh/installation/) |
+[🎁模型仓库](https://mindspore-lab.github.io/mindcv/zh/modelzoo/) |
+[🎉更新日志](https://github.com/mindspore-lab/mindcv/blob/main/RELEASE.md) |
+[🐛报告问题](https://github.com/mindspore-lab/mindcv/issues/new/choose)
 
-[简介](#简介) |
-[安装](#安装) |
-[快速入门](#快速入门) |
-[教程](#教程) |
-[模型列表](#模型列表) |
-[支持算法](#支持算法)
+[English](README.md) | 中文
 
 </div>
 
 ## 简介
 
 MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力于计算机视觉相关技术研发的开源工具箱。它提供大量的计算机视觉领域的经典模型和SoTA模型以及它们的预训练权重和训练策略。同时，还提供了自动增强等SoTA算法来提高模型性能。通过解耦的模块设计，您可以轻松地将MindCV应用到您自己的CV任务中。
+
+主分支代码目前支持 **MindSpore 1.8+** 以上的版本，包含 **MindSpore 2.0🔥** 版本。
 
 ### 主要特性
 
@@ -296,6 +297,23 @@ python train.py --model=resnet50 --dataset=cifar10 \
 </details>
 
 ## 更新
+
+- 2023/6/16
+1. 新版本 `0.2.2` 发布啦！我们将`MindSpore`升级到了2.0版本，同时保持了对1.8版本的兼容
+2. 新模型:
+   - [ConvNextV2](configs/convnextv2)
+   - [CoAT](configs/coat)的mini规格
+   - [MnasNet](configs/mnasnet)的1.3规格
+   - [ShuffleNetV2](configs/shufflenetv2)的混合精度(O3)版本
+3. 新特性:
+   - 梯度累加
+   - 自定义[TrainStep](mindcv/utils/train_step.py)支持了动态损失缩放
+   - `OneCycleLR`和`CyclicLR`学习率调度器
+   - 更好的日志打印与记录
+   - 金字塔特征抽取
+4. 错误修复:
+   - `Serving`部署教程(mobilenet_v3在昇腾后端的MindSpore1.8版本上不支持)
+   - 文档网站上的损坏链接
 
 - 2023/6/2
 1. 新版本：`0.2.1` 发布
