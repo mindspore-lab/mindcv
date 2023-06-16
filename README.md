@@ -13,20 +13,21 @@
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-English | [中文](README_CN.md)
+[📝Documentation](https://mindspore-lab.github.io/mindcv/) |
+[🚀Installation](https://mindspore-lab.github.io/mindcv/installation/) |
+[🎁Model Zoo](https://mindspore-lab.github.io/mindcv/modelzoo/) |
+[🎉Update News](https://github.com/mindspore-lab/mindcv/blob/main/RELEASE.md) |
+[🐛Reporting Issues](https://github.com/mindspore-lab/mindcv/issues/new/choose)
 
-[Introduction](#introduction) |
-[Installation](#installation) |
-[Getting Started](#getting-started) |
-[Tutorials](#tutorials) |
-[Model List](#model-list) |
-[Supported Algorithms](#supported-algorithms)
+English | [中文](README_CN.md)
 
 </div>
 
 ## Introduction
 
 MindCV is an open-source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pre-trained weights and training strategies. SoTA methods such as auto augmentation are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks.
+
+The main branch works with **MindSpore 1.8+**, including **MindSpore 2.0🔥**.
 
 ### Major Features
 
@@ -294,9 +295,22 @@ Please see [configs](./configs) for the details about model performance and pret
 
 ## What is New
 
-- 2023/6/2
-1. New version: `0.2.1` is released!
-2. New [documents](https://mindspore-lab.github.io/mindcv/) is online!
+- 2023/6/16
+1. New version `0.2.2` is released! We upgrade to support `MindSpore` v2.0 while maintaining compatibility of v1.8
+2. New models:
+   - [ConvNextV2](configs/convnextv2)
+   - mini of [CoAT](configs/coat)
+   - 1.3 of [MnasNet](configs/mnasnet)
+   - AMP(O3) version of [ShuffleNetV2](configs/shufflenetv2)
+3. New features:
+   - Gradient Accumulation
+   - DynamicLossScale for customized [TrainStep](mindcv/utils/train_step.py)
+   - OneCycleLR and CyclicLR learning rate scheduler
+   - Refactored Logging
+   - Pyramid Feature Extraction
+4. Bug fixes:
+   - Serving Deployment Tutorial(mobilenet_v3 doesn't work on ms1.8 when using Ascend backend)
+   - Some broken links on our documentation website.
 
 See [RELEASE](RELEASE.md) for detailed history.
 
