@@ -7,7 +7,7 @@ val_interval: 1
 
 # dataset
 dataset: 'imagenet'
-data_dir: '/path/to/imagenet/'
+data_dir: '/path/to/imagenet'
 shuffle: True
 dataset_download: False
 batch_size: 32
@@ -59,3 +59,4 @@ filter_bias_and_bn: True
 loss_scale: 4096
 use_nesterov: False
 loss_scale_type: dynamic
+drop_overflow_update: True
