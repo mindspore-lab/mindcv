@@ -57,14 +57,14 @@ def load_pretrained(model, default_cfg, num_classes=1000, in_channels=3, filter_
         classifier_bias.set_data(classifier_bias[:1000], slice_shape=True)
     elif num_classes != default_cfg["num_classes"]:
         params_names = list(param_dict.keys())
-        param_dict.pop(
-            _search_param_name(params_names, classifier_name + ".weight"),
-            "No Parameter {} in ParamDict".format(classifier_name + ".weight"),
-        )
-        param_dict.pop(
-            _search_param_name(params_names, classifier_name + ".bias"),
-            "No Parameter {} in ParamDict".format(classifier_name + ".bias"),
-        )
+        for param_name in _search_param_name(params_names, classifier_name + ".weight"):
+            param_dict.pop(param_name,
+                           "Parameter {} has been deleted from ParamDict.".format(param_name),
+                           )
+        for param_name in _search_param_name(params_names, classifier_name + ".bias"):
+            param_dict.pop(param_name,
+                           "Parameter {} has been deleted from ParamDict.".format(param_name),
+                           )
 
     if filter_fn is not None:
         param_dict = filter_fn(param_dict)
@@ -73,9 +73,9 @@ def load_pretrained(model, default_cfg, num_classes=1000, in_channels=3, filter_
 
 
 def make_divisible(
-    v: float,
-    divisor: int,
-    min_value: Optional[int] = None,
+        v: float,
+        divisor: int,
+        min_value: Optional[int] = None,
 ) -> int:
     """Find the smallest integer larger than v and divisible by divisor."""
     if not min_value:
@@ -97,10 +97,11 @@ def _ntuple(n):
 
 
 def _search_param_name(params_names: List, param_name: str) -> str:
+    search_results = []
     for pi in params_names:
         if param_name in pi:
-            return pi
-    return ""
+            search_results.append(pi)
+    return search_results
 
 
 def auto_map(model, param_dict):
