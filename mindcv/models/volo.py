@@ -134,13 +134,12 @@ class OutlookAttention(nn.Cell):
                                 rates=[1, 1, 1, 1])
         self.pool = nn.AvgPool2d(kernel_size=stride, stride=stride)
         self.softmax = nn.Softmax(axis=-1)
-        self.transpose = ops.Transpose()
         self.batch_mat_mul = ops.BatchMatMul()
 
     def construct(self, x: Tensor) -> Tensor:
         B, H, W, C = x.shape
 
-        v = ops.Transpose()(self.v(x), (0, 3, 1, 2))  # B, C, H, W
+        v = ops.transpose(self.v(x), (0, 3, 1, 2))  # B, C, H, W
 
         h = int((H - 1) / self.stride + 1)
         w = int((W - 1) / self.stride + 1)
@@ -149,24 +148,24 @@ class OutlookAttention(nn.Cell):
         v = ops.reshape(v, (B, self.num_heads, C // self.num_heads,
                                    self.kernel_size * self.kernel_size,
                                    h * w))
-        v = self.transpose(v, (0, 1, 4, 3, 2))  # B,H,N,kxk,C/H
+        v = ops.transpose(v, (0, 1, 4, 3, 2))  # B,H,N,kxk,C/H
 
-        attn = self.pool(self.transpose(x, (0, 3, 1, 2)))
-        attn = self.transpose(attn, (0, 2, 3, 1))
+        attn = self.pool(ops.transpose(x, (0, 3, 1, 2)))
+        attn = ops.transpose(attn, (0, 2, 3, 1))
         attn = ops.reshape(self.attn(attn), 
             (B, h * w, self.num_heads, self.kernel_size * self.kernel_size,
             self.kernel_size * self.kernel_size))
-        attn = self.transpose(attn, (0, 2, 1, 3, 4))  # B,H,N,kxk,kxk
+        attn = ops.transpose(attn, (0, 2, 1, 3, 4))  # B,H,N,kxk,kxk
         attn = attn * self.scale
         attn = self.softmax(attn)
         attn = self.attn_drop(attn)
 
-        x = self.transpose(self.batch_mat_mul(attn, v), (0, 1, 4, 3, 2))
+        x = ops.transpose(self.batch_mat_mul(attn, v), (0, 1, 4, 3, 2))
         x = ops.reshape(x, 
             (B, C * self.kernel_size * self.kernel_size, h * w))
         fold = Fold(C, (H, W), self.kernel_size, padding=self.padding, stride=self.stride)
         x = fold(x)
-        x = self.proj(self.transpose(x, (0, 2, 3, 1)))
+        x = self.proj(ops.transpose(x, (0, 2, 3, 1)))
         x = self.proj_drop(x)
 
         return x
@@ -268,7 +267,6 @@ class Attention(nn.Cell):
         self.attn_drop = nn.Dropout(1.0 - attn_drop)
         self.proj = nn.Dense(dim, dim)
         self.proj_drop = nn.Dropout(1.0 - proj_drop)
-        self.transpose = ops.Transpose() 
         self.softmax = nn.Softmax(axis=-1)
         self.batch_mat_mul_transpose = ops.BatchMatMul(transpose_b=True)
         self.batch_mat_mul = ops.BatchMatMul()
@@ -280,14 +278,14 @@ class Attention(nn.Cell):
         qkv = self.qkv(x)
         qkv = ops.reshape(qkv, (B, H * W, 3, self.num_heads,
                                   C // self.num_heads))
-        qkv = self.transpose(qkv, (2, 0, 3, 1, 4))
+        qkv = ops.transpose(qkv, (2, 0, 3, 1, 4))
         q, k, v = qkv[0], qkv[1], qkv[2]
 
         attn = self.batch_mat_mul_transpose(q, k) * self.scale
         attn = self.softmax(attn)
         attn = self.attn_drop(attn)
 
-        x = self.transpose(self.batch_mat_mul(attn, v), (0, 2, 1, 3))
+        x = ops.transpose(self.batch_mat_mul(attn, v), (0, 2, 1, 3))
         x = ops.reshape(x, (B, H, W, C))
         x = self.proj(x)
         x = self.proj_drop(x)
@@ -363,7 +361,6 @@ class ClassAttention(nn.Cell):
         self.attn_drop = nn.Dropout(1.0 - attn_drop)
         self.proj = nn.Dense(self.head_dim * self.num_heads, dim)
         self.proj_drop = nn.Dropout(1.0 - proj_drop)
-        self.transpose = ops.Transpose()
         self.batch_mat_mul_transpose = ops.BatchMatMul(transpose_b=True)
         self.batch_mat_mul = ops.BatchMatMul()
         self.softmax = nn.Softmax(axis=-1)
@@ -374,7 +371,7 @@ class ClassAttention(nn.Cell):
         kv = self.kv(x)
         kv = ops.reshape(kv, (B, N, 2, self.num_heads,
                                 self.head_dim))
-        kv = self.transpose(kv, (2, 0, 3, 1, 4))
+        kv = ops.transpose(kv, (2, 0, 3, 1, 4))
         k, v = kv[0], kv[1]
         q = self.q(x[:, :1, :])
         q = ops.reshape(q, (B, self.num_heads, 1, self.head_dim))
@@ -382,7 +379,7 @@ class ClassAttention(nn.Cell):
         attn = self.softmax(attn)
         attn = self.attn_drop(attn)
 
-        cls_embed = self.transpose(self.batch_mat_mul(attn, v), (0, 2, 1, 3))
+        cls_embed = ops.transpose(self.batch_mat_mul(attn, v), (0, 2, 1, 3))
         cls_embed = ops.reshape(cls_embed, (B, 1, self.head_dim * self.num_heads))
         cls_embed = self.proj(cls_embed)
         cls_embed = self.proj_drop(cls_embed)
@@ -423,13 +420,12 @@ class ClassBlock(nn.Cell):
                        hidden_features=mlp_hidden_dim,
                        act_layer=act_layer,
                        drop=drop)
-        self.concat = ops.Concat(1)
 
     def construct(self, x: Tensor) -> Tensor:
         cls_embed = x[:, :1]
         cls_embed = cls_embed + self.drop_path(self.attn(self.norm1(x)))
         cls_embed = cls_embed + self.drop_path(self.mlp(self.norm2(cls_embed)))
-        x = self.concat([cls_embed, x[:, 1:]])
+        x = ops.concat([cls_embed, x[:, 1:]], 1)
         return x
 
 
@@ -498,12 +494,11 @@ class Downsample(nn.Cell):
         super().__init__()
         self.proj = nn.Conv2d(in_embed_dim, out_embed_dim,
                               kernel_size=patch_size, stride=patch_size, has_bias=True)
-        self.transpose = ops.Transpose()
 
     def construct(self, x: Tensor) -> Tensor:
-        x = self.transpose(x, (0, 3, 1, 2))
+        x = ops.transpose(x, (0, 3, 1, 2))
         x = self.proj(x)  # B, C, H, W
-        x = self.transpose(x, (0, 2, 3, 1))
+        x = ops.transpose(x, (0, 2, 3, 1))
         return x
 
 
@@ -702,7 +697,7 @@ class VOLO(nn.Cell):
         # patch embedding
         x = self.patch_embed(x)
         # B,C,H,W-> B,H,W,C
-        x = ops.Transpose()(x, (0, 2, 3, 1))
+        x = ops.transpose(x, (0, 2, 3, 1))
         return x          
 
     def forward_tokens(self, x: Tensor) -> Tensor:
@@ -713,14 +708,14 @@ class VOLO(nn.Cell):
             x = block(x)
 
         B, H, W, C = x.shape
-        x = ops.Reshape()(x, (B, -1, C))
+        x = ops.reshape(x, (B, -1, C))
         return x
 
     def forward_cls(self, x: Tensor) -> Tensor:
         # B, N, C = x.shape
         cls_tokens = ops.broadcast_to(self.cls_token, (x.shape[0], -1, -1))
         x = ops.Cast()(x, cls_tokens.dtype)
-        x = ops.Concat(1)([cls_tokens, x])
+        x = ops.concat([cls_tokens, x], 1)
         for block in self.post_network:
             x = block(x)
         return x
