@@ -80,7 +80,7 @@ python validate.py -c configs/inceptionv4/inception_v4_ascend.yaml --data_dir /p
 
 ### Deployment
 
-Please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md) in MindCV.
+Please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/) in MindCV.
 
 ## References
 

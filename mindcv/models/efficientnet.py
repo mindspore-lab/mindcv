@@ -143,7 +143,7 @@ class MBConv(nn.Cell):
     Args:
         cnf (MBConvConfig): The class which contains the parameters(in_channels, out_channels, nums_layers) and
             the functions which help calculate the parameters after multipling the expand_ratio.
-        keep_prob: The dropout rate in MBConv. Default: 0.8.
+        drop_path_prob: The drop path rate in MBConv. Default: 0.2.
         norm (nn.Cell): The BatchNorm Method. Default: None.
         se_layer (nn.Cell): The squeeze-excite Module. Default: SqueezeExcite.
 
@@ -154,7 +154,7 @@ class MBConv(nn.Cell):
     def __init__(
         self,
         cnf: MBConvConfig,
-        keep_prob: float = 0.8,
+        drop_path_prob: float = 0.2,
         norm: Optional[nn.Cell] = None,
         se_layer: Callable[..., nn.Cell] = SqueezeExcite,
     ) -> None:
@@ -192,7 +192,7 @@ class MBConv(nn.Cell):
         ])
 
         self.block = nn.SequentialCell(layers)
-        self.dropout = DropPath(keep_prob)
+        self.dropout = DropPath(drop_path_prob)
         self.out_channels = cnf.out_channels
 
     def construct(self, x) -> Tensor:
@@ -225,7 +225,7 @@ class FusedMBConv(nn.Cell):
     def __init__(
         self,
         cnf: FusedMBConvConfig,
-        keep_prob: float,
+        drop_path_prob: float,
         norm: Optional[nn.Cell] = None,
     ) -> None:
         super().__init__()
@@ -261,7 +261,7 @@ class FusedMBConv(nn.Cell):
             ])
 
         self.block = nn.SequentialCell(layers)
-        self.dropout = DropPath(keep_prob)
+        self.dropout = DropPath(drop_path_prob)
         self.out_channels = cnf.out_channels
 
     def construct(self, x) -> Tensor:
@@ -286,7 +286,7 @@ class EfficientNet(nn.Cell):
         num_classes (int): The number of class. Default: 1000.
         inverted_residual_setting (Sequence[Union[MBConvConfig, FusedMBConvConfig]], optional): The settings of block.
             Default: None.
-        keep_prob (float): The dropout rate of MBConv. Default: 0.2.
+        drop_path_prob (float): The drop path rate of MBConv. Default: 0.2.
         norm_layer (nn.Cell, optional): The normalization layer. Default: None.
 
     Inputs:
@@ -305,7 +305,7 @@ class EfficientNet(nn.Cell):
         in_channels: int = 3,
         num_classes: int = 1000,
         inverted_residual_setting: Optional[Sequence[Union[MBConvConfig, FusedMBConvConfig]]] = None,
-        keep_prob: float = 0.2,
+        drop_path_prob: float = 0.2,
         norm_layer: Optional[nn.Cell] = None,
     ) -> None:
         super().__init__()
@@ -410,7 +410,7 @@ class EfficientNet(nn.Cell):
                     block_cnf.stride = 1
 
                 # adjust dropout rate of blocks based on the depth of the stage block
-                sd_prob = keep_prob * float(stage_block_id + 0.00001) / total_stage_blocks
+                sd_prob = drop_path_prob * float(stage_block_id) / total_stage_blocks
 
                 total_reduction *= block_cnf.stride
 

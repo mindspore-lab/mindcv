@@ -74,7 +74,7 @@ Below are a few code snippets for your taste.
 >>> network = mindcv.create_model('swin_tiny', pretrained=True)
 # Validate its accuracy
 >>> !python validate.py --model=swin_tiny --pretrained --dataset=imagenet --val_split=validation
-{'Top_1_Accuracy': 0.808343989769821, 'Top_5_Accuracy': 0.9527253836317136, 'loss': 0.8474242982580839}
+{'Top_1_Accuracy': 0.80824, 'Top_5_Accuracy': 0.94802, 'loss': 1.7331367141008378}
 ```
 
 ???+ example "Image Classification Demo"
