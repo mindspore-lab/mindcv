@@ -76,4 +76,3 @@ To deploy online inference services with the trained model efficiently, please r
 ## References
 
 [1] Yuan L ,  Hou Q ,  Jiang Z , et al. VOLO: Vision Outlooker for Visual Recognition[J].  . arXiv preprint arXiv:2106.13112, 2021.
-
