@@ -14,7 +14,7 @@ from mindspore import ops
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
 from .registry import register_model
-from .utils import load_pretrained
+from .helpers import load_pretrained
 
 __all__ = [
     "VOLO",
