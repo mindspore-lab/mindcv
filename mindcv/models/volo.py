@@ -11,10 +11,10 @@ from mindspore import Parameter, Tensor
 from mindspore import dtype as mstype
 from mindspore import ops
 
+from .helpers import load_pretrained
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
 from .registry import register_model
-from .helpers import load_pretrained
 
 __all__ = [
     "VOLO",
