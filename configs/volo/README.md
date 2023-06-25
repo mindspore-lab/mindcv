@@ -4,7 +4,7 @@
 
 ##  Introduction
 
-Vision Outlooker (VOLO),  a novel outlook attention, presents a simple and general architecture . Unlike self-attention that focuses on global dependency modeling at a coarse level, the outlook attention efficiently encodes finer-level features and contexts into tokens, which is shown to be critically beneficial to recognition performance but largely ignored by the self-attention. Experiments show that VOLO achieves 87.1% top-1 accuracy on ImageNet-1K classification, which is the first model exceeding 87% accuracy on this competitive benchmark, without using any extra training data.
+Vision Outlooker (VOLO),  a novel outlook attention, presents a simple and general architecture . Unlike self-attention that focuses on global dependency modeling at a coarse level, the outlook attention efficiently encodes finer-level features and contexts into tokens, which is shown to be critically beneficial to recognition performance but largely ignored by the self-attention. Five versions different from model scaling are introduced based on the proposed VOLO: VOLO-D1 with 27M parameters to VOLO-D5 with 296M. Experiments show that the best one, VOLO-D5, achieves 87.1% top-1 accuracy on ImageNet-1K classification, which is the first model exceeding 87% accuracy on this competitive benchmark, without using any extra training data.
 
 ## Results
 
@@ -14,7 +14,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model           | Context   |  Top-1 (%)  |  Top-5 (%)  | Params (M) | Recipe                                                                                   | Weight                                                                            |
 |-----------------|-----------|-------|------------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| volo_d1 | D910x8-G | 82.598 | 95.998 | 27    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/volo/volo_d1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/volo/volo_d1-c7efada9.ckpt) |
+| volo_d1 | D910x8-G | 82.59 | 95.99 | 27    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/volo/volo_d1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/volo/volo_d1-c7efada9.ckpt) |
 
 </div>
 
