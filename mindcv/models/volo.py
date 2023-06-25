@@ -12,6 +12,7 @@ from mindspore import dtype as mstype
 from mindspore import ops
 
 from .helpers import load_pretrained
+from .layers.compatibility import Dropout
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
 from .registry import register_model
@@ -119,8 +120,8 @@ class OutlookAttention(nn.Cell):
         stride=1,
         qkv_bias=False,
         qk_scale=None,
-        attn_drop=0.,
-        proj_drop=0.
+        attn_drop=0.0,
+        proj_drop=0.0,
     ) -> None:
         super().__init__()
         head_dim = dim // num_heads
@@ -133,9 +134,9 @@ class OutlookAttention(nn.Cell):
         self.v = nn.Dense(dim, dim, has_bias=qkv_bias)
         self.attn = nn.Dense(dim, kernel_size**4 * num_heads)
 
-        self.attn_drop = nn.Dropout(1.0 - attn_drop)
+        self.attn_drop = Dropout(p=attn_drop)
         self.proj = nn.Dense(dim, dim)
-        self.proj_drop = nn.Dropout(1.0 - proj_drop)
+        self.proj_drop = Dropout(p=proj_drop)
 
         self.unfold = nn.Unfold(ksizes=[1, kernel_size, kernel_size, 1], strides=[1, stride, stride, 1],
                                 rates=[1, 1, 1, 1])
@@ -192,12 +193,12 @@ class Outlooker(nn.Cell):
         stride=1,
         num_heads=1,
         mlp_ratio=3.,
-        attn_drop=0.,
-        drop_path=0.,
+        attn_drop=0.0,
+        drop_path=0.0,
         act_layer=nn.GELU,
         norm_layer=nn.LayerNorm,
         qkv_bias=False,
-        qk_scale=None
+        qk_scale=None,
     ) -> None:
         super().__init__()
         self.norm1 = norm_layer([dim])
@@ -207,7 +208,7 @@ class Outlooker(nn.Cell):
                                      attn_drop=attn_drop)
 
         self.drop_path = DropPath(
-            drop_path) if drop_path > 0. else Identity()
+            drop_path) if drop_path > 0.0 else Identity()
 
         self.norm2 = norm_layer([dim])
         mlp_hidden_dim = int(dim * mlp_ratio)
@@ -230,7 +231,7 @@ class Mlp(nn.Cell):
         hidden_features=None,
         out_features=None,
         act_layer=nn.GELU,
-        drop=0.
+        drop=0.0,
     ) -> None:
         super().__init__()
         out_features = out_features or in_features
@@ -238,7 +239,7 @@ class Mlp(nn.Cell):
         self.fc1 = nn.Dense(in_features, hidden_features)
         self.act = act_layer()
         self.fc2 = nn.Dense(hidden_features, out_features)
-        self.drop = nn.Dropout(1.0 - drop)
+        self.drop = Dropout(p=drop)
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.fc1(x)
@@ -258,8 +259,8 @@ class Attention(nn.Cell):
         num_heads=8,
         qkv_bias=False,
         qk_scale=None,
-        attn_drop=0.,
-        proj_drop=0.
+        attn_drop=0.0,
+        proj_drop=0.0,
     ) -> None:
         super().__init__()
         self.num_heads = num_heads
@@ -267,9 +268,9 @@ class Attention(nn.Cell):
         self.scale = qk_scale or head_dim**-0.5
 
         self.qkv = nn.Dense(dim, dim * 3, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(1.0 - attn_drop)
+        self.attn_drop = Dropout(p=attn_drop)
         self.proj = nn.Dense(dim, dim)
-        self.proj_drop = nn.Dropout(1.0 - proj_drop)
+        self.proj_drop = Dropout(p=proj_drop)
         self.softmax = nn.Softmax(axis=-1)
         self.batch_mat_mul_transpose = ops.BatchMatMul(transpose_b=True)
         self.batch_mat_mul = ops.BatchMatMul()
@@ -305,10 +306,10 @@ class Transformer(nn.Cell):
         mlp_ratio=4.,
         qkv_bias=False,
         qk_scale=None,
-        attn_drop=0.,
-        drop_path=0.,
+        attn_drop=0.0,
+        drop_path=0.0,
         act_layer=nn.GELU,
-        norm_layer=nn.LayerNorm
+        norm_layer=nn.LayerNorm,
     ) -> None:
         super().__init__()
         self.norm1 = norm_layer([dim])
@@ -317,7 +318,7 @@ class Transformer(nn.Cell):
 
         # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(
-            drop_path) if drop_path > 0. else Identity()
+            drop_path) if drop_path > 0.0 else Identity()
 
         self.norm2 = norm_layer([dim])
         mlp_hidden_dim = int(dim * mlp_ratio)
@@ -343,8 +344,8 @@ class ClassAttention(nn.Cell):
         head_dim=None,
         qkv_bias=False,
         qk_scale=None,
-        attn_drop=0.,
-        proj_drop=0.
+        attn_drop=0.0,
+        proj_drop=0.0,
     ) -> None:
         super().__init__()
         self.num_heads = num_heads
@@ -357,9 +358,9 @@ class ClassAttention(nn.Cell):
 
         self.kv = nn.Dense(dim, self.head_dim * self.num_heads * 2, has_bias=qkv_bias)
         self.q = nn.Dense(dim, self.head_dim * self.num_heads, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(1.0 - attn_drop)
+        self.attn_drop = Dropout(p=attn_drop)
         self.proj = nn.Dense(self.head_dim * self.num_heads, dim)
-        self.proj_drop = nn.Dropout(1.0 - proj_drop)
+        self.proj_drop = Dropout(p=proj_drop)
         self.batch_mat_mul_transpose = ops.BatchMatMul(transpose_b=True)
         self.batch_mat_mul = ops.BatchMatMul()
         self.softmax = nn.Softmax(axis=-1)
@@ -399,11 +400,11 @@ class ClassBlock(nn.Cell):
         mlp_ratio=4.,
         qkv_bias=False,
         qk_scale=None,
-        drop=0.,
-        attn_drop=0.,
-        drop_path=0.,
+        drop=0.0,
+        attn_drop=0.0,
+        drop_path=0.0,
         act_layer=nn.GELU,
-        norm_layer=nn.LayerNorm
+        norm_layer=nn.LayerNorm,
     ) -> None:
         super().__init__()
         self.norm1 = norm_layer([dim])
@@ -412,7 +413,7 @@ class ClassBlock(nn.Cell):
             qk_scale=qk_scale, attn_drop=attn_drop, proj_drop=drop)
         # NOTE: drop path for stochastic depth
         self.drop_path = DropPath(
-            drop_path) if drop_path > 0. else Identity()
+            drop_path) if drop_path > 0.0 else Identity()
         self.norm2 = norm_layer([dim])
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(in_features=dim,
@@ -450,7 +451,7 @@ class PatchEmbed(nn.Cell):
         patch_size=8,
         in_channels=3,
         hidden_dim=64,
-        embed_dim=384
+        embed_dim=384,
     ) -> None:
         super().__init__()
         assert patch_size in [4, 8, 16]
@@ -489,7 +490,7 @@ class Downsample(nn.Cell):
     """
     Image to Patch Embedding, downsampling between stage1 and stage2
     """
-    def __init__(self, in_embed_dim, out_embed_dim, patch_size) -> None:
+    def __init__(self, in_embed_dim, out_embed_dim, patch_size,) -> None:
         super().__init__()
         self.proj = nn.Conv2d(in_embed_dim, out_embed_dim,
                               kernel_size=patch_size, stride=patch_size, has_bias=True)
@@ -503,7 +504,7 @@ class Downsample(nn.Cell):
 
 def outlooker_blocks(block_fn, index, dim, layers, num_heads=1, kernel_size=3,
                      padding=1, stride=1, mlp_ratio=3., qkv_bias=False, qk_scale=None,
-                     attn_drop=0, drop_path_rate=0., **kwargs) -> nn.SequentialCell:
+                     attn_drop=0.0, drop_path_rate=0.0, **kwargs) -> nn.SequentialCell:
     """
     generate outlooker layer in stage1
     return: outlooker layers
@@ -524,7 +525,7 @@ def outlooker_blocks(block_fn, index, dim, layers, num_heads=1, kernel_size=3,
 
 def transformer_blocks(block_fn, index, dim, layers, num_heads, mlp_ratio=3.,
                        qkv_bias=False, qk_scale=None, attn_drop=0,
-                       drop_path_rate=0., **kwargs) -> nn.SequentialCell:
+                       drop_path_rate=0.0, **kwargs) -> nn.SequentialCell:
     """
     generate transformer layers in stage2
     return: transformer layers
@@ -586,9 +587,9 @@ class VOLO(nn.Cell):
         mlp_ratios=None,
         qkv_bias=False,
         qk_scale=None,
-        drop_rate=0.,
-        attn_drop_rate=0.,
-        drop_path_rate=0.,
+        drop_rate=0.0,
+        attn_drop_rate=0.0,
+        drop_path_rate=0.0,
         norm_layer=nn.LayerNorm,
         post_layers=None,
         return_mean=False,
@@ -597,7 +598,7 @@ class VOLO(nn.Cell):
         pooling_scale=2,
         out_kernel=3,
         out_stride=2,
-        out_padding=1
+        out_padding=1,
     ) -> None:
 
         super().__init__()
@@ -607,11 +608,11 @@ class VOLO(nn.Cell):
                                       embed_dim=embed_dims[0])
         # inital positional encoding, we add positional encoding after outlooker blocks
         self.pos_embed = Parameter(
-            ops.Zeros()((1, img_size // patch_size // pooling_scale,
-                        img_size // patch_size // pooling_scale,
-                        embed_dims[-1]), mstype.float32))
+            ops.zeros((1, img_size // patch_size // pooling_scale,
+                      img_size // patch_size // pooling_scale,
+                      embed_dims[-1]), mstype.float32))
 
-        self.pos_drop = nn.Dropout(1.0 - drop_rate)
+        self.pos_drop = Dropout(p=drop_rate)
 
         # set the main block in network
         network = []
@@ -652,11 +653,11 @@ class VOLO(nn.Cell):
                           qkv_bias=qkv_bias,
                           qk_scale=qk_scale,
                           attn_drop=attn_drop_rate,
-                          drop_path=0.,
+                          drop_path=0.0,
                           norm_layer=norm_layer)
                 for i in range(len(post_layers))
             ])
-            self.cls_token = Parameter(ops.Zeros()((1, 1, embed_dims[-1]), mstype.float32))
+            self.cls_token = Parameter(ops.zeros((1, 1, embed_dims[-1]), mstype.float32))
             self.cls_token.set_data(init.initializer(init.TruncatedNormal(sigma=.02), self.cls_token.data.shape))
 
         # set output type

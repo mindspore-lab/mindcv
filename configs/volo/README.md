@@ -4,7 +4,14 @@
 
 ##  Introduction
 
-Vision Outlooker (VOLO),  a novel outlook attention, presents a simple and general architecture . Unlike self-attention that focuses on global dependency modeling at a coarse level, the outlook attention efficiently encodes finer-level features and contexts into tokens, which is shown to be critically beneficial to recognition performance but largely ignored by the self-attention. Five versions different from model scaling are introduced based on the proposed VOLO: VOLO-D1 with 27M parameters to VOLO-D5 with 296M. Experiments show that the best one, VOLO-D5, achieves 87.1% top-1 accuracy on ImageNet-1K classification, which is the first model exceeding 87% accuracy on this competitive benchmark, without using any extra training data.
+Vision Outlooker (VOLO), a novel outlook attention, presents a simple and general architecture. Unlike self-attention that focuses on global dependency modeling at a coarse level, the outlook attention efficiently encodes finer-level features and contexts into tokens, which is shown to be critically beneficial to recognition performance but largely ignored by the self-attention. Five versions different from model scaling are introduced based on the proposed VOLO: VOLO-D1 with 27M parameters to VOLO-D5 with 296M. Experiments show that the best one, VOLO-D5, achieves 87.1% top-1 accuracy on ImageNet-1K classification, which is the first model exceeding 87% accuracy on this competitive benchmark, without using any extra training data.
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61639773/249760556-b7aa4b23-a204-4061-8bed-170b02c52419.png" width=800 />
+</p>
+<p align="center">
+  <em>Figure 1. Illustration of outlook attention. [<a href="#references">1</a>] </em>
+</p>
 
 ## Results
 
@@ -71,7 +78,7 @@ python validate.py -c configs/volo/volo_d1_ascend.yaml --data_dir /path/to/image
 
 ### Deployment
 
-To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://github.com/mindspore-lab/mindcv/blob/main/tutorials/deployment.md).
+To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/).
 
 ## References
 
