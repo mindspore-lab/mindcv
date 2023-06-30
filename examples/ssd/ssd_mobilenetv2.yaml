@@ -3,7 +3,7 @@ mode: 0
 distribute: True
 num_parallel_workers: 8
 enable_modelarts: False
-eval_while_train: True
+eval_while_train: False
 
 # dataset
 dataset: "coco"
@@ -66,7 +66,7 @@ keep_checkpoint_max: 10
 eval_interval: 1
 eval_start_epoch: 350
 dataset_sink_mode: True
-amp_level: "O0"
+amp_level: "O2"
 
 # scheduler
 lr: 0.05
