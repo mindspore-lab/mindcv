@@ -1,0 +1,67 @@
+# system
+mode: 0
+distribute: True
+num_parallel_workers: 8
+val_while_train: True
+val_interval: 1
+
+# dataset
+dataset: 'imagenet'
+data_dir: '/path/to/imagenet'
+shuffle: True
+dataset_download: False
+batch_size: 128
+drop_remainder: True
+
+# augmentation
+image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.33]
+hflip: 0.5
+vflip: 0.0
+interpolation: 'bicubic'
+auto_augment: 'randaug-m9-mstd0.5-inc1'
+re_prob: 0.25
+mixup: 0.2
+cutmix: 1.0
+cutmix_prob: 1.0
+crop_pct: 0.96
+color_jitter: [0.4, 0.4, 0.4]
+
+# model
+model: 'volo_d1'
+num_classes: 1000
+pretrained: False
+ckpt_path: ''
+keep_checkpoint_max: 10
+ckpt_save_dir: './ckpt'
+ckpt_save_policy: 'top_k'
+drop_path_rate: 0.1
+dataset_sink_mode: True
+amp_level: 'O3'
+val_amp_level: 'O3'
+ema: True
+ema_decay: 0.9995
+
+# loss
+loss: 'CE'
+label_smoothing: 0.1
+
+# lr scheduler
+scheduler: 'cosine_decay'
+lr: 0.0019
+min_lr: 0.00001
+epoch_size: 300
+warmup_epochs: 20
+decay_epochs: 280
+decay_rate: 0.1
+
+# optimizer
+opt: 'adamw'
+weight_decay: 0.05
+momentum: 0.9
+filter_bias_and_bn: True
+loss_scale_type: 'dynamic'
+loss_scale: 1024
+use_nesterov: False
+drop_overflow_update: True

@@ -49,6 +49,7 @@ from . import (
     vgg,
     visformer,
     vit,
+    volo,
     xception,
     xcit,
 )
@@ -102,6 +103,7 @@ from .swin_transformer_v2 import *
 from .vgg import *
 from .visformer import *
 from .vit import *
+from .volo import *
 from .xception import *
 from .xcit import *
 
@@ -157,5 +159,6 @@ __all__.extend(swin_transformer_v2.__all__)
 __all__.extend(vgg.__all__)
 __all__.extend(visformer.__all__)
 __all__.extend(vit.__all__)
+__all__.extend(volo.__all__)
 __all__.extend(["Xception", "xception"])
 __all__.extend(xcit.__all__)
