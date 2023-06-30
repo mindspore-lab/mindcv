@@ -57,7 +57,7 @@ gamma: 2.0
 alpha: 0.25
 num_addition_layers: 4
 use_anchor_generator: True
-epoch_size: 500
+epoch_size: 60
 
 ckpt_save_dir: "./ckpt"
 keep_checkpoint_max: 10
