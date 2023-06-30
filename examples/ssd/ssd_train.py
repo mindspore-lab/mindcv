@@ -22,6 +22,7 @@ def train(args):
     """main train function"""
 
     ms.set_context(mode=args.mode)
+
     if args.distribute:
         init()
         device_num = get_group_size()
@@ -60,6 +61,7 @@ def train(args):
         checkpoint_path=args.backbone_ckpt_path,
         auto_mapping=args.get("backbone_ckpt_auto_mapping", False),
         features_only=args.backbone_features_only,
+        out_indices=args.backbone_out_indices,
     )
 
     ssd = SSD(backbone, args)

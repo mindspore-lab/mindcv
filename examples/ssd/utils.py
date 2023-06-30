@@ -68,12 +68,12 @@ class GridAnchorGenerator:
         self.bbox_centers = np.concatenate([bbox_centers, bbox_sizes], axis=1)
         self.bbox_centers = self.bbox_centers / np.array([*self.image_shape, *self.image_shape]).astype(np.float32)
 
-        print(self.bbox_centers.shape)
         return self.bbox_centers, self.bbox_corners
 
     def generate_multi_levels(self, steps):
         bbox_centers_list = []
         bbox_corners_list = []
+
         for step in steps:
             bbox_centers, bbox_corners = self.generate(step)
             bbox_centers_list.append(bbox_centers)
@@ -81,6 +81,7 @@ class GridAnchorGenerator:
 
         self.bbox_centers = np.concatenate(bbox_centers_list, axis=0)
         self.bbox_corners = np.concatenate(bbox_corners_list, axis=0)
+
         return self.bbox_centers, self.bbox_corners
 
 
@@ -96,19 +97,23 @@ class GeneratDefaultBoxes:
         scale_rate = (args.max_scale - args.min_scale) / (len(args.num_default) - 1)
         scales = [args.min_scale + scale_rate * i for i in range(len(args.num_default))] + [1.0]
         self.default_boxes = []
+
         for idex, feature_size in enumerate(args.feature_size):
             sk1 = scales[idex]
             sk2 = scales[idex + 1]
             sk3 = math.sqrt(sk1 * sk2)
+
             if idex == 0 and not args.aspect_ratios[idex]:
                 w, h = sk1 * math.sqrt(2), sk1 / math.sqrt(2)
                 all_sizes = [(0.1, 0.1), (w, h), (h, w)]
             else:
                 all_sizes = [(sk1, sk1)]
+
                 for aspect_ratio in args.aspect_ratios[idex]:
                     w, h = sk1 * math.sqrt(aspect_ratio), sk1 / math.sqrt(aspect_ratio)
                     all_sizes.append((w, h))
                     all_sizes.append((h, w))
+
                 all_sizes.append((sk3, sk3))
 
             assert len(all_sizes) == args.num_default[idex]
@@ -168,6 +173,7 @@ def ssd_bboxes_encode(boxes, args):
     pre_scores = np.zeros((args.num_ssd_boxes), dtype=np.float32)
     t_boxes = np.zeros((args.num_ssd_boxes, 4), dtype=np.float32)
     t_label = np.zeros((args.num_ssd_boxes), dtype=np.int64)
+
     for bbox in boxes:
         label = int(bbox[4])
         scores = jaccard_with_anchors(bbox)
@@ -177,6 +183,7 @@ def ssd_bboxes_encode(boxes, args):
         mask = mask & (scores > pre_scores)
         pre_scores = np.maximum(pre_scores, scores * mask)
         t_label = mask * label + (1 - mask) * t_label
+
         for i in range(4):
             t_boxes[:, i] = mask * bbox[i] + (1 - mask) * t_boxes[:, i]
 

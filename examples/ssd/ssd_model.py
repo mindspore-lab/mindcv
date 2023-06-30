@@ -128,6 +128,147 @@ class InvertedResidual(nn.Cell):
         return x
 
 
+class MobileNetV2Wrapper(nn.Cell):
+    def __init__(self, backbone, args):
+        super(MobileNetV2Wrapper, self).__init__()
+        self.backbone = backbone
+        feature1_output_channels = backbone.out_channels[0]
+        self.feature1_expand_layer = ConvBNReLU(
+            feature1_output_channels, int(round(feature1_output_channels * 6)), kernel_size=1
+        )
+
+        in_channels = args.extras_in_channels
+        out_channels = args.extras_out_channels
+        ratios = args.extras_ratio
+        strides = args.extras_strides
+        residual_list = []
+
+        for i in range(2, len(in_channels)):
+            residual = InvertedResidual(
+                in_channels[i], out_channels[i], stride=strides[i], expand_ratio=ratios[i], last_relu=True
+            )
+            residual_list.append(residual)
+
+        self.multi_residual = nn.CellList(residual_list)
+
+        self._initialize_weights()
+
+    def _initialize_weights(self) -> None:
+        params = self.feature1_expand_layer.trainable_params()
+        params.extend(self.multi_residual.trainable_params())
+
+        for p in params:
+            if "beta" not in p.name and "gamma" not in p.name and "bias" not in p.name:
+                p.set_data(initializer(TruncatedNormal(0.02), p.data.shape, p.data.dtype))
+
+    def construct(self, x):
+        feature1, feature2 = self.backbone(x)
+        layer_out = self.feature1_expand_layer(feature1)
+        multi_feature = (layer_out, feature2)
+        feature = feature2
+
+        for residual in self.multi_residual:
+            feature = residual(feature)
+            multi_feature += (feature,)
+
+        return multi_feature
+
+
+class FPNTopDown(nn.Cell):
+    """
+    Fpn to extract features
+    """
+    def __init__(self, in_channel_list, out_channels):
+        super(FPNTopDown, self).__init__()
+        self.lateral_convs_list_ = []
+        self.fpn_convs_ = []
+
+        for channel in in_channel_list:
+            l_conv = nn.Conv2d(channel, out_channels, kernel_size=1, stride=1,
+                               has_bias=True, padding=0, pad_mode='same')
+            fpn_conv = ConvBNReLU(out_channels, out_channels, kernel_size=3, stride=1)
+            self.lateral_convs_list_.append(l_conv)
+            self.fpn_convs_.append(fpn_conv)
+
+        self.lateral_convs_list = nn.layer.CellList(self.lateral_convs_list_)
+        self.fpn_convs_list = nn.layer.CellList(self.fpn_convs_)
+        self.num_layers = len(in_channel_list)
+
+    def construct(self, inputs):
+        image_features = ()
+
+        for i, feature in enumerate(inputs):
+            image_features = image_features + (self.lateral_convs_list[i](feature),)
+
+        features = (image_features[-1],)
+
+        for i in range(len(inputs) - 1):
+            top = len(inputs) - i - 1
+            down = top - 1
+            size = ops.shape(inputs[down])
+            top_down = ops.ResizeBilinear((size[2], size[3]))(features[-1])
+            top_down = top_down + image_features[down]
+            features = features + (top_down,)
+
+        extract_features = ()
+        num_features = len(features)
+
+        for i in range(num_features):
+            extract_features = extract_features + (self.fpn_convs_list[i](features[num_features - i - 1]),)
+
+        return extract_features
+
+
+class BottomUp(nn.Cell):
+    """
+    Bottom Up feature extractor
+    """
+    def __init__(self, levels, channels, kernel_size, stride):
+        super(BottomUp, self).__init__()
+        self.levels = levels
+        bottom_up_cells = [
+            ConvBNReLU(channels, channels, kernel_size, stride) for x in range(self.levels)
+        ]
+        self.blocks = nn.CellList(bottom_up_cells)
+
+    def construct(self, features):
+        for block in self.blocks:
+            features = features + (block(features[-1]),)
+
+        return features
+
+
+class ResNet50FPNWrapper(nn.Cell):
+    def __init__(self, backbone, args):
+        super(ResNet50FPNWrapper, self).__init__()
+        self.backbone = backbone
+        self.fpn = FPNTopDown([512, 1024, 2048], 256)
+        self.bottom_up = BottomUp(2, 256, 3, 2)
+
+        self._initialize_weights()
+
+    def _initialize_weights(self) -> None:
+        params = self.fpn.trainable_params()
+        params.extend(self.bottom_up.trainable_params())
+
+        for p in params:
+            if "beta" not in p.name and "gamma" not in p.name and "bias" not in p.name:
+                p.set_data(initializer(TruncatedNormal(0.02), p.data.shape, p.data.dtype))
+
+    def construct(self, x):
+        feature1, feature2, feature3 = self.backbone(x)
+        features = self.fpn((feature1, feature2, feature3))
+        features = self.bottom_up(features)
+
+        return features
+
+
+backbone_wrapper = {
+    "mobilenet_v2_100_224": MobileNetV2Wrapper,
+    "resnet50": ResNet50FPNWrapper,
+}
+
+
 class FlattenConcat(nn.Cell):
     """
     Concatenate predictions into a single tensor.
@@ -139,9 +280,9 @@ class FlattenConcat(nn.Cell):
         Tensor, flatten predictions.
     """
 
-    def __init__(self, config):
+    def __init__(self, args):
         super(FlattenConcat, self).__init__()
-        self.num_ssd_boxes = config.num_ssd_boxes
+        self.num_ssd_boxes = args.num_ssd_boxes
         self.concat = ops.Concat(axis=1)
         self.transpose = ops.Transpose()
 
@@ -202,6 +343,92 @@ class MultiBox(nn.Cell):
         return self.flatten_concat(loc_outputs), self.flatten_concat(cls_outputs)
 
 
+class WeightSharedMultiBox(nn.Cell):
+    """
+    Weight shared Multi-box conv layers. Each multi-box layer contains class conf scores and localization predictions.
+    All box predictors shares the same conv weight in different features.
+
+    Args:
+        config (dict): The default config of SSD.
+        loc_cls_shared_addition(bool): Whether the location predictor and classifier prediction share the
+                                       same addition layer.
+    Returns:
+        Tensor, localization predictions.
+        Tensor, class conf scores.
+    """
+    def __init__(self, args, loc_cls_shared_addition=False):
+        super(WeightSharedMultiBox, self).__init__()
+        num_classes = args.num_classes
+        out_channels = args.extras_out_channels[0]
+        num_default = args.num_default[0]
+        num_features = len(args.feature_size)
+        num_addition_layers = args.num_addition_layers
+        self.loc_cls_shared_addition = loc_cls_shared_addition
+
+        if not loc_cls_shared_addition:
+            loc_convs = [
+                _conv2d(out_channels, out_channels, 3, 1) for x in range(num_addition_layers)
+            ]
+            cls_convs = [
+                _conv2d(out_channels, out_channels, 3, 1) for x in range(num_addition_layers)
+            ]
+            addition_loc_layer_list = []
+            addition_cls_layer_list = []
+
+            for _ in range(num_features):
+                addition_loc_layer = [
+                    ConvBNReLU(out_channels, out_channels, 3, 1, 1, loc_convs[x]) for x in range(num_addition_layers)
+                ]
+                addition_cls_layer = [
+                    ConvBNReLU(out_channels, out_channels, 3, 1, 1, cls_convs[x]) for x in range(num_addition_layers)
+                ]
+                addition_loc_layer_list.append(nn.SequentialCell(addition_loc_layer))
+                addition_cls_layer_list.append(nn.SequentialCell(addition_cls_layer))
+
+            self.addition_layer_loc = nn.CellList(addition_loc_layer_list)
+            self.addition_layer_cls = nn.CellList(addition_cls_layer_list)
+        else:
+            convs = [
+                _conv2d(out_channels, out_channels, 3, 1) for x in range(num_addition_layers)
+            ]
+            addition_layer_list = []
+
+            for _ in range(num_features):
+                addition_layers = [
+                    ConvBNReLU(out_channels, out_channels, 3, 1, 1, convs[x]) for x in range(num_addition_layers)
+                ]
+                addition_layer_list.append(nn.SequentialCell(addition_layers))
+
+            self.addition_layer = nn.SequentialCell(addition_layer_list)
+
+        loc_layers = [_conv2d(out_channels, 4 * num_default,
+                              kernel_size=3, stride=1, pad_mod='same')]
+        cls_layers = [_conv2d(out_channels, num_classes * num_default,
+                              kernel_size=3, stride=1, pad_mod='same')]
+
+        self.loc_layers = nn.SequentialCell(loc_layers)
+        self.cls_layers = nn.SequentialCell(cls_layers)
+        self.flatten_concat = FlattenConcat(args)
+
+    def construct(self, inputs):
+        loc_outputs = ()
+        cls_outputs = ()
+        num_heads = len(inputs)
+
+        for i in range(num_heads):
+            if self.loc_cls_shared_addition:
+                features = self.addition_layer[i](inputs[i])
+                loc_outputs += (self.loc_layers(features),)
+                cls_outputs += (self.cls_layers(features),)
+            else:
+                features = self.addition_layer_loc[i](inputs[i])
+                loc_outputs += (self.loc_layers(features),)
+                features = self.addition_layer_cls[i](inputs[i])
+                cls_outputs += (self.cls_layers(features),)
+
+        return self.flatten_concat(loc_outputs), self.flatten_concat(cls_outputs)
+
+
 class SSD(nn.Cell):
     """
     SSD300 Network. Default backbone is resnet34.
@@ -221,27 +448,13 @@ class SSD(nn.Cell):
 
     def __init__(self, backbone, args, is_training=True):
         super(SSD, self).__init__()
+        self.backbone_wrapper = backbone_wrapper[args.backbone](backbone, args)
 
-        self.backbone = backbone
-        feature1_output_channels = backbone.out_channels[0]
-        self.feature1_expand_layer = ConvBNReLU(
-            feature1_output_channels, int(round(feature1_output_channels * 6)), kernel_size=1
-        )
+        if args.get("use_fpn", False):
+            self.multi_box = WeightSharedMultiBox(args)
+        else:
+            self.multi_box = MultiBox(args)
 
-        in_channels = args.extras_in_channels
-        out_channels = args.extras_out_channels
-        ratios = args.extras_ratio
-        strides = args.extras_strides
-        residual_list = []
-
-        for i in range(2, len(in_channels)):
-            residual = InvertedResidual(
-                in_channels[i], out_channels[i], stride=strides[i], expand_ratio=ratios[i], last_relu=True
-            )
-            residual_list.append(residual)
-
-        self.multi_residual = nn.CellList(residual_list)
-        self.multi_box = MultiBox(args)
         self.is_training = is_training
 
         if not is_training:
@@ -250,23 +463,14 @@ class SSD(nn.Cell):
         self._initialize_weights()
 
     def _initialize_weights(self) -> None:
-        params = self.feature1_expand_layer.trainable_params()
-        params.extend(self.multi_residual.trainable_params())
-        params.extend(self.multi_box.trainable_params())
+        params = self.multi_box.trainable_params()
 
         for p in params:
             if "beta" not in p.name and "gamma" not in p.name and "bias" not in p.name:
                 p.set_data(initializer(TruncatedNormal(0.02), p.data.shape, p.data.dtype))
 
     def construct(self, x):
-        feature1, feature2 = self.backbone(x)
-        layer_out = self.feature1_expand_layer(feature1)
-        multi_feature = (layer_out, feature2)
-        feature = feature2
-
-        for residual in self.multi_residual:
-            feature = residual(feature)
-            multi_feature += (feature,)
+        multi_feature = self.backbone_wrapper(x)
 
         pred_loc, pred_label = self.multi_box(multi_feature)
 
@@ -353,6 +557,14 @@ class SSDWithLossCell(nn.Cell):
         return self.reduce_sum((loss_cls + loss_loc) / num_matched_boxes)
 
 
+grad_scale = ops.MultitypeFuncGraph("grad_scale")
+
+
+@grad_scale.register("Tensor", "Tensor")
+def tensor_grad_scale(scale, grad):
+    return grad * ops.Reciprocal()(scale)
+
+
 class TrainingWrapper(nn.Cell):
     """
     Encapsulation class of SSD network training.
@@ -367,7 +579,7 @@ class TrainingWrapper(nn.Cell):
         use_global_nrom(bool): Whether apply global norm before optimizer. Default: False
     """
 
-    def __init__(self, network, optimizer, sens=1.0):
+    def __init__(self, network, optimizer, sens=1.0, use_global_norm=False):
         super(TrainingWrapper, self).__init__(auto_prefix=False)
         self.network = network
         self.network.set_grad()
@@ -377,6 +589,7 @@ class TrainingWrapper(nn.Cell):
         self.sens = sens
         self.reducer_flag = False
         self.grad_reducer = None
+        self.use_global_norm = use_global_norm
         self.parallel_mode = ms.get_auto_parallel_context("parallel_mode")
 
         if self.parallel_mode in [ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL]:
@@ -403,6 +616,10 @@ class TrainingWrapper(nn.Cell):
         if self.reducer_flag:
             # apply grad reducer on grads
             grads = self.grad_reducer(grads)
+
+        if self.use_global_norm:
+            grads = self.hyper_map(ops.partial(grad_scale, ops.scalar_to_tensor(self.sens)), grads)
+            grads = ops.clip_by_global_norm(grads)
 
         self.optimizer(grads)
 
