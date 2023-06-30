@@ -232,6 +232,11 @@ def create_parser():
                             'Choice: O0 - all FP32, O1 - only cast ops in white-list to FP16, '
                             'O2 - cast all ops except for blacklist to FP16, '
                             'O3 - cast all ops to FP16. (default="O0").')
+    group.add_argument('--val_amp_level', type=str, default='O0',
+                       help='Amp level used in validation '
+                            'Choice: O0 - all FP32, O1 - only cast ops in white-list to FP16, '
+                            'O2 - cast all ops except for blacklist to FP16, '
+                            'O3 - cast all ops to FP16. (default="O0").')
     group.add_argument('--loss_scale_type', type=str, default='fixed',
                        choices=['fixed', 'dynamic', 'auto'],
                        help='The type of loss scale (default="fixed")')
