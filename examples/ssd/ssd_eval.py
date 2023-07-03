@@ -31,6 +31,7 @@ def eval(args):
     backbone = create_model(
         args.backbone,
         features_only=args.backbone_features_only,
+        out_indices=args.backbone_out_indices,
     )
 
     ssd = SSD(backbone, args, is_training=False)

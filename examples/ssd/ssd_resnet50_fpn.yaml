@@ -44,12 +44,14 @@ backbone_ckpt_auto_mapping: False
 backbone_features_only: True
 backbone_out_indices: [2, 3, 4]
 
-ckpt_path: "./ckpt/best.ckpt"
+ckpt_path: "/root/zjd/mindcv/ckpt/ssd-1_458.ckpt"
 
 use_fpn: True
 num_default: [6, 6, 6, 6, 6]
 extras_out_channels: [256, 256, 256, 256, 256]
 feature_size: [80, 40, 20, 10, 5]
+min_scale: 0.2
+max_scale: 0.95
 aspect_ratios: [[2, 3], [2, 3], [2, 3], [2, 3], [2, 3], [2, 3]]
 steps: [8, 16, 32, 64, 128]
 prior_scaling: [0.1, 0.2]
@@ -57,7 +59,7 @@ gamma: 2.0
 alpha: 0.25
 num_addition_layers: 4
 use_anchor_generator: True
-epoch_size: 60
+epoch_size: 500
 
 ckpt_save_dir: "./ckpt"
 keep_checkpoint_max: 10
