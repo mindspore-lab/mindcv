@@ -44,7 +44,7 @@ backbone_ckpt_auto_mapping: False
 backbone_features_only: True
 backbone_out_indices: [2, 3, 4]
 
-ckpt_path: "./ckpt/best.ckpt"
+ckpt_path: "/data1/zjd/mindcv/ckpt/best.ckpt"
 
 use_fpn: True
 num_default: [6, 6, 6, 6, 6]

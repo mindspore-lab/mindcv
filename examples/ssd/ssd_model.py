@@ -178,14 +178,16 @@ class FPNTopDown(nn.Cell):
     """
     Fpn to extract features
     """
+
     def __init__(self, in_channel_list, out_channels):
         super(FPNTopDown, self).__init__()
         self.lateral_convs_list_ = []
         self.fpn_convs_ = []
 
         for channel in in_channel_list:
-            l_conv = nn.Conv2d(channel, out_channels, kernel_size=1, stride=1,
-                               has_bias=True, padding=0, pad_mode='same')
+            l_conv = nn.Conv2d(
+                channel, out_channels, kernel_size=1, stride=1, has_bias=True, padding=0, pad_mode="same"
+            )
             fpn_conv = ConvBNReLU(out_channels, out_channels, kernel_size=3, stride=1)
             self.lateral_convs_list_.append(l_conv)
             self.fpn_convs_.append(fpn_conv)
@@ -223,12 +225,11 @@ class BottomUp(nn.Cell):
     """
     Bottom Up feature extractor
     """
+
     def __init__(self, levels, channels, kernel_size, stride):
         super(BottomUp, self).__init__()
         self.levels = levels
-        bottom_up_cells = [
-            ConvBNReLU(channels, channels, kernel_size, stride) for x in range(self.levels)
-        ]
+        bottom_up_cells = [ConvBNReLU(channels, channels, kernel_size, stride) for x in range(self.levels)]
         self.blocks = nn.CellList(bottom_up_cells)
 
     def construct(self, features):
@@ -356,6 +357,7 @@ class WeightSharedMultiBox(nn.Cell):
         Tensor, localization predictions.
         Tensor, class conf scores.
     """
+
     def __init__(self, args, loc_cls_shared_addition=False):
         super(WeightSharedMultiBox, self).__init__()
         num_classes = args.num_classes
@@ -366,12 +368,8 @@ class WeightSharedMultiBox(nn.Cell):
         self.loc_cls_shared_addition = loc_cls_shared_addition
 
         if not loc_cls_shared_addition:
-            loc_convs = [
-                _conv2d(out_channels, out_channels, 3, 1) for x in range(num_addition_layers)
-            ]
-            cls_convs = [
-                _conv2d(out_channels, out_channels, 3, 1) for x in range(num_addition_layers)
-            ]
+            loc_convs = [_conv2d(out_channels, out_channels, 3, 1) for x in range(num_addition_layers)]
+            cls_convs = [_conv2d(out_channels, out_channels, 3, 1) for x in range(num_addition_layers)]
             addition_loc_layer_list = []
             addition_cls_layer_list = []
 
@@ -388,9 +386,7 @@ class WeightSharedMultiBox(nn.Cell):
             self.addition_layer_loc = nn.CellList(addition_loc_layer_list)
             self.addition_layer_cls = nn.CellList(addition_cls_layer_list)
         else:
-            convs = [
-                _conv2d(out_channels, out_channels, 3, 1) for x in range(num_addition_layers)
-            ]
+            convs = [_conv2d(out_channels, out_channels, 3, 1) for x in range(num_addition_layers)]
             addition_layer_list = []
 
             for _ in range(num_features):
@@ -401,10 +397,8 @@ class WeightSharedMultiBox(nn.Cell):
 
             self.addition_layer = nn.SequentialCell(addition_layer_list)
 
-        loc_layers = [_conv2d(out_channels, 4 * num_default,
-                              kernel_size=3, stride=1, pad_mod='same')]
-        cls_layers = [_conv2d(out_channels, num_classes * num_default,
-                              kernel_size=3, stride=1, pad_mod='same')]
+        loc_layers = [_conv2d(out_channels, 4 * num_default, kernel_size=3, stride=1, pad_mod="same")]
+        cls_layers = [_conv2d(out_channels, num_classes * num_default, kernel_size=3, stride=1, pad_mod="same")]
 
         self.loc_layers = nn.SequentialCell(loc_layers)
         self.cls_layers = nn.SequentialCell(cls_layers)
@@ -645,8 +639,9 @@ class SSDInferWithDecoder(nn.Cell):
         self.network = network
 
         if hasattr(args, "use_anchor_generator") and args.use_anchor_generator:
-            self.default_boxes, _ = \
-                GridAnchorGenerator(args.image_size, 4, 2, [1.0, 2.0, 0.5]).generate_multi_levels(args.steps)
+            self.default_boxes, _ = GridAnchorGenerator(args.image_size, 4, 2, [1.0, 2.0, 0.5]).generate_multi_levels(
+                args.steps
+            )
             self.default_boxes = Tensor(self.default_boxes)
         else:
             self.default_boxes = Tensor(GeneratDefaultBoxes(args).default_boxes)
