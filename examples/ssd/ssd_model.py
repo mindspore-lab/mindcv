@@ -1,4 +1,4 @@
-from utils import GeneratDefaultBoxes
+from utils import GeneratDefaultBoxes, GridAnchorGenerator
 
 import mindspore as ms
 import mindspore.nn as nn
@@ -643,7 +643,14 @@ class SSDInferWithDecoder(nn.Cell):
     def __init__(self, network, args):
         super(SSDInferWithDecoder, self).__init__()
         self.network = network
-        self.default_boxes = Tensor(GeneratDefaultBoxes(args).default_boxes)
+
+        if hasattr(args, "use_anchor_generator") and args.use_anchor_generator:
+            self.default_boxes, _ = \
+                GridAnchorGenerator(args.image_size, 4, 2, [1.0, 2.0, 0.5]).generate_multi_levels(args.steps)
+            self.default_boxes = Tensor(self.default_boxes)
+        else:
+            self.default_boxes = Tensor(GeneratDefaultBoxes(args).default_boxes)
+
         self.prior_scaling_xy = args.prior_scaling[0]
         self.prior_scaling_wh = args.prior_scaling[1]
 
