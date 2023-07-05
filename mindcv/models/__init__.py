@@ -2,6 +2,7 @@
 from . import (
     bit,
     cait,
+    cmt,
     coat,
     convit,
     convnext,
@@ -55,6 +56,7 @@ from . import (
 )
 from .bit import *
 from .cait import *
+from .cmt import *
 from .coat import *
 from .convit import *
 from .convnext import *
@@ -112,6 +114,7 @@ from .xcit import *
 __all__ = []
 __all__.extend(bit.__all__)
 __all__.extend(cait.__all__)
+__all__.extend(cmt.__all__)
 __all__.extend(coat.__all__)
 __all__.extend(convit.__all__)
 __all__.extend(convnext.__all__)
