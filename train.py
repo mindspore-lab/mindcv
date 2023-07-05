@@ -200,7 +200,12 @@ def train(args):
     if (
         args.loss_scale_type == "fixed"
         and args.drop_overflow_update is False
-        and not require_customized_train_step(args.ema, args.clip_grad, args.gradient_accumulation_steps)
+        and not require_customized_train_step(
+            args.ema,
+            args.clip_grad,
+            args.gradient_accumulation_steps,
+            args.amp_cast_list,
+        )
     ):
         optimizer_loss_scale = args.loss_scale
     else:
@@ -228,6 +233,7 @@ def train(args):
         optimizer,
         metrics,
         amp_level=args.amp_level,
+        amp_cast_list=args.amp_cast_list,
         loss_scale_type=args.loss_scale_type,
         loss_scale=args.loss_scale,
         drop_overflow_update=args.drop_overflow_update,
