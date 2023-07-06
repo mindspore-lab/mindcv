@@ -1,5 +1,5 @@
 """
-MindSpore implementation of `RepMLP`.
+MindSpore implementation of `RepMLPNet`.
 Refer to RepMLPNet: Hierarchical Vision MLP with Re-parameterized Locality.
 """
 
@@ -15,12 +15,12 @@ from .registry import register_model
 
 __all__ = [
     "RepMLPNet",
-    "RepMLPNet_T224",
-    "RepMLPNet_T256",
-    "RepMLPNet_B224",
-    "RepMLPNet_B256",
-    "RepMLPNet_D256",
-    "RepMLPNet_L256",
+    "repmlp_t224",
+    "repmlp_t256",
+    "repmlp_b224",
+    "repmlp_b256",
+    "repmlp_d256",
+    "repmlp_l256",
 ]
 
 
@@ -35,12 +35,12 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "RepMLPNet_T224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repmlp/repmlp_t224-8dbedd00.ckpt"),
-    "RepMLPNet_T256": _cfg(url="", input_size=(3, 256, 256)),
-    "RepMLPNet_B224": _cfg(url=""),
-    "RepMLPNet_B256": _cfg(url="", input_size=(3, 256, 256)),
-    "RepMLPNet_D256": _cfg(url="", input_size=(3, 256, 256)),
-    "RepMLPNet_L256": _cfg(url="", input_size=(3, 256, 256)),
+    "repmlp_t224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/repmlp/repmlp_t224-8dbedd00.ckpt"),
+    "repmlp_t256": _cfg(url="", input_size=(3, 256, 256)),
+    "repmlp_b224": _cfg(url=""),
+    "repmlp_b256": _cfg(url="", input_size=(3, 256, 256)),
+    "repmlp_d256": _cfg(url="", input_size=(3, 256, 256)),
+    "repmlp_l256": _cfg(url="", input_size=(3, 256, 256)),
 }
 
 
@@ -342,13 +342,13 @@ class RepMLPNet(nn.Cell):
         for name, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 k = cell.group / (cell.in_channels * cell.kernel_size[0] * cell.kernel_size[1])
-                k = k**0.5
+                k = k ** 0.5
                 cell.weight.set_data(init.initializer(init.Uniform(k), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(init.initializer(init.Uniform(k), cell.bias.shape, cell.bias.dtype))
             elif isinstance(cell, nn.Dense):
                 k = 1 / cell.in_channels
-                k = k**0.5
+                k = k ** 0.5
                 cell.weight.set_data(init.initializer(init.Uniform(k), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(init.initializer(init.Uniform(k), cell.bias.shape, cell.bias.dtype))
@@ -384,11 +384,10 @@ def locality_injection(self):
 
 
 @register_model
-def RepMLPNet_T224(pretrained: bool = False, image_size: int = 224, num_classes: int = 1000, in_channels=3,
-                   deploy=False, **kwargs):
-    """Get RepMLPNet_T224 model.
-    Refer to the base class `models.RepMLPNet` for more details."""
-    default_cfg = default_cfgs["RepMLPNet_T224"]
+def repmlp_t224(pretrained: bool = False, image_size: int = 224, num_classes: int = 1000, in_channels=3,
+                deploy=False, **kwargs):
+    """Get repmlp_t224 model. Refer to the base class `models.RepMLPNet` for more details."""
+    default_cfg = default_cfgs["repmlp_t224"]
     model = RepMLPNet(in_channels=in_channels, num_class=num_classes, channels=(64, 128, 256, 512), hs=(56, 28, 14, 7),
                       ws=(56, 28, 14, 7),
                       num_blocks=(2, 2, 6, 2), reparam_conv_k=(1, 3), sharesets_nums=(1, 4, 16, 128),
@@ -401,11 +400,11 @@ def RepMLPNet_T224(pretrained: bool = False, image_size: int = 224, num_classes:
 
 
 @register_model
-def RepMLPNet_T256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
-                   deploy=False, **kwargs):
-    """Get RepMLPNet_T256 model.
+def repmlp_t256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
+                deploy=False, **kwargs):
+    """Get repmlp_t256 model.
     Refer to the base class `models.RepMLPNet` for more details."""
-    default_cfg = default_cfgs["RepMLPNet_T256"]
+    default_cfg = default_cfgs["repmlp_t256"]
     model = RepMLPNet(in_channels=in_channels, num_class=num_classes, channels=(64, 128, 256, 512), hs=(64, 32, 16, 8),
                       ws=(64, 32, 16, 8),
                       num_blocks=(2, 2, 6, 2), reparam_conv_k=(1, 3), sharesets_nums=(1, 4, 16, 128),
@@ -417,11 +416,11 @@ def RepMLPNet_T256(pretrained: bool = False, image_size: int = 256, num_classes:
 
 
 @register_model
-def RepMLPNet_B224(pretrained: bool = False, image_size: int = 224, num_classes: int = 1000, in_channels=3,
-                   deploy=False, **kwargs):
-    """Get RepMLPNet_B224 model.
+def repmlp_b224(pretrained: bool = False, image_size: int = 224, num_classes: int = 1000, in_channels=3,
+                deploy=False, **kwargs):
+    """Get repmlp_b224 model.
     Refer to the base class `models.RepMLPNet` for more details."""
-    default_cfg = default_cfgs["RepMLPNet_B224"]
+    default_cfg = default_cfgs["repmlp_b224"]
     model = RepMLPNet(in_channels=in_channels, num_class=num_classes, channels=(96, 192, 384, 768), hs=(56, 28, 14, 7),
                       ws=(56, 28, 14, 7),
                       num_blocks=(2, 2, 12, 2), reparam_conv_k=(1, 3), sharesets_nums=(1, 4, 32, 128),
@@ -433,11 +432,11 @@ def RepMLPNet_B224(pretrained: bool = False, image_size: int = 224, num_classes:
 
 
 @register_model
-def RepMLPNet_B256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
-                   deploy=False, **kwargs):
-    """Get RepMLPNet_B256 model.
+def repmlp_b256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
+                deploy=False, **kwargs):
+    """Get repmlp_b256 model.
     Refer to the base class `models.RepMLPNet` for more details."""
-    default_cfg = default_cfgs["RepMLPNet_B256"]
+    default_cfg = default_cfgs["repmlp_b256"]
     model = RepMLPNet(in_channels=in_channels, num_class=num_classes, channels=(96, 192, 384, 768), hs=(64, 32, 16, 8),
                       ws=(64, 32, 16, 8),
                       num_blocks=(2, 2, 12, 2), reparam_conv_k=(1, 3), sharesets_nums=(1, 4, 32, 128),
@@ -449,11 +448,11 @@ def RepMLPNet_B256(pretrained: bool = False, image_size: int = 256, num_classes:
 
 
 @register_model
-def RepMLPNet_D256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
-                   deploy=False, **kwargs):
-    """Get RepMLPNet_D256 model.
+def repmlp_d256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
+                deploy=False, **kwargs):
+    """Get repmlp_d256 model.
     Refer to the base class `models.RepMLPNet` for more details."""
-    default_cfg = default_cfgs["RepMLPNet_D256"]
+    default_cfg = default_cfgs["repmlp_d256"]
     model = RepMLPNet(in_channels=in_channels, num_class=num_classes, channels=(80, 160, 320, 640), hs=(64, 32, 16, 8),
                       ws=(64, 32, 16, 8),
                       num_blocks=(2, 2, 18, 2), reparam_conv_k=(1, 3), sharesets_nums=(1, 4, 16, 128),
@@ -465,11 +464,11 @@ def RepMLPNet_D256(pretrained: bool = False, image_size: int = 256, num_classes:
 
 
 @register_model
-def RepMLPNet_L256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
-                   deploy=False, **kwargs):
-    """Get RepMLPNet_L256 model.
+def repmlp_l256(pretrained: bool = False, image_size: int = 256, num_classes: int = 1000, in_channels=3,
+                deploy=False, **kwargs):
+    """Get repmlp_l256 model.
     Refer to the base class `models.RepMLPNet` for more details."""
-    default_cfg = default_cfgs["RepMLPNet_L256"]
+    default_cfg = default_cfgs["repmlp_l256"]
     model = RepMLPNet(in_channels=in_channels, num_class=num_classes, channels=(96, 192, 384, 768), hs=(64, 32, 16, 8),
                       ws=(64, 32, 16, 8),
                       num_blocks=(2, 2, 18, 2), reparam_conv_k=(1, 3), sharesets_nums=(1, 4, 32, 256),
@@ -484,7 +483,7 @@ def RepMLPNet_L256(pretrained: bool = False, image_size: int = 256, num_classes:
 if __name__ == "__main__":
     # x = Tensor(np.ones([1, 3, 3, 3]).astype(np.float32))
     dummy_input = Tensor(np.ones([1, 3, 256, 256]).astype(np.float32))
-    model = RepMLPNet_B256()
+    model = repmlp_b256()
     origin_y = model(dummy_input)
 
     model.locality_injection()

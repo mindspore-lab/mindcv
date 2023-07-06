@@ -20,7 +20,7 @@ from .registry import register_model
 
 __all__ = [
     'XCiT',
-    'xcit_tiny_12_p16',
+    'xcit_tiny_12_p16_224',
 ]
 
 
@@ -35,7 +35,7 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'xcit_tiny_12_p16': _cfg(
+    'xcit_tiny_12_p16_224': _cfg(
         url='https://download.mindspore.cn/toolkits/mindcv/xcit/xcit_tiny_12_p16_224-1b1c9301.ckpt'),
 }
 
@@ -476,11 +476,11 @@ class XCiT(nn.Cell):
 
 
 @register_model
-def xcit_tiny_12_p16(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> XCiT:
-    """Get xcit_tiny_12_p16 model.
+def xcit_tiny_12_p16_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> XCiT:
+    """Get xcit_tiny_12_p16_224 model.
     Refer to the base class 'models.XCiT' for more details.
     """
-    default_cfg = default_cfgs['xcit_tiny_12_p16']
+    default_cfg = default_cfgs['xcit_tiny_12_p16_224']
     model = XCiT(
         patch_size=16, num_classes=num_classes, embed_dim=192, depth=12, num_heads=4, mlp_ratio=4, qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), eta=1.0, tokens_norm=True, **kwargs)

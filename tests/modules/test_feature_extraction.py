@@ -193,7 +193,7 @@ def test_feature_extraction_indices_using_feature_wrapper(mode):
             5,
         ),
         (
-            "rexnet_x10",
+            "rexnet_10",
             5,
         ),
     ],

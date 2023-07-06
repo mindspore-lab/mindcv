@@ -22,9 +22,9 @@ from .layers.mlp import Mlp
 from .registry import register_model
 
 __all__ = [
-    "crossvit9",
-    "crossvit15",
-    "crossvit18",
+    "crossvit_9",
+    "crossvit_15",
+    "crossvit_18",
 ]
 
 
@@ -452,7 +452,7 @@ class VisionTransformer(nn.Cell):
 
 
 @register_model
-def crossvit9(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+def crossvit_9(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     model = VisionTransformer(img_size=[240, 224],
                               patch_size=[12, 16], embed_dim=[128, 256], depth=[[1, 3, 0], [1, 3, 0], [1, 3, 0]],
                               num_heads=[4, 4], mlp_ratio=[3, 3, 1], qkv_bias=True,
@@ -464,7 +464,7 @@ def crossvit9(pretrained: bool = False, num_classes: int = 1000, in_channels=3, 
 
 
 @register_model
-def crossvit15(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> VisionTransformer:
+def crossvit_15(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> VisionTransformer:
     model = VisionTransformer(img_size=[240, 224],
                               patch_size=[12, 16], embed_dim=[192, 384], depth=[[1, 5, 0], [1, 5, 0], [1, 5, 0]],
                               num_heads=[6, 6], mlp_ratio=[3, 3, 1], qkv_bias=True,
@@ -476,7 +476,7 @@ def crossvit15(pretrained: bool = False, num_classes: int = 1000, in_channels=3,
 
 
 @register_model
-def crossvit18(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> VisionTransformer:
+def crossvit_18(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> VisionTransformer:
     model = VisionTransformer(img_size=[240, 224],
                               patch_size=[12, 16], embed_dim=[224, 448], depth=[[1, 6, 0], [1, 6, 0], [1, 6, 0]],
                               num_heads=[7, 7], mlp_ratio=[3, 3, 1], qkv_bias=True,

@@ -19,7 +19,7 @@ interpolation: "bilinear"
 crop_pct: 0.875
 
 # model
-model: "shufflenet_v1_g3_x1_0"
+model: "shufflenet_v1_g3_10"
 num_classes: 1000
 pretrained: False
 ckpt_path: ""

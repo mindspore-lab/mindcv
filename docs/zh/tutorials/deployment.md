@@ -24,12 +24,12 @@ from mindcv.models import create_model
 import numpy as np
 import mindspore as ms
 
-model = create_model(model_name='mobilenet_v2_100_224', num_classes=1000, pretrained=True)
+model = create_model(model_name='mobilenet_v2_100', num_classes=1000, pretrained=True)
 
 input_np = np.random.uniform(0.0, 1.0, size=[1, 3, 224, 224]).astype(np.float32)
 
-# 导出文件mobilenet_v2_100_224.mindir到当前文件夹
-ms.export(model, ms.Tensor(input_np), file_name='mobilenet_v2_100_224', file_format='MINDIR')
+# 导出文件mobilenet_v2_100.mindir到当前文件夹
+ms.export(model, ms.Tensor(input_np), file_name='mobilenet_v2_100', file_format='MINDIR')
 ```
 
 ## 部署Serving推理服务
@@ -40,9 +40,9 @@ ms.export(model, ms.Tensor(input_np), file_name='mobilenet_v2_100_224', file_for
 
 ```text
 demo
-├── mobilenet_v2_100_224
+├── mobilenet_v2_100
 │   ├── 1
-│   │   └── mobilenet_v2_100_224.mindir
+│   │   └── mobilenet_v2_100.mindir
 │   └── servable_config.py
 │── serving_server.py
 ├── serving_client.py
@@ -54,8 +54,8 @@ demo
     └─ ……
 ```
 
-- `mobilenet_v2_100_224`为模型文件夹，文件夹名即为模型名。
-- `mobilenet_v2_100_224.mindir`为上一步网络生成的模型文件，放置在文件夹1下，1为版本号，不同的版本放置在不同的文件夹下，版本号需以纯数字串命名，默认配置下启动最大数值的版本号的模型文件。
+- `mobilenet_v2_100`为模型文件夹，文件夹名即为模型名。
+- `mobilenet_v2_100.mindir`为上一步网络生成的模型文件，放置在文件夹1下，1为版本号，不同的版本放置在不同的文件夹下，版本号需以纯数字串命名，默认配置下启动最大数值的版本号的模型文件。
 - `servable_config.py`为模型配置脚本，对模型进行声明、入参和出参定义。
 - `serving_server.py`为启动服务脚本文件。
 - `serving_client.py`为启动客户端脚本文件。
@@ -68,7 +68,7 @@ demo
 from mindspore_serving.server import register
 
 # 进行模型声明，其中declare_model入参model_file指示模型的文件名称，model_format指示模型的模型类别
-model = register.declare_model(model_file="mobilenet_v2_100_224.mindir", model_format="MindIR")
+model = register.declare_model(model_file="mobilenet_v2_100.mindir", model_format="MindIR")
 
 # Servable方法的入参由Python方法的入参指定，Servable方法的出参由register_method的output_names指定
 @register.register_method(output_names=["score"])
@@ -79,7 +79,7 @@ def predict(image):
 
 ### 启动服务
 
-MindSpore的`server`函数提供两种服务部署，一种是gRPC方式，一种是通过RESTful方式，本教程以gRPC方式为例。服务启动脚本`serving_server.py`把本地目录下的`mobilenet_v2_100_224`部署到设备0，并启动地址为127.0.0.1:5500的gRPC服务器。脚本文件内容如下：
+MindSpore的`server`函数提供两种服务部署，一种是gRPC方式，一种是通过RESTful方式，本教程以gRPC方式为例。服务启动脚本`serving_server.py`把本地目录下的`mobilenet_v2_100`部署到设备0，并启动地址为127.0.0.1:5500的gRPC服务器。脚本文件内容如下：
 
 ```python
 import os
@@ -89,7 +89,7 @@ from mindspore_serving import server
 def start():
     servable_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
 
-    servable_config = server.ServableStartConfig(servable_directory=servable_dir, servable_name="mobilenet_v2_100_224",
+    servable_config = server.ServableStartConfig(servable_directory=servable_dir, servable_name="mobilenet_v2_100",
                                                  device_ids=0)
     server.start_servables(servable_configs=servable_config)
     server.start_grpc_server(address="127.0.0.1:5500")
@@ -137,7 +137,7 @@ def postprocess(score):
     return idx2label[max_idx]
 
 def predict():
-    client = Client("127.0.0.1:5500", "mobilenet_v2_100_224", "predict")
+    client = Client("127.0.0.1:5500", "mobilenet_v2_100", "predict")
     instances = []
     images, _ = next(data_loader.create_tuple_iterator())
     image_np = images.asnumpy().squeeze()

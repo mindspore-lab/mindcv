@@ -17,13 +17,13 @@ from mindcv.models import registry
 registry.list_models()
 ```
 
-    ['BiTresnet50',
-     'RepMLPNet_B224',
-     'RepMLPNet_B256',
-     'RepMLPNet_D256',
-     'RepMLPNet_L256',
-     'RepMLPNet_T224',
-     'RepMLPNet_T256',
+    ['BiT_resnet50',
+     'repmlp_b224',
+     'repmlp_b256',
+     'repmlp_d256',
+     'repmlp_l256',
+     'repmlp_t224',
+     'repmlp_t256',
      'convit_base',
      'convit_base_plus',
      'convit_small',

@@ -29,9 +29,9 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model        | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                              | Download                                                                                     |
 |--------------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
-| GhostNet_050 | D910x8-G | 66.03     | 86.64     | 2.60       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/ghostnet/ghostnet_050_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/ghostnet/ghostnet_050-85b91860.ckpt) |
-| GhostNet_100 | D910x8-G | 73.78     | 91.66     | 5.20       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/ghostnet/ghostnet_100_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/ghostnet/ghostnet_100-bef8025a.ckpt) |
-| GhostNet_130 | D910x8-G | 75.50     | 92.56     | 7.39       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/ghostnet/ghostnet_130_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/ghostnet/ghostnet_130-cf4c235c.ckpt) |
+| ghostnet_050 | D910x8-G | 66.03     | 86.64     | 2.60       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/ghostnet/ghostnet_050_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/ghostnet/ghostnet_050-85b91860.ckpt) |
+| ghostnet_100 | D910x8-G | 73.78     | 91.66     | 5.20       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/ghostnet/ghostnet_100_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/ghostnet/ghostnet_100-bef8025a.ckpt) |
+| ghostnet_130 | D910x8-G | 75.50     | 92.56     | 7.39       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/ghostnet/ghostnet_130_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/ghostnet/ghostnet_130-cf4c235c.ckpt) |
 
 </div>
 

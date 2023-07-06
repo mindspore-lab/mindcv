@@ -22,7 +22,7 @@ interpolation: 'bilinear'
 crop_pct: 0.875
 
 # model
-model: 'mobilenet_v2_075_224'
+model: 'mobilenet_v2_075'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''

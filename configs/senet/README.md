@@ -25,11 +25,11 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model             | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                | Download                                                                                       |
 |-------------------|----------|-----------|-----------|------------|-------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| SEResNet18        | D910x8-G | 71.81     | 90.49     | 11.80      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet18_ascend.yaml)        | [weights](https://download.mindspore.cn/toolkits/mindcv/senet/seresnet18-7880643b.ckpt)        |
-| SEResNet34        | D910x8-G | 75.38     | 92.50     | 21.98      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet34_ascend.yaml)        | [weights](https://download.mindspore.cn/toolkits/mindcv/senet/seresnet34-8179d3c9.ckpt)        |
-| SEResNet50        | D910x8-G | 78.32     | 94.07     | 28.14      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet50_ascend.yaml)        | [weights](https://download.mindspore.cn/toolkits/mindcv/senet/seresnet50-ff9cd214.ckpt)        |
-| SEResNeXt26_32x4d | D910x8-G | 77.17     | 93.42     | 16.83      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnext26_32x4d_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/senet/seresnext26_32x4d-5361f5b6.ckpt) |
-| SEResNeXt50_32x4d | D910x8-G | 78.71     | 94.36     | 27.63      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnext50_32x4d_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/senet/seresnext50_32x4d-fdc35aca.ckpt) |
+| seresnet18        | D910x8-G | 71.81     | 90.49     | 11.80      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet18_ascend.yaml)        | [weights](https://download.mindspore.cn/toolkits/mindcv/senet/seresnet18-7880643b.ckpt)        |
+| seresnet34        | D910x8-G | 75.38     | 92.50     | 21.98      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet34_ascend.yaml)        | [weights](https://download.mindspore.cn/toolkits/mindcv/senet/seresnet34-8179d3c9.ckpt)        |
+| seresnet50        | D910x8-G | 78.32     | 94.07     | 28.14      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet50_ascend.yaml)        | [weights](https://download.mindspore.cn/toolkits/mindcv/senet/seresnet50-ff9cd214.ckpt)        |
+| seresnext26_32x4d | D910x8-G | 77.17     | 93.42     | 16.83      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnext26_32x4d_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/senet/seresnext26_32x4d-5361f5b6.ckpt) |
+| seresnext50_32x4d | D910x8-G | 78.71     | 94.36     | 27.63      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnext50_32x4d_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/senet/seresnext50_32x4d-fdc35aca.ckpt) |
 
 </div>
 
