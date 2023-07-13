@@ -30,7 +30,7 @@ auto_augment: 'randaug-m9-mstd0.5-inc1'
 
 
 # model
-model: 'RepMLPNet_T224'
+model: 'repmlp_t224'
 num_classes: 1000
 in_channels: 3
 pretrained: False

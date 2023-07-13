@@ -1,7 +1,9 @@
 """ loss init """
-from . import binary_cross_entropy_smooth, cross_entropy_smooth, loss_factory
+from . import asymmetric, binary_cross_entropy_smooth, cross_entropy_smooth, jsd, loss_factory
+from .asymmetric import AsymmetricLossMultilabel, AsymmetricLossSingleLabel
 from .binary_cross_entropy_smooth import BinaryCrossEntropySmooth
 from .cross_entropy_smooth import CrossEntropySmooth
+from .jsd import JSDCrossEntropy
 from .loss_factory import create_loss
 
 __all__ = []

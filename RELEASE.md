@@ -123,7 +123,7 @@
 `mindcv.models` now expose `num_classes` and `in_channels` as constructor arguments:
 
 - Add DenseNet models and pre-trained weights
-- Add GoogleNet models and pre-trained weights
+- Add GoogLeNet models and pre-trained weights
 - Add Inception V3 models and pre-trained weights
 - Add Inception V4 models and pre-trained weights
 - Add MnasNet models and pre-trained weights

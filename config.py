@@ -92,6 +92,9 @@ def create_parser():
                             '"trivialaugwide" for TrivialAugmentWide. '
                             'If apply, recommend for imagenet: randaug-m7-mstd0.5 (default=None).'
                             'Example: "randaug-m10-n2-w0-mstd0.5-mmax10-inc0", "autoaug-mstd0.5" or autoaugr-mstd0.5.')
+    group.add_argument('--aug_splits', type=int, default=0,
+                       help='Number of augmentation splits (default: 0, valid: 3 (currently, only support 3 splits))'
+                       'it should be set with one auto_augment')
     group.add_argument('--re_prob', type=float, default=0.0,
                        help='Probability of performing erasing (default=0.0)')
     group.add_argument('--re_scale', type=tuple, default=(0.02, 0.33),
@@ -237,6 +240,14 @@ def create_parser():
                             'Choice: O0 - all FP32, O1 - only cast ops in white-list to FP16, '
                             'O2 - cast all ops except for blacklist to FP16, '
                             'O3 - cast all ops to FP16. (default="O0").')
+    group.add_argument('--amp_cast_list', type=str, default=None,
+                       help='At the cell level, customize the black-list or white-list to cast cells to '
+                            'FP16 based on the value of argument "amp_level". If None, use the built-in '
+                            'black-list and white-list. (default=None) '
+                            'If amp_level="O0" or "O3", this argument has no effect. '
+                            'If amp_level="O1", cast all cells in the white-list to FP16. '
+                            'If amp_level="O2", cast all cells except for the black-list to FP16. '
+                            'Example: "[nn.Conv1d, nn.Conv2d]" or "[nn.BatchNorm1d, nn.BatchNorm2d]".')
     group.add_argument('--loss_scale_type', type=str, default='fixed',
                        choices=['fixed', 'dynamic', 'auto'],
                        help='The type of loss scale (default="fixed")')

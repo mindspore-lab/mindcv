@@ -20,10 +20,10 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model                 | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                        | Download                                                                                                             |
-|-----------------------|----------|-----------|-----------|------------|---------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
-| shufflenet_v1_g3_x0_5 | D910x8-G | 57.05     | 79.73     | 0.73       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv1/shufflenet_v1_0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_05-42cfe109.ckpt) |
-| shufflenet_v1_g3_x1_0 | D910x8-G | 67.77     | 87.73     | 1.89       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv1/shufflenet_v1_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_10-245f0ccf.ckpt) |
+| Model               | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                       | Download                                                                                                             |
+|---------------------|----------|-----------|-----------|------------|--------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| shufflenet_v1_g3_05 | D910x8-G | 57.05     | 79.73     | 0.73       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv1/shufflenet_v1_0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_05-42cfe109.ckpt) |
+| shufflenet_v1_g3_10 | D910x8-G | 67.77     | 87.73     | 1.89       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv1/shufflenet_v1_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_10-245f0ccf.ckpt) |
 
 </div>
 

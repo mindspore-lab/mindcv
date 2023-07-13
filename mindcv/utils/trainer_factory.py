@@ -1,10 +1,14 @@
 import logging
-from typing import Union
+from typing import Optional, Union
 
 import mindspore as ms
-from mindspore import Tensor, context, nn
+from mindspore import Tensor, context
+from mindspore import dtype as mstype
+from mindspore import nn
+from mindspore.ops import functional as F
 from mindspore.train import DynamicLossScaleManager, FixedLossScaleManager, Model
 
+from .amp import auto_mixed_precision
 from .train_step import TrainStep
 
 __all__ = [
@@ -29,14 +33,44 @@ def get_metrics(num_classes):
     return metrics
 
 
-def require_customized_train_step(ema: bool = False, clip_grad: bool = False, gradient_accumulation_steps: int = 1):
+def require_customized_train_step(
+    ema: bool = False,
+    clip_grad: bool = False,
+    gradient_accumulation_steps: int = 1,
+    amp_cast_list: Optional[str] = None,
+):
     if ema:
         return True
     if clip_grad:
         return True
     if gradient_accumulation_steps > 1:
         return True
+    if amp_cast_list:
+        return True
     return False
+
+
+def add_loss_network(network, loss_fn, amp_level):
+    """Add loss network."""
+
+    class WithLossCell(nn.Cell):
+        "Wrap loss for amp. Cast network output back to float32"
+
+        def __init__(self, backbone, loss_fn):
+            super(WithLossCell, self).__init__(auto_prefix=False)
+            self._backbone = backbone
+            self._loss_fn = loss_fn
+
+        def construct(self, data, label):
+            out = self._backbone(data)
+            label = F.mixed_precision_cast(mstype.float32, label)
+            return self._loss_fn(F.mixed_precision_cast(mstype.float32, out), label)
+
+    if amp_level == "O2" or amp_level == "O3":
+        network = WithLossCell(network, loss_fn)
+    else:
+        network = nn.WithLossCell(network, loss_fn)
+    return network
 
 
 def create_trainer(
@@ -45,6 +79,7 @@ def create_trainer(
     optimizer: nn.Cell,
     metrics: Union[dict, set],
     amp_level: str,
+    amp_cast_list: str,
     loss_scale_type: str,
     loss_scale: float = 1.0,
     drop_overflow_update: bool = False,
@@ -62,6 +97,7 @@ def create_trainer(
         optimizer: The optimizer for training.
         metrics: The metrics for model evaluation.
         amp_level: The level of auto mixing precision training.
+        amp_cast_list: At the cell level, custom casting the cell to FP16.
         loss_scale_type: The type of loss scale.
         loss_scale: The value of loss scale.
         drop_overflow_update: Whether to execute optimizer if there is an overflow.
@@ -84,7 +120,7 @@ def create_trainer(
     if gradient_accumulation_steps < 1:
         raise ValueError("`gradient_accumulation_steps` must be >= 1!")
 
-    if not require_customized_train_step(ema, clip_grad, gradient_accumulation_steps):
+    if not require_customized_train_step(ema, clip_grad, gradient_accumulation_steps, amp_cast_list):
         mindspore_kwargs = dict(
             network=network,
             loss_fn=loss,
@@ -111,8 +147,9 @@ def create_trainer(
             raise ValueError(f"Loss scale type only support ['fixed', 'dynamic', 'auto'], but got{loss_scale_type}.")
         model = Model(**mindspore_kwargs)
     else:  # require customized train step
-        net_with_loss = nn.WithLossCell(network, loss)
-        ms.amp.auto_mixed_precision(net_with_loss, amp_level=amp_level)
+        eval_network = nn.WithEvalCell(network, loss, amp_level in ["O2", "O3", "auto"])
+        auto_mixed_precision(network, amp_level, amp_cast_list)
+        net_with_loss = add_loss_network(network, loss, amp_level)
         train_step_kwargs = dict(
             network=net_with_loss,
             optimizer=optimizer,
@@ -145,7 +182,6 @@ def create_trainer(
                 )
             train_step_kwargs["scale_sense"] = update_cell
         train_step_cell = TrainStep(**train_step_kwargs).set_train()
-        eval_network = nn.WithEvalCell(network, loss, amp_level in ["O2", "O3", "auto"])
         model = Model(train_step_cell, eval_network=eval_network, metrics=metrics, eval_indexes=[0, 1, 2])
         # todo: do we need to set model._loss_scale_manager
     return model

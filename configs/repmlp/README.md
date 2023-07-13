@@ -24,8 +24,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-|    Model    | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                           | Download                                                                                     |
-|:-----------:|:--------:|:---------:|:---------:|:----------:|--------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+|     Model      | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                              | Download                                                                                     |
+|:--------------:|:--------:|:---------:|:---------:|:----------:|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
 | repmlp_t224 | D910x8-G |   76.71   |   93.30   |   38.30    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repmlp/repmlp_t224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repmlp/repmlp_t224-8dbedd00.ckpt) |
 
 </div>
@@ -79,7 +79,7 @@ python train.py --config configs/repmlp/repmlp_t224_ascend.yaml --data_dir /path
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```shell
-python validate.py --model=RepMLPNet_T224 --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+python validate.py --model=repmlp_t224 --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 ### Deployment

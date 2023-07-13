@@ -21,7 +21,7 @@ interpolation: 'bicubic'
 crop_pct: 0.875
 
 # model
-model: 'mnasnet0_5'
+model: 'mnasnet_050'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''

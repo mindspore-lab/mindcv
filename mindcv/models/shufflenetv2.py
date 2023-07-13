@@ -32,16 +32,16 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "shufflenet_v2_0.5": _cfg(
+    "shufflenet_v2_x0_5": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x0_5-8c841061.ckpt"
     ),
-    "shufflenet_v2_1.0": _cfg(
+    "shufflenet_v2_x1_0": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_0-0da4b7fa.ckpt"
     ),
-    "shufflenet_v2_1.5": _cfg(
+    "shufflenet_v2_x1_5": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_5-00b56131.ckpt"
     ),
-    "shufflenet_v2_2.0": _cfg(
+    "shufflenet_v2_x2_0": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x2_0-ed8e698d.ckpt"
     ),
 }
@@ -222,7 +222,7 @@ def shufflenet_v2_x0_5(pretrained: bool = False, num_classes: int = 1000, in_cha
     """Get ShuffleNetV2 model with width scaled by 0.5.
     Refer to the base class `models.ShuffleNetV2` for more details.
     """
-    default_cfg = default_cfgs["shufflenet_v2_0.5"]
+    default_cfg = default_cfgs["shufflenet_v2_x0_5"]
     model = ShuffleNetV2(model_size="0.5x", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -236,7 +236,7 @@ def shufflenet_v2_x1_0(pretrained: bool = False, num_classes: int = 1000, in_cha
     """Get ShuffleNetV2 model with width scaled by 1.0.
     Refer to the base class `models.ShuffleNetV2` for more details.
     """
-    default_cfg = default_cfgs["shufflenet_v2_1.0"]
+    default_cfg = default_cfgs["shufflenet_v2_x1_0"]
     model = ShuffleNetV2(model_size="1.0x", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -250,7 +250,7 @@ def shufflenet_v2_x1_5(pretrained: bool = False, num_classes: int = 1000, in_cha
     """Get ShuffleNetV2 model with width scaled by 1.5.
     Refer to the base class `models.ShuffleNetV2` for more details.
     """
-    default_cfg = default_cfgs["shufflenet_v2_1.5"]
+    default_cfg = default_cfgs["shufflenet_v2_x1_5"]
     model = ShuffleNetV2(model_size="1.5x", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -264,7 +264,7 @@ def shufflenet_v2_x2_0(pretrained: bool = False, num_classes: int = 1000, in_cha
     """Get ShuffleNetV2 model with width scaled by 2.0.
     Refer to the base class `models.ShuffleNetV2` for more details.
     """
-    default_cfg = default_cfgs["shufflenet_v2_2.0"]
+    default_cfg = default_cfgs["shufflenet_v2_x2_0"]
     model = ShuffleNetV2(model_size="2.0x", num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
