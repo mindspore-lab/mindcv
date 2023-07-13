@@ -12,10 +12,10 @@ from .registry import register_model
 
 __all__ = [
     "MobileNetV1",
-    "mobilenet_v1_025_224",
-    "mobilenet_v1_050_224",
-    "mobilenet_v1_075_224",
-    "mobilenet_v1_100_224",
+    "mobilenet_v1_025",
+    "mobilenet_v1_050",
+    "mobilenet_v1_075",
+    "mobilenet_v1_100",
 ]
 
 
@@ -30,16 +30,16 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "mobilenet_v1_0.25_224": _cfg(
+    "mobilenet_v1_025": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025-d3377fba.ckpt"
     ),
-    "mobilenet_v1_0.5_224": _cfg(
+    "mobilenet_v1_050": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_050-23e9ddbe.ckpt"
     ),
-    "mobilenet_v1_0.75_224": _cfg(
+    "mobilenet_v1_075": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_075-5bed0c73.ckpt"
     ),
-    "mobilenet_v1_1.0_224": _cfg(
+    "mobilenet_v1_100": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_100-91c7b206.ckpt"
     ),
 }
@@ -135,11 +135,11 @@ class MobileNetV1(nn.Cell):
 
 
 @register_model
-def mobilenet_v1_025_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
+def mobilenet_v1_025(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
     """Get MobileNetV1 model with width scaled by 0.25.
     Refer to the base class `models.MobileNetV1` for more details.
     """
-    default_cfg = default_cfgs["mobilenet_v1_0.25_224"]
+    default_cfg = default_cfgs["mobilenet_v1_025"]
     model = MobileNetV1(alpha=0.25, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
@@ -149,11 +149,11 @@ def mobilenet_v1_025_224(pretrained: bool = False, num_classes: int = 1000, in_c
 
 
 @register_model
-def mobilenet_v1_050_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
+def mobilenet_v1_050(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
     """Get MobileNetV1 model with width scaled by 0.5.
     Refer to the base class `models.MobileNetV1` for more details.
     """
-    default_cfg = default_cfgs["mobilenet_v1_0.5_224"]
+    default_cfg = default_cfgs["mobilenet_v1_050"]
     model = MobileNetV1(alpha=0.5, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
@@ -163,11 +163,11 @@ def mobilenet_v1_050_224(pretrained: bool = False, num_classes: int = 1000, in_c
 
 
 @register_model
-def mobilenet_v1_075_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
+def mobilenet_v1_075(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
     """Get MobileNetV1 model with width scaled by 0.75.
     Refer to the base class `models.MobileNetV1` for more details.
     """
-    default_cfg = default_cfgs["mobilenet_v1_0.75_224"]
+    default_cfg = default_cfgs["mobilenet_v1_075"]
     model = MobileNetV1(alpha=0.75, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
@@ -177,11 +177,11 @@ def mobilenet_v1_075_224(pretrained: bool = False, num_classes: int = 1000, in_c
 
 
 @register_model
-def mobilenet_v1_100_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
+def mobilenet_v1_100(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV1:
     """Get MobileNetV1 model without width scaling.
     Refer to the base class `models.MobileNetV1` for more details.
     """
-    default_cfg = default_cfgs["mobilenet_v1_1.0_224"]
+    default_cfg = default_cfgs["mobilenet_v1_100"]
     model = MobileNetV1(alpha=1.0, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:

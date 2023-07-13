@@ -27,7 +27,7 @@ color_jitter: 0.4
 crop_pct: 0.935
 
 # model
-model: 'crossvit9'
+model: 'crossvit_9'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''

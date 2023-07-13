@@ -217,7 +217,7 @@ python train.py --model=resnet50 --dataset=cifar10 \
 * EfficientNet (MBConvNet Family) https://arxiv.org/abs/1905.11946
 * EfficientNet V2 - https://arxiv.org/abs/2104.00298
 * GhostNet - https://arxiv.org/abs/1911.11907
-* GoogleNet - https://arxiv.org/abs/1409.4842
+* GoogLeNet - https://arxiv.org/abs/1409.4842
 * Inception-V3 - https://arxiv.org/abs/1512.00567
 * Inception-ResNet-V2 and Inception-V4 - https://arxiv.org/abs/1602.07261
 * MNASNet - https://arxiv.org/abs/1807.11626

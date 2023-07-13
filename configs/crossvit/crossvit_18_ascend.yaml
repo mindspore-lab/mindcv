@@ -28,7 +28,7 @@ crop_pct: 0.935
 ema: True
 
 # model
-model: 'crossvit18'
+model: 'crossvit_18'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''

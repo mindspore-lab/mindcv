@@ -18,12 +18,12 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model            | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                      | Download                                                                                                          |
-|------------------|----------|-----------|-----------|------------|-------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| MobileNet_v1_025 | D910x8-G | 53.87     | 77.66     | 0.47       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.25_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025-d3377fba.ckpt) |
-| MobileNet_v1_050 | D910x8-G | 65.94     | 86.51     | 1.34       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.5_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_050-23e9ddbe.ckpt) |
-| MobileNet_v1_075 | D910x8-G | 70.44     | 89.49     | 2.60       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_075-5bed0c73.ckpt) |
-| MobileNet_v1_100 | D910x8-G | 72.95     | 91.01     | 4.25       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_1.0_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_100-91c7b206.ckpt) |
+| Model            | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                     | Download                                                                                                          |
+|------------------|----------|-----------|-----------|------------|------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| mobilenet_v1_025 | D910x8-G | 53.87     | 77.66     | 0.47       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.25_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025-d3377fba.ckpt) |
+| mobilenet_v1_050 | D910x8-G | 65.94     | 86.51     | 1.34       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_050-23e9ddbe.ckpt) |
+| mobilenet_v1_075 | D910x8-G | 70.44     | 89.49     | 2.60       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_075-5bed0c73.ckpt) |
+| mobilenet_v1_100 | D910x8-G | 72.95     | 91.01     | 4.25       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_100-91c7b206.ckpt) |
 
 </div>
 

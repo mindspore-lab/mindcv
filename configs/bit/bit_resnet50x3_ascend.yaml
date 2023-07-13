@@ -20,7 +20,7 @@ crop_pct: 0.875
 auto_augment: "randaug-m7-mstd0.5"
 
 # model
-model: 'BiTresnet50x3'
+model: 'BiT_resnet50x3'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''

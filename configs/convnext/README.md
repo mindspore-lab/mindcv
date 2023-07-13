@@ -25,9 +25,9 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model          | Context   | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                | Download                                                                                       |
 |----------------|-----------|-----------|-----------|------------|-------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| ConvNeXt_tiny  | D910x64-G | 81.91     | 95.79     | 28.59      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_tiny_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_tiny-ae5ff8d7.ckpt)  |
-| ConvNeXt_small | D910x64-G | 83.40     | 96.36     | 50.22      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_small-e23008f3.ckpt) |
-| ConvNeXt_base  | D910x64-G | 83.32     | 96.24     | 88.59      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_base_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_base-ee3544b8.ckpt)  |
+| convnext_tiny  | D910x64-G | 81.91     | 95.79     | 28.59      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_tiny_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_tiny-ae5ff8d7.ckpt)  |
+| convnext_small | D910x64-G | 83.40     | 96.36     | 50.22      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_small-e23008f3.ckpt) |
+| convnext_base  | D910x64-G | 83.32     | 96.24     | 88.59      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_base_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_base-ee3544b8.ckpt)  |
 
 </div>
 
