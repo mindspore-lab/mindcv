@@ -8,7 +8,7 @@ import math
 import mindspore.common.initializer as init
 from mindspore import Tensor, nn
 
-from .helpers import load_pretrained, make_divisible
+from .helpers import build_model_with_cfg, make_divisible
 from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
@@ -203,6 +203,11 @@ class MobileNetV2(nn.Cell):
             nn.BatchNorm2d(input_channels),
             nn.ReLU6(),
         ]
+
+        total_reduction = 2
+        self.feature_info = []
+        self.flatten_sequential = True
+
         # Building inverted residual blocks.
         for t, c, n, s in inverted_residual_setting:
             output_channel = make_divisible(c * alpha, round_nearest)
@@ -210,12 +215,23 @@ class MobileNetV2(nn.Cell):
                 stride = s if i == 0 else 1
                 features.append(InvertedResidual(input_channels, output_channel, stride, expand_ratio=t))
                 input_channels = output_channel
+
+                total_reduction *= stride
+
+                if len(features) == 16:
+                    self.feature_info.append(dict(chs=output_channel, reduction=total_reduction,
+                                                  name=f'features.{len(features) - 1}'))
+
         # Building last point-wise layers.
         features.extend([
             nn.Conv2d(input_channels, last_channels, 1, 1, pad_mode="pad", padding=0, has_bias=False),
             nn.BatchNorm2d(last_channels),
             nn.ReLU6(),
         ])
+
+        self.feature_info.append(dict(chs=last_channels, reduction=total_reduction,
+                                      name=f'features.{len(features) - 1}'))
+
         self.features = nn.SequentialCell(features)
 
         self.pool = GlobalAvgPooling()
@@ -259,18 +275,18 @@ class MobileNetV2(nn.Cell):
         return x
 
 
+def _create_mobilenet_v2(pretrained=False, **kwargs):
+    return build_model_with_cfg(MobileNetV2, pretrained, **kwargs)
+
+
 @register_model
 def mobilenet_v2_140(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> MobileNetV2:
     """Get MobileNetV2 model with width scaled by 1.4 and input image size of 224.
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_140"]
-    model = MobileNetV2(alpha=1.4, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=1.4, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -279,12 +295,8 @@ def mobilenet_v2_130_224(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_130_224"]
-    model = MobileNetV2(alpha=1.3, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=1.3, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -293,12 +305,8 @@ def mobilenet_v2_100(pretrained: bool = False, num_classes: int = 1000, in_chann
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_100"]
-    model = MobileNetV2(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -307,12 +315,8 @@ def mobilenet_v2_100_192(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_100_192"]
-    model = MobileNetV2(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -321,12 +325,8 @@ def mobilenet_v2_100_160(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_100_160"]
-    model = MobileNetV2(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -335,12 +335,8 @@ def mobilenet_v2_100_128(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_100_128"]
-    model = MobileNetV2(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -349,12 +345,8 @@ def mobilenet_v2_100_96(pretrained: bool = False, num_classes: int = 1000, in_ch
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_100_96"]
-    model = MobileNetV2(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=1.0, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -363,12 +355,8 @@ def mobilenet_v2_075(pretrained: bool = False, num_classes: int = 1000, in_chann
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_075"]
-    model = MobileNetV2(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -377,12 +365,8 @@ def mobilenet_v2_075_192(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_075_192"]
-    model = MobileNetV2(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -391,12 +375,8 @@ def mobilenet_v2_075_160(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_075_160"]
-    model = MobileNetV2(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -405,12 +385,8 @@ def mobilenet_v2_075_128(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_075_128"]
-    model = MobileNetV2(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -419,12 +395,8 @@ def mobilenet_v2_075_96(pretrained: bool = False, num_classes: int = 1000, in_ch
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_075_96"]
-    model = MobileNetV2(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.75, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -433,12 +405,8 @@ def mobilenet_v2_050_224(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_050_224"]
-    model = MobileNetV2(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -447,12 +415,8 @@ def mobilenet_v2_050_192(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_050_192"]
-    model = MobileNetV2(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -461,12 +425,8 @@ def mobilenet_v2_050_160(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_050_160"]
-    model = MobileNetV2(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -475,12 +435,8 @@ def mobilenet_v2_050_128(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_050_128"]
-    model = MobileNetV2(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -489,12 +445,8 @@ def mobilenet_v2_050_96(pretrained: bool = False, num_classes: int = 1000, in_ch
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_050_96"]
-    model = MobileNetV2(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.5, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -503,12 +455,8 @@ def mobilenet_v2_035_224(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_035_224"]
-    model = MobileNetV2(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -517,12 +465,8 @@ def mobilenet_v2_035_192(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_035_192"]
-    model = MobileNetV2(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -531,12 +475,8 @@ def mobilenet_v2_035_160(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_035_160"]
-    model = MobileNetV2(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -545,12 +485,8 @@ def mobilenet_v2_035_128(pretrained: bool = False, num_classes: int = 1000, in_c
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_035_128"]
-    model = MobileNetV2(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
 
 @register_model
@@ -559,9 +495,5 @@ def mobilenet_v2_035_96(pretrained: bool = False, num_classes: int = 1000, in_ch
     Refer to the base class `models.MobileNetV2` for more details.
     """
     default_cfg = default_cfgs["mobilenet_v2_035_96"]
-    model = MobileNetV2(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
-
-    if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
-
-    return model
+    model_args = dict(alpha=0.35, num_classes=num_classes, in_channels=in_channels, **kwargs)
+    return _create_mobilenet_v2(pretrained, **dict(default_cfg=default_cfg, **model_args))

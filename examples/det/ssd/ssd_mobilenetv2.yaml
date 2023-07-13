@@ -38,7 +38,7 @@ max_boxes: 100
 all_reduce_fusion_config: [29, 58, 89]
 
 # model
-backbone: "mobilenet_v2_100_224"
+backbone: "mobilenet_v2_100"
 backbone_ckpt_path: "/root/zjd/mindcv/checkpoints/mobilenetv2/mobilenet_v2_100-d5532038.ckpt"
 backbone_ckpt_auto_mapping: True
 backbone_features_only: True

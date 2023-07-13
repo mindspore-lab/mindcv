@@ -265,7 +265,7 @@ class ResNet50FPNWrapper(nn.Cell):
 
 
 backbone_wrapper = {
-    "mobilenet_v2_100_224": MobileNetV2Wrapper,
+    "mobilenet_v2_100": MobileNetV2Wrapper,
     "resnet50": ResNet50FPNWrapper,
 }
 
