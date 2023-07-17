@@ -256,6 +256,22 @@ def create_parser():
     group.add_argument('--drop_overflow_update', type=bool, default=False,
                        help='Whether to execute optimizer if there is an overflow (default=False)')
 
+    # distillation
+    group = parser.add_argument_group('Distillation parameters')
+    group.add_argument('--distillation_type', type=str, default=None,
+                       choices=['hard', 'soft'],
+                       help='The type of distillation (default=None)')
+    group.add_argument('--teacher_model', type=str, default=None,
+                       help='Name of teacher model (default=None)')
+    group.add_argument('--teacher_ckpt_path', type=str, default='',
+                       help='Initialize teacher model from this checkpoint. '
+                            'If use distillation, specify the checkpoint path (default="").')
+    group.add_argument('--teacher_ema', type=str2bool, nargs='?', const=True, default=False,
+                       help='Whether teacher model training with ema (default=False)')
+    group.add_argument('--distillation_alpha', type=float, default=0.5,
+                       help='The coefficient to balance the distillation loss and base loss. '
+                            '(default=0.5)')
+
     # modelarts
     group = parser.add_argument_group('modelarts')
     group.add_argument('--enable_modelarts', type=str2bool, nargs='?', const=True, default=False,

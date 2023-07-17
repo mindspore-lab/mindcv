@@ -19,6 +19,7 @@ from mindcv.utils import (
     require_customized_train_step,
     set_logger,
     set_seed,
+    set_validation,
 )
 
 from config import parse_args, save_args  # isort: skip
@@ -180,6 +181,19 @@ def train(args):
         aux_factor=args.aux_factor,
     )
 
+    # create teacher model
+    teacher_network = None
+    if args.distillation_type:
+        if not args.teacher_ckpt_path:
+            logger.warning("You are using distillation, but your teacher model has not loaded weights.")
+        teacher_network = create_model(
+            model_name=args.teacher_model,
+            num_classes=num_classes,
+            checkpoint_path=args.teacher_ckpt_path,
+            ema=args.teacher_ema,
+        )
+        set_validation(teacher_network)
+
     # create learning rate schedule
     lr_scheduler = create_scheduler(
         num_batches,
@@ -213,6 +227,7 @@ def train(args):
             args.clip_grad,
             args.gradient_accumulation_steps,
             args.amp_cast_list,
+            args.distillation_type,
         )
     ):
         optimizer_loss_scale = args.loss_scale
@@ -250,6 +265,9 @@ def train(args):
         clip_grad=args.clip_grad,
         clip_value=args.clip_value,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
+        distillation_type=args.distillation_type,
+        teacher_network=teacher_network,
+        distillation_alpha=args.distillation_alpha,
     )
 
     # callback
