@@ -43,7 +43,7 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
     python train.py --model swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir=/path/to/dataset
     ```
 
-- **高性能** MindCV集成了大量基于CNN和和Transformer的高性能模型, 如SwinTransformer，并提供预训练权重、训练策略和性能报告，帮助用户快速选型并将其应用于视觉模型。
+- **高性能** MindCV集成了大量基于CNN和Transformer的高性能模型，如SwinTransformer，并提供预训练权重、训练策略和性能报告，帮助用户快速选型并将其应用于视觉模型。
 
 - **灵活高效** MindCV基于高效的深度学习框架MindSpore开发，具有自动并行和自动微分等特性，支持不同硬件平台上（CPU/GPU/Ascend），同时支持效率优化的静态图模式和调试灵活的动态图模式。
 
@@ -96,7 +96,7 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
 
 ### 模型训练
 
-通过`train.py`，用户可以很容易地在标准数据集或自定义数据集上训练模型，用户可以通过外部变量或者yaml配文件来设置训练策略（如数据增强、学习率策略）。
+通过`train.py`，用户可以很容易地在标准数据集或自定义数据集上训练模型，用户可以通过外部变量或者yaml配置文件来设置训练策略（如数据增强、学习率策略）。
 
 - 单卡训练
 
@@ -131,9 +131,9 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
     ```
 
     !!! tip "预定义的训练策略"
-        MindCV目前提前了超过20种模型训练策略，在ImageNet取得SoTA性能。
+        MindCV目前提供了超过20种模型训练策略，在ImageNet取得SoTA性能。
         具体的参数配置和详细精度性能汇总请见[`configs`](https://github.com/mindspore-lab/mindcv/tree/main/configs)文件夹。
-        您可以便捷将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）。
+        您可以便捷地将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）。
 
 - 在ModelArts/OpenI平台上训练
 
@@ -230,8 +230,8 @@ python validate.py --model=resnet50 --dataset=imagenet --data_dir=/path/to/data 
     * Stochastic Depth (depends on networks)
     * Dropout (depends on networks)
 * 损失函数
-    * Cross Entropy (w/ class weight and auxiliary  logit support)
-    * Binary Cross Entropy  (w/ class weight and auxiliary  logit support)
+    * Cross Entropy (w/ class weight and auxiliary logit support)
+    * Binary Cross Entropy  (w/ class weight and auxiliary logit support)
     * Soft Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
     * Soft Binary Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
 * 模型融合

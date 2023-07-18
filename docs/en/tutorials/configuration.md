@@ -35,7 +35,7 @@ Let's use squeezenet_1.0 model as an example to explain how to configure the cor
 
 4. Corresponding code example
 
-    > `args.mode` represents the parameter `mode`, `args.distribute` represents the parameter `distribute`。
+    > `args.mode` represents the parameter `mode`, `args.distribute` represents the parameter `distribute`.
 
     ```python
     def train(args):
@@ -66,9 +66,9 @@ Let's use squeezenet_1.0 model as an example to explain how to configure the cor
 
    - dataset_download: whether to download the dataset.
 
-   - batch_size: The number of rows each batch.
+   - batch_size: The number of rows in each batch.
 
-   - drop_remainder: Determines whether to drop the last block whose data row number is less than batch size.
+   - drop_remainder: Determines whether to drop the last block whose data row number is less than the batch size.
 
    - num_parallel_workers: Number of workers(threads) to process the dataset in parallel.
 
@@ -133,7 +133,7 @@ Let's use squeezenet_1.0 model as an example to explain how to configure the cor
 
 1. Parameter description
 
-   - image_resize: the image size after resize for adapting to network.
+   - image_resize: the image size after resizing for adapting to the network.
 
    - scale: random resize scale.
 
@@ -147,7 +147,7 @@ Let's use squeezenet_1.0 model as an example to explain how to configure the cor
 
    - color_jitter: color jitter factor.
 
-   - re_prob: probability of performing erasing.
+   - re_prob: the probability of performing erasing.
 
 2. Sample yaml file
 
@@ -202,21 +202,21 @@ Let's use squeezenet_1.0 model as an example to explain how to configure the cor
 
 1. Parameter description
 
-   - model: model name。
+   - model: model name.
 
-   - num_classes: number of label classes.。
+   - num_classes: number of label classes.
 
-   - pretrained: whether load pretrained model。
+   - pretrained: whether load pretrained model.
 
-   - ckpt_path: initialize model from this checkpoint.。
+   - ckpt_path: initialize model from this checkpoint.
 
-   - keep_checkpoint_max: max number of checkpoint files。
+   - keep_checkpoint_max: max number of checkpoint files.
 
-   - ckpt_save_dir: path of checkpoint.
+   - ckpt_save_dir: the path of checkpoint.
 
    - epoch_size: train epoch size.
 
-   - dataset_sink_mode: the dataset sink mode。
+   - dataset_sink_mode: the dataset sink mode.
 
    - amp_level: auto mixed precision level for saving memory and acceleration.
 
@@ -302,7 +302,7 @@ Let's use squeezenet_1.0 model as an example to explain how to configure the cor
 
    - scheduler: name of scheduler.
 
-   - min_lr: the minimum value of learning rate if scheduler supports.
+   - min_lr: the minimum value of learning rate if the scheduler supports.
 
    - lr: learning rate.
 
@@ -352,13 +352,13 @@ Let's use squeezenet_1.0 model as an example to explain how to configure the cor
 
 1. Parameter description
 
-   - opt: name of optimizer。
+   - opt: name of optimizer.
 
    - filter_bias_and_bn: filter Bias and BatchNorm.
 
    - momentum: Hyperparameter of type float, means momentum for the moving average.
 
-   - weight_decay: weight decay（L2 penalty）。
+   - weight_decay: weight decay (L2 penalty).
 
    - loss_scale: gradient scaling factor
 

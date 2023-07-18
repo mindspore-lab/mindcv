@@ -26,7 +26,7 @@ pip install -r requirements.txt
 
 ## PyPI源安装
 
-MindCV发布为一个[Python包]并能够通过`pip`进行安装。我们推荐您在[虚拟环境]安装使用。 打开终端，输入以下指令来安装MindCV:
+MindCV被发布为一个[Python包]并能够通过`pip`进行安装。我们推荐您在[虚拟环境]安装使用。 打开终端，输入以下指令来安装MindCV:
 
 === "stable"
 

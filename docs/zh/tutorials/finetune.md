@@ -54,7 +54,7 @@ data/
 - 当参数`name`设为空时，指定为自定义数据集。(默认值)
 - 当参数`name`设为`MNIST`, `CIFAR10`等标准数据集名称时，指定为预设数据集。
 
-同时，我们需要设定数据集的路经`data_dir`和数据切分的名称`split` (如train, val)，以加载对应的训练集或者验证集。
+同时，我们需要设定数据集的路径`data_dir`和数据切分的名称`split` (如train, val)，以加载对应的训练集或者验证集。
 
 ```python
 from mindcv.data import create_dataset, create_transforms, create_loader
@@ -293,7 +293,7 @@ def visualize_model(model, val_dl, num_classes=2):
     plt.show()
 ```
 
-使用微调过后的模型件对验证集的狼和狗图像数据进行预测。若预测字体为蓝色表示预测正确，若预测字体为红色表示预测错误。
+使用微调过后的模型对验证集的狼和狗图像数据进行预测。若预测字体为蓝色表示预测正确，若预测字体为红色表示预测错误。
 
 ```python
 visualize_model(model, loader_val)
