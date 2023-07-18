@@ -41,9 +41,9 @@ from .layers.classifier import ClassifierHead
 
 ## `__all__`
 
-> Python 没有原生的可见性控制，其可见性的维护是靠一套需要大家自觉遵守的”约定“。`__all__` 是针对模块公开接口的一种约定，以提供了”白名单“的形式暴露接口。如果定义了`__all__`，其他文件中使用`from xxx import *`导入该文件时，只会导入` __all__ `列出的成员，可以其他成员都被排除在外。
+> Python 没有原生的可见性控制，其可见性的维护是靠一套需要大家自觉遵守的“约定”。`__all__` 是针对模块公开接口的一种约定，以提供了”白名单“的形式暴露接口。如果定义了`__all__`，其他文件中使用`from xxx import *`导入该文件时，只会导入` __all__ `列出的成员，可以其他成员都被排除在外。
 
-我们约定模型中对外暴露的接口包括主模型类以及返回不同规格模型的函数， 例如：
+我们约定模型中对外暴露的接口包括主模型类以及返回不同规格模型的函数，例如：
 
 ```python
 __all__ = [
@@ -103,7 +103,7 @@ class MixerBlock(nn.Cell):
   - CellList is just a container that contains a list of neural network layers(Cell). The Cells contained by it can be properly registered, and will be visible by all Cell methods. We must overwrite the forward calculation, that is, the construct function.
 
 
-  - SequentialCell is a container than holds a sequential list of layers(Cell). The Cells may have a name(OrderedDict) or not(List). We don't need to implement forward computation, which is done according to the order of the sequential list.
+  - SequentialCell is a container that holds a sequential list of layers(Cell). The Cells may have a name(OrderedDict) or not(List). We don't need to implement forward computation, which is done according to the order of the sequential list.
 
 - construct
 

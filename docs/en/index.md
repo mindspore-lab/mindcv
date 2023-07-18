@@ -61,7 +61,7 @@ See [Installation](./installation.md) for details.
 
 ### Hands-on Tutorial
 
-To get started with MindCV, please see the [Quick Start](./tutorials/quick_start.md), which will give you a quick tour on each key component and the train/validate/predict pipelines.
+To get started with MindCV, please see the [Quick Start](./tutorials/quick_start.md), which will give you a quick tour of each key component and the train/validate/predict pipelines.
 
 Below are a few code snippets for your taste.
 
@@ -105,7 +105,7 @@ It is easy to train your model on a standard or customized dataset using `train.
     python train.py --model=resnet50 --dataset=cifar10 --dataset_download
     ```
 
-    Above is an example for training ResNet50 on CIFAR10 dataset on a CPU/GPU/Ascend device
+    Above is an example of training ResNet50 on CIFAR10 dataset on a CPU/GPU/Ascend device
 
 - Distributed Training
 
@@ -142,8 +142,8 @@ It is easy to train your model on a standard or customized dataset using `train.
 
     ```text
     1. Create a new training task on the cloud platform.
-    2. Add run parameter `config` and specify the path to the yaml config file on the website UI interface.
-    3. Add run parameter `enable_modelarts` and set True on the website UI interface.
+    2. Add the parameter `config` and specify the path to the yaml config file on the website UI interface.
+    3. Add the parameter `enable_modelarts` and set True on the website UI interface.
     4. Fill in other blanks on the website and launch the training task.
     ```
 
@@ -180,7 +180,7 @@ python validate.py --model=resnet50 --dataset=imagenet --data_dir=/path/to/data 
         --val_while_train --val_split=test --val_interval=1
     ```
 
-    The training loss and validation accuracy for each epoch  will be saved in `${ckpt_save_dir}/results.log`.
+    The training loss and validation accuracy for each epoch will be saved in `${ckpt_save_dir}/results.log`.
 
     More examples about training and validation can be seen in [examples](https://github.com/mindspore-lab/mindcv/tree/main/examples).
 
@@ -242,7 +242,7 @@ We provide the following jupyter notebook tutorials to help users learn to use M
 
 ## How to Contribute
 
-We appreciate all kind of contributions including issues and PRs to make MindCV better.
+We appreciate all kinds of contributions including issues and PRs to make MindCV better.
 
 Please refer to [CONTRIBUTING](./notes/contributing.md) for the contributing guideline.
 Please follow the [Model Template and Guideline](./how_to_guides/write_a_new_model.md) for contributing a model that fits the overall interface :)
