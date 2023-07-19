@@ -25,8 +25,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model               | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                              | Download                                                                                          |
-|---------------------|----------|-----------|-----------|------------|---------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| Model                | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                              | Download                                                                                          |
+|----------------------|----------|-----------|-----------|------------|---------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
 | swinv2_tiny_window8 | D910x8-G | 81.42     | 95.43     | 28.78      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformerv2/swinv2_tiny_window8_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/swinv2/swinv2_tiny_window8-3ef8b787.ckpt) |
 
 </div>

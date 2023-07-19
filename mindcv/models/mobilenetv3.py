@@ -34,14 +34,14 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "mobilenet_v3_small_1.0": _cfg(
+    "mobilenet_v3_small_100": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-509c6047.ckpt"
     ),
-    "mobilenet_v3_large_1.0": _cfg(
+    "mobilenet_v3_large_100": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-1279ad5f.ckpt"
     ),
-    "mobilenet_v3_small_0.75": _cfg(url=""),
-    "mobilenet_v3_large_0.75": _cfg(url=""),
+    "mobilenet_v3_small_075": _cfg(url=""),
+    "mobilenet_v3_large_075": _cfg(url=""),
 }
 
 
@@ -251,7 +251,7 @@ def mobilenet_v3_small_100(pretrained: bool = False, num_classes: int = 1000, in
     """Get small MobileNetV3 model without width scaling.
     Refer to the base class `models.MobileNetV3` for more details.
     """
-    default_cfg = default_cfgs["mobilenet_v3_small_1.0"]
+    default_cfg = default_cfgs["mobilenet_v3_small_100"]
     model_args = dict(arch="small", alpha=1.0, in_channels=in_channels, num_classes=num_classes, **kwargs)
     return _create_mobilenet_v3(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
@@ -261,7 +261,7 @@ def mobilenet_v3_large_100(pretrained: bool = False, num_classes: int = 1000, in
     """Get large MobileNetV3 model without width scaling.
     Refer to the base class `models.MobileNetV3` for more details.
     """
-    default_cfg = default_cfgs["mobilenet_v3_large_1.0"]
+    default_cfg = default_cfgs["mobilenet_v3_large_100"]
     model_args = dict(arch="large", alpha=1.0, in_channels=in_channels, num_classes=num_classes, **kwargs)
     return _create_mobilenet_v3(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
@@ -271,7 +271,7 @@ def mobilenet_v3_small_075(pretrained: bool = False, num_classes: int = 1000, in
     """Get small MobileNetV3 model with width scaled by 0.75.
     Refer to the base class `models.MobileNetV3` for more details.
     """
-    default_cfg = default_cfgs["mobilenet_v3_small_0.75"]
+    default_cfg = default_cfgs["mobilenet_v3_small_075"]
     model_args = dict(arch="small", alpha=0.75, in_channels=in_channels, num_classes=num_classes, **kwargs)
     return _create_mobilenet_v3(pretrained, **dict(default_cfg=default_cfg, **model_args))
 
@@ -281,6 +281,6 @@ def mobilenet_v3_large_075(pretrained: bool = False, num_classes: int = 1000, in
     """Get large MobileNetV3 model with width scaled by 0.75.
     Refer to the base class `models.MobileNetV3` for more details.
     """
-    default_cfg = default_cfgs["mobilenet_v3_large_0.75"]
+    default_cfg = default_cfgs["mobilenet_v3_large_075"]
     model_args = dict(arch="large", alpha=0.75, in_channels=in_channels, num_classes=num_classes, **kwargs)
     return _create_mobilenet_v3(pretrained, **dict(default_cfg=default_cfg, **model_args))

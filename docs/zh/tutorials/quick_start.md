@@ -20,7 +20,7 @@
 
 ### 数据集
 
-通过[mindcv.data](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html)中的[create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset)模块，我们可快速地读取标准数据集或自定义的数据集。
+通过[mindcv.data](https://mindspore-lab.github.io/mindcv/zh/reference/data/)中的[create_dataset](https://mindspore-lab.github.io/mindcv/zh/reference/data/#mindcv.data.dataset_factory.create_dataset)模块，我们可以快速地读取标准数据集或自定义的数据集。
 
 ```python
 import os
@@ -38,7 +38,7 @@ dataset_train = create_dataset(
 
 ### 数据变换
 
-通过[create_transforms](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_transforms)函数, 可直接得到标准数据集合适的数据处理增强策略(transform list)，包括Cifar10, ImageNet上常用的数据处理策略。
+[create_transforms](https://mindspore-lab.github.io/mindcv/zh/reference/data/#mindcv.data.transforms_factory.create_transforms)函数可直接生成适配标准数据集的数据处理增强策略(transform list)，包括Cifar10, ImageNet上常用的数据处理策略。
 
 ```python
 # 创建所需的数据增强操作的列表
@@ -47,7 +47,7 @@ trans = create_transforms(dataset_name='cifar10', image_resize=224)
 
 ### 数据加载
 
-通过[mindcv.data.create_loader](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_loader)函数，进行数据转换和batch切分加载，我们需要将[create_transforms](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_transforms)返回的transform_list传入。
+通过[mindcv.data.create_loader](https://mindspore-lab.github.io/mindcv/zh/reference/data/#mindcv.data.loader.create_loader)函数，进行数据转换和batch切分加载，我们需要将[create_transforms](https://mindspore-lab.github.io/mindcv/zh/reference/data/#mindcv.data.transforms_factory.create_transforms)返回的transform_list传入。
 
 ```python
 # 执行数据增强操作，生成所需数据集。
@@ -61,11 +61,11 @@ loader_train = create_loader(dataset=dataset_train,
 num_batches = loader_train.get_dataset_size()
 ```
 
-> 在notebook中避免重复执行[create_loader](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_loader)单个Cell，或在执行[create_dataset](https://mindcv.readthedocs.io/en/latest/api/mindcv.data.html#mindcv.data.create_dataset)之后再次执行。
+> 在notebook中避免重复执行[create_loader](https://mindspore-lab.github.io/mindcv/zh/reference/data/#mindcv.data.loader.create_loader)单个Cell，或在执行[create_dataset](https://mindspore-lab.github.io/mindcv/zh/reference/data/#mindcv.data.dataset_factory.create_dataset)之后再次执行。
 
 ## 模型创建和加载
 
-使用[create_model](https://mindcv.readthedocs.io/en/latest/api/mindcv.models.html#mindcv.models.create_model)接口获得实例化的DenseNet，并加载预训练权重densenet_121_224.ckpt（ImageNet数据集训练得到）。
+使用[create_model](https://mindspore-lab.github.io/mindcv/zh/reference/models/#mindcv.models.model_factory.create_model)接口获得实例化的DenseNet，并加载预训练权重densenet_121_224.ckpt（ImageNet数据集训练得到）。
 
 ```python
 from mindcv.models import create_model
@@ -78,7 +78,7 @@ network = create_model(model_name='densenet121', num_classes=num_classes, pretra
 
 ## 损失函数
 
-通过[create_loss](https://mindcv.readthedocs.io/en/latest/api/mindcv.loss.html#mindcv.loss.create_loss)接口获得损失函数
+通过[create_loss](https://mindspore-lab.github.io/mindcv/zh/reference/loss/#mindcv.loss.loss_factory.create_loss)接口获得损失函数
 
 ```python
 from mindcv.loss import create_loss
@@ -88,7 +88,7 @@ loss = create_loss(name='CE')
 
 ## 学习率调度器
 
-使用[create_scheduler](https://mindcv.readthedocs.io/en/latest/api/mindcv.scheduler.html#mindcv.scheduler.create_scheduler)接口设置学习率策略。
+使用[create_scheduler](https://mindspore-lab.github.io/mindcv/zh/reference/scheduler/#mindcv.scheduler.scheduler_factory.create_scheduler)接口设置学习率策略。
 
 ```python
 from mindcv.scheduler import create_scheduler
@@ -101,7 +101,7 @@ lr_scheduler = create_scheduler(steps_per_epoch=num_batches,
 
 ## 优化器
 
-使用[create_optimizer](https://mindcv.readthedocs.io/en/latest/api/mindcv.optim.html#mindcv.optim.create_optimizer)接口创建优化器。
+使用[create_optimizer](https://mindspore-lab.github.io/mindcv/zh/reference/optim/#mindcv.optim.optim_factory.create_optimizer)接口创建优化器。
 
 ```python
 from mindcv.optim import create_optimizer

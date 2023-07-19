@@ -20,7 +20,7 @@ interpolation: 'bilinear'
 crop_pct: 0.875
 
 # model
-model: 'mnasnet0_75'
+model: 'mnasnet_075'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''

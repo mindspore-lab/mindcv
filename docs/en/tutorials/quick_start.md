@@ -3,13 +3,13 @@
 [![Download Notebook](https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.8/resource/_static/logo_notebook_en.png)](https://download.mindspore.cn/toolkits/mindcv/tutorials/quick_start.ipynb)
 
 
-[MindCV] is an open source toolbox for computer vision research and development based on [MindSpore].
+[MindCV] is an open-source toolbox for computer vision research and development based on [MindSpore].
 It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pretrained weights.
 SoTA methods such as AutoAugment are also provided for performance improvement.
 With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks.
 In this tutorial, we will provide a quick start guideline for MindCV.
 
-This tutorial will take DenseNet classification model as an example to implement transfer training on [CIFAR-10] dataset, and explain the usage of MindCV modules in this process.
+This tutorial will take DenseNet classification model as an example to implement transfer training on [CIFAR-10] dataset and explain the usage of MindCV modules in this process.
 
 [MindCV]: https://github.com/mindspore-lab/mindcv
 [MindSpore]: https://www.mindspore.cn/en
@@ -90,7 +90,7 @@ loss = create_loss(name='CE')
 
 ## Learning Rate Scheduler
 
-Use `create_scheduler` interface sets the learning rate scheduler.
+Use `create_scheduler` interface to set the learning rate scheduler.
 
 ```python
 from mindcv.scheduler import create_scheduler
@@ -199,7 +199,7 @@ loader_val = create_loader(dataset=dataset_val,
 
 Load the fine-tuning parameter file (densenet121-cifar10-5_782.ckpt) to the model.
 
-Encapsulate inferable instances according to the parameters passed in by the user, load the validation data set, and verify the precision of the fine-tuned DenseNet121 model.
+Encapsulate inferable instances according to the parameters passed in by the user, load the validation dataset and verify the precision of the fine-tuned DenseNet121 model.
 
 ```python
 # Verify the accuracy of DenseNet121 after fine-tune

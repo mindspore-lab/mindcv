@@ -18,13 +18,13 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model        | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                             | Download                                                                                 |
-|--------------|----------|-----------|-----------|------------|----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
-| MnasNet_0.5  | D910x8-G | 68.07     | 88.09     | 2.14       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.5_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_050-7d8bf4db.ckpt) |
-| MnasNet_0.75 | D910x8-G | 71.81     | 90.53     | 3.20       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_075-465d366d.ckpt) |
-| MnasNet_1_0  | D910x8-G | 74.28     | 91.70     | 4.42       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.0_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_100-1bcf43f8.ckpt)  |
-| MnasNet_1_3  | D910x8-G | 75.65     | 92.64     | 6.33       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.3_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_130-a43a150a.ckpt)  |
-| MnasNet_1.4  | D910x8-G | 76.01     | 92.83     | 7.16       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.4_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_140-7e20bb30.ckpt)  |
+| Model       | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                            | Download                                                                                 |
+|-------------|----------|-----------|-----------|------------|---------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| mnasnet_050 | D910x8-G | 68.07     | 88.09     | 2.14       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_050-7d8bf4db.ckpt) |
+| mnasnet_075 | D910x8-G | 71.81     | 90.53     | 3.20       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_075-465d366d.ckpt) |
+| mnasnet_100 | D910x8-G | 74.28     | 91.70     | 4.42       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_100-1bcf43f8.ckpt)  |
+| mnasnet_130 | D910x8-G | 75.65     | 92.64     | 6.33       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.3_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_130-a43a150a.ckpt)  |
+| mnasnet_140 | D910x8-G | 76.01     | 92.83     | 7.16       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_140-7e20bb30.ckpt)  |
 
 </div>
 

@@ -3,7 +3,7 @@
 
 ## Introduction
 
-InceptionV3 is an upgraded version of GoogleNet. One of the most important improvements of V3 is Factorization, which
+InceptionV3 is an upgraded version of GoogLeNet. One of the most important improvements of V3 is Factorization, which
 decomposes 7x7 into two one-dimensional convolutions (1x7, 7x1), and 3x3 is the same (1x3, 3x1), such benefits, both It
 can accelerate the calculation (excess computing power can be used to deepen the network), and can split 1 conv into 2
 convs, which further increases the network depth and increases the nonlinearity of the network. It is also worth noting
@@ -26,7 +26,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model        | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                  | Download                                                                                    |
 |--------------|----------|-----------|-----------|------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
-| Inception_v3 | D910x8-G | 79.11     | 94.40     | 27.20      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv3/inception_v3_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/inception_v3/inception_v3-38f67890.ckpt) |
+| inception_v3 | D910x8-G | 79.11     | 94.40     | 27.20      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv3/inception_v3_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/inception_v3/inception_v3-38f67890.ckpt) |
 
 </div>
 

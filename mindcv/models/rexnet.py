@@ -16,11 +16,11 @@ from .registry import register_model
 
 __all__ = [
     "ReXNetV1",
-    "rexnet_x09",
-    "rexnet_x10",
-    "rexnet_x13",
-    "rexnet_x15",
-    "rexnet_x20",
+    "rexnet_09",
+    "rexnet_10",
+    "rexnet_13",
+    "rexnet_15",
+    "rexnet_20",
 ]
 
 
@@ -36,11 +36,11 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "rexnet_x09": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_09-da498331.ckpt"),
-    "rexnet_x10": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_10-c5fb2dc7.ckpt"),
-    "rexnet_x13": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_13-a49c41e5.ckpt"),
-    "rexnet_x15": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_15-37a931d3.ckpt"),
-    "rexnet_x20": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_20-c5810914.ckpt"),
+    "rexnet_09": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_09-da498331.ckpt"),
+    "rexnet_10": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_10-c5fb2dc7.ckpt"),
+    "rexnet_13": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_13-a49c41e5.ckpt"),
+    "rexnet_15": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_15-37a931d3.ckpt"),
+    "rexnet_20": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_20-c5810914.ckpt"),
 }
 
 
@@ -267,40 +267,40 @@ def _rexnet(
 
 
 @register_model
-def rexnet_x09(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
+def rexnet_09(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
     """Get ReXNet model with width multiplier of 0.9.
     Refer to the base class `models.ReXNetV1` for more details.
     """
-    return _rexnet("rexnet_x09", 0.9, in_channels, num_classes, pretrained, **kwargs)
+    return _rexnet("rexnet_09", 0.9, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def rexnet_x10(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
+def rexnet_10(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
     """Get ReXNet model with width multiplier of 1.0.
     Refer to the base class `models.ReXNetV1` for more details.
     """
-    return _rexnet("rexnet_x10", 1.0, in_channels, num_classes, pretrained, **kwargs)
+    return _rexnet("rexnet_10", 1.0, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def rexnet_x13(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
+def rexnet_13(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
     """Get ReXNet model with width multiplier of 1.3.
     Refer to the base class `models.ReXNetV1` for more details.
     """
-    return _rexnet("rexnet_x13", 1.3, in_channels, num_classes, pretrained, **kwargs)
+    return _rexnet("rexnet_13", 1.3, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def rexnet_x15(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
+def rexnet_15(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
     """Get ReXNet model with width multiplier of 1.5.
     Refer to the base class `models.ReXNetV1` for more details.
     """
-    return _rexnet("rexnet_x15", 1.5, in_channels, num_classes, pretrained, **kwargs)
+    return _rexnet("rexnet_15", 1.5, in_channels, num_classes, pretrained, **kwargs)
 
 
 @register_model
-def rexnet_x20(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
+def rexnet_20(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> ReXNetV1:
     """Get ReXNet model with width multiplier of 2.0.
     Refer to the base class `models.ReXNetV1` for more details.
     """
-    return _rexnet("rexnet_x20", 2.0, in_channels, num_classes, pretrained, **kwargs)
+    return _rexnet("rexnet_20", 2.0, in_channels, num_classes, pretrained, **kwargs)

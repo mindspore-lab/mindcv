@@ -49,13 +49,13 @@ This will automatically install compatible versions of dependencies:
 
     If you don't have prior experience with Python, we recommend reading
     [Using Python's pip to Manage Your Projects' Dependencies], which is a really
-    good introduction on the mechanics of Python package management and helps you
+    good introduction to the mechanics of Python package management and helps you
     troubleshoot if you run into errors.
 
 !!! warning
 
     The above command will **NOT** install [MindSpore].
-    We highly recommand you install [MindSpore] following the [official instructions](https://www.mindspore.cn/install).
+    We highly recommend you install [MindSpore] following the [official instructions](https://www.mindspore.cn/install).
 
 [Python package]: https://pypi.org/project/mindcv/
 [virtual environment]: https://realpython.com/what-is-pip/#using-pip-in-a-python-virtual-environment
