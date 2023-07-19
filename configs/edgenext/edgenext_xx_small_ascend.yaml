@@ -3,6 +3,7 @@ mode: 0
 distribute: True
 num_parallel_workers: 8
 val_while_train: True
+seed: 1
 
 # dataset
 dataset: 'imagenet'
@@ -58,4 +59,5 @@ filter_bias_and_bn: True
 momentum: 0.9
 weight_decay: 0.05
 loss_scale: 1024
+drop_overflow_update: True
 use_nesterov: False

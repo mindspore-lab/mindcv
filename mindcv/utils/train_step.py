@@ -152,6 +152,8 @@ class TrainStep(nn.TrainOneStepWithLossScaleCell):
                 # if there is no overflow, do optimize
                 if not overflow:
                     loss = self.gradient_accumulation(loss, grads)
+                    if self.ema:
+                        loss = F.depend(loss, self.ema_update())
             else:
                 # apply grad reducer on grads
                 grads = self.grad_reducer(grads)
@@ -161,6 +163,8 @@ class TrainStep(nn.TrainOneStepWithLossScaleCell):
                 # if there is no overflow, do optimize
                 if not overflow:
                     loss = F.depend(loss, self.optimizer(grads))
+                    if self.ema:
+                        loss = F.depend(loss, self.ema_update())
         else:  # scale_sense = loss_scale: Tensor --> TrainOneStepCell.construct
             if self.accumulate_grad:
                 loss = self.gradient_accumulation(loss, grads)
@@ -168,7 +172,7 @@ class TrainStep(nn.TrainOneStepWithLossScaleCell):
                 grads = self.grad_reducer(grads)
                 loss = F.depend(loss, self.optimizer(grads))
 
-        if self.ema:
-            loss = F.depend(loss, self.ema_update())
+            if self.ema:
+                loss = F.depend(loss, self.ema_update())
 
         return loss
