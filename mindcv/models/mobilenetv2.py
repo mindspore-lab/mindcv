@@ -207,6 +207,8 @@ class MobileNetV2(nn.Cell):
         total_reduction = 2
         self.feature_info = []
         self.flatten_sequential = True
+        self.feature_info.append(dict(chs=input_channels, reduction=total_reduction,
+                                      name=f'features.{len(features) - 1}'))
 
         # Building inverted residual blocks.
         for t, c, n, s in inverted_residual_setting:
@@ -217,10 +219,8 @@ class MobileNetV2(nn.Cell):
                 input_channels = output_channel
 
                 total_reduction *= stride
-
-                if len(features) == 16:
-                    self.feature_info.append(dict(chs=output_channel, reduction=total_reduction,
-                                                  name=f'features.{len(features) - 1}'))
+                self.feature_info.append(dict(chs=output_channel, reduction=total_reduction,
+                                              name=f'features.{len(features) - 1}'))
 
         # Building last point-wise layers.
         features.extend([
