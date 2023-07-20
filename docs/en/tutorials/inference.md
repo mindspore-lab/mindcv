@@ -98,7 +98,7 @@ Image.open("./data/test/dog/dog.jpg")
 
 ### Data Preprocessing
 
-Call the `create_transforms` function to obtain the data processing strategy (transform list) of the ImageNet dataset used by the pre training model.
+Call the `create_transforms` function to obtain the data processing strategy (transform list) of the ImageNet dataset used by the pre-trained model.
 
 We pass the obtained transform list into the `create_loader` function, specify `batch_size=1` and other parameters, and then complete the preparation of test data. The `Dataset` object is returned as the input of the model.
 

@@ -186,7 +186,7 @@ python train.py --model=resnet50 --dataset=cifar10 \
     --val_while_train --val_split=test --val_interval=1
 ```
 
-The training loss and validation accuracy for each epoch  will be saved in `{ckpt_save_dir}/results.log`.
+The training loss and validation accuracy for each epoch will be saved in `{ckpt_save_dir}/results.log`.
 
 More examples about training and validation can be seen in [examples](examples/scripts).
 
@@ -316,7 +316,7 @@ See [RELEASE](RELEASE.md) for detailed history.
 
 ## How to Contribute
 
-We appreciate all kind of contributions including issues and PRs to make MindCV better.
+We appreciate all kinds of contributions including issues and PRs to make MindCV better.
 
 Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline.
 Please follow the [Model Template and Guideline](docs/en/how_to_guides/write_a_new_model.md) for contributing a model that fits the overall interface :)
@@ -337,7 +337,7 @@ If you find this project useful in your research, please consider citing:
 
 ```latex
 @misc{MindSpore Computer Vision 2022,
-    title={{MindSpore Computer  Vision}:MindSpore Computer Vision Toolbox and Benchmark},
+    title={{MindSpore Computer Vision}:MindSpore Computer Vision Toolbox and Benchmark},
     author={MindSpore Vision Contributors},
     howpublished = {\url{https://github.com/mindspore-lab/mindcv/}},
     year={2022}

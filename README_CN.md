@@ -48,7 +48,7 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
     python train.py --model swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir=/path/to/dataset
     ```
 
-- **高性能** MindCV集成了大量基于CNN和和Transformer的高性能模型, 如SwinTransformer，并提供预训练权重、训练策略和性能报告，帮助用户快速选型并将其应用于视觉模型。
+- **高性能** MindCV集成了大量基于CNN和Transformer的高性能模型, 如SwinTransformer，并提供预训练权重、训练策略和性能报告，帮助用户快速选型并将其应用于视觉模型。
 
 - **灵活高效** MindCV基于高效的深度学习框架MindSpore开发，具有自动并行和自动微分等特性，支持不同硬件平台上（CPU/GPU/Ascend），同时支持效率优化的静态图模式和调试灵活的动态图模式。
 
@@ -132,14 +132,14 @@ python infer.py --model=swin_tiny --image_path='./dog.jpg'
 
 - 超参配置和预训练策略
 
-    您可以编写yaml文件或设置外部参数来指定配置数据、模型、优化器等组件及其超参。以下是使用预设的训练策略（yaml文件）进行模型训练的示例。
+    您可以编写yaml文件或设置外部参数来指定配置数据、模型、优化器等组件及其超参数。以下是使用预设的训练策略（yaml文件）进行模型训练的示例。
 
     ```shell
     mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml
     ```
 
     **预定义的训练策略**
-    MindCV目前提前了超过20种模型训练策略，在ImageNet取得SoTA性能。
+    MindCV目前提供了超过20种模型训练策略，在ImageNet取得SoTA性能。
     具体的参数配置和详细精度性能汇总请见[`configs`](configs)文件夹。
     您可以便捷地将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）。
 
