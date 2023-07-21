@@ -23,6 +23,7 @@ re_prob: 0.25
 crop_pct: 0.875
 mixup: 0.2
 cutmix: 1.0
+cutmix_prob: 0.0
 
 # model
 model: "mixnet_m"
@@ -34,6 +35,7 @@ ckpt_save_dir: "./ckpt"
 epoch_size: 600
 dataset_sink_mode: True
 amp_level: "O3"
+drop_rate: 0.25
 
 # loss
 loss: "CE"
