@@ -3,17 +3,16 @@
 In this tutorial, you will learn how to apply feature extraction to the models in MindCV.
 In real deep learning model projects, we often exploit classic CV backbones, such as ResNet, VGG, for the purposes of better performance and fast development. Generally, using only the final output of backbones is not enough.
 We need outputs from intermediate layers, which act as multi-level abstractions of the input, to help further boost the performance of our downstream tasks.
-To this end, we have designed a mechanism for extracting multi-level features from backbones in MindCV. At the time of composing this tutorial, MindCV has supported extracting features with this mechanism from ResNet, MobileNetV3, ConvNeXt, ResNeST, EfficientNet, RepVGG, HRNet, and ReXNet. For more details of the feature extraction mechanism, please refer to [`FeatureExtractWrapper`](https://github.com/DexterJZ/mindcv/blob/main/mindcv/models/features.py#L36).
+To this end, we have designed a mechanism for extracting multi-level features from backbones in MindCV. At the time of composing this tutorial, MindCV has supported extracting features with this mechanism from ResNet, MobileNetV3, ConvNeXt, ResNeST, EfficientNet, RepVGG, HRNet, and ReXNet. For more details of the feature extraction mechanism, please refer to [`FeatureExtractWrapper`](https://github.com/mindspore-lab/mindcv/blob/main/mindcv/models/features.py#L36).
 
 This tutorial will help you learn how to add some a piece of code to extracting features from the rest of backbones. There are mainly two steps to achieve this:
 
 1. In `__init__()` of a model, register the intermediate layers whose outputted feature needs to be extracted in `self.feature_info`.
 2. Add a wrapper function for model creation.
-3. Pass `feature_only=True` and `out_indices` to [`create_model()`](https://github.com/DexterJZ/mindcv/blob/main/mindcv/models/model_factory.py#L7).
+3. Pass `feature_only=True` and `out_indices` to [`create_model()`](https://github.com/mindspore-lab/mindcv/blob/main/mindcv/models/model_factory.py#L7).
 
 ## Layer Registration
 
-There are mainly three types of model implementation
 There are mainly three possible scenarios when implementing code for feature extraction in MindCV, i.e.,
 * a model with separate sequential module for each layer,
 * a model with one sequential module for all layers, and
@@ -67,7 +66,7 @@ class DummyNet1(nn.Cell):
 
 As we can see above, `self.feature_info` is a list of dictionaries, each of which contains three key-value pairs. Specifically, `chs` denotes the channel number of the produced feature, `reduction` denotes the total stride at the current layer, and `name` indicates the name of this layer stored in the model parameters which can be found using [`get_parameters()`](https://www.mindspore.cn/docs/en/r1.8/note/api_mapping/pytorch_diff/GetParams.html).
 
-For a real example of this scenario, please refer to [ResNet](https://github.com/DexterJZ/mindcv/blob/main/mindcv/models/resnet.py).
+For a real example of this scenario, please refer to [ResNet](https://github.com/mindspore-lab/mindcv/blob/main/mindcv/models/resnet.py#L177).
 
 ### Scenario 2: One Sequential Module for All Layers
 
@@ -115,7 +114,7 @@ class DummyNet2(nn.Cell):
 
 Please be reminded that the order of the module instantiations in `__init__()` is very important. The order must be kept as same as the order that these modules are called in `forward_features()` and `construct()`. Furthermore, only the modules called in `forward_features()` and `construct()` should be instantiated as member variables with the type of `nn.Cell`. Otherwise, the feature extraction mechanism will not work.
 
-For a real example of this scenario, please refer to [MobileNetV3](https://github.com/DexterJZ/mindcv/blob/main/mindcv/models/mobilenetv3.py).
+For a real example of this scenario, please refer to [MobileNetV3](https://github.com/mindspore-lab/mindcv/blob/main/mindcv/models/mobilenetv3.py#L112).
 
 ### Scenario 3: Nonsequential Modules
 
@@ -182,7 +181,7 @@ class DummyFeatureNet3(DummyNet3):
         self.feature_info.append(dict(chs=, reduction=, name=”stage1”)  # register layer
         self.feature_info.append(dict(chs=, reduction=, name=”stage2”)  # register layer
 
-    def forward_features(self, x):
+    def forward_features(self, x):  # reimplement feature extraction logic
         out = []
         x_list = []
 
@@ -207,11 +206,11 @@ class DummyFeatureNet3(DummyNet3):
         return x
 ```
 
-For a real example of this scenario, please refer to [HRNet](https://github.com/DexterJZ/mindcv/blob/main/mindcv/models/hrnet.py).
+For a real example of this scenario, please refer to [HRNet](https://github.com/mindspore-lab/mindcv/blob/main/mindcv/models/hrnet.py#L688).
 
 ## Adding A Wrapper Function for Model Creation
 
-After adding layer registration, we need to add one more simple wrapper function for model creation, so that the model instance can be passed to [`build_model_with_cfg()`](https://github.com/DexterJZ/mindcv/blob/main/mindcv/models/helpers.py#L170) for feature extraction.
+After adding layer registration, we need to add one more simple wrapper function for model creation, so that the model instance can be passed to [`build_model_with_cfg()`](https://github.com/mindspore-lab/mindcv/blob/main/mindcv/models/helpers.py#L170) for feature extraction.
 
 Usually, the original creation function of a model in MindCV looks like this,
 
@@ -227,7 +226,7 @@ def dummynet18(pretrained: bool = False, num_classes: int = 1000, in_channels=3,
     return model
 ```
 
-As for the models falling into scenarios 1 & 2, to add a wrapper function of model creation, simply wrap the model instantiation part (the bold part in the above example) in a function, e.g.,
+As for the models falling into scenarios 1 & 2, in the wrapper function of model creation, simply pass the arguements to `build_model_with_cfg()`, e.g.,
 
 ```
 def _create_dummynet(pretrained=False, **kwargs):
@@ -240,7 +239,7 @@ def dummynet18(pretrained: bool = False, num_classes: int = 1000, in_channels=3,
     return _create_dummynet(pretrained, **dict(default_cfg=default_cfg, **model_args))
 ```
 
-As for the models falling into scenario 3, most part of the wrapper function is the same as the ones for scenarios 1 & 2. The difference lies in the part of deciding which model class to be instantiated. This is conditioned on the feature_only parameter, e.g.,
+As for the models falling into scenario 3, most part of the wrapper function is the same as the ones for scenarios 1 & 2. The difference lies in the part of deciding which model class to be instantiated. This is conditioned on `feature_only`, e.g.,
 
 ```
 def _create_dummynet(pretrained=False, **kwargs):
@@ -256,13 +255,16 @@ def dummynet18(pretrained: bool = False, num_classes: int = 1000, in_channels=3,
     return _create_dummynet(pretrained, **dict(default_cfg=default_cfg, **model_args))
 ```
 
-For real examples, please refer to [ResNet](https://github.com/DexterJZ/mindcv/blob/main/mindcv/models/resnet.py) and [HRNet](https://github.com/DexterJZ/mindcv/blob/main/mindcv/models/hrnet.py).
+For real examples, please refer to [ResNet](https://github.com/mindspore-lab/mindcv/blob/main/mindcv/models/resnet.py#L304) and [HRNet](https://github.com/mindspore-lab/mindcv/blob/main/mindcv/models/hrnet.py#L749).
 
 ## Passing Arguements to `create_model()`
 
 After the previous two steps are done, we can simply create the backbone that outputs the desired features by passing `feature_only=True` and `out_indices` to `create_model()`, e.g.,
 
 ```
+from mindcv.models import create_model
+
+
 backbone = create_model(
     model_name="dummynet18",
     features_only=True,  # set features_only to be True
@@ -273,6 +275,9 @@ backbone = create_model(
 In addtion, if we want to load a checkpoint into the backbone for feature extraction and this backbone falls into scenarios 2, we need to also set `auto_mapping=True`, e.g.,
 
 ```
+from mindcv.models import create_model
+
+
 backbone = create_model(
     model_name="dummynet18",
     checkpoint_path="/path/to/dummynet18.ckpt",
