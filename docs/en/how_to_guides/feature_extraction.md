@@ -1,11 +1,11 @@
-# MindCV Model Feature Extraction
+# Multi-Scale Feature Extraction
 
-In this tutorial, you will learn how to apply feature extraction to the models in MindCV.
+In this guide, you will learn how to apply multi-scale feature extraction to the models in MindCV.
 In real deep learning model projects, we often exploit classic CV backbones, such as ResNet, VGG, for the purposes of better performance and fast development. Generally, using only the final output of backbones is not enough.
-We need outputs from intermediate layers, which act as multi-level abstractions of the input, to help further boost the performance of our downstream tasks.
-To this end, we have designed a mechanism for extracting multi-level features from backbones in MindCV. At the time of composing this tutorial, MindCV has supported extracting features with this mechanism from ResNet, MobileNetV3, ConvNeXt, ResNeST, EfficientNet, RepVGG, HRNet, and ReXNet. For more details of the feature extraction mechanism, please refer to [`FeatureExtractWrapper`](https://github.com/mindspore-lab/mindcv/blob/main/mindcv/models/features.py#L36).
+We need outputs from intermediate layers, which act as multi-scale abstractions of the input, to help further boost the performance of our downstream tasks.
+To this end, we have designed a mechanism for extracting multi-scale features from backbones in MindCV. At the time of composing this guide, MindCV has supported extracting features with this mechanism from ResNet, MobileNetV3, ConvNeXt, ResNeST, EfficientNet, RepVGG, HRNet, and ReXNet. For more details of the feature extraction mechanism, please refer to [`FeatureExtractWrapper`](https://github.com/mindspore-lab/mindcv/blob/main/mindcv/models/features.py#L36).
 
-This tutorial will help you learn how to add some a piece of code to extracting features from the rest of backbones. There are mainly two steps to achieve this:
+This guide will help you learn how to add pieces of code to extracting multi-scale features from the rest of backbones. There are mainly two steps to achieve this:
 
 1. In `__init__()` of a model, register the intermediate layers whose outputted feature needs to be extracted in `self.feature_info`.
 2. Add a wrapper function for model creation.
@@ -287,4 +287,4 @@ backbone = create_model(
 )
 ```
 
-Congradulations! Now you have learnt how to apply feature extraction to the models in MindCV.
+Congradulations! Now you have learnt how to apply multi-scale feature extraction to the models in MindCV.

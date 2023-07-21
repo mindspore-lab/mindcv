@@ -1,11 +1,11 @@
-# MindCV模型特征抽取
+# 多尺度特征提取
 
-在本教程中，您将学习如何在MindCV中对模型进行特征抽取。
+在本教程中，您将学习如何在MindCV中对模型进行多尺度特征抽取。
 在实际的深度学习模型项目中，我们经常使用经典的计算机视觉骨干网络，如ResNet、VGG，以获得更好的性能和更快的开发进度。通常情况下，仅使用骨干网络的最终输出往往是不够的。
-我们需要来自中间层的输出，它们作为输入的多级抽象，可以帮助进一步提升我们下游任务的性能。
-为此，我们在MindCV中设计了一种从骨干网络中抽取多级特征的机制。在编写本教程时，MindCV已经支持从ResNet、MobileNetV3、ConvNeXt、ResNeST、EfficientNet、RepVGG、HRNet和ReXNet中使用这种机制抽取特征。有关特征抽取机制的更多详细信息，请参阅[`FeatureExtractWrapper`](https://github.com/mindspore-lab/mindcv/blob/main/mindcv/models/features.py#L36).
+我们需要来自中间层的输出，它们作为输入的多尺度抽象，可以帮助进一步提升我们下游任务的性能。
+为此，我们在MindCV中设计了一种从骨干网络中抽取多尺度特征的机制。在编写本教程时，MindCV已经支持从ResNet、MobileNetV3、ConvNeXt、ResNeST、EfficientNet、RepVGG、HRNet和ReXNet中使用这种机制抽取特征。有关特征抽取机制的更多详细信息，请参阅[`FeatureExtractWrapper`](https://github.com/mindspore-lab/mindcv/blob/main/mindcv/models/features.py#L36).
 
-本教程将帮助您学习如何添加一些代码来从其余骨干网络中抽取特征。主要有两个步骤：
+本教程将帮助您学习如何添加一些代码来从其余骨干网络中抽取多尺度特征。主要有两个步骤：
 
 1. 在模型的`__init__()`中，注册需要提取输出特征的中间层，将其添加到`self.feature_info`中。
 2. 添加一个用于模型创建的封装函数。
@@ -287,4 +287,4 @@ backbone = create_model(
 )
 ```
 
-恭喜您！现在您已经学会了如何在MindCV中对模型进行特征抽取。
+恭喜您！现在您已经学会了如何在MindCV中对模型进行多尺度特征抽取。
