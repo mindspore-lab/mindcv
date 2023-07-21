@@ -23,6 +23,7 @@ re_prob: 0.25
 crop_pct: 0.875
 mixup: 0.2
 cutmix: 1.0
+cutmix_prob: 0.0
 
 # model
 model: "mixnet_s"
