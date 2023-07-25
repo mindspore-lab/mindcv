@@ -39,7 +39,7 @@ all_reduce_fusion_config: [29, 58, 89]
 
 # model
 backbone: "mobilenet_v3_large_100"
-backbone_ckpt_path: "/root/zjd/mindcv/checkpoints/mobilenetv3/mobilenet_v3_large_100-1279ad5f.ckpt"
+backbone_ckpt_path: "./checkpoints/mobilenetv3/mobilenet_v3_large_100-1279ad5f.ckpt"
 backbone_ckpt_auto_mapping: True
 backbone_features_only: True
 backbone_out_indices: [12, 16]

@@ -39,12 +39,12 @@ all_reduce_fusion_config: [90, 183, 279]
 
 # model
 backbone: "resnet50"
-backbone_ckpt_path: "/root/zjd/mindcv/checkpoints/resnet/resnet50-e0733ab8.ckpt"
+backbone_ckpt_path: "./checkpoints/resnet/resnet50-e0733ab8.ckpt"
 backbone_ckpt_auto_mapping: False
 backbone_features_only: True
 backbone_out_indices: [2, 3, 4]
 
-ckpt_path: "/root/zjd/mindcv/ckpt/ssd-1_458.ckpt"
+ckpt_path: "./ckpt/ssd-1_458.ckpt"
 
 use_fpn: True
 num_default: [6, 6, 6, 6, 6]
