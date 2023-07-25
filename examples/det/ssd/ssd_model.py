@@ -264,9 +264,61 @@ class ResNet50FPNWrapper(nn.Cell):
         return features
 
 
+class MobileNetV3Wrapper(nn.Cell):
+    def __init__(self, backbone, args):
+        super(MobileNetV3Wrapper, self).__init__()
+        self.backbone = backbone
+
+        feature1_output_channels = backbone.out_channels[0]
+
+        self.feature1_expand_layer = nn.SequentialCell([
+            nn.Conv2d(feature1_output_channels, 672, 1, 1,
+                      pad_mode="pad", padding=0, has_bias=False),
+            nn.BatchNorm2d(672),
+            nn.HSwish(),
+        ])
+
+        in_channels = args.extras_in_channels
+        out_channels = args.extras_out_channels
+        ratios = args.extras_ratio
+        strides = args.extras_strides
+        residual_list = []
+
+        for i in range(2, len(in_channels)):
+            residual = InvertedResidual(
+                in_channels[i], out_channels[i], stride=strides[i], expand_ratio=ratios[i], last_relu=True
+            )
+            residual_list.append(residual)
+
+        self.multi_residual = nn.CellList(residual_list)
+
+        self._initialize_weights()
+
+    def _initialize_weights(self) -> None:
+        params = self.feature1_expand_layer.trainable_params()
+        params.extend(self.multi_residual.trainable_params())
+
+        for p in params:
+            if "beta" not in p.name and "gamma" not in p.name and "bias" not in p.name:
+                p.set_data(initializer(TruncatedNormal(0.02), p.data.shape, p.data.dtype))
+
+    def construct(self, x):
+        feature1, feature2 = self.backbone(x)
+        layer_out = self.feature1_expand_layer(feature1)
+        multi_feature = (layer_out, feature2)
+        feature = feature2
+
+        for residual in self.multi_residual:
+            feature = residual(feature)
+            multi_feature += (feature,)
+
+        return multi_feature
+
+
 backbone_wrapper = {
     "mobilenet_v2_100": MobileNetV2Wrapper,
     "resnet50": ResNet50FPNWrapper,
+    "mobilenet_v3_large_100": MobileNetV3Wrapper,
 }
 
 
