@@ -17,6 +17,7 @@ nav:
   - How-To Guides:  # Problem Oriented
       - Write A New Model: how_to_guides/write_a_new_model.md
       - Multi-Scale Feature Extraction: how_to_guides/feature_extraction.md
+      - Fine-tune with A Custom Dataset: how_to_guides/finetune_with_a_custom_dataset.md
   - Reference:
       - data: reference/data.md
       - loss: reference/loss.md

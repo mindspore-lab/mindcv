@@ -278,7 +278,11 @@ class StateMonitor(Callback):
         else:  # if the optimizer is successfully called, the global_step will actually be the value of next step.
             optim_step = optimizer.global_step - 1
         if optimizer.dynamic_lr:
-            lr = optimizer.learning_rate(optim_step)[0]
+            if isinstance(optimizer.learning_rate, ms.nn.CellList):
+                # return the learning rates of the first parameter if dynamic_lr
+                lr = optimizer.learning_rate[0](optim_step)[0]
+            else:
+                lr = optimizer.learning_rate(optim_step)[0]
         else:
             lr = optimizer.learning_rate
         return lr
