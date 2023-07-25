@@ -271,12 +271,13 @@ class MobileNetV3Wrapper(nn.Cell):
 
         feature1_output_channels = backbone.out_channels[0]
 
-        self.feature1_expand_layer = nn.SequentialCell([
-            nn.Conv2d(feature1_output_channels, 672, 1, 1,
-                      pad_mode="pad", padding=0, has_bias=False),
-            nn.BatchNorm2d(672),
-            nn.HSwish(),
-        ])
+        self.feature1_expand_layer = nn.SequentialCell(
+            [
+                nn.Conv2d(feature1_output_channels, 672, 1, 1, pad_mode="pad", padding=0, has_bias=False),
+                nn.BatchNorm2d(672),
+                nn.HSwish(),
+            ]
+        )
 
         in_channels = args.extras_in_channels
         out_channels = args.extras_out_channels
