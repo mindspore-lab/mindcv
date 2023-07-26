@@ -688,7 +688,7 @@ class SSDInferWithDecoder(nn.Cell):
     """
 
     def __init__(self, network, args):
-        super(SSDInferWithDecoder, self).__init__()
+        super(SSDInferWithDecoder, self).__init__(auto_prefix=False)
         self.network = network
 
         if hasattr(args, "use_anchor_generator") and args.use_anchor_generator:
