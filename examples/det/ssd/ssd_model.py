@@ -578,7 +578,7 @@ class SSDWithLossCell(nn.Cell):
     """
 
     def __init__(self, network, args):
-        super(SSDWithLossCell, self).__init__()
+        super(SSDWithLossCell, self).__init__(auto_prefix=False)
         self.network = network
         self.less = ops.Less()
         self.tile = ops.Tile()
