@@ -41,6 +41,7 @@ ckpt_save_dir: './ckpt'
 epoch_size: 350
 dataset_sink_mode: True
 amp_level: 'O2'
+val_amp_level: 'O2'
 drop_path_rate: 0.1
 
 # loss
