@@ -16,7 +16,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model      | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                       | Download                                                     |
 | ---------- | --------- | --------- | ---------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| halonet50t | 79.528    | 94.788    | 6.99       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/halonet/halonet_50t_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/halonet/) |
+| halonet50t | 79.528    | 94.788    | 6.99       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/halonet/halonet_50t_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/halonet/halonet50t-2efa9106.ckpt/) |
 
 </div>
 
