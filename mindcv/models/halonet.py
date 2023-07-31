@@ -20,6 +20,7 @@ def _cfg(url="", **kwargs):
     return {
         "url": url,
         "num_classes": 1000,
+        "input_size": (3, 256, 256),
         "first_conv": "stem.conv1.conv",
         "classifier": "classifier",
         **kwargs,
@@ -27,7 +28,7 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "halonet50t": _cfg(
+    "halonet_50t": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/halonet/halonet_50t-533da6be.ckpt")
 }
 
@@ -141,13 +142,14 @@ class Stem(nn.Cell):
         self.conv1 = ConvBnAct(3, 24, kernel_size=3, stride=2, padding=1, act=act)
         self.conv2 = ConvBnAct(24, 32, kernel_size=3, stride=1, padding=1, act=act)
         self.conv3 = ConvBnAct(32, 64, kernel_size=3, stride=1, padding=1, act=act)
+        self.pad = ops.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)))
         self.pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='valid')
 
     def construct(self, x):
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
-        x = ms.numpy.pad(x, ((0, 0), (0, 0), (1, 0), (1, 0)), constant_values=-32768)
+        x = self.pad(x)
         x = self.pool(x)
         return x
 
@@ -280,7 +282,6 @@ class HaloAttention(nn.Cell):
                            self.dim_out_qk,
                            1,
                            stride=self.block_stride,
-
                            has_bias=qkv_bias,
                            weight_init=HeUniform())
         self.kv = nn.Conv2d(dim, self.dim_out_qk + self.dim_out_v, 1, has_bias=qkv_bias)
@@ -625,7 +626,7 @@ class HaloNet(nn.Cell):
 def halonet_50t(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get HaloNet model.
     Refer to the base class `models.HaloNet` for more details."""
-    default_cfg = default_cfgs["halonet"]
+    default_cfg = default_cfgs["halonet_50t"]
     model = HaloNet(
         depth_list=[3, 4, 6, 3],
         stage1_block=['bottle', 'bottle', 'bottle'],

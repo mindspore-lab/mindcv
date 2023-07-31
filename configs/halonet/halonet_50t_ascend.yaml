@@ -50,7 +50,7 @@ use_nesterov: False
 # lr scheduler
 scheduler: 'warmup_cosine_decay'
 min_lr: 0.000006
-lr:  0.000234375
+lr:  0.00125
 warmup_epochs: 3
 decay_epochs: 297
 
