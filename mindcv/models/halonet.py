@@ -3,6 +3,7 @@ MindSpore implementation of `HaloNet`.
 Refer to Scaling Local Self-Attention for Parameter Effificient Visual Backbones.
 """
 import mindspore as ms
+import mindspore.common.initializer as init
 import mindspore.numpy as msnp
 from mindspore import Parameter, Tensor, nn, ops
 from mindspore.common.initializer import HeUniform, TruncatedNormal
@@ -611,6 +612,24 @@ class HaloNet(nn.Cell):
             nn.Dense(chs_list[4], num_classes, TruncatedNormal(.02), bias_init='zeros'),
             Identity()]
         )
+        self._initialize_weights()
+
+    def _initialize_weights(self) -> None:
+        """Initialize weights for cells."""
+        for _, cell in self.cells_and_names():
+            if isinstance(cell, nn.Conv2d):
+                cell.weight.set_data(init.initializer(init.HeUniform(), cell.weight.shape, cell.weight.dtype))
+                if cell.bias is not None:
+                    cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
+            elif isinstance(cell, nn.BatchNorm2d):
+                cell.gamma.set_data(init.initializer("ones", cell.gamma.shape, cell.gamma.dtype))
+                cell.beta.set_data(init.initializer("zeros", cell.beta.shape, cell.beta.dtype))
+            elif isinstance(cell, nn.Dense):
+                cell.weight.set_data(init.initializer(init.HeUniform(), cell.weight.shape, cell.weight.dtype))
+                if cell.bias is not None:
+                    cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
+
+        pass
 
     def construct(self, x):
         x = self.stem(x)
