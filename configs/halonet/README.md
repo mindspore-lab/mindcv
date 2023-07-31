@@ -1,10 +1,10 @@
-# ConvNeXt
+# HaloNet
 > [Scaling Local Self-Attention for Parameter Effificient Visual Backbones](https://arxiv.org/abs/2103.12731)
 
 ## Introduction
 
-​		Researchers from Google Research and UC Berkeley have developed a new model of self-attention that can outperform standard baseline models and even high-performance convolutional models.[[1](https://github.com/mindspore-lab/mindcv/diffs/0?base_sha=308825d43f92ea20ccae08b7f388948349664596&branch=6ed77368429ac1b6e6586d8cfcd27c476e6e214f&commentable=true&head_user=xjtu-fgh&name=6ed77368429ac1b6e6586d8cfcd27c476e6e214f&pull_number=713&qualified_name=6ed77368429ac1b6e6586d8cfcd27c476e6e214f&sha1=308825d43f92ea20ccae08b7f388948349664596&sha2=5dcde6e357c4ea1f885474d3f2775d34f25d70b8&short_path=d3e159c&unchanged=expanded&w=false#references)]  
-​		Blocked Self-Attention：The whole input image is divided into multiple blocks and self-attention is applied to each block.However, if only the information inside the block is considered each time, it will inevitably lead to the loss of information.Therefore, before calculating the SA, a haloing operation is performed on each block, i.e., outside of each block, the information of the original image is used to padding a circle, so that the sensory field of each block can be appropriately larger and focus on more information.  
+​		Researchers from Google Research and UC Berkeley have developed a new model of self-attention that can outperform standard baseline models and even high-performance convolutional models.[[1](#references)]
+​		Blocked Self-Attention：The whole input image is divided into multiple blocks and self-attention is applied to each block.However, if only the information inside the block is considered each time, it will inevitably lead to the loss of information.Therefore, before calculating the SA, a haloing operation is performed on each block, i.e., outside of each block, the information of the original image is used to padding a circle, so that the sensory field of each block can be appropriately larger and focus on more information.
 ​		Down Sampling：In order to reduce the amount of computation, each block is sampled separately, and then attentions are performed on this sampled information to reach the effect of down sampling.
 
 
@@ -14,9 +14,9 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model      | Context   | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                       | Download                                                     |
-| ---------- | --------- | --------- | --------- | ---------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| halonet50t | D910x64-G | 79.528    | 94.788    | 28.59      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/halonet/halonet_50t_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/halonet/halonet50t-d441ba2c.ckpt) |
+| Model      | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                       | Download                                                     |
+| ---------- | -------- | --------- | --------- | ---------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| halonet50t | D910X8-G | 79.53     | 94.79     | 28.59      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/halonet/halonet_50t_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/halonet/halonet_50t-533da6be.ckpt) |
 
 </div>
 
@@ -77,4 +77,4 @@ Please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv
 
 ## References
 
-[1] Scaling Local Self-Attention for Parameter Effificient Visual Backbones.
+[1] Scaling Local Self-Attention for Parameter Effificient Visual Backbones. CVPR，2021.

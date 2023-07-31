@@ -2,22 +2,36 @@
 MindSpore implementation of `HaloNet`.
 Refer to Scaling Local Self-Attention for Parameter Effificient Visual Backbones.
 """
-
 import mindspore as ms
-from mindspore import nn, ops, Tensor, Parameter
-from mindspore.common.initializer import HeUniform, TruncatedNormal, One
-from numpy import expand_dims, transpose
 import mindspore.numpy as msnp
-from mindspore import dtype as mstype
-from mindspore import context
+from mindspore import Parameter, Tensor, nn, ops
+from mindspore.common.initializer import HeUniform, TruncatedNormal
 
+from .helpers import load_pretrained
 from .registry import register_model
-
 
 __all__ = [
     "halonet_50t",
     "HaloNet"
 ]
+
+
+def _cfg(url="", **kwargs):
+    return {
+        "url": url,
+        "num_classes": 1000,
+        "first_conv": "stem.conv1.conv",
+        "classifier": "classifier",
+        **kwargs,
+    }
+
+
+default_cfgs = {
+    "halonet50t": _cfg(
+        url="https://download.mindspore.cn/toolkits/mindcv/halonet/halonet_50t-533da6be.ckpt")
+}
+
+
 def make_divisible(v, divisor=8, min_value=None, round_limit=.9):
     """ calculate new vector dim according to input vector dim
     """
@@ -32,6 +46,7 @@ def make_divisible(v, divisor=8, min_value=None, round_limit=.9):
 class Identity(nn.Cell):
     def __init__(self):
         super(Identity, self).__init__()
+
     def construct(self, x):
         return x
 
@@ -58,15 +73,16 @@ class ConvBnAct(nn.Cell):
                               weight_init=HeUniform(),
                               has_bias=bias_init
                               )
-        self.bn = nn.BatchNorm2d(out_channels)        
-        self.act = ActLayer(act)  
+        self.bn = nn.BatchNorm2d(out_channels)
+        self.act = ActLayer(act)
+
     def construct(self, inputs):
         out = self.conv(inputs)
         out = self.bn(out)
         out = self.act(out)
         return out
 
-        
+
 class ActLayer(nn.Cell):
     """ Build Activation Layer according to act type
     """
@@ -77,11 +93,11 @@ class ActLayer(nn.Cell):
         elif act == 'relu':
             self.act = nn.ReLU()
         else:
-            self.act = Identity()         
+            self.act = Identity()
+
     def construct(self, inputs):
         out = self.act(inputs)
-        return out      
- 
+        return out
 
 
 class BatchNormAct2d(nn.Cell):
@@ -91,6 +107,7 @@ class BatchNormAct2d(nn.Cell):
         super().__init__()
         self.bn = nn.BatchNorm2d(chs)
         self.act = ActLayer(act)
+
     def construct(self, inputs):
         out = self.bn(inputs)
         out = self.act(out)
@@ -111,8 +128,9 @@ class SelectAdaptivePool2d(nn.Cell):
             self.pool = ops.ReduceMean(keep_dims=True)
         else:
             assert False, 'Invalid pool type: %s' % pool_type
+
     def construct(self, inputs):
-        out = self.pool(inputs,(2,3))
+        out = self.pool(inputs, (2, 3))
         out = self.flatten(out)
         return out
 
@@ -123,52 +141,56 @@ class Stem(nn.Cell):
         self.conv1 = ConvBnAct(3, 24, kernel_size=3, stride=2, padding=1, act=act)
         self.conv2 = ConvBnAct(24, 32, kernel_size=3, stride=1, padding=1, act=act)
         self.conv3 = ConvBnAct(32, 64, kernel_size=3, stride=1, padding=1, act=act)
-        self.pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='valid')        
+        self.pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='valid')
+
     def construct(self, x):
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
-        x = ms.numpy.pad(x, ((0,0),(0,0),(1,0),(1,0)), constant_values= -32768)
+        x = ms.numpy.pad(x, ((0, 0), (0, 0), (1, 0), (1, 0)), constant_values=-32768)
         x = self.pool(x)
         return x
+
 
 def rel_logits_1d(q, rel_k, permute_mask):
     """ Compute relative logits along one dimension
     :param q: [batch,H,W,dim]
-    :param rel_k: [2*window-1,dim]          
+    :param rel_k: [2*window-1,dim]
     :param permute_mask: permute output axis according to this
     """
     B, H, W, _ = q.shape
     rel_size = rel_k.shape[0]
-    win_size = (rel_size+1)//2 
-    rel_k = ops.transpose(rel_k, (1, 0)) 
+    win_size = (rel_size+1)//2
+    rel_k = ops.transpose(rel_k, (1, 0))
     x = msnp.tensordot(q, rel_k, axes=1)
-    x = ops.reshape(x, (-1, W, rel_size)) 
+    x = ops.reshape(x, (-1, W, rel_size))
     # pad to shift from relative to absolute indexing
     pad = ops.Pad(paddings=((0, 0), (0, 0), (0, 1)))
     x_pad = pad(x)
     x_pad = ops.flatten(x_pad)
     x_pad = ops.expand_dims(x_pad, 1)
-    pad = ops.Pad(paddings=((0, 0),(0, 0),(0, rel_size - W)))
+    pad = ops.Pad(paddings=((0, 0), (0, 0), (0, rel_size - W)))
     x_pad = pad(x_pad)
-    x_pad = ops.squeeze(x_pad,axis=())
+    x_pad = ops.squeeze(x_pad, axis=())
     # reshape adn slice out the padded elements
-    x_pad = ops.reshape(x_pad, (-1, W+1, rel_size))    
-    x = x_pad[:, :W, win_size-1:]    
+    x_pad = ops.reshape(x_pad, (-1, W+1, rel_size))
+    x = x_pad[:, :W, win_size-1:]
     # reshape and tile
     x = ops.reshape(x, (B, H, 1, W, win_size))
     x = ops.broadcast_to(x, (B, H, win_size, W, win_size))
     x = ops.transpose(x, permute_mask)
-    return x  
+    return x
+
 
 class RelPosEmb(nn.Cell):
     """ Relative Position Embedding
     """
-    def __init__(self,
-                    block_size,
-                    win_size,
-                    dim_head,
-                    ):
+    def __init__(
+            self,
+            block_size,
+            win_size,
+            dim_head,
+            ):
         """
         :param block_size (int): block size
         :param win_size (int): neighbourhood window size
@@ -182,21 +204,20 @@ class RelPosEmb(nn.Cell):
         self.rel_height = Parameter(tensor1)
         tensor2 = Tensor(shape=((2 * win_size - 1), dim_head), dtype=ms.float32, init=TruncatedNormal(sigma=.02))
         self.rel_width = Parameter(tensor2)
-        
 
     def construct(self, q):
-        B,BB,HW,_ = q.shape
+        B, BB, HW, _ = q.shape
         # relative logits in width dimension
-        q = ops.reshape(q, (-1,self.block_size,self.block_size,self.dim_head))
-        rel_logits_w = rel_logits_1d(q,self.rel_width,permute_mask=(0,1,3,2,4))
+        q = ops.reshape(q, (-1, self.block_size, self.block_size, self.dim_head))
+        rel_logits_w = rel_logits_1d(q, self.rel_width, permute_mask=(0, 1, 3, 2, 4))
         # relative logits in height dimension
-        q = ops.transpose(q,(0,2,1,3))
-        rel_logits_h = rel_logits_1d(q,self.rel_height,permute_mask=(0,3,1,4,2))
+        q = ops.transpose(q, (0, 2, 1, 3))
+        rel_logits_h = rel_logits_1d(q, self.rel_height, permute_mask=(0, 3, 1, 4, 2))
         rel_logits = rel_logits_h+rel_logits_w
         rel_logits = ops.reshape(rel_logits, (B, BB, HW, -1))
         return rel_logits
 
- 
+
 class HaloAttention(nn.Cell):
     """
     The internal dimensions of the attention module are controlled by
@@ -224,26 +245,26 @@ class HaloAttention(nn.Cell):
     """
     def __init__(self,
                  dim,
-                 dim_out=None, 
+                 dim_out=None,
                  feat_size=None,
-                 stride=1, #
-                 num_heads=8, 
-                 dim_head=None, #dimension of query and key heads，calculated from dim_out * attn_ratio // num_heads if not set
+                 stride=1,
+                 num_heads=8,
+                 dim_head=None,
                  block_size=8,
                  halo_size=3,
-                 qk_ratio=1.0, #ratio of q and k dimensions to output dimension when dim_head not set. 
+                 qk_ratio=1.0,  # ratio of q and k dimensions to output dimension when dim_head not set.
                  qkv_bias=False,
-                 avg_down=False,# use average pool downsample instead of strided query blocks
-                 scale_pos_embed=False):#scale the position embedding as well as Q @ K
+                 avg_down=False,  # use average pool downsample instead of strided query blocks
+                 scale_pos_embed=False):  # scale the position embedding as well as Q @ K
         super().__init__()
         dim_out = dim_out or dim
         assert dim_out % num_heads == 0
         self.stride = stride
-        self.num_heads = num_heads #8
+        self.num_heads = num_heads  # 8
         self.dim_head_qk = make_divisible(dim_out * qk_ratio, divisor=8) // num_heads
-        self.dim_head_v = dim_out // self.num_heads # dimension of head
-        self.dim_out_qk = num_heads * self.dim_head_qk # dimension of query and key heads, calculated from dim_out * attn_ratio // num_heads if not set
-        self.dim_out_v = num_heads * self.dim_head_v # dimension of dim_out_v
+        self.dim_head_v = dim_out // self.num_heads  # dimension of head
+        self.dim_out_qk = num_heads * self.dim_head_qk
+        self.dim_out_v = num_heads * self.dim_head_v  # dimension of dim_out_v
         self.scale = self.dim_head_qk ** -0.5
         self.scale_pos_embed = scale_pos_embed
         self.block_size = self.block_size_ds = block_size
@@ -266,28 +287,37 @@ class HaloAttention(nn.Cell):
         self.pos_embed = RelPosEmb(
             block_size=self.block_size_ds, win_size=self.win_size, dim_head=self.dim_head_qk)
         self.pool = nn.AvgPool2d(2, 2) if use_avg_pool else Identity()
+        self.softmax_fn = ops.Softmax(-1)
+        self.pad_kv = ops.Pad(
+            paddings=((0, 0), (0, 0), (self.halo_size, self.halo_size), (self.halo_size, self.halo_size))
+            )
+        self.kv_unfold = nn.Unfold(
+            ksizes=[1, self.win_size, self.win_size, 1],
+            strides=[1, self.block_size, self.block_size, 1],
+            rates=[1, 1, 1, 1],
+            padding='valid'
+            )
+
     def construct(self, x):
         B, C, H, W = x.shape
-        assert H % self.block_size == 0 and W % self.block_size == 0, 'fmap dimensions must be divisible by the block size'
+        assert H % self.block_size == 0 and W % self.block_size == 0, 'fmap dimensions must be divisible'
         num_h_blocks = H//self.block_size
         num_w_blocks = W//self.block_size
         num_blocks = num_h_blocks * num_w_blocks
         q = self.q(x)
         # unfold
-        q = ops.reshape(q, (-1,self.dim_head_qk,num_h_blocks,self.block_size_ds,num_w_blocks,self.block_size_ds))
-        q = ops.transpose(q,(0,1,3,5,2,4))
-        q = ops.reshape(q, (B*self.num_heads,self.dim_head_qk,-1,num_blocks))
-        q = ops.transpose(q,(0,3,2,1))  # B*num_heads,num_blocks,block_size**2, dim_head
-        kv = self.kv(x) # [bs,dim_out,H,W]
-        pad_kv = ops.Pad(paddings=((0, 0), (0, 0), (self.halo_size, self.halo_size), (self.halo_size, self.halo_size))) 
-        kv = pad_kv(kv)
-        kv_unfold = nn.Unfold(ksizes=[1, self.win_size, self.win_size, 1], strides=[1, self.block_size, self.block_size, 1], rates=[1, 1, 1, 1], padding='valid')
-        kv = kv_unfold(kv) # B, C_kh_kw, _, _
-        kv = ops.reshape(kv, (B * self.num_heads, self.dim_head_qk + self.dim_head_v, -1, num_blocks)) 
-        kv = ops.transpose(kv,(0, 3, 2, 1)) # [B * self.num_heads, num_blocks, -1, self.dim_head_qk + self.dim_head_v]
-        k = kv[...,:self.dim_head_qk]
-        v = kv[...,self.dim_head_qk:(self.dim_head_qk + self.dim_head_v)]
-        k = ops.transpose(k,(0,1,3,2)) # [B * self.num_heads, num_blocks, self.dim_head_qk, -1]
+        q = ops.reshape(q, (-1, self.dim_head_qk, num_h_blocks, self.block_size_ds, num_w_blocks, self.block_size_ds))
+        q = ops.transpose(q, (0, 1, 3, 5, 2, 4))
+        q = ops.reshape(q, (B*self.num_heads, self.dim_head_qk, -1, num_blocks))
+        q = ops.transpose(q, (0, 3, 2, 1))  # B*num_heads,num_blocks,block_size**2, dim_head
+        kv = self.kv(x)  # [bs,dim_out,H,W]
+        kv = self.pad_kv(kv)
+        kv = self.kv_unfold(kv)  # B, C_kh_kw, _, _
+        kv = ops.reshape(kv, (B * self.num_heads, self.dim_head_qk + self.dim_head_v, -1, num_blocks))
+        kv = ops.transpose(kv, (0, 3, 2, 1))  # [B * self.num_heads, num_blocks, -1, self.dim_head_qk + self.dim_head_v]
+        k = kv[..., :self.dim_head_qk]
+        v = kv[..., self.dim_head_qk:(self.dim_head_qk + self.dim_head_v)]
+        k = ops.transpose(k, (0, 1, 3, 2))  # [B * self.num_heads, num_blocks, self.dim_head_qk, -1]
         if self.scale_pos_embed:
             attn = (ops.matmul(q, k) + self.pos_embed(q)) * self.scale
         else:
@@ -295,21 +325,20 @@ class HaloAttention(nn.Cell):
             part_1 = (ops.matmul(q, k)) * self.scale
             attn = part_1 + pos_embed_q
         # attn: B * num_heads, num_blocks, block_size ** 2, win_size ** 2
-        softmax_fn = ops.Softmax(-1)
-        attn = softmax_fn(attn)
-        #attn = attn @ v
-        attn = ops.matmul(attn, v) # attn: B * num_heads, num_blocks, block_size ** 2, dim_head_v
-        out = ops.transpose(attn,(0,3,2,1))  # B * num_heads, dim_head_v, block_size ** 2, num_blocks
+        attn = self.softmax_fn(attn)
+        # attn = attn @ v
+        attn = ops.matmul(attn, v)  # attn: B * num_heads, num_blocks, block_size ** 2, dim_head_v
+        out = ops.transpose(attn, (0, 3, 2, 1))  # B * num_heads, dim_head_v, block_size ** 2, num_blocks
         # fold
         out = ops.reshape(out, (-1, self.block_size_ds, self.block_size_ds, num_h_blocks, num_w_blocks))
-        out = ops.transpose(out,(0, 3, 1, 4, 2)) # -1, num_h_blocks, self.block_size_ds, num_w_blocks, self.block_size_ds
-        out = ops.reshape(out,
-            (B, self.dim_out_v, H // self.block_stride, W // self.block_stride))
+        # -1, num_h_blocks, self.block_size_ds, num_w_blocks, self.block_size_ds
+        out = ops.transpose(out, (0, 3, 1, 4, 2))
+        out = ops.reshape(out, (B, self.dim_out_v, H // self.block_stride, W // self.block_stride))
         # B, dim_out, H // block_stride, W // block_stride
         out = self.pool(out)
-        return out   
-    
-    
+        return out
+
+
 class BottleneckBlock(nn.Cell):
     """ ResNet-like Bottleneck Block - 1x1 - kxk - 1x1
     """
@@ -360,6 +389,7 @@ class BottleneckBlock(nn.Cell):
                                                 padding=0)
         self.Identity = Identity()
         self.act = ActLayer(act)
+
     def construct(self, x):
         h = x
         x = self.conv1_1x1(x)
@@ -401,7 +431,7 @@ class SelfAttnBlock(nn.Cell):
             self.stride = 1
         else:
             self.stride = stride
-        self.conv1_1x1 = ConvBnAct(out_chs, mid_chs, kernel_size=1, stride=1, padding=0,act=act)
+        self.conv1_1x1 = ConvBnAct(out_chs, mid_chs, kernel_size=1, stride=1, padding=0, act=act)
         self.conv2_kxk = Identity()
         self.conv3_1x1 = ConvBnAct(mid_chs, chs, kernel_size=1, stride=1, padding=0)
         self.self_attn = HaloAttention(mid_chs,
@@ -410,7 +440,7 @@ class SelfAttnBlock(nn.Cell):
                                        halo_size=halo_size,
                                        num_heads=num_heads,
                                        stride=self.stride)
-        self.post_attn = BatchNormAct2d(mid_chs,act=act)
+        self.post_attn = BatchNormAct2d(mid_chs, act=act)
         self.shortcut = shortcut
         if self.shortcut:
             self.creat_shortcut = ConvBnAct(out_chs,
@@ -498,8 +528,9 @@ class HaloStage(nn.Cell):
                             shortcut=shortcut,
                             act=act,
                         )
-                )
+                    )
         self.blocks = nn.CellList(blocks)
+
     def construct(self, x):
         for stage in self.blocks:
             x = stage(x)
@@ -579,6 +610,7 @@ class HaloNet(nn.Cell):
             nn.Dense(chs_list[4], num_classes, TruncatedNormal(.02), bias_init='zeros'),
             Identity()]
         )
+
     def construct(self, x):
         x = self.stem(x)
         out_stage1 = self.stage1(x)
@@ -586,50 +618,30 @@ class HaloNet(nn.Cell):
         out_stage3 = self.stage3(out_stage2)
         out_stage4 = self.stage4(out_stage3)
         out = self.classifier(out_stage4)
-        return out    
-    
-
-def build_halonet():
-    """ Build HaloNet by reading options in config object
-    :param config: config instance contains setting options
-    :return: HaloNet model
-    """
-    model = HaloNet(depth_list=[3,4,6,3],
-                    stage1_block=['bottle','bottle','bottle'],
-                    stage2_block=['bottle','bottle','bottle','attn'],
-                    stage3_block=['bottle','attn','bottle','attn','bottle','attn'],
-                    stage4_block=['bottle', 'attn', 'bottle'],
-                    chs_list=[64,256,512,1024,2048],
-                    num_heads=[0,4,8,8],
-                    num_classes=1000,
-                    stride_list=[1,2,2,2],
-                    block_size=8,
-                    halo_size=3,
-                    hidden_chs=None,
-                    act='silu',
-    )
-    return model
+        return out
 
 
 @register_model
 def halonet_50t(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
-    model = HaloNet(depth_list=[3,4,6,3],
-                stage1_block=['bottle','bottle','bottle'],
-                stage2_block=['bottle','bottle','bottle','attn'],
-                stage3_block=['bottle','attn','bottle','attn','bottle','attn'],
-                stage4_block=['bottle', 'attn', 'bottle'],
-                chs_list=[64,256,512,1024,2048],
-                num_heads=[0,4,8,8],
-                num_classes=num_classes,
-                stride_list=[1,2,2,2],
-                block_size=8,
-                halo_size=3,
-                hidden_chs=None,
-                act='silu',
-                **kwargs
+    """Get HaloNet model.
+    Refer to the base class `models.HaloNet` for more details."""
+    default_cfg = default_cfgs["halonet"]
+    model = HaloNet(
+        depth_list=[3, 4, 6, 3],
+        stage1_block=['bottle', 'bottle', 'bottle'],
+        stage2_block=['bottle', 'bottle', 'bottle', 'attn'],
+        stage3_block=['bottle', 'attn', 'bottle', 'attn', 'bottle', 'attn'],
+        stage4_block=['bottle', 'attn', 'bottle'],
+        chs_list=[64, 256, 512, 1024, 2048],
+        num_heads=[0, 4, 8, 8],
+        num_classes=num_classes,
+        stride_list=[1, 2, 2, 2],
+        block_size=8,
+        halo_size=3,
+        hidden_chs=None,
+        act='silu',
+        **kwargs
     )
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
-
-
-
-
