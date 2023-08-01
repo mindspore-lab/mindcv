@@ -7,7 +7,7 @@
 SSD is an single-staged object detector. It discretizes the output space of bounding boxes into a set of default boxes over different aspect ratios and scales per feature map location, and combines predictions from multi-scale feature maps to detect objects with various sizes. At prediction time, SSD generates scores for the presence of each object category in each default box and produces adjustments to the box to better match the object shape.
 
 <p align="center">
-  <img src="https://github.com/DexterJZ/mindcv/assets/16130861/a2262166-9412-46c4-ae77-72ca2f56e62b" width=1000 />
+  <img src="https://github.com/DexterJZ/mindcv/assets/16130861/a2262166-9412-46c4-ae77-72ca2f56e62b" width=800 />
 </p>
 <p align="center">
   <em>Figure 1. Architecture of SSD [<a href="#references">1</a>] </em>
