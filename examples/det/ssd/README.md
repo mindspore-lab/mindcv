@@ -25,9 +25,14 @@ We train and test SSD using [COCO 2017 Dataset](https://cocodataset.org/#downloa
 
 ### Preparation
 
-Install dependencies as shown [here](https://mindspore-lab.github.io/mindcv/installation/).
+1. Clone MindCV repository by running
+```
+git clone https://github.com/mindspore-lab/mindcv.git
+```
 
-Download [COCO 2017 Dataset](https://cocodataset.org/#download), prepare the dataset as follows, and specify the dataset path at keyword `data_dir` in the config file at.
+2. Install dependencies as shown [here](https://mindspore-lab.github.io/mindcv/installation/).
+
+3. Download [COCO 2017 Dataset](https://cocodataset.org/#download), prepare the dataset as follows, and specify the dataset path at keyword `data_dir` in the config file.
 ```
 .
 └─cocodataset
@@ -38,17 +43,84 @@ Download [COCO 2017 Dataset](https://cocodataset.org/#download), prepare the dat
   └─train2017
 ```
 
-Download the pretrained backbone weights from the table below, and specify the path of the backbone weights at keyword `backbone_ckpt_path` in the config file.
+4. Download the pretrained backbone weights from the table below, and specify the path to the backbone weights at keyword `backbone_ckpt_path` in the config file.
 <div align="center">
 
 |    MobileNetV2   |     ResNet50     |    MobileNetV3   |
 |:----------------:|:----------------:|:----------------:|
-| [backbone wegihts](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_100-d5532038.ckpt) | [backbone wegihts](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet50-e0733ab8.ckpt) | [backbone wegihts](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-1279ad5f.ckpt) |
+| [backbone weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_100-d5532038.ckpt) | [backbone weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet50-e0733ab8.ckpt) | [backbone weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-1279ad5f.ckpt) |
 
 </div>
 
-### Training
+### Train
 
-It is highly recommended to use distributed training for this SSD implementation.
+It is highly recommended to use **distributed training** for this SSD implementation.
 
-For using MPI
+For distributed training using **OpenMPI's `mpirun`**, simply run
+```
+cd mindcv  # change directory to the root of MindCV repository
+mpirun -n [# of devices] python examples/det/ssd/ssd_train.py --config [the path to the config file]
+```
+For example, if train SSD distributively with the `MobileNetV2` configuration on 8 devices, run
+```
+cd mindcv  # change directory to the root of MindCV repository
+mpirun -n 8 python examples/det/ssd/ssd_train.py --config examples/det/ssd/ssd_mobilenetv2.yaml
+```
+
+For distributed training with [Ascend rank table](https://github.com/mindspore-lab/mindocr/blob/main/docs/en/tutorials/distribute_train.md#12-configure-rank_table_file-for-training), configure `ascend8p.sh` as follows
+```
+#!/bin/bash
+export DEVICE_NUM=8
+export RANK_SIZE=8
+export RANK_TABLE_FILE="./hccl_8p_01234567_127.0.0.1.json"
+
+for ((i = 0; i < ${DEVICE_NUM}; i++)); do
+    export DEVICE_ID=$i
+    export RANK_ID=$i
+    echo "Launching rank: ${RANK_ID}, device: ${DEVICE_ID}"
+    if [ $i -eq 0 ]; then
+      echo 'i am 0'
+      python examples/det/ssd/ssd_train.py --config [the path to the config file] &> ./train.log &
+    else
+      echo 'not 0'
+      python -u examples/det/ssd/ssd_train.py --config [the path to the config file] &> /dev/null &
+    fi
+done
+```
+and start training by running
+```
+cd mindcv  # change directory to the root of MindCV repository
+bash ascend8p.sh
+```
+
+For single-device training, please run
+```
+cd mindcv  # change directory to the root of MindCV repository
+python examples/det/ssd/ssd_train.py --config [the path to the config file]
+```
+
+### Test
+
+For testing the trained model, first specify the path to the model checkpoint at keyword `ckpt_path` in the config file, then run
+```
+cd mindcv  # change directory to the root of MindCV repository
+python examples/det/ssd/ssd_eval.py --config [the path to the config file]
+```
+For example, for testing SSD with the `MobileNetV2` configuration, run
+```
+cd mindcv  # change directory to the root of MindCV repository
+python examples/det/ssd/ssd_eval.py --config examples/det/ssd/ssd_mobilenetv2.yaml
+```
+
+## Performance
+
+Here are the performance resutls and the pretrained model weights for each configuration.
+<div align="center">
+
+|   Configuration   | Mixed Precision |  mAP | Config | Download |
+|:-----------------:|:---------------:|:----:|:------:|:--------:|
+|    MobileNetV2    |        O2       | 23.2 |  [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_mobilenetv2.yaml)  |  [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_mobilenetv2-5bbd7411.ckpt) |
+| ResNet50 with FPN |        O3       | 38.3 |  [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_resnet50_fpn.yaml)  |  [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_resnet50_fpn-ac87ddac.ckpt) |
+|    MobileNetV3    |        O2       | 23.8 |  [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_mobilenetv3.yaml)  |  [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_mobilenetv3-53d9f6e9.ckpt) |
+
+</div>
