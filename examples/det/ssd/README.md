@@ -6,6 +6,13 @@
 
 SSD is an single-staged object detector. It discretizes the output space of bounding boxes into a set of default boxes over different aspect ratios and scales per feature map location, and combines predictions from multi-scale feature maps to detect objects with various sizes. At prediction time, SSD generates scores for the presence of each object category in each default box and produces adjustments to the box to better match the object shape.
 
+<p align="center">
+  <img src="https://github.com/DexterJZ/mindcv/assets/16130861/a2262166-9412-46c4-ae77-72ca2f56e62b" width=1000 />
+</p>
+<p align="center">
+  <em>Figure 1. Architecture of SSD [<a href="#references">1</a>] </em>
+</p>
+
 In this example, by leveraging [the multi-scale feature extraction of MindCV](https://github.com/mindspore-lab/mindcv/blob/main/docs/en/how_to_guides/feature_extraction.md), we demonstrate that using backbones from MindCV much simplifies the implementation of SSD.
 
 ## Configurations
@@ -124,3 +131,7 @@ Here are the performance resutls and the pretrained model weights for each confi
 |    MobileNetV3    |        O2       | 23.8 |  [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_mobilenetv3.yaml)  |  [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_mobilenetv3-53d9f6e9.ckpt) |
 
 </div>
+
+## References
+
+[1] Liu, W., Anguelov, D., Erhan, D., Szegedy, C., Reed, S., Fu, C. Y., & Berg, A. C. (2016). SSD: Single Shot Multibox Detector. In Computer Vision–ECCV 2016: 14th European Conference, Amsterdam, The Netherlands, October 11–14, 2016, Proceedings, Part I 14 (pp. 21-37). Springer International Publishing.
