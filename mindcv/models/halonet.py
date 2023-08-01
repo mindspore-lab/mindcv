@@ -8,7 +8,9 @@ import mindspore.numpy as msnp
 from mindspore import Parameter, Tensor, nn, ops
 from mindspore.common.initializer import HeUniform, TruncatedNormal
 
-from .helpers import load_pretrained
+from .helpers import load_pretrained, make_divisible
+from .layers.conv_norm_act import Conv2dNormActivation
+from .layers.identity import Identity
 from .registry import register_model
 
 __all__ = [
@@ -32,57 +34,6 @@ default_cfgs = {
     "halonet_50t": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/halonet/halonet_50t-533da6be.ckpt")
 }
-
-
-def make_divisible(v, divisor=8, min_value=None, round_limit=.9):
-    """ calculate new vector dim according to input vector dim
-    """
-    min_value = min_value or divisor
-    new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)
-    # Make sure that round down does not go down by more than 10%.
-    if new_v < round_limit * v:
-        new_v += divisor
-    return new_v
-
-
-class Identity(nn.Cell):
-    def __init__(self):
-        super(Identity, self).__init__()
-
-    def construct(self, x):
-        return x
-
-
-class ConvBnAct(nn.Cell):
-    """ Build layer contain: conv - bn - act
-    """
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 kernel_size,
-                 stride,
-                 padding,
-                 act=None,
-                 bias_init=False
-                 ):
-        super().__init__()
-        self.conv = nn.Conv2d(in_channels=in_channels,
-                              out_channels=out_channels,
-                              kernel_size=kernel_size,
-                              stride=stride,
-                              pad_mode="pad",
-                              padding=padding,
-                              weight_init=HeUniform(),
-                              has_bias=bias_init
-                              )
-        self.bn = nn.BatchNorm2d(out_channels)
-        self.act = ActLayer(act)
-
-    def construct(self, inputs):
-        out = self.conv(inputs)
-        out = self.bn(out)
-        out = self.act(out)
-        return out
 
 
 class ActLayer(nn.Cell):
@@ -140,9 +91,9 @@ class SelectAdaptivePool2d(nn.Cell):
 class Stem(nn.Cell):
     def __init__(self, act):
         super().__init__()
-        self.conv1 = ConvBnAct(3, 24, kernel_size=3, stride=2, padding=1, act=act)
-        self.conv2 = ConvBnAct(24, 32, kernel_size=3, stride=1, padding=1, act=act)
-        self.conv3 = ConvBnAct(32, 64, kernel_size=3, stride=1, padding=1, act=act)
+        self.conv1 = Conv2dNormActivation(3, 24, kernel_size=3, stride=2, padding=1, act=act)
+        self.conv2 = Conv2dNormActivation(24, 32, kernel_size=3, stride=1, padding=1, act=act)
+        self.conv3 = Conv2dNormActivation(32, 64, kernel_size=3, stride=1, padding=1, act=act)
         self.pad = ops.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)))
         self.pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='valid')
 
@@ -355,20 +306,23 @@ class BottleneckBlock(nn.Cell):
         super().__init__()
         self.stride = stride
         mid_chs = out_chs//4
-        self.conv1_1x1 = ConvBnAct(in_chs,
+        self.conv1_1x1 = Conv2dNormActivation(
+                                   in_chs,
                                    mid_chs,
                                    kernel_size=1,
                                    stride=1,
                                    padding=0,
                                    act=act)
-        self.conv2_kxk = ConvBnAct(mid_chs,
+        self.conv2_kxk = Conv2dNormActivation(
+                                   mid_chs,
                                    mid_chs,
                                    kernel_size=3,
                                    stride=self.stride,
                                    padding=1,
                                    act=act)
         self.conv2b_kxk = Identity()
-        self.conv3_1x1 = ConvBnAct(mid_chs,
+        self.conv3_1x1 = Conv2dNormActivation(
+                                   mid_chs,
                                    out_chs,
                                    kernel_size=1,
                                    stride=1,
@@ -378,13 +332,15 @@ class BottleneckBlock(nn.Cell):
         self.shortcut = shortcut
         if self.shortcut:
             if downsample:
-                self.creat_shortcut = ConvBnAct(in_chs,
+                self.creat_shortcut = Conv2dNormActivation(
+                                                in_chs,
                                                 out_chs,
                                                 kernel_size=1,
                                                 stride=self.stride,
                                                 padding=0)
             else:
-                self.creat_shortcut = ConvBnAct(in_chs,
+                self.creat_shortcut = Conv2dNormActivation(
+                                                in_chs,
                                                 out_chs,
                                                 kernel_size=1,
                                                 stride=1,
@@ -433,9 +389,9 @@ class SelfAttnBlock(nn.Cell):
             self.stride = 1
         else:
             self.stride = stride
-        self.conv1_1x1 = ConvBnAct(out_chs, mid_chs, kernel_size=1, stride=1, padding=0, act=act)
+        self.conv1_1x1 = Conv2dNormActivation(out_chs, mid_chs, kernel_size=1, stride=1, padding=0, act=act)
         self.conv2_kxk = Identity()
-        self.conv3_1x1 = ConvBnAct(mid_chs, chs, kernel_size=1, stride=1, padding=0)
+        self.conv3_1x1 = Conv2dNormActivation(mid_chs, chs, kernel_size=1, stride=1, padding=0)
         self.self_attn = HaloAttention(mid_chs,
                                        dim_out=mid_chs,
                                        block_size=block_size,
@@ -445,7 +401,8 @@ class SelfAttnBlock(nn.Cell):
         self.post_attn = BatchNormAct2d(mid_chs, act=act)
         self.shortcut = shortcut
         if self.shortcut:
-            self.creat_shortcut = ConvBnAct(out_chs,
+            self.creat_shortcut = Conv2dNormActivation(
+                                            out_chs,
                                             chs,
                                             kernel_size=1,
                                             stride=self.stride,
@@ -659,7 +616,7 @@ def halonet_50t(pretrained: bool = False, num_classes: int = 1000, in_channels=3
         block_size=8,
         halo_size=3,
         hidden_chs=None,
-        act='silu',
+        act=nn.SiLU,
         **kwargs
     )
     if pretrained:
