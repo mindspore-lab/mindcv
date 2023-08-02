@@ -1,20 +1,28 @@
 # HaloNet
 
-> [Scaling Local Self-Attention for Parameter Effificient Visual Backbones](https://arxiv.org/abs/2103.12731)
+> [Scaling Local Self-Attention for Parameter Efficient Visual Backbones](https://arxiv.org/abs/2103.12731)
 
 ## Introduction
 
-- Researchers from Google Research and UC Berkeley have developed a new model of self-attention that can outperform standard baseline models and even high-performance convolutional models.[[1](#references)]
+Researchers from Google Research and UC Berkeley have developed a new model of self-attention that can outperform standard baseline models and even high-performance convolutional models.[[1](#references)]
 
-- Blocked Self-Attention：The whole input image is divided into multiple blocks and self-attention is applied to each block.However, if only the information inside the block is considered each time, it will inevitably lead to the loss of information.Therefore, before calculating the SA, a haloing operation is performed on each block, i.e., outside of each block, the information of the original image is used to padding a circle, so that the sensory field of each block can be appropriately larger and focus on more information.
+Blocked Self-Attention：The whole input image is divided into multiple blocks and self-attention is applied to each block.However, if only the information inside the block is considered each time, it will inevitably lead to the loss of information.Therefore, before calculating the SA, a haloing operation is performed on each block, i.e., outside of each block, the information of the original image is used to padding a circle, so that the sensory field of each block can be appropriately larger and focus on more information.
 
-  ![image-20230801161350468](https://github-production-user-asset-6210df.s3.amazonaws.com/50255437/257577202-3ac43b82-785a-42c5-9b6c-ca58b0fa7ab8.png)
+<p align="center">
+  <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/50255437/257577202-3ac43b82-785a-42c5-9b6c-ca58b0fa7ab8.png" width=800 />
+</p>
+<p align="center">
+  <em>Figure 1. Architecture of Blocked Self-Attention [<a href="#references">1</a>] </em>
+</p>
 
-- Down Sampling：In order to reduce the amount of computation, each block is sampled separately, and then attentions are performed on this sampled information to reach the effect of down sampling.
+Down Sampling：In order to reduce the amount of computation, each block is sampled separately, and then attentions are performed on this sampled information to reach the effect of down sampling.
 
-![image-20230801161350468](https://github-production-user-asset-6210df.s3.amazonaws.com/50255437/257578183-fe45c2c2-5006-492b-b30a-5b049a0e2531.png)
-
--
+<p align="center">
+  <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/50255437/257578183-fe45c2c2-5006-492b-b30a-5b049a0e2531.png" width=800 />
+</p>
+<p align="center">
+  <em>Figure 2. Architecture of Down Sampling [<a href="#references">1</a>] </em>
+</p>
 
 
 ## Results
@@ -86,4 +94,4 @@ Please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv
 
 ## References
 
-[1] Scaling Local Self-Attention for Parameter Effificient Visual Backbones. CVPR，2021.
+[1] Vaswani A, Ramachandran P, Srinivas A, et al. Scaling local self-attention for parameter efficient visual backbones[C]//Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2021: 12894-12904.
