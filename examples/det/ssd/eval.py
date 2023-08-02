@@ -5,7 +5,7 @@ import sys
 import yaml
 from addict import Dict
 from data import create_ssd_dataset
-from ssd_model import SSD, SSDInferWithDecoder
+from model import SSD, SSDInferWithDecoder
 from utils import apply_eval
 
 from mindspore import load_checkpoint, load_param_into_net

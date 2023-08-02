@@ -39,7 +39,7 @@ git clone https://github.com/mindspore-lab/mindcv.git
 
 2. Install dependencies as shown [here](https://mindspore-lab.github.io/mindcv/installation/).
 
-3. Download [COCO 2017 Dataset](https://cocodataset.org/#download), prepare the dataset as follows, and specify the dataset path at keyword `data_dir` in the config file.
+3. Download [COCO 2017 Dataset](https://cocodataset.org/#download), prepare the dataset as follows.
 ```
 .
 └─cocodataset
@@ -49,6 +49,12 @@ git clone https://github.com/mindspore-lab/mindcv.git
   ├─val2017
   └─train2017
 ```
+Run the following commands to preprocess the dataset and convert it to [MindRecord format](https://www.mindspore.cn/docs/zh-CN/master/api_python/mindspore.mindrecord.html) for reducing preprocessing time during training and testing.
+```
+cd mindcv  # change directory to the root of MindCV repository
+python examples/det/ssd/create_data.py coco --data_path [root of COCO 2017 Dataset] --out_path [directory for storing MindRecord files]
+```
+Specify the path of the preprocessed dataset at keyword `data_dir` in the config file.
 
 4. Download the pretrained backbone weights from the table below, and specify the path to the backbone weights at keyword `backbone_ckpt_path` in the config file.
 <div align="center">
@@ -66,12 +72,12 @@ It is highly recommended to use **distributed training** for this SSD implementa
 For distributed training using **OpenMPI's `mpirun`**, simply run
 ```
 cd mindcv  # change directory to the root of MindCV repository
-mpirun -n [# of devices] python examples/det/ssd/ssd_train.py --config [the path to the config file]
+mpirun -n [# of devices] python examples/det/ssd/train.py --config [the path to the config file]
 ```
 For example, if train SSD distributively with the `MobileNetV2` configuration on 8 devices, run
 ```
 cd mindcv  # change directory to the root of MindCV repository
-mpirun -n 8 python examples/det/ssd/ssd_train.py --config examples/det/ssd/ssd_mobilenetv2.yaml
+mpirun -n 8 python examples/det/ssd/train.py --config examples/det/ssd/ssd_mobilenetv2.yaml
 ```
 
 For distributed training with [Ascend rank table](https://github.com/mindspore-lab/mindocr/blob/main/docs/en/tutorials/distribute_train.md#12-configure-rank_table_file-for-training), configure `ascend8p.sh` as follows
@@ -87,10 +93,10 @@ for ((i = 0; i < ${DEVICE_NUM}; i++)); do
     echo "Launching rank: ${RANK_ID}, device: ${DEVICE_ID}"
     if [ $i -eq 0 ]; then
       echo 'i am 0'
-      python examples/det/ssd/ssd_train.py --config [the path to the config file] &> ./train.log &
+      python examples/det/ssd/train.py --config [the path to the config file] &> ./train.log &
     else
       echo 'not 0'
-      python -u examples/det/ssd/ssd_train.py --config [the path to the config file] &> /dev/null &
+      python -u examples/det/ssd/train.py --config [the path to the config file] &> /dev/null &
     fi
 done
 ```
@@ -103,7 +109,7 @@ bash ascend8p.sh
 For single-device training, please run
 ```
 cd mindcv  # change directory to the root of MindCV repository
-python examples/det/ssd/ssd_train.py --config [the path to the config file]
+python examples/det/ssd/train.py --config [the path to the config file]
 ```
 
 ### Test
@@ -111,12 +117,12 @@ python examples/det/ssd/ssd_train.py --config [the path to the config file]
 For testing the trained model, first specify the path to the model checkpoint at keyword `ckpt_path` in the config file, then run
 ```
 cd mindcv  # change directory to the root of MindCV repository
-python examples/det/ssd/ssd_eval.py --config [the path to the config file]
+python examples/det/ssd/eval.py --config [the path to the config file]
 ```
 For example, for testing SSD with the `MobileNetV2` configuration, run
 ```
 cd mindcv  # change directory to the root of MindCV repository
-python examples/det/ssd/ssd_eval.py --config examples/det/ssd/ssd_mobilenetv2.yaml
+python examples/det/ssd/eval.py --config examples/det/ssd/ssd_mobilenetv2.yaml
 ```
 
 ## Performance

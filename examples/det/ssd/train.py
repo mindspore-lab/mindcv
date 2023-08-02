@@ -6,7 +6,7 @@ import yaml
 from addict import Dict
 from callbacks import get_ssd_callbacks, get_ssd_eval_callback
 from data import create_ssd_dataset
-from ssd_model import SSD, SSDInferWithDecoder, SSDWithLossCell, get_ssd_trainer
+from model import SSD, SSDInferWithDecoder, SSDWithLossCell, get_ssd_trainer
 from utils import get_ssd_lr_scheduler, get_ssd_optimizer
 
 import mindspore as ms
