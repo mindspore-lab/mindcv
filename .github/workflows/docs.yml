@@ -1,0 +1,30 @@
+name: docs
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements/docs.txt
+          pip install "Pillow==9.1.1"
+          pip install "mindspore>=1.8,<=1.10"
+      - name: Build site
+        run: mkdocs build
+      - name: Deploy to gh-pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'mindspore-lab/mindcv'
+        run: mkdocs gh-deploy --force
