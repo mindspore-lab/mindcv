@@ -65,7 +65,11 @@ class ConvBnAct(nn.Cell):
         out = self.bn(out)
         out = self.act(out)
         return out
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e6788d342ed1617b3ad1cc5a61eefcec7a25dd88
 
 class ActLayer(nn.Cell):
     """ Build Activation Layer according to act type
@@ -122,9 +126,15 @@ class SelectAdaptivePool2d(nn.Cell):
 class Stem(nn.Cell):
     def __init__(self, act):
         super().__init__()
+<<<<<<< HEAD
         self.conv1 = ConvBnAct(3, 24, kernel_size=3, stride=2, padding=1, act=act)
         self.conv2 = ConvBnAct(24, 32, kernel_size=3, stride=1, padding=1, act=act)
         self.conv3 = ConvBnAct(32, 64, kernel_size=3, stride=1, padding=1, act=act)
+=======
+        self.conv1 =ConvBnAct(3, 24, kernel_size=3, stride=2, padding=1, act=act)
+        self.conv2 =ConvBnAct(24, 32, kernel_size=3, stride=1, padding=1, act=act)
+        self.conv3 =ConvBnAct(32, 64, kernel_size=3, stride=1, padding=1, act=act)
+>>>>>>> e6788d342ed1617b3ad1cc5a61eefcec7a25dd88
         self.pad = ops.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)))
         self.pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='valid')
 
@@ -337,14 +347,22 @@ class BottleneckBlock(nn.Cell):
         super().__init__()
         self.stride = stride
         mid_chs = out_chs//4
+<<<<<<< HEAD
         self.conv1_1x1 = ConvBnAct(
+=======
+        self.conv1_1x1 =ConvBnAct(
+>>>>>>> e6788d342ed1617b3ad1cc5a61eefcec7a25dd88
                                    in_chs,
                                    mid_chs,
                                    kernel_size=1,
                                    stride=1,
                                    padding=0,
                                    act=act)
+<<<<<<< HEAD
         self.conv2_kxk = ConvBnAct(
+=======
+        self.conv2_kxk =ConvBnAct(
+>>>>>>> e6788d342ed1617b3ad1cc5a61eefcec7a25dd88
                                    mid_chs,
                                    mid_chs,
                                    kernel_size=3,
@@ -352,7 +370,11 @@ class BottleneckBlock(nn.Cell):
                                    padding=1,
                                    act=act)
         self.conv2b_kxk = Identity()
+<<<<<<< HEAD
         self.conv3_1x1 = ConvBnAct(
+=======
+        self.conv3_1x1 =ConvBnAct(
+>>>>>>> e6788d342ed1617b3ad1cc5a61eefcec7a25dd88
                                    mid_chs,
                                    out_chs,
                                    kernel_size=1,
@@ -363,14 +385,22 @@ class BottleneckBlock(nn.Cell):
         self.shortcut = shortcut
         if self.shortcut:
             if downsample:
+<<<<<<< HEAD
                 self.creat_shortcut = ConvBnAct(
+=======
+                self.creat_shortcut =ConvBnAct(
+>>>>>>> e6788d342ed1617b3ad1cc5a61eefcec7a25dd88
                                                 in_chs,
                                                 out_chs,
                                                 kernel_size=1,
                                                 stride=self.stride,
                                                 padding=0)
             else:
+<<<<<<< HEAD
                 self.creat_shortcut = ConvBnAct(
+=======
+                self.creat_shortcut =ConvBnAct(
+>>>>>>> e6788d342ed1617b3ad1cc5a61eefcec7a25dd88
                                                 in_chs,
                                                 out_chs,
                                                 kernel_size=1,
@@ -420,9 +450,15 @@ class SelfAttnBlock(nn.Cell):
             self.stride = 1
         else:
             self.stride = stride
+<<<<<<< HEAD
         self.conv1_1x1 = ConvBnAct(out_chs, mid_chs, kernel_size=1, stride=1, padding=0, act=act)
         self.conv2_kxk = Identity()
         self.conv3_1x1 = ConvBnAct(mid_chs, chs, kernel_size=1, stride=1, padding=0)
+=======
+        self.conv1_1x1 =ConvBnAct(out_chs, mid_chs, kernel_size=1, stride=1, padding=0, act=act)
+        self.conv2_kxk = Identity()
+        self.conv3_1x1 =ConvBnAct(mid_chs, chs, kernel_size=1, stride=1, padding=0)
+>>>>>>> e6788d342ed1617b3ad1cc5a61eefcec7a25dd88
         self.self_attn = HaloAttention(mid_chs,
                                        dim_out=mid_chs,
                                        block_size=block_size,
@@ -432,7 +468,11 @@ class SelfAttnBlock(nn.Cell):
         self.post_attn = BatchNormAct2d(mid_chs, act=act)
         self.shortcut = shortcut
         if self.shortcut:
+<<<<<<< HEAD
             self.creat_shortcut = ConvBnAct(
+=======
+            self.creat_shortcut =ConvBnAct(
+>>>>>>> e6788d342ed1617b3ad1cc5a61eefcec7a25dd88
                                             out_chs,
                                             chs,
                                             kernel_size=1,
