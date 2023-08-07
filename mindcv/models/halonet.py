@@ -150,11 +150,10 @@ def rel_logits_1d(q, rel_k, permute_mask):
     x = msnp.tensordot(q, rel_k, axes=1)
     x = ops.reshape(x, (-1, W, rel_size))
     # pad to shift from relative to absolute indexing
-    pad = ops.Pad(paddings=((0, 0), (0, 0), (0, 1)))
-    x_pad = pad(x)
+    x_pad = ops.pad(x,paddings=((0, 0), (0, 0), (0, 1)))
     x_pad = ops.flatten(x_pad)
     x_pad = ops.expand_dims(x_pad, 1)
-    x_pad = ms.ops.pad(x_pad, paddings=((0, 0), (0, 0), (0, rel_size - W)))
+    x_pad = ops.pad(x_pad, paddings=((0, 0), (0, 0), (0, rel_size - W)))
     x_pad = ops.squeeze(x_pad, axis=())
     # reshape adn slice out the padded elements
     x_pad = ops.reshape(x_pad, (-1, W+1, rel_size))
