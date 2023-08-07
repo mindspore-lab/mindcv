@@ -154,8 +154,7 @@ def rel_logits_1d(q, rel_k, permute_mask):
     x_pad = pad(x)
     x_pad = ops.flatten(x_pad)
     x_pad = ops.expand_dims(x_pad, 1)
-    pad = ops.Pad(paddings=((0, 0), (0, 0), (0, rel_size - W)))
-    x_pad = pad(x_pad)
+    x_pad = ms.ops.pad(x_pad, paddings=((0, 0), (0, 0), (0, rel_size - W)))
     x_pad = ops.squeeze(x_pad, axis=())
     # reshape adn slice out the padded elements
     x_pad = ops.reshape(x_pad, (-1, W+1, rel_size))
