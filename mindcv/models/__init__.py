@@ -13,6 +13,7 @@ from . import (
     efficientnet,
     ghostnet,
     googlenet,
+    halonet,
     hrnet,
     inceptionv3,
     inceptionv4,
@@ -67,6 +68,7 @@ from .edgenext import *
 from .efficientnet import *
 from .ghostnet import *
 from .googlenet import *
+from .halonet import *
 from .helpers import *
 from .hrnet import *
 from .inceptionv3 import *
@@ -125,6 +127,7 @@ __all__.extend(edgenext.__all__)
 __all__.extend(efficientnet.__all__)
 __all__.extend(ghostnet.__all__)
 __all__.extend(["GoogLeNet", "googlenet"])
+__all__.extend(halonet.__all__)
 __all__.extend(hrnet.__all__)
 __all__.extend(["InceptionV3", "inception_v3"])
 __all__.extend(["InceptionV4", "inception_v4"])
