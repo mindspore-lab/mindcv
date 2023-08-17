@@ -3,14 +3,13 @@ mode: 0
 distribute: True
 num_parallel_workers: 8
 val_while_train: True
-seed: 1
 
 # dataset
 dataset: 'imagenet'
 data_dir: '/path/to/imagenet'
 shuffle: True
 dataset_download: False
-batch_size: 256
+batch_size: 64
 drop_remainder: True
 val_split: val
 
@@ -19,47 +18,43 @@ image_resize: 256
 scale: [0.08, 1.0]
 ratio: [0.75, 1.333]
 hflip: 0.5
-interpolation: 'bicubic'
-crop_pct: 0.875
+interpolation: 'bilinear'
+crop_pct: 0.95
+
+#color_jitter:
+auto_augment: 'randaug-m9-n2-mstd0.5-inc1'
+re_prob: 0.25
+re_max_attempts: 1
+mixup: 0.8
 color_jitter: 0.4
-re_prob: 0.0
-cutmix: 1.0
-cutmix_prob: 0.0
-auto_augment: 'randaug-m9-mstd0.5-inc1'
-ema: True
-ema_decay: 0.9995
 
 # model
-model: 'edgenext_small'
+model: 'halonet_50t'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''
-keep_checkpoint_max: 10
-val_interval: 2
+keep_checkpoint_max: 20
+val_interval: 5
 ckpt_save_dir: './ckpt'
-epoch_size: 350
+epoch_size: 300
 dataset_sink_mode: True
 amp_level: 'O3'
-val_amp_level: 'O3'
-drop_path_rate: 0.1
-
-# loss
-loss: 'CE'
-label_smoothing: 0.1
-
-# lr scheduler
-scheduler: 'cosine_decay'
-min_lr: 1e-6
-lr: 4e-3
-warmup_epochs: 20
-decay_rate: 0.1
-decay_epochs: 330
+val_amp_level: 'O2'
 
 # optimizer
 opt: 'adamw'
 filter_bias_and_bn: True
-momentum: 0.9
-weight_decay: 0.05
+weight_decay: 0.04
 loss_scale: 1024
-drop_overflow_update: True
 use_nesterov: False
+
+# lr scheduler
+scheduler: 'warmup_cosine_decay'
+min_lr: 0.000006
+lr:  0.00125
+warmup_epochs: 3
+decay_epochs: 297
+
+# loss
+loss: 'CE'
+label_smoothing: 0.1

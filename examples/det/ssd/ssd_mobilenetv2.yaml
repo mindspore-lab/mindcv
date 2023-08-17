@@ -1,0 +1,80 @@
+# system
+mode: 0
+distribute: True
+num_parallel_workers: 8
+enable_modelarts: False
+eval_while_train: False
+
+# dataset
+dataset: "coco"
+data_dir: "/root/zjd/coco_ori"
+shuffle: True
+batch_size: 32
+drop_remainder: True
+num_classes: 81
+classes: ['background', 'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
+                'train', 'truck', 'boat', 'traffic light', 'fire hydrant',
+                'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog',
+                'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra',
+                'giraffe', 'backpack', 'umbrella', 'handbag', 'tie',
+                'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball',
+                'kite', 'baseball bat', 'baseball glove', 'skateboard',
+                'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup',
+                'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
+                'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza',
+                'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed',
+                'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote',
+                'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink',
+                'refrigerator', 'book', 'clock', 'vase', 'scissors',
+                'teddy bear', 'hair drier', 'toothbrush']
+
+# Training options
+image_size: [300, 300]
+num_ssd_boxes: 1917
+match_threshold: 0.5
+nms_threshold: 0.6
+min_score: 0.1
+max_boxes: 100
+all_reduce_fusion_config: [29, 58, 89]
+
+# model
+backbone: "mobilenet_v2_100"
+backbone_ckpt_path: "./checkpoints/mobilenetv2/mobilenet_v2_100-d5532038.ckpt"
+backbone_ckpt_auto_mapping: True
+backbone_features_only: True
+backbone_out_indices: [13, 18]
+
+ckpt_path: "./ckpt/best.ckpt"
+
+num_default: [3, 6, 6, 6, 6, 6]
+extras_in_channels: [256, 576, 1280, 512, 256, 256]
+extras_out_channels: [576, 1280, 512, 256, 256, 128]
+extras_strides: [1, 1, 2, 2, 2, 2]
+extras_ratio: [0.2, 0.2, 0.2, 0.25, 0.5, 0.25]
+feature_size: [19, 10, 5, 3, 2, 1]
+min_scale: 0.2
+max_scale: 0.95
+aspect_ratios: [[], [2, 3], [2, 3], [2, 3], [2, 3], [2, 3]]
+steps: [16, 32, 64, 100, 150, 300]
+prior_scaling: [0.1, 0.2]
+gamma: 2.0
+alpha: 0.75
+epoch_size: 500
+
+ckpt_save_dir: "./ckpt"
+keep_checkpoint_max: 20
+eval_interval: 1
+eval_start_epoch: 350
+dataset_sink_mode: True
+amp_level: "O2"
+
+# scheduler
+lr: 0.05
+lr_init: 0.001
+lr_end_rate: 0.001
+warmup_epochs: 2
+
+# optimizer
+loss_scale: 1024.0
+weight_decay: 0.00015
+momentum: 0.9
