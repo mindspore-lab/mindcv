@@ -10,7 +10,7 @@ A better approach is to use a pretrained model on a large dataset (close to the 
 This tutorial will use the DenseNet model pretrained on ImageNet as an example to introduce two different fine-tuning strategies to solve the image classification problem of wolves and dogs in the case of small samples:
 
 1. Overall model fine-tuning.
-2. Freeze backbone and only fine tune the classifier.
+2. Freeze backbone and only fine-tune the classifier.
 
 > For details of transfer learning, see [Stanford University CS231n](https://cs231n.github.io/transfer-learning/#tf)
 
@@ -52,7 +52,7 @@ data/
 By calling the `create_dataset` function in `mindcv.data`, we can easily load preset and customized datasets.
 
 - When the parameter `name` is set to null, it is specified as a user-defined dataset. (Default)
-- When the parameter `name` is set to `MNIST`, `CIFAR10` and other standard data set names, it is specified as the preset data set.
+- When the parameter `name` is set to be `MNIST`, `CIFAR10` or other standard dataset names, it is specified as the preset dataset.
 
 At the same time, we need to set the path `data_dir` of the dataset and the name `split` of the data segmentation (such as train, val) to load the corresponding training set or validation set.
 
@@ -95,9 +95,9 @@ DATASET_NAME
 
 ### Data Processing and Augmentation
 
-First, we call the `create_transforms` function to obtain the preset data processing and augmentation strategy (transform list). In this task, because the wolf dog image and ImageNet data are consistent (that is, the domain is consistent), we specify the parameter `dataset_name` as ImageNet, and directly use the preset ImageNet data processing and image augmentation strategy. `create_transforms` also supports a variety of customized processing and enhancement operations, as well as automatic enhancement policies (AutoAug). See API description for details.
+First, we call the `create_transforms` function to obtain the preset data processing and augmentation strategy (transform list). In this task, because the file structure of the wolf-dog dataset is consistent with that of the ImageNet dataset, we specify the parameter `dataset_name` as ImageNet, and directly use the preset ImageNet data processing and image augmentation strategy. `create_transforms` also supports a variety of customized processing and enhancement operations, as well as automatic enhancement policies (AutoAug). See API description for details.
 
-We will transfer the obtained transform list to the `create_loader()`, and specify `batch_size` and other parameters to complete the preparation of training and validation data, and return the `Dataset` Object as the input of the model.
+We will transfer the obtained transform list to the `create_loader()`, specify `batch_size` and other parameters to complete the preparation of training and validation data, and return the `Dataset` Object as the input of the model.
 
 ```python
 # Define and acquire data processing and augment operations
@@ -174,7 +174,7 @@ plt.show()
 #### Pretraining Model Loading
 
 We use `mindcv.models.densenet` to define the DenseNet121 network. When the `pretrained` parameter in the interface is set to True, the network weight can be automatically downloaded.
-Since the pretraining model is used to classify 1000 categories in the ImageNet dataset, we set `num_classes=2`, and the output of DenseNet's classifier (the last FC layer) is adjusted to two dimensions. At this time, only the pre training weights of backbone are loaded, while the classifier uses the initial value.
+Since the pretraining model is used to classify 1000 categories in the ImageNet dataset, we set `num_classes=2`, and the output of DenseNet's classifier (the last FC layer) is adjusted to two dimensions. At this time, only the pre-trained weights of the backbone are loaded, while the classifier uses the initial value.
 
 ```python
 from mindcv.models import create_model
@@ -305,7 +305,7 @@ visualize_model(model, loader_val)
 
 #### Freezing Backbone Parameters
 
-First, we need to freeze all network layers except the last layer classifier, that is, set the `requires_grad` attribute of the corresponding layer parameter to False, so that it does not calculate the gradient and update the parameters in the back propagation.
+First, we need to freeze all network layers except the last layer classifier, that is, set the `requires_grad` attribute of the corresponding layer parameter to False, so that it does not calculate the gradient and update the parameters in the backpropagation.
 
 Because all models in `mindcv.models` use a `classifier` to identify and name the classifier of the model (i.e., the Dense layer), the parameters of each layer outside the classifier can be filtered through `classifier.weight` and `classifier.bias`, and its `requires_grad` attribute is set to False.
 
@@ -418,4 +418,4 @@ visualize_model(model, loader_val)
 
 ![png](https://github.com/mindspore-lab/mindcv/assets/74176172/b088fe01-7591-450b-bf51-df44280d984f)
 
-The prediction results of wolf dog after fine-tuning are correct.
+The prediction results of wolf/dog after fine-tuning are correct.

@@ -28,7 +28,7 @@ crop_pct: 0.935
 ema: True
 
 # model
-model: 'crossvit18'
+model: 'crossvit_18'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''
@@ -37,6 +37,7 @@ ckpt_save_dir: './ckpt'
 epoch_size: 300
 dataset_sink_mode: True
 amp_level: 'O3'
+val_amp_level: 'O3'
 drop_path_rate: 0.1
 
 # loss
@@ -45,7 +46,7 @@ label_smoothing: 0.1
 
 # lr scheduler
 scheduler: 'warmup_cosine_decay'
-lr: 0.004
+lr: 0.0015
 min_lr: 0.00001
 warmup_epochs: 30
 decay_epochs: 270
@@ -56,8 +57,7 @@ opt: 'adamw'
 weight_decay: 0.05
 filter_bias_and_bn: True
 loss_scale: 1024
+drop_overflow_update: True
+loss_scale_type: 'dynamic'
 use_nesterov: False
 eps: 1e-8
-
-# Scheduler parameters
-lr_epoch_stair: True

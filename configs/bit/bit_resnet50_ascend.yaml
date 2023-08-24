@@ -18,7 +18,7 @@ hflip: 0.5
 crop_pct: 0.875
 
 # model
-model: 'BiTresnet50'
+model: 'BiT_resnet50'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''

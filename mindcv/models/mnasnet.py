@@ -15,11 +15,11 @@ from .registry import register_model
 
 __all__ = [
     "Mnasnet",
-    "mnasnet0_5",
-    "mnasnet0_75",
-    "mnasnet1_0",
-    "mnasnet1_3",
-    "mnasnet1_4",
+    "mnasnet_050",
+    "mnasnet_075",
+    "mnasnet_100",
+    "mnasnet_130",
+    "mnasnet_140",
 ]
 
 
@@ -34,11 +34,11 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "mnasnet0.5": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_050-7d8bf4db.ckpt"),
-    "mnasnet0.75": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_075-465d366d.ckpt"),
-    "mnasnet1.0": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_100-1bcf43f8.ckpt"),
-    "mnasnet1.3": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_130-a43a150a.ckpt"),
-    "mnasnet1.4": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_140-7e20bb30.ckpt"),
+    "mnasnet_050": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_050-7d8bf4db.ckpt"),
+    "mnasnet_075": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_075-465d366d.ckpt"),
+    "mnasnet_100": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_100-1bcf43f8.ckpt"),
+    "mnasnet_130": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_130-a43a150a.ckpt"),
+    "mnasnet_140": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_140-7e20bb30.ckpt"),
 }
 
 
@@ -178,10 +178,10 @@ class Mnasnet(nn.Cell):
 
 
 @register_model
-def mnasnet0_5(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
+def mnasnet_050(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
     """Get MnasNet model with width scaled by 0.5.
     Refer to the base class `models.Mnasnet` for more details."""
-    default_cfg = default_cfgs["mnasnet0.5"]
+    default_cfg = default_cfgs["mnasnet_050"]
     model = Mnasnet(alpha=0.5, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
@@ -191,10 +191,10 @@ def mnasnet0_5(pretrained: bool = False, num_classes: int = 1000, in_channels=3,
 
 
 @register_model
-def mnasnet0_75(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
+def mnasnet_075(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
     """Get MnasNet model with width scaled by 0.75.
     Refer to the base class `models.Mnasnet` for more details."""
-    default_cfg = default_cfgs["mnasnet0.75"]
+    default_cfg = default_cfgs["mnasnet_075"]
     model = Mnasnet(alpha=0.75, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
@@ -204,10 +204,10 @@ def mnasnet0_75(pretrained: bool = False, num_classes: int = 1000, in_channels=3
 
 
 @register_model
-def mnasnet1_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
+def mnasnet_100(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
     """Get MnasNet model with width scaled by 1.0.
     Refer to the base class `models.Mnasnet` for more details."""
-    default_cfg = default_cfgs["mnasnet1.0"]
+    default_cfg = default_cfgs["mnasnet_100"]
     model = Mnasnet(alpha=1.0, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
@@ -217,10 +217,10 @@ def mnasnet1_0(pretrained: bool = False, num_classes: int = 1000, in_channels=3,
 
 
 @register_model
-def mnasnet1_3(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
+def mnasnet_130(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
     """Get MnasNet model with width scaled by 1.3.
     Refer to the base class `models.Mnasnet` for more details."""
-    default_cfg = default_cfgs["mnasnet1.3"]
+    default_cfg = default_cfgs["mnasnet_130"]
     model = Mnasnet(alpha=1.3, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:
@@ -230,10 +230,10 @@ def mnasnet1_3(pretrained: bool = False, num_classes: int = 1000, in_channels=3,
 
 
 @register_model
-def mnasnet1_4(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
+def mnasnet_140(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> Mnasnet:
     """Get MnasNet model with width scaled by 1.4.
     Refer to the base class `models.Mnasnet` for more details."""
-    default_cfg = default_cfgs["mnasnet1.4"]
+    default_cfg = default_cfgs["mnasnet_140"]
     model = Mnasnet(alpha=1.4, in_channels=in_channels, num_classes=num_classes, **kwargs)
 
     if pretrained:

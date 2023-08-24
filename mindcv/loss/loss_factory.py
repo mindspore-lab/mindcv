@@ -3,8 +3,10 @@ from typing import Optional
 
 from mindspore import Tensor
 
+from .asymmetric import AsymmetricLossMultilabel, AsymmetricLossSingleLabel
 from .binary_cross_entropy_smooth import BinaryCrossEntropySmooth
 from .cross_entropy_smooth import CrossEntropySmooth
+from .jsd import JSDCrossEntropy
 
 __all__ = ["create_loss"]
 
@@ -50,6 +52,12 @@ def create_loss(
         loss = BinaryCrossEntropySmooth(
             smoothing=label_smoothing, aux_factor=aux_factor, reduction=reduction, weight=weight, pos_weight=None
         )
+    elif name == "asl_single_label":
+        loss = AsymmetricLossSingleLabel(smoothing=label_smoothing)
+    elif name == "asl_multi_label":
+        loss = AsymmetricLossMultilabel()
+    elif name == "jsd":
+        loss = JSDCrossEntropy(smoothing=label_smoothing, aux_factor=aux_factor, reduction=reduction, weight=weight)
     else:
         raise NotImplementedError
 

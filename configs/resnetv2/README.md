@@ -20,10 +20,10 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model           | Context   | Top-1 (%) | Top-5 (%) |  Params (M) | Recipe  | Download                                                                           |
-|-----------------|-----------|-----------|-----------|-------|-------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| ResNetv2_50 | D910x8-G | 76.90     | 93.37     | 25.60 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_50_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_50-3c2f143b.ckpt)  |
-| ResNetv2_101 | D910x8-G | 78.48     | 94.23     | 44.55 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_101_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_101-5d4c49a1.ckpt)  |
+| Model        | Context   | Top-1 (%) | Top-5 (%) |  Params (M) | Recipe  | Download                                                                           |
+|--------------|-----------|-----------|-----------|-------|-------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
+| resnetv2_50  | D910x8-G | 76.90     | 93.37     | 25.60 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_50_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_50-3c2f143b.ckpt)  |
+| resnetv2_101 | D910x8-G | 78.48     | 94.23     | 44.55 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_101_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_101-5d4c49a1.ckpt)  |
 
 </div>
 

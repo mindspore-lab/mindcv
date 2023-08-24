@@ -25,6 +25,7 @@ def create_model(
         ema (bool): Whether use ema method. Default: False.
         auto_mapping (bool): Whether to automatically map the names of checkpoint weights
             to the names of model weights when there are differences in names. Default: False.
+        **kwargs: additional args, e.g., "features_only", "out_indices".
     """
 
     if checkpoint_path != "" and pretrained:

@@ -12,13 +12,13 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 <div align="center">
 
-| Model           | Context   |  Top-1 (%)  | Top-5 (%)  | Params (M) | Recipe                                                                                   | Download                                                                         |
-|-----------------|-----------|-------|-------|------------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| rexnet_x09 | D910x8-G | 77.06 | 93.41    | 4.13       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x09_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_09-da498331.ckpt) |
-| rexnet_x10 | D910x8-G | 77.38 | 93.60    | 4.84       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x10_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_10-c5fb2dc7.ckpt)   |
-| rexnet_x13 | D910x8-G | 79.06 | 94.28 | 7.61       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x13_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_13-a49c41e5.ckpt)   |
-| rexnet_x15 | D910x8-G | 79.95 | 94.74  | 9.79       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x15_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_15-37a931d3.ckpt)   |
-| rexnet_x20 | D910x8-G | 80.64 | 94.99  | 16.45      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x20_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_20-c5810914.ckpt)   |
+| Model           | Context   |  Top-1 (%)  | Top-5 (%)  | Params (M) | Recipe                                                                                          | Download                                                                         |
+|-----------------|-----------|-------|-------|------------|-------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| rexnet_09 | D910x8-G | 77.06 | 93.41    | 4.13       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x09_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_09-da498331.ckpt) |
+| rexnet_10 | D910x8-G | 77.38 | 93.60    | 4.84       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x10_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_10-c5fb2dc7.ckpt)   |
+| rexnet_13 | D910x8-G | 79.06 | 94.28 | 7.61       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x13_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_13-a49c41e5.ckpt)   |
+| rexnet_15 | D910x8-G | 79.95 | 94.74  | 9.79       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x15_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_15-37a931d3.ckpt)   |
+| rexnet_20 | D910x8-G | 80.64 | 94.99  | 16.45      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x20_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_20-c5810914.ckpt)   |
 
 </div>
 

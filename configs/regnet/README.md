@@ -24,6 +24,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 | regnet_y_400mf | D910x8-G |   73.91   |   91.84   |    4.34    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_y_400mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_400mf-d496799d.ckpt) |
 | regnet_y_600mf | D910x8-G |   75.69   |   92.50   |    6.06    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_y_600mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_600mf-a84e19b2.ckpt) |
 | regnet_y_800mf | D910x8-G |   76.52   |   93.10   |    6.26    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_y_800mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_800mf-9b5211bd.ckpt) |
+| regnet_y_16gf  | D910x8-G |   82.92   |   96.29   |   83.71    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_y_16gf_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_16gf-c30a856f.ckpt)  |
 
 </div>
 

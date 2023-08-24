@@ -14,9 +14,9 @@ from .registry import register_model
 
 __all__ = [
     "BiT_ResNet",
-    "BiTresnet50",
-    "BiTresnet50x3",
-    "BiTresnet101",
+    "BiT_resnet50",
+    "BiT_resnet50x3",
+    "BiT_resnet101",
 ]
 
 
@@ -31,9 +31,9 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "BiTresnet50": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50-1e4795a4.ckpt"),
-    "BiTresnet50x3": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50x3-a960f91f.ckpt"),
-    "BiTresnet101": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet101-2efa9106.ckpt"),
+    "BiT_resnet50": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50-1e4795a4.ckpt"),
+    "BiT_resnet50x3": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50x3-a960f91f.ckpt"),
+    "BiT_resnet101": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet101-2efa9106.ckpt"),
 }
 
 
@@ -268,11 +268,11 @@ class BiT_ResNet(nn.Cell):
 
 
 @register_model
-def BiTresnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+def BiT_resnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 50 layers ResNet model.
     Refer to the base class `models.BiT_Resnet` for more details.
     """
-    default_cfg = default_cfgs["BiTresnet50"]
+    default_cfg = default_cfgs["BiT_resnet50"]
     model = BiT_ResNet(Bottleneck, [3, 4, 6, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -282,11 +282,11 @@ def BiTresnet50(pretrained: bool = False, num_classes: int = 1000, in_channels=3
 
 
 @register_model
-def BiTresnet50x3(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+def BiT_resnet50x3(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 50 layers ResNet model.
      Refer to the base class `models.BiT_Resnet` for more details.
      """
-    default_cfg = default_cfgs["BiTresnet50x3"]
+    default_cfg = default_cfgs["BiT_resnet50x3"]
     model = BiT_ResNet(Bottleneck, [3, 4, 6, 3], wf=3, num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:
@@ -296,11 +296,11 @@ def BiTresnet50x3(pretrained: bool = False, num_classes: int = 1000, in_channels
 
 
 @register_model
-def BiTresnet101(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
+def BiT_resnet101(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs):
     """Get 101 layers ResNet model.
     Refer to the base class `models.BiT_Resnet` for more details.
     """
-    default_cfg = default_cfgs["BiTresnet101"]
+    default_cfg = default_cfgs["BiT_resnet101"]
     model = BiT_ResNet(Bottleneck, [3, 4, 23, 3], num_classes=num_classes, in_channels=in_channels, **kwargs)
 
     if pretrained:

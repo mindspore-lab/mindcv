@@ -2,6 +2,7 @@
 from . import (
     bit,
     cait,
+    cmt,
     coat,
     convit,
     convnext,
@@ -12,16 +13,17 @@ from . import (
     efficientnet,
     ghostnet,
     googlenet,
+    halonet,
     hrnet,
-    inception_v3,
-    inception_v4,
+    inceptionv3,
+    inceptionv4,
     layers,
     mixnet,
     mlpmixer,
     mnasnet,
-    mobilenet_v1,
-    mobilenet_v2,
-    mobilenet_v3,
+    mobilenetv1,
+    mobilenetv2,
+    mobilenetv3,
     mobilevit,
     model_factory,
     nasnet,
@@ -44,7 +46,8 @@ from . import (
     shufflenetv2,
     sknet,
     squeezenet,
-    swin_transformer,
+    swintransformer,
+    swintransformerv2,
     vgg,
     visformer,
     vit,
@@ -54,6 +57,7 @@ from . import (
 )
 from .bit import *
 from .cait import *
+from .cmt import *
 from .coat import *
 from .convit import *
 from .convnext import *
@@ -64,17 +68,18 @@ from .edgenext import *
 from .efficientnet import *
 from .ghostnet import *
 from .googlenet import *
+from .halonet import *
 from .helpers import *
 from .hrnet import *
-from .inception_v3 import *
-from .inception_v4 import *
+from .inceptionv3 import *
+from .inceptionv4 import *
 from .layers import *
 from .mixnet import *
 from .mlpmixer import *
 from .mnasnet import *
-from .mobilenet_v1 import *
-from .mobilenet_v2 import *
-from .mobilenet_v3 import *
+from .mobilenetv1 import *
+from .mobilenetv2 import *
+from .mobilenetv3 import *
 from .mobilevit import *
 from .model_factory import *
 from .nasnet import *
@@ -97,7 +102,8 @@ from .shufflenetv1 import *
 from .shufflenetv2 import *
 from .sknet import *
 from .squeezenet import *
-from .swin_transformer import *
+from .swintransformer import *
+from .swintransformerv2 import *
 from .vgg import *
 from .visformer import *
 from .vit import *
@@ -110,6 +116,7 @@ from .xcit import *
 __all__ = []
 __all__.extend(bit.__all__)
 __all__.extend(cait.__all__)
+__all__.extend(cmt.__all__)
 __all__.extend(coat.__all__)
 __all__.extend(convit.__all__)
 __all__.extend(convnext.__all__)
@@ -120,6 +127,7 @@ __all__.extend(edgenext.__all__)
 __all__.extend(efficientnet.__all__)
 __all__.extend(ghostnet.__all__)
 __all__.extend(["GoogLeNet", "googlenet"])
+__all__.extend(halonet.__all__)
 __all__.extend(hrnet.__all__)
 __all__.extend(["InceptionV3", "inception_v3"])
 __all__.extend(["InceptionV4", "inception_v4"])
@@ -127,9 +135,9 @@ __all__.extend(layers.__all__)
 __all__.extend(mixnet.__all__)
 __all__.extend(mlpmixer.__all__)
 __all__.extend(mnasnet.__all__)
-__all__.extend(mobilenet_v1.__all__)
-__all__.extend(mobilenet_v2.__all__)
-__all__.extend(mobilenet_v3.__all__)
+__all__.extend(mobilenetv1.__all__)
+__all__.extend(mobilenetv2.__all__)
+__all__.extend(mobilenetv3.__all__)
 __all__.extend(mobilevit.__all__)
 __all__.extend(model_factory.__all__)
 __all__.extend(nasnet.__all__)
@@ -152,7 +160,8 @@ __all__.extend(shufflenetv1.__all__)
 __all__.extend(shufflenetv2.__all__)
 __all__.extend(sknet.__all__)
 __all__.extend(squeezenet.__all__)
-__all__.extend(swin_transformer.__all__)
+__all__.extend(swintransformer.__all__)
+__all__.extend(swintransformerv2.__all__)
 __all__.extend(vgg.__all__)
 __all__.extend(visformer.__all__)
 __all__.extend(vit.__all__)

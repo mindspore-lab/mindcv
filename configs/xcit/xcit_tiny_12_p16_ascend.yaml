@@ -26,7 +26,7 @@ ema: True
 ema_decay: 0.99996
 
 # model
-model: 'xcit_tiny_12_p16'
+model: 'xcit_tiny_12_p16_224'
 num_classes: 1000
 pretrained: False
 ckpt_path: ""

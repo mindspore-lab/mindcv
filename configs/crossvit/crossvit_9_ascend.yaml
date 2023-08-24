@@ -27,7 +27,7 @@ color_jitter: 0.4
 crop_pct: 0.935
 
 # model
-model: 'crossvit9'
+model: 'crossvit_9'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''
@@ -36,6 +36,7 @@ ckpt_save_dir: './ckpt'
 epoch_size: 300
 dataset_sink_mode: True
 amp_level: 'O2'
+val_amp_level: 'O2'
 drop_path_rate: 0.1
 
 # loss

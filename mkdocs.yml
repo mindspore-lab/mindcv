@@ -16,6 +16,7 @@ nav:
       - Deployment: tutorials/deployment.md
   - How-To Guides:  # Problem Oriented
       - Write A New Model: how_to_guides/write_a_new_model.md
+      - Multi-Scale Feature Extraction: how_to_guides/feature_extraction.md
   - Reference:
       - data: reference/data.md
       - loss: reference/loss.md
