@@ -237,6 +237,14 @@ def create_parser():
                             'Choice: O0 - all FP32, O1 - only cast ops in white-list to FP16, '
                             'O2 - cast all ops except for blacklist to FP16, '
                             'O3 - cast all ops to FP16. (default="O0").')
+    group.add_argument('--amp_cast_list', type=str, default=None,
+                       help='At the cell level, customize the black-list or white-list to cast cells to '
+                            'FP16 based on the value of argument "amp_level". If None, use the built-in '
+                            'black-list and white-list. (default=None) '
+                            'If amp_level="O0" or "O3", this argument has no effect. '
+                            'If amp_level="O1", cast all cells in the white-list to FP16. '
+                            'If amp_level="O2", cast all cells except for the black-list to FP16. '
+                            'Example: "[nn.Conv1d, nn.Conv2d]" or "[nn.BatchNorm1d, nn.BatchNorm2d]".')
     group.add_argument('--loss_scale_type', type=str, default='fixed',
                        choices=['fixed', 'dynamic', 'auto'],
                        help='The type of loss scale (default="fixed")')
