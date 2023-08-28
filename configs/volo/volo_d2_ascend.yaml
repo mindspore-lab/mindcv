@@ -39,6 +39,7 @@ ckpt_save_policy: 'top_k'
 drop_path_rate: 0.2
 dataset_sink_mode: True
 amp_level: 'O3'
+val_amp_level: 'O3'
 ema: True
 ema_decay: 0.9995
 

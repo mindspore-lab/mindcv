@@ -10,7 +10,7 @@ dataset: 'imagenet'
 data_dir: '/path/to/imagenet'
 shuffle: True
 dataset_download: False
-batch_size: 64
+batch_size: 32
 drop_remainder: True
 
 # augmentation
@@ -25,11 +25,11 @@ re_prob: 0.25
 mixup: 0.2
 cutmix: 1.0
 cutmix_prob: 1.0
-crop_pct: 0.96
+crop_pct: 1.15
 color_jitter: [0.4, 0.4, 0.4]
 
 # model
-model: 'volo_d3'
+model: 'volo_d4'
 num_classes: 1000
 pretrained: False
 ckpt_path: ''
@@ -42,7 +42,6 @@ amp_level: 'O3'
 val_amp_level: 'O3'
 ema: True
 ema_decay: 0.9995
-gradient_accumulation_steps: 2
 
 # loss
 loss: 'CE'
@@ -50,9 +49,9 @@ label_smoothing: 0.1
 
 # lr scheduler
 scheduler: 'warmup_cosine_decay'
-lr: 0.0005
+lr: 0.00025
 min_lr: 0.00001
-epoch_size: 3
+epoch_size: 300
 warmup_epochs: 10
 decay_epochs: 290
 decay_rate: 0.1
