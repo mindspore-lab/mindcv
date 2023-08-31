@@ -5,36 +5,36 @@ import numpy as np
 import scipy.io
 from PIL import Image
 
-parser = argparse.ArgumentParser('dataset list generator')
-parser.add_argument("--data_root", type=str, default='./', help='where dataset stored.')
+parser = argparse.ArgumentParser("dataset list generator")
+parser.add_argument("--data_root", type=str, default="./", help="where dataset stored.")
 
 args, _ = parser.parse_known_args()
 
 data_root = args.data_root
 print("Data dir is:", data_root)
 
-VOC_IMG_DIR = os.path.join(data_root, 'VOCdevkit/VOC2012/JPEGImages')
-VOC_ANNO_DIR = os.path.join(data_root, 'VOCdevkit/VOC2012/SegmentationClass')
-VOC_ANNO_GRAY_DIR = os.path.join(data_root, 'VOCdevkit/VOC2012/SegmentationClassGray')
-VOC_TRAIN_TXT = os.path.join(data_root, 'VOCdevkit/VOC2012/ImageSets/Segmentation/train.txt')
-VOC_VAL_TXT = os.path.join(data_root, 'VOCdevkit/VOC2012/ImageSets/Segmentation/val.txt')
+VOC_IMG_DIR = os.path.join(data_root, "VOCdevkit/VOC2012/JPEGImages")
+VOC_ANNO_DIR = os.path.join(data_root, "VOCdevkit/VOC2012/SegmentationClass")
+VOC_ANNO_GRAY_DIR = os.path.join(data_root, "VOCdevkit/VOC2012/SegmentationClassGray")
+VOC_TRAIN_TXT = os.path.join(data_root, "VOCdevkit/VOC2012/ImageSets/Segmentation/train.txt")
+VOC_VAL_TXT = os.path.join(data_root, "VOCdevkit/VOC2012/ImageSets/Segmentation/val.txt")
 
-SBD_ANNO_DIR = os.path.join(data_root, 'benchmark_RELEASE/dataset/cls')
-SBD_IMG_DIR = os.path.join(data_root, 'benchmark_RELEASE/dataset/img')
-SBD_ANNO_PNG_DIR = os.path.join(data_root, 'benchmark_RELEASE/dataset/cls_png')
-SBD_ANNO_GRAY_DIR = os.path.join(data_root, 'benchmark_RELEASE/dataset/cls_png_gray')
-SBD_TRAIN_TXT = os.path.join(data_root, 'benchmark_RELEASE/dataset/train.txt')
-SBD_VAL_TXT = os.path.join(data_root, 'benchmark_RELEASE/dataset/val.txt')
+SBD_ANNO_DIR = os.path.join(data_root, "benchmark_RELEASE/dataset/cls")
+SBD_IMG_DIR = os.path.join(data_root, "benchmark_RELEASE/dataset/img")
+SBD_ANNO_PNG_DIR = os.path.join(data_root, "benchmark_RELEASE/dataset/cls_png")
+SBD_ANNO_GRAY_DIR = os.path.join(data_root, "benchmark_RELEASE/dataset/cls_png_gray")
+SBD_TRAIN_TXT = os.path.join(data_root, "benchmark_RELEASE/dataset/train.txt")
+SBD_VAL_TXT = os.path.join(data_root, "benchmark_RELEASE/dataset/val.txt")
 
-VOC_TRAIN_LST_TXT = os.path.join(data_root, 'voc_train_lst.txt')
-VOC_VAL_LST_TXT = os.path.join(data_root, 'voc_val_lst.txt')
-VOC_AUG_TRAIN_LST_TXT = os.path.join(data_root, 'vocaug_train_lst.txt')
-SBD_VAL_LST_TXT = os.path.join(data_root, 'sbd_val_lst.txt')
-SBD_TRAIN_LST_TXT = os.path.join(data_root, 'sbd_train_lst.txt')
+VOC_TRAIN_LST_TXT = os.path.join(data_root, "voc_train_lst.txt")
+VOC_VAL_LST_TXT = os.path.join(data_root, "voc_val_lst.txt")
+VOC_AUG_TRAIN_LST_TXT = os.path.join(data_root, "vocaug_train_lst.txt")
+SBD_VAL_LST_TXT = os.path.join(data_root, "sbd_val_lst.txt")
+SBD_TRAIN_LST_TXT = os.path.join(data_root, "sbd_train_lst.txt")
 
 
 def __get_data_list(data_list_file):
-    with open(data_list_file, mode='r') as f:
+    with open(data_list_file, mode="r") as f:
         return f.readlines()
 
 
@@ -54,9 +54,9 @@ def __gen_palette(cls_nums=256):
         lbl = i
         j = 0
         while lbl:
-            palette[i, 0] |= (((lbl >> 0) & 1) << (7 - j))
-            palette[i, 1] |= (((lbl >> 1) & 1) << (7 - j))
-            palette[i, 2] |= (((lbl >> 2) & 1) << (7 - j))
+            palette[i, 0] |= ((lbl >> 0) & 1) << (7 - j)
+            palette[i, 1] |= ((lbl >> 1) & 1) << (7 - j)
+            palette[i, 2] |= ((lbl >> 2) & 1) << (7 - j)
             lbl >>= 3
             j += 1
     return palette.flatten()
@@ -72,53 +72,53 @@ def conv_sbd_mat_to_png():
     for an in os.listdir(SBD_ANNO_DIR):
         img_id = an[:-4]
         mat = scipy.io.loadmat(os.path.join(SBD_ANNO_DIR, an))
-        anno = mat['GTcls'][0]['Segmentation'][0].astype(np.uint8)
+        anno = mat["GTcls"][0]["Segmentation"][0].astype(np.uint8)
         anno_png = Image.fromarray(anno)
         # save to gray png
-        anno_png.save(os.path.join(SBD_ANNO_GRAY_DIR, img_id + '.png'))
+        anno_png.save(os.path.join(SBD_ANNO_GRAY_DIR, img_id + ".png"))
         # save to color png use palette
         anno_png.putpalette(palette)
-        anno_png.save(os.path.join(SBD_ANNO_PNG_DIR, img_id + '.png'))
+        anno_png.save(os.path.join(SBD_ANNO_PNG_DIR, img_id + ".png"))
 
 
 def create_voc_train_lst_txt():
     voc_train_data_lst = __get_data_list(VOC_TRAIN_TXT)
-    with open(VOC_TRAIN_LST_TXT, mode='w') as f:
+    with open(VOC_TRAIN_LST_TXT, mode="w") as f:
         for id_ in voc_train_data_lst:
             id_ = id_.strip()
-            img_ = os.path.join(VOC_IMG_DIR, id_ + '.jpg')
-            anno_ = os.path.join(VOC_ANNO_GRAY_DIR, id_ + '.png')
-            f.write(img_ + ' ' + anno_ + '\n')
+            img_ = os.path.join(VOC_IMG_DIR, id_ + ".jpg")
+            anno_ = os.path.join(VOC_ANNO_GRAY_DIR, id_ + ".png")
+            f.write(img_ + " " + anno_ + "\n")
 
 
 def create_voc_val_lst_txt():
     voc_val_data_lst = __get_data_list(VOC_VAL_TXT)
-    with open(VOC_VAL_LST_TXT, mode='w') as f:
+    with open(VOC_VAL_LST_TXT, mode="w") as f:
         for id_ in voc_val_data_lst:
             id_ = id_.strip()
-            img_ = os.path.join(VOC_IMG_DIR, id_ + '.jpg')
-            anno_ = os.path.join(VOC_ANNO_GRAY_DIR, id_ + '.png')
-            f.write(img_ + ' ' + anno_ + '\n')
+            img_ = os.path.join(VOC_IMG_DIR, id_ + ".jpg")
+            anno_ = os.path.join(VOC_ANNO_GRAY_DIR, id_ + ".png")
+            f.write(img_ + " " + anno_ + "\n")
 
 
 def create_sbd_train_lst_txt():
     sbd_train_data_lst = __get_data_list(SBD_TRAIN_TXT)
-    with open(SBD_TRAIN_LST_TXT, mode='w') as f:
+    with open(SBD_TRAIN_LST_TXT, mode="w") as f:
         for id_ in sbd_train_data_lst:
             id_ = id_.strip()
-            img_ = os.path.join(SBD_IMG_DIR, id_ + '.jpg')
-            anno_ = os.path.join(SBD_ANNO_GRAY_DIR, id_ + '.png')
-            f.write(img_ + ' ' + anno_ + '\n')
+            img_ = os.path.join(SBD_IMG_DIR, id_ + ".jpg")
+            anno_ = os.path.join(SBD_ANNO_GRAY_DIR, id_ + ".png")
+            f.write(img_ + " " + anno_ + "\n")
 
 
 def create_sbd_val_lst_txt():
     sbd_val_data_lst = __get_data_list(SBD_VAL_TXT)
-    with open(SBD_VAL_LST_TXT, mode='w') as f:
+    with open(SBD_VAL_LST_TXT, mode="w") as f:
         for id_ in sbd_val_data_lst:
             id_ = id_.strip()
-            img_ = os.path.join(SBD_IMG_DIR, id_ + '.jpg')
-            anno_ = os.path.join(SBD_ANNO_GRAY_DIR, id_ + '.png')
-            f.write(img_ + ' ' + anno_ + '\n')
+            img_ = os.path.join(SBD_IMG_DIR, id_ + ".jpg")
+            anno_ = os.path.join(SBD_ANNO_GRAY_DIR, id_ + ".png")
+            f.write(img_ + " " + anno_ + "\n")
 
 
 def create_voc_train_aug_lst_txt():
@@ -128,42 +128,42 @@ def create_voc_train_aug_lst_txt():
     sbd_train_data_lst = __get_data_list(SBD_TRAIN_TXT)
     sbd_val_data_lst = __get_data_list(SBD_VAL_TXT)
 
-    with open(VOC_AUG_TRAIN_LST_TXT, mode='w') as f:
+    with open(VOC_AUG_TRAIN_LST_TXT, mode="w") as f:
         for id_ in sbd_train_data_lst + sbd_val_data_lst:
             if id_ in voc_train_data_lst + voc_val_data_lst:
                 continue
             id_ = id_.strip()
-            img_ = os.path.join(SBD_IMG_DIR, id_ + '.jpg')
-            anno_ = os.path.join(SBD_ANNO_GRAY_DIR, id_ + '.png')
-            f.write(img_ + ' ' + anno_ + '\n')
+            img_ = os.path.join(SBD_IMG_DIR, id_ + ".jpg")
+            anno_ = os.path.join(SBD_ANNO_GRAY_DIR, id_ + ".png")
+            f.write(img_ + " " + anno_ + "\n")
 
         for id_ in voc_train_data_lst:
             id_ = id_.strip()
-            img_ = os.path.join(VOC_IMG_DIR, id_ + '.jpg')
-            anno_ = os.path.join(VOC_ANNO_GRAY_DIR, id_ + '.png')
-            f.write(img_ + ' ' + anno_ + '\n')
+            img_ = os.path.join(VOC_IMG_DIR, id_ + ".jpg")
+            anno_ = os.path.join(VOC_ANNO_GRAY_DIR, id_ + ".png")
+            f.write(img_ + " " + anno_ + "\n")
 
 
-if __name__ == '__main__':
-    print('converting voc color png to gray png ...')
+if __name__ == "__main__":
+    print("converting voc color png to gray png ...")
     conv_voc_colorpng_to_graypng()
-    print('converting done.')
+    print("converting done.")
 
     create_voc_train_lst_txt()
-    print('generating voc train list success.')
+    print("generating voc train list success.")
 
     create_voc_val_lst_txt()
-    print('generating voc val list success.')
+    print("generating voc val list success.")
 
-    print('converting sbd annotations to png ...')
+    print("converting sbd annotations to png ...")
     conv_sbd_mat_to_png()
-    print('converting done')
+    print("converting done")
 
     create_voc_train_aug_lst_txt()
-    print('generating voc train aug list success.')
+    print("generating voc train aug list success.")
 
     create_sbd_train_lst_txt()
-    print('generating sbd train list success.')
+    print("generating sbd train list success.")
 
     create_sbd_val_lst_txt()
-    print('generating sbd val list success.')
+    print("generating sbd val list success.")

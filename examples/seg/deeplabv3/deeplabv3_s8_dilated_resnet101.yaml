@@ -2,7 +2,7 @@
 
 # system
 seed: 1
-mode: 1 
+mode: 1
 distribute: True
 num_parallel_workers: 8
 enable_modelarts: False
@@ -32,9 +32,9 @@ output_stride: 8
 
 # model
 ckpt_pre_trained: True
-ckpt_path: "/home/cvgroup/fzl/checkpoint/deeplabv3/deeplabv3_s16_dilated_resnet101_7820-9de3c664.ckpt" 
+ckpt_path: "/home/cvgroup/fzl/checkpoint/deeplabv3/deeplabv3_s16_dilated_resnet101_7820-9de3c664.ckpt"
 amp_level: "O3"
-amp_cast_list: None 
+amp_cast_list: None
 
 # scheduler
 scheduler: "cosine_decay"

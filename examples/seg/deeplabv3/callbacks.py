@@ -1,16 +1,12 @@
-
 import os
 import stat
+
+from postprocess import apply_eval, check_batch_size
+
 from mindspore import log as logger
 from mindspore import save_checkpoint
-from mindspore.train.callback import (
-    Callback,
-    CheckpointConfig,
-    LossMonitor,
-    ModelCheckpoint,
-    TimeMonitor,
-)
-from postprocess import apply_eval, check_batch_size
+from mindspore.train.callback import Callback, CheckpointConfig, LossMonitor, ModelCheckpoint, TimeMonitor
+
 
 class EvalCallBack(Callback):
     """
@@ -28,21 +24,23 @@ class EvalCallBack(Callback):
     Examples:
         >>> EvalCallBack(eval_function, eval_param_dict)
     """
-    def __init__(self,
-                 eval_function,
-                 eval_param_dict,
-                 interval=1,
-                 eval_start_epoch=1,
-                 save_best_ckpt=True,
-                 ckpt_directory="./",
-                 best_ckpt_name="best.ckpt",
-                 metrics_name="mIoU",
-                 ) -> None:
-        super(EvalCallBack,self).__init__()
+
+    def __init__(
+        self,
+        eval_function,
+        eval_param_dict,
+        interval=1,
+        eval_start_epoch=1,
+        save_best_ckpt=True,
+        ckpt_directory="./",
+        best_ckpt_name="best.ckpt",
+        metrics_name="mIoU",
+    ) -> None:
+        super(EvalCallBack, self).__init__()
         self.eval_function = eval_function
         self.eval_param_dict = eval_param_dict
         self.eval_start_epoch = eval_start_epoch
-        
+
         if interval < 1:
             raise ValueError("interval should >= 1.")
 
@@ -95,9 +93,9 @@ class EvalCallBack(Callback):
             ),
             flush=True,
         )
-        
-def get_segment_train_callback(args, steps_per_epoch, rank_id):
 
+
+def get_segment_train_callback(args, steps_per_epoch, rank_id):
     callbacks = [TimeMonitor(data_size=steps_per_epoch), LossMonitor()]
     if rank_id == 0:
         ckpt_config = CheckpointConfig(
@@ -105,22 +103,17 @@ def get_segment_train_callback(args, steps_per_epoch, rank_id):
             keep_checkpoint_max=args.keep_checkpoint_max,
         )
         prefix_name = "deeplabv3_s" + str(args.output_stride) + "_" + args.backbone
-        ckpt_cb = ModelCheckpoint(
-            prefix=prefix_name, directory=args.ckpt_save_dir, config=ckpt_config
-        )
+        ckpt_cb = ModelCheckpoint(prefix=prefix_name, directory=args.ckpt_save_dir, config=ckpt_config)
         callbacks.append(ckpt_cb)
     return callbacks
 
 
 def get_segment_eval_callback(eval_model, eval_dataset, args):
-
     eval_args = args.copy()
     eval_args.batch_size = check_batch_size(eval_dataset.get_dataset_size(), args.batch_size)
-    
-    eval_param_dict = {"net": eval_model, 
-                       "dataset": eval_dataset, 
-                       "args": eval_args}
-    
+
+    eval_param_dict = {"net": eval_model, "dataset": eval_dataset, "args": eval_args}
+
     eval_cb = EvalCallBack(
         eval_function=apply_eval,
         eval_param_dict=eval_param_dict,
@@ -131,5 +124,5 @@ def get_segment_eval_callback(eval_model, eval_dataset, args):
         best_ckpt_name="best.ckpt",
         metrics_name="mIoU",
     )
-    
+
     return eval_cb

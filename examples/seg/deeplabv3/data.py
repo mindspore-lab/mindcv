@@ -1,25 +1,29 @@
-import numpy as np
 import cv2
+import numpy as np
+
 import mindspore.dataset as de
+
 cv2.setNumThreads(0)
 
-class SegDataset:
-    def __init__(self,
-                 image_mean,
-                 image_std,
-                 data_file='',
-                 batch_size=32,
-                 crop_size=512,
-                 max_scale=2.0,
-                 min_scale=0.5,
-                 ignore_label=255,
-                 num_classes=21,
-                 num_readers=2,
-                 num_parallel_calls=4,
-                 shard_id=None,
-                 shard_num=None,
-                 shuffle = True):
 
+class SegDataset:
+    def __init__(
+        self,
+        image_mean,
+        image_std,
+        data_file="",
+        batch_size=32,
+        crop_size=512,
+        max_scale=2.0,
+        min_scale=0.5,
+        ignore_label=255,
+        num_classes=21,
+        num_readers=2,
+        num_parallel_calls=4,
+        shard_id=None,
+        shard_num=None,
+        shuffle=True,
+    ):
         self.data_file = data_file
         self.batch_size = batch_size
         self.crop_size = crop_size
@@ -37,39 +41,41 @@ class SegDataset:
         assert max_scale > min_scale
 
     def get_dataset(self):
+        data_set = de.MindDataset(
+            dataset_files=self.data_file,
+            columns_list=["data", "label"],
+            shuffle=True,
+            num_parallel_workers=self.num_readers,
+            num_shards=self.shard_num,
+            shard_id=self.shard_id,
+        )
 
-        data_set = de.MindDataset(dataset_files=self.data_file, 
-                                  columns_list=["data", "label"],
-                                  shuffle=True, 
-                                  num_parallel_workers=self.num_readers,
-                                  num_shards=self.shard_num, 
-                                  shard_id=self.shard_id)
-
-        input_columns= ["data", "label"]
-        output_columns=["data", "label"]
+        input_columns = ["data", "label"]
+        output_columns = ["data", "label"]
         transforms_list = self.train_preprocess_
 
-        data_set = data_set.map(operations=transforms_list,
-                                input_columns=input_columns,
-                                output_columns=output_columns,
-                                num_parallel_workers=self.num_parallel_calls)
+        data_set = data_set.map(
+            operations=transforms_list,
+            input_columns=input_columns,
+            output_columns=output_columns,
+            num_parallel_workers=self.num_parallel_calls,
+        )
 
         if self.shuffle:
             data_set = data_set.shuffle(buffer_size=self.batch_size * 10)
-        
+
         data_set = data_set.batch(self.batch_size, drop_remainder=True)
 
         return data_set
 
-def create_segment_dataset(
-        name,
-        data_dir,
-        is_training=False,
-        args=None,
 
+def create_segment_dataset(
+    name,
+    data_dir,
+    is_training=False,
+    args=None,
 ):
     if name == "voc" or name == "vocaug":
-
         if is_training:
             dataset = SegDataset(
                 image_mean=args.image_mean,
@@ -88,7 +94,7 @@ def create_segment_dataset(
                 shuffle=args.shuffle,
             )
             return dataset.get_dataset()
-        
+
         else:
             with open(data_dir) as f:
                 eval_data_list = f.readlines()

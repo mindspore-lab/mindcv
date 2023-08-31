@@ -2,7 +2,7 @@
 
 # system
 seed: 1
-mode: 1 
+mode: 1
 distribute: True
 num_parallel_workers: 8
 enable_modelarts: False
@@ -32,9 +32,9 @@ output_stride: 16
 
 # model
 ckpt_pre_trained: False
-ckpt_path: "" 
+ckpt_path: ""
 amp_level: "O3"
-amp_cast_list: None 
+amp_cast_list: None
 
 # scheduler
 scheduler: "cosine_decay"

@@ -1,22 +1,22 @@
-import os
 import argparse
+import os
+
 import yaml
 from addict import Dict
+from callbacks import get_segment_eval_callback, get_segment_train_callback
+from data import create_segment_dataset
+from deeplabv3 import DeepLabV3, DeepLabV3InferNetwork, SoftmaxCrossEntropyLoss
+from dilated_resnet import *  # noqa: F403, F401
 
 import mindspore as ms
-from mindspore import context
+from mindspore import context, load_checkpoint, load_param_into_net
 from mindspore.communication import get_group_size, get_rank, init
-from mindspore import load_checkpoint, load_param_into_net
 
 from mindcv.models import create_model
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
 from mindcv.utils import create_trainer, require_customized_train_step, set_seed
 
-from dilated_resnet import *
-from data import create_segment_dataset
-from deeplabv3 import DeepLabV3, DeepLabV3InferNetwork, SoftmaxCrossEntropyLoss
-from callbacks import get_segment_train_callback, get_segment_eval_callback
 
 def train(args):
     """main train function"""
@@ -66,10 +66,10 @@ def train(args):
     if args.ckpt_pre_trained:
         param_dict = load_checkpoint(args.ckpt_path)
         net_param_not_load, _ = load_param_into_net(deeplabv3, param_dict)
-        if len(net_param_not_load)==0:
+        if len(net_param_not_load) == 0:
             print("pretrained ckpt - {:s} loaded successfully".format(args.ckpt_path))
         else:
-            raise ValueError('inconsistent params: please check net params and ckpt params')
+            raise ValueError("inconsistent params: please check net params and ckpt params")
 
     # loss
     loss = SoftmaxCrossEntropyLoss(args.num_classes, args.ignore_label)
@@ -109,7 +109,7 @@ def train(args):
         weight_decay=args.weight_decay,
         momentum=args.momentum,
         filter_bias_and_bn=args.filter_bias_and_bn,
-        loss_scale=optimizer_loss_scale, 
+        loss_scale=optimizer_loss_scale,
     )
 
     trainer = create_trainer(
@@ -117,7 +117,7 @@ def train(args):
         loss,
         optimizer,
         metrics=None,
-        amp_level = "O0" if args.device_target == "CPU" else args.amp_level,
+        amp_level="O0" if args.device_target == "CPU" else args.amp_level,
         amp_cast_list=args.amp_cast_list,
         loss_scale_type=args.loss_scale_type,
         loss_scale=args.loss_scale,
@@ -127,23 +127,24 @@ def train(args):
     # callback
     callbacks = get_segment_train_callback(args, steps_per_epoch, rank_id)
 
-    # eval when train  
+    # eval when train
     if args.eval_while_train and rank_id == 0:
         eval_model = DeepLabV3InferNetwork(deeplabv3, input_format=args.input_format)
         eval_dataset = create_segment_dataset(
             name=args.dataset,
             data_dir=args.eval_data_lst,
-            is_training=False, 
+            is_training=False,
         )
         eval_callback = get_segment_eval_callback(eval_model, eval_dataset, args)
         callbacks.append(eval_callback)
-        
+
     trainer.train(
         args.epoch_size,
         dataset,
         callbacks=callbacks,
         dataset_sink_mode=(args.device_target != "CPU"),
     )
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Training Config", add_help=False)
@@ -157,21 +158,21 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+
 if __name__ == "__main__":
     args = parse_args()
     yaml_fp = args.config
     with open(yaml_fp) as fp:
         args = yaml.safe_load(fp)
     args = Dict(args)
-    context.set_context(device_target=args.device_target) 
+    context.set_context(device_target=args.device_target)
     # data sync for cloud platform if enabled
 
     if args.enable_modelarts:
         import moxing as mox
+
         args.data_dir = f"/cache/{args.data_url}"
-        mox.file.copy_parallel(
-            src_url=os.path.join(args.data_url, args.dataset), dst_url=args.data_dir
-        )
+        mox.file.copy_parallel(src_url=os.path.join(args.data_url, args.dataset), dst_url=args.data_dir)
 
     # core training
     train(args)

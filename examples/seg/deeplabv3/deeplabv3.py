@@ -1,16 +1,19 @@
 """DeeplabV3 implement with replaceable backbones"""
 
 from typing import List
-from mindspore import Tensor
+
+import mindspore.common.dtype as mstype
 import mindspore.nn as nn
 import mindspore.ops as ops
-import mindspore.common.dtype as mstype
+from mindspore import Tensor
+
 
 class ASPP(nn.Cell):
     """
     Atrous Spatial Pyramid Pooling.
-    
+
     """
+
     def __init__(
         self,
         atrous_rates: List[int],
@@ -19,9 +22,8 @@ class ASPP(nn.Cell):
         in_channels: int = 2048,
         out_channels: int = 256,
         num_classes: int = 21,
-        weight_init:str = 'xavier_uniform',
+        weight_init: str = "xavier_uniform",
     ) -> None:
-        
         super(ASPP, self).__init__()
 
         self.is_training = is_training
@@ -36,16 +38,14 @@ class ASPP(nn.Cell):
                 )
             )
         self.aspp_convs.append(ASPPPooling(in_channels, out_channels))
-        
+
         self.conv1 = nn.Conv2d(
-            out_channels * (len(atrous_rates) + 1), out_channels, kernel_size=1,
-            weight_init=weight_init
+            out_channels * (len(atrous_rates) + 1), out_channels, kernel_size=1, weight_init=weight_init
         )
         self.bn1 = nn.BatchNorm2d(out_channels)
         self.relu = nn.ReLU()
         self.drop = nn.Dropout(p=0.7)
-        self.conv2 = nn.Conv2d(out_channels, num_classes, kernel_size=1, 
-                               weight_init=weight_init, has_bias=True)
+        self.conv2 = nn.Conv2d(out_channels, num_classes, kernel_size=1, weight_init=weight_init, has_bias=True)
 
     def construct(self, x):
         _out = []
@@ -64,16 +64,16 @@ class ASPP(nn.Cell):
 
 class ASPPPooling(nn.Cell):
     def __init__(
-        self, 
-        in_channels: int, 
-        out_channels: int, 
-        weight_init:str = 'xavier_uniform',
+        self,
+        in_channels: int,
+        out_channels: int,
+        weight_init: str = "xavier_uniform",
     ) -> None:
         super(ASPPPooling, self).__init__()
         self.conv = nn.SequentialCell(
             [
                 nn.Conv2d(in_channels, out_channels, kernel_size=1, weight_init=weight_init),
-                nn.BatchNorm2d(out_channels), 
+                nn.BatchNorm2d(out_channels),
                 nn.ReLU(),
             ]
         )
@@ -88,29 +88,28 @@ class ASPPPooling(nn.Cell):
 
 class ASPPConv(nn.Cell):
     def __init__(
-        self,
-        in_channels: int,
-        out_channels: int,
-        atrous_rate: int = 1,
-        weight_init: str = 'xavier_uniform'
+        self, in_channels: int, out_channels: int, atrous_rate: int = 1, weight_init: str = "xavier_uniform"
     ) -> None:
         super(ASPPConv, self).__init__()
 
-        self._aspp_conv = nn.SequentialCell([
-            nn.Conv2d(in_channels, out_channels, kernel_size=1, has_bias=False, weight_init=weight_init)
-            if atrous_rate == 1
-            else nn.Conv2d(
-                in_channels,
-                out_channels,
-                kernel_size=3,
-                pad_mode="pad",
-                padding=atrous_rate,
-                dilation=atrous_rate,
-                weight_init=weight_init,
-            ),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(),
-        ])
+        self._aspp_conv = nn.SequentialCell(
+            [
+                nn.Conv2d(in_channels, out_channels, kernel_size=1, has_bias=False, weight_init=weight_init)
+                if atrous_rate == 1
+                else nn.Conv2d(
+                    in_channels,
+                    out_channels,
+                    kernel_size=3,
+                    pad_mode="pad",
+                    padding=atrous_rate,
+                    dilation=atrous_rate,
+                    weight_init=weight_init,
+                ),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(),
+            ]
+        )
+
     def construct(self, x):
         out = self._aspp_conv(x)
         return out
@@ -121,6 +120,7 @@ class DeepLabV3(nn.Cell):
     DeeplabV3 implement.
 
     """
+
     def __init__(
         self,
         backbone,
@@ -141,16 +141,16 @@ class DeepLabV3(nn.Cell):
         size = ops.shape(x)
         features = self.backbone(x)[-1]
         out = self.aspp(features)
-        out = ops.interpolate(
-            out, size=(size[2], size[3]), mode="bilinear", align_corners=True
-        )
+        out = ops.interpolate(out, size=(size[2], size[3]), mode="bilinear", align_corners=True)
         return out
 
+
 class DeepLabV3InferNetwork(nn.Cell):
-    """ 
+    """
     Provide DeeplabV3 infer network.
 
-    """    
+    """
+
     def __init__(self, network, input_format="NCHW"):
         super(DeepLabV3InferNetwork, self).__init__()
         self.network = network
@@ -163,11 +163,13 @@ class DeepLabV3InferNetwork(nn.Cell):
         output = self.network(input_data)
         output = self.softmax(output)
         return output
-    
+
+
 class SoftmaxCrossEntropyLoss(nn.Cell):
     """
     softmax cross entropy loss
     """
+
     def __init__(self, num_cls=21, ignore_label=255):
         super(SoftmaxCrossEntropyLoss, self).__init__()
         self.cast = ops.Cast()

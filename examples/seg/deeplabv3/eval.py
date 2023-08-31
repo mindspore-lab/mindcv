@@ -1,23 +1,25 @@
 import argparse
+
 import yaml
 from addict import Dict
+from data import create_segment_dataset
+from deeplabv3 import DeepLabV3, DeepLabV3InferNetwork
+from dilated_resnet import *  # noqa: F403, F401
+from postprocess import apply_eval
 
 from mindspore import load_checkpoint, load_param_into_net
+
 from mindcv.models import create_model
 
-from data import create_segment_dataset
-from dilated_resnet import *
-from deeplabv3 import DeepLabV3, DeepLabV3InferNetwork
-from postprocess import apply_eval
 
 def eval(args):
     # create eval dataset
     eval_dataset = create_segment_dataset(
         name=args.dataset,
         data_dir=args.eval_data_lst,
-        is_training=False, 
+        is_training=False,
     )
-    
+
     # create eval model
     backbone = create_model(
         args.backbone,
@@ -32,22 +34,21 @@ def eval(args):
     net_param_not_load, _ = load_param_into_net(eval_model, param_dict)
     print("number of net param not loaded: {}".format(len(net_param_not_load)))
     if len(net_param_not_load) == 0:
-        print("ckpt - {:s} loaded successfully". format(args.ckpt_path))
+        print("ckpt - {:s} loaded successfully".format(args.ckpt_path))
 
-    eval_model.set_train(False)   
+    eval_model.set_train(False)
 
     print("\n========================================\n")
     print("Processing, please wait a moment.")
 
     # evaluate
-    eval_param_dict = {"net": eval_model, 
-                       "dataset": eval_dataset, 
-                       "args": args}
-    
+    eval_param_dict = {"net": eval_model, "dataset": eval_dataset, "args": args}
+
     mIoU = apply_eval(eval_param_dict)
-      
+
     print("\n========================================\n")
     print(f"mean IoU: {mIoU}")
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluation Config", add_help=False)
@@ -71,4 +72,3 @@ if __name__ == "__main__":
 
     # core evaluation
     eval(args)
-   
