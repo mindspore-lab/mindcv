@@ -1,0 +1,49 @@
+"""positional embedding"""
+from mindspore import nn, ops, Tensor, Parameter
+from typing import Optional, Tuple, Union, List
+
+
+class RelativePositionBiasWithCLS(nn.Cell):
+    def __init__(
+        self,
+        window_size: Tuple[int],
+        num_heads: int
+    ):
+        super(RelativePositionBiasWithCLS, self).__init__()
+        self.window_size = window_size
+        self.num_tokens = window_size[0] * window_size[1]
+
+        num_relative_distance = (2 * window_size[0] - 1) * (2 * window_size[1] - 1) + 3
+        # 3: cls to token, token to cls, cls to cls
+        self.relative_position_bias_table = Parameter(
+            Tensor(np.zeros((num_relative_distance, num_heads)), dtype=ms.float16)
+        )
+        coords_h = np.arange(window_size[0]).reshape(window_size[0], 1).repeat(window_size[1], 1).reshape(1, -1)
+        coords_w = np.arange(window_size[1]).reshape(1, window_size[1]).repeat(window_size[0], 0).reshape(1, -1)
+        coords_flatten = np.concatenate([coords_h, coords_w], axis=0) # [2, Wh * Ww]
+
+        relative_coords = coords_flatten[:, :, np.newaxis] - coords_flatten[:, np.newaxis, :] # [2, Wh * Ww, Wh * Ww]
+        relative_coords = relative_coords.transpose(1, 2, 0) # [Wh * Ww, Wh * Ww, 2]
+        relative_coords[:, :, 0] += window_size[0] - 1
+        relative_coords[:, :, 1] += window_size[1] - 1
+        relative_coords[:, :, 0] *= 2 * window_size[0] - 1
+
+        relative_position_index = np.zeros((self.num_tokens + 1, self.num_tokens + 1),
+                                           dtype=relative_coords.dtype) # [Wh * Ww + 1, Wh * Ww + 1]
+        relative_position_index[1:, 1:] = relative_coords.sum(-1)
+        relative_position_index[0, 0:] = num_relative_distance - 3
+        relative_position_index[0:, 0] = num_relative_distance - 2
+        relative_position_index[0, 0] = num_relative_distance - 1
+        relative_position_index = Tensor(relative_position_index.reshape(-1)) 
+
+        self.one_hot = nn.OneHot(axis=-1, depth=num_relative_distance, dtype=ms.float16)
+        self.relative_position_index = Parameter(self.one_hot(relative_position_index), requires_grad=False)
+
+    def construct(self):
+        out = ops.matmul(self.relative_position_index, self.relative_position_bias_table)
+        out = ops.reshape(out, (self.num_tokens + 1, self.num_tokens + 1, -1))
+        out = ops.transpose(out, (2, 0, 1))
+        out = ops.expand_dims(out, 0)
+        return out
+
+
