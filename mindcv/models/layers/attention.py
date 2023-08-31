@@ -1,9 +1,13 @@
-"""attention layers"""
-#TODO: add Flash Attention
+"""attention layers
+TODO: add Flash Attention
+"""
 
-from typing import Optional, Tuple, Union, List
-from mindspore import nn, ops, Tensor, Parameter
+from typing import Optional
+
+from mindspore import Tensor, nn, ops
+
 from .compatibility import Dropout
+
 
 class Attention(nn.Cell):
     """
@@ -71,7 +75,7 @@ class Attention(nn.Cell):
         attn = self.mul(attn, self.scale)
 
         if rel_pos_bias is not None:
-            attn  = attn + rel_pos_bias
+            attn = attn + rel_pos_bias
 
         attn = self.softmax(attn)
         attn = self.attn_drop(attn)
@@ -83,5 +87,3 @@ class Attention(nn.Cell):
         out = self.proj_drop(out)
 
         return out
-
-

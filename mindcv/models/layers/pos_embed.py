@@ -1,6 +1,10 @@
 """positional embedding"""
-from mindspore import nn, ops, Tensor, Parameter
-from typing import Optional, Tuple, Union, List
+from typing import Tuple
+
+import numpy as np
+
+import mindspore as ms
+from mindspore import Parameter, Tensor, nn, ops
 
 
 class RelativePositionBiasWithCLS(nn.Cell):
@@ -20,21 +24,21 @@ class RelativePositionBiasWithCLS(nn.Cell):
         )
         coords_h = np.arange(window_size[0]).reshape(window_size[0], 1).repeat(window_size[1], 1).reshape(1, -1)
         coords_w = np.arange(window_size[1]).reshape(1, window_size[1]).repeat(window_size[0], 0).reshape(1, -1)
-        coords_flatten = np.concatenate([coords_h, coords_w], axis=0) # [2, Wh * Ww]
+        coords_flatten = np.concatenate([coords_h, coords_w], axis=0)  # [2, Wh * Ww]
 
-        relative_coords = coords_flatten[:, :, np.newaxis] - coords_flatten[:, np.newaxis, :] # [2, Wh * Ww, Wh * Ww]
-        relative_coords = relative_coords.transpose(1, 2, 0) # [Wh * Ww, Wh * Ww, 2]
+        relative_coords = coords_flatten[:, :, np.newaxis] - coords_flatten[:, np.newaxis, :]  # [2, Wh * Ww, Wh * Ww]
+        relative_coords = relative_coords.transpose(1, 2, 0)  # [Wh * Ww, Wh * Ww, 2]
         relative_coords[:, :, 0] += window_size[0] - 1
         relative_coords[:, :, 1] += window_size[1] - 1
         relative_coords[:, :, 0] *= 2 * window_size[0] - 1
 
         relative_position_index = np.zeros((self.num_tokens + 1, self.num_tokens + 1),
-                                           dtype=relative_coords.dtype) # [Wh * Ww + 1, Wh * Ww + 1]
+                                           dtype=relative_coords.dtype)  # [Wh * Ww + 1, Wh * Ww + 1]
         relative_position_index[1:, 1:] = relative_coords.sum(-1)
         relative_position_index[0, 0:] = num_relative_distance - 3
         relative_position_index[0:, 0] = num_relative_distance - 2
         relative_position_index[0, 0] = num_relative_distance - 1
-        relative_position_index = Tensor(relative_position_index.reshape(-1)) 
+        relative_position_index = Tensor(relative_position_index.reshape(-1))
 
         self.one_hot = nn.OneHot(axis=-1, depth=num_relative_distance, dtype=ms.float16)
         self.relative_position_index = Parameter(self.one_hot(relative_position_index), requires_grad=False)
@@ -45,5 +49,3 @@ class RelativePositionBiasWithCLS(nn.Cell):
         out = ops.transpose(out, (2, 0, 1))
         out = ops.expand_dims(out, 0)
         return out
-
-
