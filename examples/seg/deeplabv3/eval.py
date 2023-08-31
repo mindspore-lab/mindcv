@@ -1,0 +1,74 @@
+import argparse
+import yaml
+from addict import Dict
+
+from mindspore import load_checkpoint, load_param_into_net
+from mindcv.models import create_model
+
+from data import create_segment_dataset
+from dilated_resnet import *
+from deeplabv3 import DeepLabV3, DeepLabV3InferNetwork
+from postprocess import apply_eval
+
+def eval(args):
+    # create eval dataset
+    eval_dataset = create_segment_dataset(
+        name=args.dataset,
+        data_dir=args.eval_data_lst,
+        is_training=False, 
+    )
+    
+    # create eval model
+    backbone = create_model(
+        args.backbone,
+        features_only=args.backbone_features_only,
+        out_indices=args.backbone_out_indices,
+        output_stride=args.output_stride,
+    )
+    deeplabv3 = DeepLabV3(backbone, args, is_training=False)
+    eval_model = DeepLabV3InferNetwork(deeplabv3, input_format=args.input_format)
+
+    param_dict = load_checkpoint(args.ckpt_path)
+    net_param_not_load, _ = load_param_into_net(eval_model, param_dict)
+    print("number of net param not loaded: {}".format(len(net_param_not_load)))
+    if len(net_param_not_load) == 0:
+        print("ckpt - {:s} loaded successfully". format(args.ckpt_path))
+
+    eval_model.set_train(False)   
+
+    print("\n========================================\n")
+    print("Processing, please wait a moment.")
+
+    # evaluate
+    eval_param_dict = {"net": eval_model, 
+                       "dataset": eval_dataset, 
+                       "args": args}
+    
+    mIoU = apply_eval(eval_param_dict)
+      
+    print("\n========================================\n")
+    print(f"mean IoU: {mIoU}")
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Evaluation Config", add_help=False)
+    parser.add_argument(
+        "-c", "--config", type=str, default="", help="YAML config file specifying default arguments (default=" ")"
+    )
+
+    args = parser.parse_args()
+
+    return args
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    yaml_fp = args.config
+
+    with open(yaml_fp) as fp:
+        args = yaml.safe_load(fp)
+
+    args = Dict(args)
+
+    # core evaluation
+    eval(args)
+   
