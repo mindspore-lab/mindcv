@@ -77,6 +77,7 @@ class DilatedResNet(ResNet):
         block: Type[DilatedBottleneck],
         layers: List[int],
         output_stride: int = 16,
+        num_classes: int = 1000,
         in_channels: int = 3,
         groups: int = 1,
         base_width: int = 64,

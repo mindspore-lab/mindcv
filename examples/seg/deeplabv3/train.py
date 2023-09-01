@@ -44,6 +44,8 @@ def train(args):
         data_dir=args.data_dir,
         args=args,
         is_training=True,
+        shard_id=rank_id,
+        shard_num=device_num,
     )
 
     steps_per_epoch = dataset.get_dataset_size()

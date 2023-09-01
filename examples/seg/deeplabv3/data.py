@@ -40,6 +40,42 @@ class SegDataset:
         self.shuffle = shuffle
         assert max_scale > min_scale
 
+    def train_preprocess_(self, image, label):
+        # bgr image
+        image_out = cv2.imdecode(np.frombuffer(image, dtype=np.uint8), cv2.IMREAD_COLOR)
+        label_out = cv2.imdecode(np.frombuffer(label, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
+
+        # random scaling
+        sc = np.random.uniform(self.min_scale, self.max_scale)
+        new_h, new_w = int(sc * image_out.shape[0]), int(sc * image_out.shape[1])
+        image_out = cv2.resize(image_out, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
+        label_out = cv2.resize(label_out, (new_w, new_h), interpolation=cv2.INTER_NEAREST)
+
+        # mean std
+        image_out = (image_out - self.image_mean) / self.image_std
+
+        # pad or random crop
+        h_, w_ = max(new_h, self.crop_size), max(new_w, self.crop_size)
+        pad_h, pad_w = h_ - new_h, w_ - new_w
+        if pad_h > 0 or pad_w > 0:
+            image_out = cv2.copyMakeBorder(image_out, 0, pad_h, 0, pad_w, cv2.BORDER_CONSTANT, value=0)
+            label_out = cv2.copyMakeBorder(label_out, 0, pad_h, 0, pad_w, cv2.BORDER_CONSTANT, value=self.ignore_label)
+        offset_h = np.random.randint(0, h_ - self.crop_size + 1)
+        offset_w = np.random.randint(0, w_ - self.crop_size + 1)
+        image_out = image_out[offset_h : offset_h + self.crop_size, offset_w : offset_w + self.crop_size, :]
+        label_out = label_out[offset_h : offset_h + self.crop_size, offset_w : offset_w + self.crop_size]
+
+        # random flip
+        if np.random.uniform(0.0, 1.0) > 0.5:
+            image_out = image_out[:, ::-1, :]
+            label_out = label_out[:, ::-1]
+
+        image_out = image_out.transpose((2, 0, 1))
+        image_out = image_out.copy()
+        label_out = label_out.copy()
+
+        return image_out, label_out
+
     def get_dataset(self):
         data_set = de.MindDataset(
             dataset_files=self.data_file,
@@ -74,6 +110,8 @@ def create_segment_dataset(
     data_dir,
     is_training=False,
     args=None,
+    shard_id=None,
+    shard_num=None,
 ):
     if name == "voc" or name == "vocaug":
         if is_training:
@@ -89,8 +127,8 @@ def create_segment_dataset(
                 num_classes=args.num_classes,
                 num_readers=args.num_parallel_workers,
                 num_parallel_calls=args.num_parallel_workers,
-                shard_id=args.shard_id,
-                shard_num=args.shard_num,
+                shard_id=shard_id,
+                shard_num=shard_num,
                 shuffle=args.shuffle,
             )
             return dataset.get_dataset()

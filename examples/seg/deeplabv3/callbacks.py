@@ -1,7 +1,7 @@
 import os
 import stat
 
-from postprocess import apply_eval, check_batch_size
+from postprocess import apply_eval
 
 from mindspore import log as logger
 from mindspore import save_checkpoint
@@ -109,10 +109,7 @@ def get_segment_train_callback(args, steps_per_epoch, rank_id):
 
 
 def get_segment_eval_callback(eval_model, eval_dataset, args):
-    eval_args = args.copy()
-    eval_args.batch_size = check_batch_size(eval_dataset.get_dataset_size(), args.batch_size)
-
-    eval_param_dict = {"net": eval_model, "dataset": eval_dataset, "args": eval_args}
+    eval_param_dict = {"net": eval_model, "dataset": eval_dataset, "args": args}
 
     eval_cb = EvalCallBack(
         eval_function=apply_eval,

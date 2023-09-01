@@ -62,6 +62,7 @@ ckpt_save_dir: "./ckpt"
 # eval
 eval_while_train: True
 eval_data_lst: "/home/cvgroup/Datasets/Segment/voc_val_lst.txt"
+data_root: ""
 eval_interval: 2
 eval_start_epoch: 50
 input_format: "NCHW"
