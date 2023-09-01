@@ -119,28 +119,29 @@ plugins:
             # Docstrings
             docstring_section_style: spacy
   - i18n:
-      default_language: en
       docs_structure: folder
+      fallback_to_default: true
       languages:
-        en:
+        - locale: en
+          default: true
           name: English
-        zh:
+        - locale: zh
+          default: false
           name: 中文
-      nav_translations:
-        zh:
-          Home: 主页
-          Installation: 安装
-          Model Zoo: 模型仓库
-          Tutorials: 教程
-          Quick Start: 快速开始
-          Configuration: 配置
-          Finetune: 微调
-          Inference: 推理
-          Deployment: 部署
-          Notes: 说明
-          Change Log: 更新日志
-          Code of Conduct: 行为准则
-          FAQ: 常见问题
+          nav_translations:
+            Home: 主页
+            Installation: 安装
+            Model Zoo: 模型仓库
+            Tutorials: 教程
+            Quick Start: 快速开始
+            Configuration: 配置
+            Finetune: 微调
+            Inference: 推理
+            Deployment: 部署
+            Notes: 说明
+            Change Log: 更新日志
+            Code of Conduct: 行为准则
+            FAQ: 常见问题
 
 extra:
   generator: false
