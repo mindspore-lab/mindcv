@@ -39,7 +39,7 @@ This example provides an implementation of DeepLabV3 using backbones from MindCV
   ......
   ```
 
-- Convert training dataset to mindrecords by running  ``bulid_seg_data.py `` script. 
+- Convert training dataset to mindrecords by running  ``bulid_seg_data.py `` script.
 
   ```shell
   python examples/seg/deeplabv3/bulid_dataset/bulid_seg_data.py \
@@ -47,7 +47,7 @@ This example provides an implementation of DeepLabV3 using backbones from MindCV
   		--data_lst=[path of data list file prepared above] \
   		--dst_path=[path to save mindrecords] \
   		--num_shards=8 \
-  		--shuffle=True 
+  		--shuffle=True
   ```
 
 * In accord with paper, we train on *trainaug* dataset (voc train + SBD) and evaluate on *voc val* dataset.
@@ -79,7 +79,7 @@ for ((i = 0; i < ${DEVICE_NUM}; i++)); do
 done
 ```
 
-and start training by running: 
+and start training by running:
 ```shell l
 cd mindcv  # change directory to the root of MindCV repository
 bash ascend8p.sh
@@ -122,7 +122,7 @@ python examples/det/ssd/eval.py --config examples/seg/deeplabv3/deeplabv3_s8_dil
 
 
 
-### Model results 
+### Model results
 
 
 | Train OS | Infer OS |  MS  | FLIP | mIoU  |                            Config                            |                           Download                           |
@@ -135,7 +135,7 @@ python examples/det/ssd/eval.py --config examples/seg/deeplabv3/deeplabv3_s8_dil
 
 **Note**: **OS**: output stride.  **MS**: multiscale inputs during test. **Flip**: adding left-right flipped inputs during test. **Train OS = 16** means training step 1 mentioned in train scetion above, and **Train OS = 16, 8** means the entire two-step training.
 
-As illustrated in paper, adding left-right flipped inputs or muilt-scale inputs during test could improve the performence. Also, once the model is finally trained, employed output_stride=8 during inference bring improvement over using  output_stride=16. 
+As illustrated in paper, adding left-right flipped inputs or muilt-scale inputs during test could improve the performence. Also, once the model is finally trained, employed output_stride=8 during inference bring improvement over using  output_stride=16.
 
 
 ## References
