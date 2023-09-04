@@ -10,7 +10,7 @@ DeepLabV3 is a semantic segmentation architecture improved over previous version
   <img src="https://github.com/mindspore-lab/mindcv/assets/33061146/db2076ed-bccd-455f-badb-e03deb131dc5" width=800 />
 </p>
 <p align="center">
-  <em>Figure 1. Architecture of DeepLabV3 with output_strip=16 [<a href="#references">1</a>] </em>
+  <em>Figure 1. Architecture of DeepLabV3 with output_stride=16 [<a href="#references">1</a>] </em>
 </p>
 
 This example provides an implementation of DeepLabV3 using backbones from MindCV. More details about feature extraction of MindCV are in [this tutorial](https://github.com/mindspore-lab/mindcv/blob/main/docs/en/how_to_guides/feature_extraction.md). Note that the ResNet in DeeplabV3 contains atrous convolutions with different rates,  `dilated_resnet.py`  is provided as a modification of ResNet from MindCV, with atrous convolutions in block 3-4.
