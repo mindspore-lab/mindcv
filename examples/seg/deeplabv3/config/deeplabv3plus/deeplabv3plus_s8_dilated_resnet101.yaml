@@ -1,4 +1,4 @@
-# finetune on os=16 with pretrained backbone: resnet101 from mindcv
+# employ os=8 to finetune after training on os=16
 
 # system
 seed: 1
@@ -12,7 +12,7 @@ all_reduce_fusion_config: [90, 183, 279]
 # dataset
 dataset: "vocaug"
 data_dir: "/home/cvgroup/Datasets/Segment/mindrecord/vocaug0"
-batch_size: 32
+batch_size: 16
 crop_size: 513
 image_mean: [103.53, 116.28, 123.675]
 image_std: [57.375, 57.120, 58.395]
@@ -27,28 +27,29 @@ backbone: "dilated_resnet101"
 backbone_ckpt_path: "/home/cvgroup/fzl/checkpoint/resnet/resnet101-689c5e77.ckpt"
 backbone_ckpt_auto_mapping: False
 backbone_features_only: True
-backbone_out_indices: [4]
-output_stride: 16
+backbone_out_indices: [1, 4]
+output_stride: 8
 
 # model
-ckpt_pre_trained: False
-ckpt_path: ""
+model: deeplabv3plus
+ckpt_pre_trained: True
+ckpt_path: "/home/cvgroup/fzl/checkpoint/deeplabv3/deeplabv3_s16_dilated_resnet101_7820-9de3c664.ckpt"
 amp_level: "O3"
 amp_cast_list: None
 
 # scheduler
 scheduler: "cosine_decay"
-lr: 0.08
+lr: 0.02
 min_lr: 0.0000001
 decay_epochs: 40000
 decay_rate: 0.1
-epoch_size: 300
+epoch_size: 500
 lr_epoch_stair: False
 
 # optimizer
 loss_scale_type: "fixed"
 drop_overflow_update: False
-loss_scale: 3072.0
+loss_scale: 2048.0
 momentum: 0.9
 weight_decay: 0.0001
 filter_bias_and_bn: False

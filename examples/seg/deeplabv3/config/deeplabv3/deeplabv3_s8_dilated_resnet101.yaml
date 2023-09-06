@@ -1,0 +1,72 @@
+# employ os=8 to finetune after training on os=16
+
+# system
+seed: 1
+mode: 1
+distribute: True
+num_parallel_workers: 8
+enable_modelarts: False
+device_target: "Ascend"
+all_reduce_fusion_config: [90, 183, 279]
+
+# dataset
+dataset: "vocaug"
+data_dir: "/home/cvgroup/Datasets/Segment/mindrecord/vocaug0"
+batch_size: 16
+crop_size: 513
+image_mean: [103.53, 116.28, 123.675]
+image_std: [57.375, 57.120, 58.395]
+max_scale: 2.0
+min_scale: 0.5
+ignore_label: 255
+num_classes: 21
+shuffle: True
+
+# backbone
+backbone: "dilated_resnet101"
+backbone_ckpt_path: "/home/cvgroup/fzl/checkpoint/resnet/resnet101-689c5e77.ckpt"
+backbone_ckpt_auto_mapping: False
+backbone_features_only: True
+backbone_out_indices: [4]
+output_stride: 8
+
+# model
+model: deeplabv3
+ckpt_pre_trained: True
+ckpt_path: "/home/cvgroup/fzl/checkpoint/deeplabv3/deeplabv3_s16_dilated_resnet101_7820-9de3c664.ckpt"
+amp_level: "O3"
+amp_cast_list: None
+
+# scheduler
+scheduler: "cosine_decay"
+lr: 0.02
+min_lr: 0.0000001
+decay_epochs: 40000
+decay_rate: 0.1
+epoch_size: 500
+lr_epoch_stair: False
+
+# optimizer
+loss_scale_type: "fixed"
+drop_overflow_update: False
+loss_scale: 2048.0
+momentum: 0.9
+weight_decay: 0.0001
+filter_bias_and_bn: False
+gradient_accumulation_steps: 1
+
+# callbacks
+save_steps: 410
+keep_checkpoint_max: 2
+ckpt_save_dir: "./ckpt"
+
+# eval
+eval_while_train: True
+eval_data_lst: "/home/cvgroup/Datasets/Segment/voc_val_lst.txt"
+data_root: ""
+eval_interval: 2
+eval_start_epoch: 50
+input_format: "NCHW"
+flip: False
+scales: [1.0,]
+# scales: [0.5, 0.75, 1.0, 1.25, 1.75]

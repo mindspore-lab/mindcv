@@ -5,8 +5,9 @@ import yaml
 from addict import Dict
 from callbacks import get_segment_eval_callback, get_segment_train_callback
 from data import create_segment_dataset
-from deeplabv3 import DeepLabV3, DeepLabV3InferNetwork, SoftmaxCrossEntropyLoss
+from deeplabv3 import BuildInferNetwork, DeepLabV3, DeeplabV3Plus
 from dilated_resnet import *  # noqa: F403, F401
+from loss import SoftmaxCrossEntropyLoss
 
 import mindspore as ms
 from mindspore import context, load_checkpoint, load_param_into_net
@@ -50,7 +51,7 @@ def train(args):
 
     steps_per_epoch = dataset.get_dataset_size()
 
-    # use mindcv models as backbone for DeeplabV3
+    # use mindcv models as backbone
     backbone = create_model(
         args.backbone,
         checkpoint_path=args.backbone_ckpt_path,
@@ -61,13 +62,18 @@ def train(args):
     )
 
     # network
-    deeplabv3 = DeepLabV3(backbone, args, is_training=True)
-    ms.amp.auto_mixed_precision(deeplabv3, amp_level=args.amp_level)
+    if args.model == "deeplabv3":
+        deeplab = DeepLabV3(backbone, args, is_training=True)
+    elif args.model == "deeplabv3plus":
+        deeplab = DeeplabV3Plus(backbone, args, is_training=True)
+    else:
+        NotImplementedError("support deeplabv3 and deeplabv3plus only")
+    ms.amp.auto_mixed_precision(deeplab, amp_level=args.amp_level)
 
     # load pretrained ckpt
     if args.ckpt_pre_trained:
         param_dict = load_checkpoint(args.ckpt_path)
-        net_param_not_load, _ = load_param_into_net(deeplabv3, param_dict)
+        net_param_not_load, _ = load_param_into_net(deeplab, param_dict)
         if len(net_param_not_load) == 0:
             print("pretrained ckpt - {:s} loaded successfully".format(args.ckpt_path))
         else:
@@ -105,7 +111,7 @@ def train(args):
         optimizer_loss_scale = 1.0
 
     optimizer = create_optimizer(
-        deeplabv3.trainable_params(),
+        deeplab.trainable_params(),
         opt="momentum",
         lr=lr_scheduler,
         weight_decay=args.weight_decay,
@@ -115,7 +121,7 @@ def train(args):
     )
 
     trainer = create_trainer(
-        deeplabv3,
+        deeplab,
         loss,
         optimizer,
         metrics=None,
@@ -131,7 +137,7 @@ def train(args):
 
     # eval when train
     if args.eval_while_train and rank_id == 0:
-        eval_model = DeepLabV3InferNetwork(deeplabv3, input_format=args.input_format)
+        eval_model = BuildInferNetwork(deeplab, input_format=args.input_format)
         eval_dataset = create_segment_dataset(
             name=args.dataset,
             data_dir=args.eval_data_lst,
