@@ -9,7 +9,7 @@
 **DeepLabV3** is a semantic segmentation architecture improved over previous version. Two main contributions of DeepLabV3 are as follows. 1) Modules are designed which employ atrous convolution in cascade or in parallel to capture multi-scale context by adopting multiple atrous rates to handle the problem of segmenting objects at multiple scale. 2) The Atrous Spatial Pyramid Pooling (ASPP) module is augmented with image-level features encoding global context and further boost performance. The improved ASPP applys global average pooling on the last feature map of the model, feeds the resulting image-level features to a 1 × 1 convolution with 256 filters (and batch normalization), and then bilinearly upsamples the feature to the desired spatial dimension. The DenseCRF post-processing from DeepLabV2 is deprecated.
 
 <p align="center">
-  <img src="https://github.com/mindspore-lab/mindcv/assets/33061146/db2076ed-bccd-455f-badb-e03deb131dc5" />
+  <img src="https://github.com/mindspore-lab/mindcv/assets/33061146/db2076ed-bccd-455f-badb-e03deb131dc5" width=700/>
 </p>
 <p align="center">
   <em>Figure 1. Architecture of DeepLabV3 with output_stride=16 [<a href="#references">1</a>] </em>
@@ -20,11 +20,12 @@
 **DeepLabV3+** extends DeepLabv3 by adding a simple yet effective decoder module to refine the segmentation results especially along object boundaries. It combines advantages from Spatial pyramid pooling module and encode-decoder structure. The last feature map before logits in the origin deeplabv3 becomes the encoder output.  The encoder features are first bilinearly upsampled by a factor of 4 and then concatenated with the corresponding low-level features  from the network backbone that have the same spatial resolution. Another 1 × 1 convolution is applied on the low-level features to reduce the number of channels. After the concatenation, a few 3 × 3 convolutions are applied to refine the features followed by another simple bilinear upsampling by a factor of 4.
 
 <p align="center">
-  <img src="https://github.com/mindspore-lab/mindcv/assets/33061146/e1a17518-b19a-46f1-b28a-ec67cafa81be"  />
+  <img src="https://github.com/mindspore-lab/mindcv/assets/33061146/e1a17518-b19a-46f1-b28a-ec67cafa81be" width=700/>
 </p>
 <p align="center">
   <em>Figure 2. DeepLabv3+ extends DeepLabv3 by employing a encoderdecoder structure [<a href="#references">2</a>] </em>
 </p>
+
 
 This example provides implementations of DeepLabV3 and DeepLabV3+ using backbones from MindCV. More details about feature extraction of MindCV are in [this tutorial](https://github.com/mindspore-lab/mindcv/blob/main/docs/en/how_to_guides/feature_extraction.md). Note that the ResNet in DeepLab contains atrous convolutions with different rates,  `dilated_resnet.py`  is provided as a modification of ResNet from MindCV, with atrous convolutions in block 3-4.
 
