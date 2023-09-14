@@ -149,6 +149,8 @@ def eval_batch_scales(args, eval_net, img_lst, scales, base_crop_size=513, flip=
 def apply_eval(eval_param_dict):
     """compute mean IoU"""
 
+    print("evalating...")
+
     eval_net = eval_param_dict["net"]
     eval_net.set_train(False)
     img_lst = eval_param_dict["dataset"]
@@ -182,7 +184,8 @@ def apply_eval(eval_param_dict):
             inner_batch_idx = 0
             batch_img_lst = []
             batch_msk_lst = []
-            print("processed {} images".format(i + 1))
+            if args.eval_processing_log:
+                print("processed {} images".format(i + 1))
 
     iou = np.diag(hist) / (hist.sum(1) + hist.sum(0) - np.diag(hist))
     miou = np.nanmean(iou)

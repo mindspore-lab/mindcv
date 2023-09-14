@@ -1,19 +1,32 @@
-# DeepLabV3 Based on MindCV Backbones
+# DeepLabV3, DeeplabV3+ Based on MindCV Backbones
 
-> [Rethinking Atrous Convolution for Semantic Image Segmentation](https://arxiv.org/abs/1706.05587)
+> DeeplabV3: [Rethinking Atrous Convolution for Semantic Image Segmentation](https://arxiv.org/abs/1706.05587)
+>
+> DeeplabV3+:[Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation](https://arxiv.org/abs/1802.02611)
 
 ## Introduction
 
-DeepLabV3 is a semantic segmentation architecture improved over previous version. Two main contributions of DeepLabV3 are as follows. 1) Modules are designed which employ atrous convolution in cascade or in parallel to capture multi-scale context by adopting multiple atrous rates to handle the problem of segmenting objects at multiple scale. 2) The Atrous Spatial Pyramid Pooling (ASPP) module is augmented with image-level features encoding global context and further boost performance. The improved ASPP applys global average pooling on the last feature map of the model, feeds the resulting image-level features to a 1 × 1 convolution with 256 filters (and batch normalization), and then bilinearly upsamples the feature to the desired spatial dimension. The DenseCRF post-processing from DeepLabv2 is deprecated.
+**DeepLabV3** is a semantic segmentation architecture improved over previous version. Two main contributions of DeepLabV3 are as follows. 1) Modules are designed which employ atrous convolution in cascade or in parallel to capture multi-scale context by adopting multiple atrous rates to handle the problem of segmenting objects at multiple scale. 2) The Atrous Spatial Pyramid Pooling (ASPP) module is augmented with image-level features encoding global context and further boost performance. The improved ASPP applys global average pooling on the last feature map of the model, feeds the resulting image-level features to a 1 × 1 convolution with 256 filters (and batch normalization), and then bilinearly upsamples the feature to the desired spatial dimension. The DenseCRF post-processing from DeepLabV2 is deprecated.
 
 <p align="center">
-  <img src="https://github.com/mindspore-lab/mindcv/assets/33061146/db2076ed-bccd-455f-badb-e03deb131dc5" width=800 />
+  <img src="https://github.com/mindspore-lab/mindcv/assets/33061146/db2076ed-bccd-455f-badb-e03deb131dc5" />
 </p>
 <p align="center">
   <em>Figure 1. Architecture of DeepLabV3 with output_stride=16 [<a href="#references">1</a>] </em>
 </p>
 
-This example provides an implementation of DeepLabV3 using backbones from MindCV. More details about feature extraction of MindCV are in [this tutorial](https://github.com/mindspore-lab/mindcv/blob/main/docs/en/how_to_guides/feature_extraction.md). Note that the ResNet in DeeplabV3 contains atrous convolutions with different rates,  `dilated_resnet.py`  is provided as a modification of ResNet from MindCV, with atrous convolutions in block 3-4.
+
+
+**DeepLabV3+** extends DeepLabv3 by adding a simple yet effective decoder module to refine the segmentation results especially along object boundaries. It combines advantages from Spatial pyramid pooling module and encode-decoder structure. The last feature map before logits in the origin deeplabv3 becomes the encoder output.  The encoder features are first bilinearly upsampled by a factor of 4 and then concatenated with the corresponding low-level features  from the network backbone that have the same spatial resolution. Another 1 × 1 convolution is applied on the low-level features to reduce the number of channels. After the concatenation, a few 3 × 3 convolutions are applied to refine the features followed by another simple bilinear upsampling by a factor of 4.
+
+<p align="center">
+  <img src="https://github.com/mindspore-lab/mindcv/assets/33061146/e1a17518-b19a-46f1-b28a-ec67cafa81be"  />
+</p>
+<p align="center">
+  <em>Figure 2. DeepLabv3+ extends DeepLabv3 by employing a encoderdecoder structure [<a href="#references">2</a>] </em>
+</p>
+
+This example provides implementations of DeepLabV3 and DeepLabV3+ using backbones from MindCV. More details about feature extraction of MindCV are in [this tutorial](https://github.com/mindspore-lab/mindcv/blob/main/docs/en/how_to_guides/feature_extraction.md). Note that the ResNet in DeepLab contains atrous convolutions with different rates,  `dilated_resnet.py`  is provided as a modification of ResNet from MindCV, with atrous convolutions in block 3-4.
 
 ## Quick Start
 
@@ -56,7 +69,9 @@ This example provides an implementation of DeepLabV3 using backbones from MindCV
 
 ### Train
 
-It is highly recommended to use **distributed training** for this DeepLabV3 implementation.
+Specify `deeplabv3`  or  `deeplabv3plus` in key word `model` in the config file.
+
+It is highly recommended to use **distributed training** for this DeepLabV3 and DeepLabV3+ implementation.
 
 For distributed training using **OpenMPI's `mpirun`**, simply run
 ```shell
@@ -96,13 +111,21 @@ python examples/seg/deeplabv3/train.py --config [the path to the config file]
 - Step 1: Employ output_stride=16 and fine-tune pretrained resnet101 on *trainaug* dataset. In config file, please specify the path of pretrained backbone checkpoint in keyword `backbone_ckpt_path` and set `output_stride` to `16`.
 
   ```shell
+  # for deeplabv3
   mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/deeplabv3_s16_dilated_resnet101.yaml
+
+  # for deeplabv3+
+  mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/deeplabv3plus_s16_dilated_resnet101.yaml
   ```
 
 * Step 2: Employ output_stride=8, fine-tune model from step 1 on  *trainaug* dataset with smaller base learning rate. In config file, please specify the path of checkpoint from previous step in `ckpt_path`, set  `ckpt_pre_trained` to `True` and set `output_stride` to `8` .
 
   ```shell
+  # for deeplabv3
   mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/deeplabv3_s8_dilated_resnet101.yaml
+
+  # for deeplabv3+
+  mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/deeplabv3plus_s8_dilated_resnet101.yaml
   ```
 
 ### Test
@@ -112,31 +135,41 @@ For testing the trained model, first specify the path to the model checkpoint at
 cd mindcv  # change directory to the root of MindCV repository
 python examples/seg/deeplabv3/eval.py --config [the path to the config file]
 ```
-For example, after replacing  `ckpt_path` in config file with [checkpoint](https://download.mindspore.cn/toolkits/mindcv/deeplabv3/deeplabv3_s8_resnet101-a297e7af.ckpt) from 2-step training, commands below employ os=8 without left-right filpped or muticale inputs.
+For example, after replacing  `ckpt_path` in config file with [checkpoint](https://download.mindspore.cn/toolkits/mindcv/deeplabv3/deeplabv3_s8_resnet101-a297e7af.ckpt) from 2-step training of deeplabv3, commands below employ os=8 without left-right filpped or muticale inputs.
 ```shell
 cd mindcv  # change directory to the root of MindCV repository
-python examples/det/ssd/eval.py --config examples/seg/deeplabv3/deeplabv3_s8_dilated_resnet101.yaml
+python examples/seg/deeplabv3/eval.py --config examples/seg/deeplabv3/deeplabv3_s8_dilated_resnet101.yaml
 ```
 
 ## Results
 
+### Config
 
+|   Model    |                         OS=16 config                         |                         OS=8 config                          |                           Download                           |
+| :--------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
+| DeepLabV3  | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3_s16_dilated_resnet101.yaml) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3_s8_dilated_resnet101.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/deeplabv3/deeplabv3_dilated_resnet101-8614f6af.ckpt) |
+| DeepLabV3+ | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3plus_s16_dilated_resnet101.yaml) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3plus_s8_dilated_resnet101.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/deeplabv3/deeplabv3plus_dilated_resnet101-59ea7d95.ckpt) |
 
 ### Model results
 
 
-| Train OS | Infer OS |  MS  | FLIP | mIoU  |                            Config                            |                           Download                           |
-| :------: | :------: | :--: | :--: | :---: | :----------------------------------------------------------: | :----------------------------------------------------------: |
-|    16    |    16    |      |      | 78.20 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/deeplabv3_s16_dilated_resnet101.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/deeplabv3/deeplabv3_s16_resnet101-9de3c664.ckpt) |
-|  16, 8   |    16    |      |      | 77.33 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/deeplabv3_s16_dilated_resnet101.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/deeplabv3/deeplabv3_s8_resnet101-a297e7af.ckpt) |
-|  16, 8   |    8     |      |      | 79.16 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/deeplabv3_s8_dilated_resnet101.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/deeplabv3/deeplabv3_s8_resnet101-a297e7af.ckpt) |
-|  16, 8   |    8     |  √   |      | 79.93 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/deeplabv3_s8_dilated_resnet101.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/deeplabv3/deeplabv3_s8_resnet101-a297e7af.ckpt) |
-|  16, 8   |    8     |  √   |  √   | 80.14 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/deeplabv3_s8_dilated_resnet101.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/deeplabv3/deeplabv3_s8_resnet101-a297e7af.ckpt) |
+|   Model    | Infer OS |  MS  | FLIP | mIoU  |
+| :--------: | :------: | :--: | :--: | :---: |
+| DeepLabV3  |    16    |      |      | 77.33 |
+| DeepLabV3  |    8     |      |      | 79.16 |
+| DeepLabV3  |    8     |  √   |      | 79.93 |
+| DeepLabV3  |    8     |  √   |  √   | 80.14 |
+| DeepLabV3+ |    16    |      |      | 78.99 |
+| DeepLabV3+ |    8     |      |      | 80.31 |
+| DeepLabV3+ |    8     |  √   |      | 80.99 |
+| DeepLabV3+ |    8     |  √   |  √   | 81.10 |
 
-**Note**: **OS**: output stride.  **MS**: multiscale inputs during test. **Flip**: adding left-right flipped inputs during test. **Train OS = 16** means training step 1 mentioned in train scetion above, and **Train OS = 16, 8** means the entire two-step training.
+**Note**: **OS**: output stride.  **MS**: multiscale inputs during test. **Flip**: adding left-right flipped inputs during test. **Weights** are checkpoint files saved after two-step training.
 
-As illustrated in paper, adding left-right flipped inputs or muilt-scale inputs during test could improve the performence. Also, once the model is finally trained, employed output_stride=8 during inference bring improvement over using  output_stride=16.
+As illustrated in [<a href="#references">1</a>], adding left-right flipped inputs or muilt-scale inputs during test could improve the performence. Also, once the model is finally trained, employed output_stride=8 during inference bring improvement over using  output_stride=16.
 
 
 ## References
 [1] Chen L C, Papandreou G, Schroff F, et al. Rethinking atrous convolution for semantic image segmentation[J]. arXiv preprint arXiv:1706.05587, 2017.
+
+[2] Chen, Liang-Chieh, et al. "Encoder-decoder with atrous separable convolution for semantic image segmentation." *Proceedings of the European conference on computer vision (ECCV)*. 2018.

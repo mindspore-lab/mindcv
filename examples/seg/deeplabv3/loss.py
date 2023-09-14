@@ -1,7 +1,8 @@
-from mindspore import Tensor
 import mindspore.common.dtype as mstype
 import mindspore.nn as nn
 import mindspore.ops as ops
+from mindspore import Tensor
+
 
 class SoftmaxCrossEntropyLoss(nn.Cell):
     """

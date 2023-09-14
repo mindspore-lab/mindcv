@@ -102,7 +102,7 @@ def get_segment_train_callback(args, steps_per_epoch, rank_id):
             save_checkpoint_steps=args.save_steps,
             keep_checkpoint_max=args.keep_checkpoint_max,
         )
-        prefix_name = "deeplabv3_s" + str(args.output_stride) + "_" + args.backbone
+        prefix_name = str(args.model) + "_s" + str(args.output_stride) + "_" + args.backbone
         ckpt_cb = ModelCheckpoint(prefix=prefix_name, directory=args.ckpt_save_dir, config=ckpt_config)
         callbacks.append(ckpt_cb)
     return callbacks

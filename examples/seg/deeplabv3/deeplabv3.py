@@ -1,4 +1,4 @@
-"""DeeplabV3, DeeplabV3p implement with replaceable backbones"""
+"""DeeplabV3, DeeplabV3+ implement with replaceable backbones"""
 
 from typing import List
 
@@ -234,6 +234,7 @@ class DeeplabV3Plus(nn.Cell):
         out = self.aspp(features)
         out = self.decoder(out, low_level_features)
         out = ops.interpolate(out, size=(size[2], size[3]), mode="bilinear", align_corners=True)
+        return out
 
 
 class BuildInferNetwork(nn.Cell):
