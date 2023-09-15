@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Optional
+from typing import Callable, Optional
 
 import numpy as np
 
@@ -8,8 +8,10 @@ from mindspore import Parameter, Tensor, nn, ops
 from mindspore.common.initializer import Normal, initializer
 
 from .helpers import load_pretrained
+from .layers.mlp import Mlp
+from .layers.patch_embed import PatchEmbed
 from .registry import register_model
-from .vit_encoder import Block, VisionTransformerEncoder
+from .vit import Block, VisionTransformer
 
 __all__ = [
     "mae_b_16_224_pretrain",
@@ -91,12 +93,12 @@ def get_1d_sincos_pos_embed_from_grid(embed_dim, pos):
     return emb
 
 
-class MAEForPretrain(VisionTransformerEncoder):
+class MAEForPretrain(nn.Cell):
     def __init__(
         self,
-        img_size: int = 224,
+        image_size: int = 224,
         patch_size: int = 16,
-        in_chans: int = 3,
+        in_channels: int = 3,
         embed_dim: int = 1024,
         depth: int = 24,
         num_heads: int = 16,
@@ -104,28 +106,33 @@ class MAEForPretrain(VisionTransformerEncoder):
         decoder_embed_dim: int = 512,
         decoder_depth: int = 8,
         decoder_num_heads: int = 16,
+        qkv_bias: bool = True,
+        qk_norm: bool = False,
+        proj_drop_rate: float = 0.,
+        attn_drop_rate: float = 0.,
+        drop_path_rate: float = 0.,
+        init_values: Optional[float] = None,
         act_layer: nn.Cell = nn.GELU,
         norm_layer: nn.Cell = nn.LayerNorm,
+        mlp_layer: Callable = Mlp,
         norm_pix_loss: bool = True,
         mask_ratio: float = 0.75,
-        **kwargs
+        **kwargs,
     ):
-        super(MAEForPretrain, self).__init__(
-            img_size=img_size,
-            patch_size=patch_size,
-            in_chans=in_chans,
-            embed_dim=embed_dim,
-            depth=depth,
-            num_heads=num_heads,
-            mlp_ratio=mlp_ratio,
-            init_values=None,
-            act_layer=act_layer,
-            norm_layer=norm_layer,
-            use_abs_pos_emb=True,
-            use_rel_pos_bias=False,
-            use_shared_rel_pos_bias=False,
-            **kwargs
-        )
+        super(MAEForPretrain, self).__init__()
+        self.patch_embed = PatchEmbed(image_size=image_size, patch_size=patch_size,
+                                      in_chans=in_channels, embed_dim=embed_dim)
+        self.num_patches = self.patch_embed.num_patches
+        dpr = [x.item() for x in np.linspace(0, drop_path_rate, depth)]
+        self.blocks = nn.CellList([
+            Block(
+                dim=embed_dim, num_heads=num_heads, qkv_bias=qkv_bias, qk_norm=qk_norm,
+                attn_drop=attn_drop_rate, proj_drop=proj_drop_rate,
+                mlp_ratio=mlp_ratio, drop_path=dpr[i], init_values=init_values,
+                act_layer=act_layer, norm_layer=norm_layer, mlp_layer=mlp_layer,
+            ) for i in range(depth)
+        ])
+
         self.cls_token = Parameter(initializer(Normal(sigma=0.02), (1, 1, embed_dim)))
 
         self.unmask_len = int(np.floor(self.num_patches * (1 - mask_ratio)))
@@ -148,12 +155,14 @@ class MAEForPretrain(VisionTransformerEncoder):
 
         self.decoder_blocks = nn.CellList([
             Block(
-                dim=decoder_embed_dim, num_heads=decoder_num_heads, qkv_bias=True,
-                mlp_ratio=mlp_ratio, init_values=None, act_layer=act_layer, norm_layer=norm_layer,
-            ) for _ in range(decoder_depth)
+                dim=decoder_embed_dim, num_heads=decoder_num_heads, qkv_bias=qkv_bias, qk_norm=qk_norm,
+                attn_drop=attn_drop_rate, proj_drop=proj_drop_rate,
+                mlp_ratio=mlp_ratio, drop_path=dpr[i], init_values=init_values,
+                act_layer=act_layer, norm_layer=norm_layer, mlp_layer=mlp_layer,
+            ) for i in range(decoder_depth)
         ])
         self.decoder_norm = norm_layer((decoder_embed_dim,))
-        self.decoder_pred = nn.Dense(decoder_embed_dim, patch_size ** 2 * in_chans)
+        self.decoder_pred = nn.Dense(decoder_embed_dim, patch_size ** 2 * in_channels)
 
         self.sort = ops.Sort()
 
@@ -178,7 +187,6 @@ class MAEForPretrain(VisionTransformerEncoder):
                 cell.beta.set_data(
                     initializer('zeros', cell.beta.shape, cell.beta.dtype)
                 )
-
             if name == "patch_embed.proj":
                 cell.weight.set_data(
                     initializer("xavier_uniform", cell.weight.shape, cell.weight.dtype)
@@ -288,145 +296,86 @@ class MAEForPretrain(VisionTransformerEncoder):
         loss = self.forward_loss(imgs, pred, mask)
         return loss
 
+    def get_num_layers(self):
+        return len(self.blocks)
 
-class MAEForFinetune(VisionTransformerEncoder):
-    def __init__(
-        self,
-        img_size: int = 224,
-        patch_size: int = 16,
-        in_chans: int = 3,
-        embed_dim: int = 768,
-        depth: int = 12,
-        num_heads: int = 12,
-        attn_head_dim: Optional[int] = None,
-        mlp_ratio: float = 4.,
-        qkv_bias: bool = True,
-        qk_scale: Optional[float] = None,
-        pos_drop_rate: float = 0.,
-        proj_drop_rate: float = 0.,
-        attn_drop_rate: float = 0.,
-        drop_path_rate: float = 0.,
-        act_layer: nn.Cell = nn.GELU,
-        norm_layer: nn.Cell = nn.LayerNorm,
-        num_classes: int = 1000,
-        use_mean_pooling: bool = True,
-        **kwargs
-    ):
-        super(MAEForFinetune, self).__init__(
-            img_size=img_size,
-            patch_size=patch_size,
-            in_chans=in_chans,
-            embed_dim=embed_dim,
-            depth=depth,
-            num_heads=num_heads,
-            attn_head_dim=attn_head_dim,
-            mlp_ratio=mlp_ratio,
-            qkv_bias=qkv_bias,
-            qk_scale=qk_scale,
-            pos_drop_rate=pos_drop_rate,
-            proj_drop_rate=proj_drop_rate,
-            attn_drop_rate=attn_drop_rate,
-            drop_path_rate=drop_path_rate,
-            init_values=None,
-            act_layer=act_layer,
-            norm_layer=norm_layer,
-            use_abs_pos_emb=True,
-            use_rel_pos_bias=False,
-            use_shared_rel_pos_bias=False,
-            **kwargs
-        )
-        self.use_mean_pooling = use_mean_pooling
-        if self.use_mean_pooling:
-            self.fc_norm = norm_layer((embed_dim,))
-        else:
-            self.norm = norm_layer((embed_dim,))
-        self.head = nn.Dense(embed_dim, num_classes, weight_init='TruncatedNormal')
-
-        self._init_weights()
-        self._fix_init_weights()
-
-    def construct(self, x):
-        x = self.forward_features(x)
-        if self.use_mean_pooling:
-            x = x[:, 1:].mean(axis=1)
-            x = self.fc_norm(x)
-        else:
-            x = self.norm(x)
-            x = x[:, 0]
-        x = self.head(x)
-        return x
+    def no_weight_decay(self):
+        return {'pos_embed', 'cls_token'}
 
 
 @register_model
-def mae_b_16_224_pretrain(pretrained=False, **kwargs):
+def mae_b_16_224_pretrain(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs):
+    default_cfg = default_cfgs["mae_b_16_224_pretrain"]
     model = MAEForPretrain(
-        patch_size=16, embed_dim=768, depth=12, num_heads=12,
-        decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
-        act_layer=partial(nn.GELU, approximate=False),
+        image_size=224, patch_size=16, in_channels=in_channels, embed_dim=768, depth=12, num_heads=12,
+        decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16, act_layer=partial(nn.GELU, approximate=False),
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), **kwargs
     )
     if pretrained:
-        pass
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
 
 
 @register_model
-def mae_l_16_224_pretrain(pretrained=False, **kwargs):
+def mae_l_16_224_pretrain(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs):
+    default_cfg = default_cfgs["mae_l_16_224_pretrain"]
     model = MAEForPretrain(
-        patch_size=16, embed_dim=1024, depth=24, num_heads=16,
-        decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
-        act_layer=partial(nn.GELU, approximate=False),
+        image_size=224, patch_size=16, in_channels=in_channels, embed_dim=1024, depth=24, num_heads=16,
+        decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16, act_layer=partial(nn.GELU, approximate=False),
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), **kwargs
     )
     if pretrained:
-        pass
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
 
 
 @register_model
-def mae_h_16_224_pretrain(pretrained=False, **kwargs):
+def mae_h_16_224_pretrain(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs):
+    default_cfg = default_cfgs["mae_h_16_224_pretrain"]
     model = MAEForPretrain(
-        patch_size=16, embed_dim=1280, depth=32, num_heads=16,
-        decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
-        act_layer=partial(nn.GELU, approximate=False),
+        image_size=224, patch_size=16, in_channels=in_channels, embed_dim=1280, depth=32, num_heads=16,
+        decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16, act_layer=partial(nn.GELU, approximate=False),
         norm_layer=partial(nn.LayerNorm, epsilon=1e-6), **kwargs
     )
     if pretrained:
-        pass
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
 
 
 @register_model
-def mae_b_16_224_finetune(pretrained=True, in_chans=3, num_classes=1000, **kwargs):
+def mae_b_16_224_finetune(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs):
     default_cfg = default_cfgs["mae_b_16_224_finetune"]
-    model = MAEForFinetune(
-        patch_size=16, in_chans=in_chans, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4,
-        qkv_bias=True, norm_layer=partial(nn.LayerNorm, epsilon=1e-6), num_classes=num_classes, **kwargs
+    model = VisionTransformer(
+        image_size=224, patch_size=16, in_channels=in_channels, embed_dim=768, depth=12, num_heads=12,
+        global_pool='avg', norm_layer=partial(nn.LayerNorm, epsilon=1e-6),
+        num_classes=num_classes, **kwargs
     )
     if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_chans)
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
 
 
 @register_model
-def mae_l_16_224_finetune(pretrained=True, in_chans=3, num_classes=1000, **kwargs):
+def mae_l_16_224_finetune(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs):
     default_cfg = default_cfgs["mae_l_16_224_finetune"]
-    model = MAEForFinetune(
-        patch_size=16, in_chans=in_chans, embed_dim=1024, depth=24, num_heads=16, mlp_ratio=4,
-        qkv_bias=True, norm_layer=partial(nn.LayerNorm, epsilon=1e-6), num_classes=num_classes, **kwargs
+    model = VisionTransformer(
+        image_size=224, patch_size=16, in_channels=in_channels, embed_dim=1024, depth=24, num_heads=16,
+        global_pool='avg', norm_layer=partial(nn.LayerNorm, epsilon=1e-6),
+        num_classes=num_classes, **kwargs
     )
     if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_chans)
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
 
 
 @register_model
-def mae_h_14_224_finetune(pretrained=True, in_chans=3, num_classes=1000, **kwargs):
+def mae_h_14_224_finetune(pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs):
     default_cfg = default_cfgs["mae_h_14_224_finetune"]
-    model = MAEForFinetune(
-        patch_size=14, in_chans=in_chans, embed_dim=1280, depth=32, num_heads=16, mlp_ratio=4,
-        qkv_bias=True, norm_layer=partial(nn.LayerNorm, epsilon=1e-6), num_classes=num_classes, **kwargs
+    model = VisionTransformer(
+        image_size=224, patch_size=14, in_channels=in_channels, embed_dim=1280, depth=32, num_heads=16,
+        global_pool='avg', norm_layer=partial(nn.LayerNorm, epsilon=1e-6),
+        num_classes=num_classes, **kwargs
     )
     if pretrained:
-        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_chans)
+        load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
     return model
