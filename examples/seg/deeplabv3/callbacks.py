@@ -1,11 +1,14 @@
+import logging
 import os
 import stat
 
 from postprocess import apply_eval
 
-from mindspore import log as logger
+# from mindspore import log as logger
 from mindspore import save_checkpoint
 from mindspore.train.callback import Callback, CheckpointConfig, LossMonitor, ModelCheckpoint, TimeMonitor
+
+_logger = logging.getLogger(__name__)
 
 
 class EvalCallBack(Callback):
@@ -61,9 +64,9 @@ class EvalCallBack(Callback):
             os.chmod(file_name, stat.S_IWRITE)
             os.remove(file_name)
         except OSError:
-            logger.warning("OSError, failed to remove the older ckpt file %s.", file_name)
+            _logger.warning("OSError, failed to remove the older ckpt file %s.", file_name)
         except ValueError:
-            logger.warning("ValueError, failed to remove the older ckpt file %s.", file_name)
+            _logger.warning("ValueError, failed to remove the older ckpt file %s.", file_name)
 
     def on_train_epoch_end(self, run_context):
         """Callback when epoch end."""
@@ -72,22 +75,22 @@ class EvalCallBack(Callback):
 
         if cur_epoch >= self.eval_start_epoch and (cur_epoch - self.eval_start_epoch) % self.interval == 0:
             res = self.eval_function(self.eval_param_dict)
-            print("epoch: {}, {}: {}".format(cur_epoch, self.metrics_name, res), flush=True)
+            _logger.info("epoch: {}, {}: {}".format(cur_epoch, self.metrics_name, res), flush=True)
 
             if res >= self.best_res:
                 self.best_res = res
                 self.best_epoch = cur_epoch
-                print("update best result: {}".format(res), flush=True)
+                _logger.info("update best result: {}".format(res), flush=True)
 
                 if self.save_best_ckpt:
                     if os.path.exists(self.best_ckpt_path):
                         self.remove_ckpoint_file(self.best_ckpt_path)
 
                     save_checkpoint(cb_params.train_network, self.best_ckpt_path)
-                    print("update best checkpoint at: {}".format(self.best_ckpt_path), flush=True)
+                    _logger.info("update best checkpoint at: {}".format(self.best_ckpt_path), flush=True)
 
     def on_train_end(self, run_context):
-        print(
+        _logger.info(
             "End training, the best {0} is: {1}, the best {0} epoch is {2}".format(
                 self.metrics_name, self.best_res, self.best_epoch
             ),

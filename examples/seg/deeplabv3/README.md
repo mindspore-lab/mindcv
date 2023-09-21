@@ -44,19 +44,19 @@ This example provides implementations of DeepLabV3 and DeepLabV3+ using backbone
 
 - Download Pascal VOC 2012 dataset,  [VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/) and Semantic Boundaries Dataset, [SBD](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/semantic_contours/benchmark.tgz).
 
-- Prepare training and test data list files with the path to image and annotation pairs. You could simply run `python examples/seg/deeplabv3/build_dataset/get_dataset_lst.py --data_root=[PATH TO DATA]` to generate the list files. The lines in list file should be like as follows:
+- Prepare training and test data list files with the path to image and annotation pairs. You could simply run `python examples/seg/deeplabv3/preprocess/get_dataset_lst.py --data_root=/path/to/data` to generate the list files. The lines in a list file should be like as follows:
 
   ```
-  /[PATH..]/JPEGImages/2007_000032.jpg /[PATH..]/SegmentationClassGray/2007_000032.png
-  /[PATH..]/JPEGImages/2007_000039.jpg /[PATH..]/SegmentationClassGray/2007_000039.png
-  /[PATH..]/JPEGImages/2007_000063.jpg /[PATH..]/SegmentationClassGray/2007_000063.png
+  /path/to/data/JPEGImages/2007_000032.jpg /path/to/data/SegmentationClassGray/2007_000032.png
+  /path/to/data/JPEGImages/2007_000039.jpg /path/to/data/SegmentationClassGray/2007_000039.png
+  /path/to/data/JPEGImages/2007_000063.jpg /path/to/data/SegmentationClassGray/2007_000063.png
   ......
   ```
 
-- Convert training dataset to mindrecords by running  ``bulid_seg_data.py `` script.
+- Convert training dataset to mindrecords by running  ``build_seg_data.py`` script.
 
   ```shell
-  python examples/seg/deeplabv3/bulid_dataset/bulid_seg_data.py \
+  python examples/seg/deeplabv3/preprocess/build_seg_data.py \
   		--data_root=[root path of training data] \
   		--data_lst=[path of data list file prepared above] \
   		--dst_path=[path to save mindrecords] \
@@ -70,13 +70,12 @@ This example provides implementations of DeepLabV3 and DeepLabV3+ using backbone
 
 ### Train
 
-Specify `deeplabv3`  or  `deeplabv3plus` in key word `model` in the config file.
+Specify `deeplabv3`  or  `deeplabv3plus` at the key word `model` in the config file.
 
 It is highly recommended to use **distributed training** for this DeepLabV3 and DeepLabV3+ implementation.
 
 For distributed training using **OpenMPI's `mpirun`**, simply run
 ```shell
-cd mindcv  # change directory to the root of MindCV repository
 mpirun -n [# of devices] python examples/seg/deeplabv3/train.py --config [the path to the config file]
 ```
 
@@ -97,17 +96,15 @@ done
 
 and start training by running:
 ```shell l
-cd mindcv  # change directory to the root of MindCV repository
 bash ascend8p.sh
 ```
 
-For single-device training, simply set the parameter ``distributed`` to ``False`` in config file and run:
+For single-device training, simply set the keyword ``distributed`` to ``False`` in the config file and run:
 ```shell
-cd mindcv  # change directory to the root of MindCV repository
 python examples/seg/deeplabv3/train.py --config [the path to the config file]
 ```
 
-##### The training steps are as follow:
+**The training steps are as follow**:
 
 - Step 1: Employ output_stride=16 and fine-tune pretrained resnet101 on *trainaug* dataset. In config file, please specify the path of pretrained backbone checkpoint in keyword `backbone_ckpt_path` and set `output_stride` to `16`.
 
@@ -131,14 +128,10 @@ python examples/seg/deeplabv3/train.py --config [the path to the config file]
 
 ### Test
 
-For testing the trained model, first specify the path to the model checkpoint at keyword `ckpt_path` in the config file. You could modify `output_stride`, `flip`, `scales` in config file during inference.
-```shell
-cd mindcv  # change directory to the root of MindCV repository
-python examples/seg/deeplabv3/eval.py --config [the path to the config file]
-```
+For testing the trained model, first specify the path to the model checkpoint at keyword `ckpt_path` in the config file. You could modify `output_stride`, `flip`, `scales` in the config file during inference.
+
 For example, after replacing  `ckpt_path` in config file with [checkpoint](https://download.mindspore.cn/toolkits/mindcv/deeplabv3/deeplabv3_s8_resnet101-a297e7af.ckpt) from 2-step training of deeplabv3, commands below employ os=8 without left-right filpped or muticale inputs.
 ```shell
-cd mindcv  # change directory to the root of MindCV repository
 python examples/seg/deeplabv3/eval.py --config examples/seg/deeplabv3/deeplabv3_s8_dilated_resnet101.yaml
 ```
 

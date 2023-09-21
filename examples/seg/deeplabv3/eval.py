@@ -1,15 +1,18 @@
 import argparse
+import logging
 
 import yaml
 from addict import Dict
 from data import create_segment_dataset
-from deeplabv3 import BuildInferNetwork, DeepLabV3, DeeplabV3Plus
+from deeplabv3 import DeeplabInferNetwork, DeepLabV3, DeeplabV3Plus
 from dilated_resnet import *  # noqa: F403, F401
 from postprocess import apply_eval
 
 from mindspore import load_checkpoint, load_param_into_net
 
 from mindcv.models import create_model
+
+logger = logging.getLogger("deeplabv3.eval")
 
 
 def eval(args):
@@ -35,26 +38,25 @@ def eval(args):
     else:
         NotImplementedError("support deeplabv3 and deeplabv3plus only")
 
-    eval_model = BuildInferNetwork(deeplab, input_format=args.input_format)
+    eval_model = DeeplabInferNetwork(deeplab, input_format=args.input_format)
 
     param_dict = load_checkpoint(args.ckpt_path)
     net_param_not_load, _ = load_param_into_net(eval_model, param_dict)
-    print("number of net param not loaded: {}".format(len(net_param_not_load)))
     if len(net_param_not_load) == 0:
-        print("ckpt - {:s} loaded successfully".format(args.ckpt_path))
+        logger.info(f"ckpt - {args.ckpt_path} loaded successfully")
 
     eval_model.set_train(False)
 
-    print("\n========================================\n")
-    print("Processing, please wait a moment.")
+    logger.info("\n========================================\n")
+    logger.info("Processing, please wait a moment.")
 
     # evaluate
     eval_param_dict = {"net": eval_model, "dataset": eval_dataset, "args": args}
 
     mIoU = apply_eval(eval_param_dict)
 
-    print("\n========================================\n")
-    print(f"mean IoU: {mIoU}")
+    logger.info("\n========================================\n")
+    logger.info(f"mean IoU: {mIoU}")
 
 
 def parse_args():

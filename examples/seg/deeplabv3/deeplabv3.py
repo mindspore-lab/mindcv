@@ -28,7 +28,6 @@ def conv3x3(in_channels, out_channels, stride=1, dilation=1, padding=1, weight_i
 class ASPP(nn.Cell):
     """
     Atrous Spatial Pyramid Pooling.
-
     """
 
     def __init__(
@@ -133,8 +132,13 @@ class ASPPConv(nn.Cell):
 
 class DeepLabV3(nn.Cell):
     """
-    DeeplabV3 implement.
+    Constructs a DeepLabV3 model with input backbone.
+    Reference: `Rethinking Atrous Convolution for Semantic Image Segmentation <https://arxiv.org/abs/1706.05587>`__.  # noqa: E501
 
+    Args:
+        backbone (Cell): Backbone Network.
+        args (dict): The default config of DeepLabV3.
+        is_training (bool): default True.
     """
 
     def __init__(
@@ -165,8 +169,7 @@ class DeepLabV3(nn.Cell):
 
 class Decoder(nn.Cell):
     """
-    Decoder module of DeepLabV3P model.
-
+    Decoder module of DeepLabV3+ model.
     """
 
     def __init__(
@@ -205,9 +208,15 @@ class Decoder(nn.Cell):
         return x
 
 
-class DeeplabV3Plus(nn.Cell):
+class DeepLabV3Plus(nn.Cell):
     """
-    DeepLabV3Plus implement.
+    Constructs a DeepLabV3+ model with input backbone.
+    Reference: `Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation <https://arxiv.org/abs/1802.02611>`__.  # noqa: E501
+
+    Args:
+        backbone (Cell): Backbone Network.
+        args (dict): The default config of DeepLabV3+.
+        is_training (bool): default True.
     """
 
     def __init__(
@@ -216,7 +225,7 @@ class DeeplabV3Plus(nn.Cell):
         args,
         is_training: bool = True,
     ):
-        super(DeeplabV3Plus, self).__init__()
+        super(DeepLabV3Plus, self).__init__()
         self.is_training = is_training
         self.backbone = backbone
         self.aspp = ASPP(
@@ -237,14 +246,21 @@ class DeeplabV3Plus(nn.Cell):
         return out
 
 
-class BuildInferNetwork(nn.Cell):
+class DeepLabInferNetwork(nn.Cell):
     """
-    Provide infer network.
+    Provide infer network of Deeplab, network could be deeplabv3 or deeplabv3+.
 
+    Args:
+        network (Cell): DeepLabV3 or DeeplabV3Plus.
+        input_format (str): format of input data, "NCHW" or "NHWC".
+
+    Example:
+        deeplab = DeepLabV3(backbone, args)
+        eval_model = DeeplabInferNetwork(deeplab, input_format="NCHW")
     """
 
     def __init__(self, network, input_format="NCHW"):
-        super(BuildInferNetwork, self).__init__()
+        super(DeepLabInferNetwork, self).__init__()
         self.network = network
         self.softmax = nn.Softmax(axis=1)
         self.format = input_format

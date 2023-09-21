@@ -1,11 +1,11 @@
 import argparse
-import os
+import logging
 
 import yaml
 from addict import Dict
 from callbacks import get_segment_eval_callback, get_segment_train_callback
 from data import create_segment_dataset
-from deeplabv3 import BuildInferNetwork, DeepLabV3, DeeplabV3Plus
+from deeplabv3 import DeepLabInferNetwork, DeepLabV3, DeepLabV3Plus
 from dilated_resnet import *  # noqa: F403, F401
 from loss import SoftmaxCrossEntropyLoss
 
@@ -17,6 +17,8 @@ from mindcv.models import create_model
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
 from mindcv.utils import create_trainer, require_customized_train_step, set_seed
+
+logger = logging.getLogger("deeplabv3.train")
 
 
 def train(args):
@@ -65,7 +67,7 @@ def train(args):
     if args.model == "deeplabv3":
         deeplab = DeepLabV3(backbone, args, is_training=True)
     elif args.model == "deeplabv3plus":
-        deeplab = DeeplabV3Plus(backbone, args, is_training=True)
+        deeplab = DeepLabV3Plus(backbone, args, is_training=True)
     else:
         NotImplementedError("support deeplabv3 and deeplabv3plus only")
     ms.amp.auto_mixed_precision(deeplab, amp_level=args.amp_level)
@@ -75,7 +77,7 @@ def train(args):
         param_dict = load_checkpoint(args.ckpt_path)
         net_param_not_load, _ = load_param_into_net(deeplab, param_dict)
         if len(net_param_not_load) == 0:
-            print("pretrained ckpt - {:s} loaded successfully".format(args.ckpt_path))
+            logger.info(f"pretrained ckpt - {args.ckpt_path} loaded successfully")
         else:
             raise ValueError("inconsistent params: please check net params and ckpt params")
 
@@ -137,7 +139,7 @@ def train(args):
 
     # eval when train
     if args.eval_while_train and rank_id == 0:
-        eval_model = BuildInferNetwork(deeplab, input_format=args.input_format)
+        eval_model = DeepLabInferNetwork(deeplab, input_format=args.input_format)
         eval_dataset = create_segment_dataset(
             name=args.dataset,
             data_dir=args.eval_data_lst,
@@ -145,6 +147,8 @@ def train(args):
         )
         eval_callback = get_segment_eval_callback(eval_model, eval_dataset, args)
         callbacks.append(eval_callback)
+
+    logger.info("Start training")
 
     trainer.train(
         args.epoch_size,
@@ -174,16 +178,6 @@ if __name__ == "__main__":
         args = yaml.safe_load(fp)
     args = Dict(args)
     context.set_context(device_target=args.device_target)
-    # data sync for cloud platform if enabled
-
-    if args.enable_modelarts:
-        import moxing as mox
-
-        args.data_dir = f"/cache/{args.data_url}"
-        mox.file.copy_parallel(src_url=os.path.join(args.data_url, args.dataset), dst_url=args.data_dir)
 
     # core training
     train(args)
-
-    if args.enable_modelarts:
-        mox.file.copy_parallel(src_url=args.ckpt_save_dir, dst_url=args.train_url)
