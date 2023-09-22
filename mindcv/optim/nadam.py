@@ -9,6 +9,11 @@ from mindspore.common.tensor import Tensor
 from mindspore.nn.optim import Optimizer
 from mindspore.nn.optim.optimizer import opt_init_args_register
 
+try:
+    from mindspore import jit
+except ImportError:
+    from mindspore import ms_function as jit
+
 
 def _check_param_value(beta1, beta2, eps, prim_name):
     """Check the type of inputs."""
@@ -48,6 +53,7 @@ class NAdam(Optimizer):
         self.mu_schedule = Parameter(initializer(1, [1], ms.float32), name="mu_schedule")
         self.beta2_power = Parameter(initializer(1, [1], ms.float32), name="beta2_power")
 
+    @jit
     def construct(self, gradients):
         lr = self.get_lr()
         params = self.parameters
