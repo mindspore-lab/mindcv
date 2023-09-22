@@ -4,7 +4,7 @@ import numpy as np
 from mindspore.dataset import GeneratorDataset
 
 
-class ReadDataset:
+class ImageClsDataset:
     def __init__(self, annotation_dir, images_dir):
         # Read annotations
         self.annotation = {}
@@ -32,7 +32,7 @@ class ReadDataset:
         self._data = sum(list(images.values()), [])
         self._label = sum([[i] * len(images[i]) for i in images.keys()], [])
 
-    # make class ReadDataset an iterable object
+    # make class ImageClsDataset an iterable object
     def __getitem__(self, index):
         return self._data[index], self._label[index]
 
@@ -43,5 +43,5 @@ class ReadDataset:
 # take aircraft dataset as an example
 annotation_dir = "./aircraft/data/images_variant_trainval.txt"
 images_dir = "./aircraft/data/iamges/"
-dataset = ReadDataset(annotation_dir)
+dataset = ImageClsDataset(annotation_dir)
 dataset_train = GeneratorDataset(source=dataset, column_names=["image", "label"], shuffle=True)

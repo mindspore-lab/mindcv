@@ -196,7 +196,11 @@ def create_transforms(
         image_resize (int): the image size after resize for adapting to network. Default: 224.
         is_training (bool): if True, augmentation will be applied if support. Default: False.
         auto_augment(str)：augmentation strategies, such as "augmix", "autoaug" etc.
-        separate: separate the image origin and the image been transformed.
+        separate: separate the image clean and the image been transformed. If separate==True, the transformers are
+            returned as a tuple of 3 separate transforms for use in a mixing dataset that  passes:
+            * all data through the primary transform, called "clean" data
+            * a portion of the data through the secondary transform (e.g., auto-aug)
+            * normalized and converts the branches above with the third, transform
         **kwargs: additional args parsed to `transforms_imagenet_train` and `transforms_imagenet_eval`
 
     Returns:

@@ -2,9 +2,9 @@
 
 本文档提供了使用MindCV在自定义数据集上微调的参考流程以及在线读取数据集、分层设置学习率、冻结部分特征网络等微调技巧的实现方法，主要代码实现集成在./example/finetune.py中，您可以基于此教程根据需要自行改动。
 
-接下来将以FGVC-Aircraft数据集为例展示如何对预训练模型mobilenet v3-small进行微调。[ Fine-Grained Visual Classification of Aircraft](https://www.robots.ox.ac.uk/~vgg/data/fgvc-aircraft/)是常用的细粒度图像分类基准数据集，包含 10000 张飞机图片，100 种不同的飞机型号(variant)，其中每种飞机型号均有 100 张图片。
+接下来将以FGVC-Aircraft数据集为例展示如何对预训练模型mobilenet v3-small进行微调。[Fine-Grained Visual Classification of Aircraft](https://www.robots.ox.ac.uk/~vgg/data/fgvc-aircraft/)是常用的细粒度图像分类基准数据集，包含 10000 张飞机图片，100 种不同的飞机型号(variant)，其中每种飞机型号均有 100 张图片。
 
-首先将[下载](https://mindspore-lab.github.io/mindcv/zh/tutorials/finetune/#_3)后的数据集解压到./data文件夹下，Aircraft数据集的目录为：
+首先将下载后的数据集解压到./data文件夹下，Aircraft数据集的目录为：
 
 ```text
 aircraft
@@ -24,7 +24,7 @@ aircraft
 
 ### 读取数据集
 
-对于自定义数据集而言，既可以先在本地将数据文件目录整理成与ImageNet类似的树状结构，再使用`create_dataset`读取数据集（离线方式），又可以直接将原始数据集读取成可迭代对象，替代文件拆分与`create_dataset`步骤（在线方式）。
+对于自定义数据集而言，既可以先在本地将数据文件目录整理成与ImageNet类似的树状结构，再使用`create_dataset`读取数据集（离线方式，仅适用于小型数据集），又可以直接[将原始数据集读取成可迭代/可映射对象]((https://www.mindspore.cn/tutorials/en/r2.1/beginner/dataset.html#customizing-dataset))，替代文件拆分与`create_dataset`步骤（在线方式）。
 
 #### 离线方式
 
@@ -58,9 +58,9 @@ DATASET_NAME
 import shutil
 import os
 
-
-def extract_images(images_path, subset_name, annotation_file_path):
-    # read annotation file to get the label of each image
+# only for Aircraft dataset but not a general one
+def extract_images(images_path, subset_name, annotation_file_path, copy=True):
+    # read the annotation file to get the label of each image
     def annotations(annotation_file_path):
         image_label = {}
         for i in open(annotation_file_path, "r"):
@@ -76,14 +76,17 @@ def extract_images(images_path, subset_name, annotation_file_path):
     subset_path = images_path + subset_name
     os.mkdir(subset_path)
 
-    # extract and copy images to the new folder above
+    # extract and copy/move images to the new folder
     image_label = annotations(annotation_file_path)
     for label in image_label.keys():
         label_folder = subset_path + "/" + label
         os.mkdir(label_folder)
         for image in image_label[label]:
             image_name = image + ".jpg"
-            shutil.copy(images_path + image_name, label_folder + image_name)
+            if copy:
+                shutil.copy(images_path + image_name, label_folder + image_name)
+            else:
+                shutil.move(images_path + image_name, label_folder)
 
 
 images_path = "./aircraft/data/images/"
@@ -122,20 +125,20 @@ aircraft
 
 离线方式的数据读取会在本地占用额外的磁盘空间存储新生成的数据文件，因此在本地存储空间不足或无法将数据备份到本地等其他特殊情况下，无法直接使用`create_dataset`接口读取本地数据文件时，可以采用在线方式自行编写函数读取数据集。
 
-以生成储存训练集图片的可迭代对象为例：
+以生成储存训练集图片和索引到图片样本映射的可随机访问数据集为例：
 
-- 首先定义一个读取原始数据并将其转换成可迭代对象的类`ReadDataset`：
+- 首先定义一个读取原始数据并将其转换成可随机访问的数据集对象`ImageClsDataset`：
 
 	- 在该类的初始化函数`__init__()`中，以./aircraft/data/images_variant_trainval.txt为例的标注文件的文件路径将被当做输入，用于生成储存图片与标签一一对应关系的字典`self.annotation`；
 
-	- 由于在`create_loader`中将会对此迭代对象进行map操作，而该操作不支持字符串格式的标签，因此还需要生成`self.label2id`并<font color=DarkRed>将`self.annotation`中字符串格式的标签转换成整数格式</font>；
+	- 由于在`create_loader`中将会对此对象进行map操作，而该操作不支持字符串格式的标签，因此还需要生成`self.label2id`并<font color=DarkRed>将`self.annotation`中字符串格式的标签转换成整数格式</font>；
 
 	- 根据`self.annotation`中储存的信息，从文件夹./aircraft/data/images/中<font color=DarkRed>将训练集图片读取成一维数组形式</font>（由于`create_loader`中map操作限制，此处图片数据必须被读取为一维格式），并将图片信息与标签分别存放到`self._data`与`self._label`中；
 
-	- 接下来使用`__getitem__`方法构造可迭代对象。
+	- 接下来使用`__getitem__`方法构造可随机访问的数据集对象。
 
 -
-  构造完`ReadDataset`类之后，向其传入标注文件的路径以实例化该类，并通过[`mindspore.dataset.GeneratorDataset`](https://www.mindspore.cn/docs/zh-CN/r2.0/api_python/dataset/mindspore.dataset.GeneratorDataset.html#mindspore.dataset.GeneratorDataset)函数将该可迭代对象加载成数据集即可，注意该函数的参数`column_names`必须被设置为["image", "label"]以便后续其他接口读取数据，此时得到的`dataset_train`应当与通过`create_dataset`读取的训练集完全一致。
+  构造完`ImageClsDataset`类之后，向其传入标注文件的路径以实例化该类，并通过[`mindspore.dataset.GeneratorDataset`](https://www.mindspore.cn/docs/zh-CN/r2.0/api_python/dataset/mindspore.dataset.GeneratorDataset.html#mindspore.dataset.GeneratorDataset)函数将该可映射对象加载成数据集即可，注意该函数的参数`column_names`必须被设置为["image", "label"]以便后续其他接口读取数据，此时得到的`dataset_train`应当与通过`create_dataset`读取的训练集完全一致。
 
 
 ```python
@@ -143,7 +146,7 @@ import numpy as np
 from mindspore.dataset import GeneratorDataset
 
 
-class ReadDataset:
+class ImageClsDataset:
     def __init__(self, annotation_dir, images_dir):
         # Read annotations
         self.annotation = {}
@@ -162,7 +165,7 @@ class ReadDataset:
         for image, label in self.annotation.items():
             self.annotation[image] = self.label2id[label]
 
-        # Read image-labels as iterable object
+        # Read image-labels as mappable object
         images = dict.fromkeys(self.label2id.values(), [])
         for image, label in self.annotation.items():
             read_image = np.fromfile(images_dir + image, dtype=np.uint8)
@@ -171,18 +174,19 @@ class ReadDataset:
         self._data = sum(list(images.values()), [])
         self._label = sum([[i] * len(images[i]) for i in images.keys()], [])
 
-	# make class ReadDataset an iterable object
-	def __getitem__(self, index):
-    	return self._data[index], self._label[index]
+    # make class ImageClsDataset a mappable object
+    def __getitem__(self, index):
+        return self._data[index], self._label[index]
 
+    def __len__(self):
+        return len(self._data)
 
-	def __len__(self):
-    	return len(self._data)
 
 annotation_dir = "./aircraft/data/images_variant_trainval.txt"
 images_dir = "./aircraft/data/iamges/"
-dataset = ReadDataset(annotation_dir)
+dataset = ImageClsDataset(annotation_dir)
 dataset_train = GeneratorDataset(source=dataset, column_names=["image", "label"], shuffle=True)
+
 ```
 
 与离线方式读取数据集相比，在线读取方式省略了在本地拆分数据文件并用`create_dataset`接口读取本地文件的步骤，因此在后续的训练中，只需**将finetune.py中使用`create_dataset`接口的部分替换成上述代码**，就可以与离线方式一样，直接运行finetune.py开始训练。
@@ -200,13 +204,13 @@ MindCV使用`create_loader`函数对上一章节读取的数据集进行图像�
 对于实际微调训练中所使用的的超参数配置，可以参考./configs中基于ImageNet-1k数据集预训练的配置文件。注意对模型微调而言，应事先<font color=DarkRed>将超参数`pretrained`设置为`True`</font>以加载预训练权重，<font color=DarkRed>将`num_classes`设置为自定义数据集的标签个数</font>（比如Aircfrat数据集是100），还可以基于自定义数据集规模，<font color=DarkRed>适当调小`batch_size`与`epoch_size`</font>。此外，由于预训练权重中已经包含了许多识别图像的初始信息，为了不过分破坏这些信息，还需<font color=DarkRed>将学习率`lr`调小</font>，建议至多从预训练学习率的十分之一或0.0001开始训练、调参。这些参数都可以在配置文件中修改，也可以如下所示在shell命令中添加，训练结果可在./ckpt/results.txt文件中查看。
 
 ```bash
-python finetune.py --config=./configs/mobilenetv3/mobilnet_v3_small_ascend.yaml --data_dir=./aircraft/data --pretrained=True
+python .examples/finetune/finetune.py --config=./configs/mobilenetv3/mobilnet_v3_small_ascend.yaml --data_dir=./aircraft/data --pretrained=True
 ```
 
 本文在基于Aircraft数据集对mobilenet v3-small微调时主要对超参数做了如下改动：
 
-| Hyper-parameter | Before     | After                |
-| --------------- | ---------- | -------------------- |
+| Hyper-parameter | Pretrain   | Fine-tune            |
+| --------------- |------------|----------------------|
 | dataset         | "imagenet" | ""                   |
 | batch_size      | 75         | 8                    |
 | image_resize    | 224        | 600                  |
@@ -257,15 +261,15 @@ freeze_layer=["features."+str(i) for i in range(7)]
 # prevent parameters in first 7 layers of network from updating
 for param in network.trainable_params():
     for layer in freeze_layer:
-    	if layer in param.name:
-        	param.requires_grad = False
+        if layer in param.name:
+            param.requires_grad = False
 ```
 
 ### 分层设置学习率
 
 为了进一步提升微调网络的训练效果，还可以分层设置训练中的学习率。这是由于浅层网络一般是识别通用的轮廓特征，所以即便重新更新该部分参数，学习率也应该被设置得比较小；深层部分一般识别物体精细的个性特征，学习率也因此可以设置得比较大；而相对于需要尽量保留预训练信息的特征网络而言，分类器需要从头开始训练，也可以适当将学习率调大。由于针对特定网络层的学习率调整操作比较精细，我们需要进入finetune.py中自行指定参数名与对应的学习率。
 
-MindCV使用[`create_optimizer`函数](https://mindspore-lab.github.io/mindcv/zh/reference/optim/#mindcv.optim.optim_factory.create_optimizer)构造优化器，并将学习率传到优化器中去。要设置分层学习率，只需**将finetune.py中`create_optimizer`函数的`params`参数从`network.trainable_params()`改为包含特定层参数名与对应学习率的列表即可**，参考[MindSpore各优化器说明文档](https://www.mindspore.cn/docs/zh-CN/r2.0/api_python/mindspore.nn.html#%E4%BC%98%E5%8C%96%E5%99%A8)，其中网络具体结构与每层中的参数名均可以通过打印`create_model`的结果——`network`查看。
+MindCV使用[`create_optimizer`](https://mindspore-lab.github.io/mindcv/zh/reference/optim/#mindcv.optim.optim_factory.create_optimizer)函数构造优化器，并将学习率传到优化器中去。要设置分层学习率，只需**将finetune.py中`create_optimizer`函数的`params`参数从`network.trainable_params()`改为包含特定层参数名与对应学习率的列表即可**，参考[MindSpore各优化器说明文档](https://www.mindspore.cn/docs/zh-CN/r2.0/api_python/mindspore.nn.html#%E4%BC%98%E5%8C%96%E5%99%A8)，其中网络具体结构与每层中的参数名均可以通过打印`create_model`的结果——`network`查看。
 > Tips: 您还可以使用同样的操作分层设置weight_decay.
 
 #### 单独调整分类器的学习率
@@ -280,8 +284,8 @@ MindCV使用[`create_optimizer`函数](https://mindspore-lab.github.io/mindcv/zh
 params_lr_group = [{"params": list(filter(lambda x: 'classifier' in x.name, network.trainable_params())),
                     "lr": [i*1.2 for i in lr_scheduler]},
                    {"params": list(filter(lambda x: 'classifier' not in x.name, network.trainable_params())),
-                    "lr": lr_scheduler}，
-                  {"order_params": network.trainable_params()}]
+                    "lr": lr_scheduler},
+                   {"order_params": network.trainable_params()}]
 
 optimizer = create_optimizer(params_lr_group,
                              opt=args.opt,
@@ -289,7 +293,7 @@ optimizer = create_optimizer(params_lr_group,
                              ...)
 ```
 
-#### 分层设置特征网络学习率
+#### 设置特征网络任意层的学习率
 
 与单独调整分类器的学习率类似，分层设置特征网络学习率需要指定特定层的学习率变化列表。假设我们仅增大特征网络最后三层参数（features.13, features.14, features.15）更新的学习率，对finetune.py中创建优化器部分代码的改动如下：
 

@@ -58,7 +58,11 @@ def create_loader(
             (default=None).
         python_multiprocessing (bool, optional): Parallelize Python operations with multiple worker processes. This
             option could be beneficial if the Python operation is computational heavy (default=False).
-        separate(bool, optional): separate the image origin and the image been transformed
+        separate(bool, optional): separate the image clean and the image been transformed.
+            If separate==True, that means the dataset returned has 3 parts:
+            * the first part called image "clean", which means the image without auto_augment (e.g., auto-aug)
+            * the second and third parts called image transformed, hence, with the auto_augment transform.
+            Refer to ".transforms_factory.create_transforms" for more information.
 
     Note:
         1. cutmix is now experimental (which means performance gain is not guarantee)

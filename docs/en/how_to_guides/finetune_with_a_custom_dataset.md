@@ -4,7 +4,7 @@ This document introduces the process for fine-tuning a custom dataset in MindCV 
 
 Next, we will use the FGVC-Aircraft dataset as an example to show how to fine-tune the pre-trained model mobilenet v3-small. [Fine-Grained Visual Classification of Aircraft](https://www.robots.ox.ac.uk/~vgg/data/fgvc-aircraft/) is a commonly used fine-grained image Classification benchmark dataset, which contains 10,000 aircraft images from 100 different types of aircraft (a.k.a variants), that is, 100 images for each aircraft type.
 
-First, extract the [downloaded](https://mindspore-lab.github.io/mindcv/zh/tutorials/finetune/#_3) dataset to . /data folder, the directory structure of the Aircraft dataset is:
+First, extract the downloaded dataset to . /data folder, the directory structure of the Aircraft dataset is:
 
 ```text
 aircraft
@@ -24,11 +24,11 @@ The folder "images" contains all the 10,000 images, and the airplane types and s
 
 ### Read Custom Dataset
 
-For custom datasets, you can either organize the dataset file directory locally into a tree structure similar to ImageNet, and then use the function `create_dataset` to read the dataset (offline way), or directly read all the images into an iterable object, replacing the file splitting and the `create_dataset` steps (online way).
+For custom datasets, you can either organize the dataset file directory locally into a tree structure similar to ImageNet, and then use the function `create_dataset` to read the dataset (offline way), or if your dataset is medium-scale or above, which is not suitable to use offline way, you can also directly [read all the images into a mappable or iterable object](https://www.mindspore.cn/tutorials/en/r2.1/beginner/dataset.html#customizing-dataset), replacing the file splitting and the `create_dataset` steps (online way).
 
-#### Read Dataset offline
+#### Read Dataset Offline
 
-The function ` create_dataset ` uses [`mindspore. Dataset. ImageFolderDataset `](HTTP: / / https://www.mindspore.cn/docs/zh-CN/r2.0/api_python/ The dataset/mindspore dataset. ImageFolderDataset. Html# mindspore. Dataset. ImageFolderDataset) function to build a dataset object, all images in the same folder will be assigned a same label, which is the folder name. Therefore, the prerequisite for using this function is that the file directory of the source dataset should follow the following tree structure:
+The function ` create_dataset ` uses [`mindspore.Dataset.ImageFolderDataset`](https://www.mindspore.cn/docs/zh-CN/r2.0/api_python/dataset/mindspore.dataset.ImageFolderDataset.html#mindspore.dataset.ImageFolderDataset) function to build a dataset object, all images in the same folder will be assigned a same label, which is the folder name. Therefore, the prerequisite for using this function is that the file directory of the source dataset should follow the following tree structure:
 
 ```text
 DATASET_NAME
@@ -52,14 +52,14 @@ DATASET_NAME
            └── ....
 ```
 
-Next, we'll take the annotation file . / aircraft/data/images_variant_trainval. txt as an example, locally generate the file of train set ./aircraft/data/images/trainval/, which meets the request of a tree-structure directory.
+Next, we'll take the annotation file ./aircraft/data/images_variant_trainval.txt as an example, locally generate the file of train set ./aircraft/data/images/trainval/, which meets the request of a tree-structure directory.
 
 ```python
 import shutil
 import os
 
-
-def extract_images(images_path, subset_name, annotation_file_path):
+# only for Aircraft dataset but not a general one
+def extract_images(images_path, subset_name, annotation_file_path, copy=True):
     # read the annotation file to get the label of each image
     def annotations(annotation_file_path):
         image_label = {}
@@ -76,14 +76,17 @@ def extract_images(images_path, subset_name, annotation_file_path):
     subset_path = images_path + subset_name
     os.mkdir(subset_path)
 
-    # extract and copy images to the new folder above
+    # extract and copy/move images to the new folder
     image_label = annotations(annotation_file_path)
     for label in image_label.keys():
         label_folder = subset_path + "/" + label
         os.mkdir(label_folder)
         for image in image_label[label]:
             image_name = image + ".jpg"
-            shutil.copy(images_path + image_name, label_folder + image_name)
+            if copy:
+                shutil.copy(images_path + image_name, label_folder + image_name)
+            else:
+                shutil.move(images_path + image_name, label_folder)
 
 
 images_path = "./aircraft/data/images/"
@@ -118,19 +121,19 @@ aircraft
 
 ./example/finetune.py integrates the whole training pipeline, from pre-processing to the establishment and training of the model: `create_dataset` -> `create_transforms` -> `create_loader` -> `create_model` ->..., thus, the dataset with the adequate file directory structure can be sent directly to the fine-tuning script to start the subsequent processes including loading dataset and model training by running `python ./example/finetune.py --data_dir=./aircraft/data/images/` command. For custom datasets, please note that<font color=DarkRed> the dataset parameter in the configuration file must be set to an empty string `""` </font> in advance.
 
-#### Read Dataset online
+#### Read Dataset Online
 
 Offline data reading takes up extra local disk space to store the newly generated data files. Therefore, when the local storage space is insufficient or the data cannot be backed up to the local environment, the local data files cannot be read using `create_dataset` directly, you can write a function to read the dataset in an online way.
 
-Here's how we generate an iterable object that stores the images of the training set:
+Here's how we generate a random-accessible dataset object that stores the images of the training set and realize a map from indices to data samples:
 
-- First, we define a class `ReadDataset` to read the raw data and transform them into an iterable object:
+- First, we define a class `ImageClsDataset` to read the raw data and transform them into a random-accessible dataset:
 
 	- In the initialization function `__init__()`, the annotation file path such as ./aircraft/data/images_variant_trainval.txt is taken as input, and used to generate a dictionary `self.annotation` that stores the one-to-one correspondence between images and tags;
 	- Since `create_loader` will perform a map operation on this iterated object, which does not support string format labels, it is also necessary to generate `self.label2id` to<font color=DarkRed> convert the string format label in `self.annotation` to integer type</font>;
 	- Based on the information stored in `self.annotation`, we next <font color=DarkRed>read each image in the training set as a one-dimensional array </font> from the folder ./aircraft/data/images/ (the image data must be read as an one-dimensional array due to map operation restrictions in `create_loader`). The image information and label are stored in `self._data` and `self._label` respectively.
-	- Next, the iterable object is constructed using the `__getitem__` function.
-- After writing the ReadDataset class, we can pass it the path of the annotation file to instantiate it, and load it as a dataset that can be read by the model through [`mindspore.dataset.GeneratorDataset`](https://www.mindspore.cn/docs/zh-CN/r2.0/api_python/dataset/mindspore.dataset.GeneratorD ataset.html#mindspore.dataset.GeneratorDataset). Note that <font color=DarkRed>the parameter `column_names` must be set to be ["image", "label"]</font> for subsequent reading by other functions. What we've got now is supposed to be the same as what's generated by `create_dataset`.
+	- Next, the mappable object is constructed using the `__getitem__` function.
+- After writing the ImageClsDataset class, we can pass it the path of the annotation file to instantiate it, and load it as a dataset that can be read by the model through [`mindspore.dataset.GeneratorDataset`](https://www.mindspore.cn/docs/zh-CN/r2.0/api_python/dataset/mindspore.dataset.GeneratorDataset.html#mindspore.dataset.GeneratorDataset). Note that <font color=DarkRed>the parameter `column_names` must be set to be ["image", "label"]</font> for subsequent reading by other functions. What we've got now is supposed to be the same as what's generated by `create_dataset`.
 
 
 ```python
@@ -138,7 +141,7 @@ import numpy as np
 from mindspore.dataset import GeneratorDataset
 
 
-class ReadDataset:
+class ImageClsDataset:
     def __init__(self, annotation_dir, images_dir):
         # Read annotations
         self.annotation = {}
@@ -157,7 +160,7 @@ class ReadDataset:
         for image, label in self.annotation.items():
             self.annotation[image] = self.label2id[label]
 
-        # Read image-labels as iterable object
+        # Read image-labels as mappable object
         images = dict.fromkeys(self.label2id.values(), [])
         for image, label in self.annotation.items():
             read_image = np.fromfile(images_dir + image, dtype=np.uint8)
@@ -166,18 +169,17 @@ class ReadDataset:
         self._data = sum(list(images.values()), [])
         self._label = sum([[i] * len(images[i]) for i in images.keys()], [])
 
-	# make class ReadDataset an iterable object
-	def __getitem__(self, index):
-    	return self._data[index], self._label[index]
+    # make class ImageClsDataset a mappable object
+    def __getitem__(self, index):
+        return self._data[index], self._label[index]
 
-
-	def __len__(self):
-    	return len(self._data)
+    def __len__(self):
+        return len(self._data)
 
 annotation_dir = "./aircraft/data/images_variant_trainval.txt"
 images_dir = "./aircraft/data/iamges/"
-dataset = ReadDataset(annotation_dir)
-dataset_train = GeneratorDataset(source=dataset, column_names=["image", "label"], shuffle=True)
+dataset = ImageClsDataset(annotation_dir)
+ataset_train = GeneratorDataset(source=dataset, column_names=["image", "label"], shuffle=True)
 ```
 
 Compared with the offline way, the online way skipped the step of splitting the data file locally and reading the local file with the `create_dataset` function. So in the subsequent training, simply **replace the part of finetune.py that uses `create_dataset` with the above code**, then you can start training by running finetune.py directly as what you do after reading the dataset offline.
@@ -195,12 +197,12 @@ Referring to [Stanford University CS231n](https://cs231n.github.io/transfer-lear
 For hyper-parameters used in fine-tuning training, you can refer to the configuration file used when pre-training on the ImageNet-1k dataset in ./configs. Note that for fine-tuning, <font color=DarkRed>the hyper-parameter `pretrained` should be set to be `True` </font>to load the pre-training weight, <font color=DarkRed> `num_classes` should be set to be the number of labels </font>of the custom dataset (e.g. 100 for the Aircraft dataset here), moreover, don't forget to <font color=DarkRed>reduce batch_size and epoch_size </font>based on the size of the custom dataset. In addition, since the pre-trained weight already contains a lot of information for identifying images, in order not to destroy this information too much, it is also necessary to<font color=DarkRed> reduce the learning rate `lr` </font>, and it is also recommended to start training and adjust from at most one-tenth of the pre-trained learning rate or 0.0001. These parameters can be modified in the configuration file or added in the shell command as shown below. The training results can be viewed in the file ./ckpt/results.txt.
 
 ```bash
-python finetune.py --config=./configs/mobilenetv3/mobilnet_v3_small_ascend.yaml --data_dir=./aircraft/data --pretrained=True
+python .examples/finetune/finetune.py --config=./configs/mobilenetv3/mobilnet_v3_small_ascend.yaml --data_dir=./aircraft/data --pretrained=True
 ```
 
 When fine-tuning mobilenet v3-small based on Aircraft dataset, this tutorial mainly made the following changes to the hyper-parameters:
 
-| Hyper-parameter | Before     | After                |
+| Hyper-parameter | Pretrain   | Fine-tune            |
 | --------------- | ---------- | -------------------- |
 | dataset         | "imagenet" | ""                   |
 | batch_size      | 75         | 8                    |
@@ -213,7 +215,7 @@ When fine-tuning mobilenet v3-small based on Aircraft dataset, this tutorial mai
 
 ### Fine-tuning All the Parameters
 
-Since the progress of this type of fine-tuning is the same as training from scratch, simply **start the training by running finetune.py ** and adjust the parameters as training from scratch.
+Since the progress of this type of fine-tuning is the same as training from scratch, simply **start the training by running finetune.py** and adjust the parameters as training from scratch.
 
 ### Freeze Feature Network
 
@@ -252,15 +254,15 @@ freeze_layer=["features."+str(i) for i in range(7)]
 # prevent parameters in the first 7 layers of the network from updating
 for param in network.trainable_params():
     for layer in freeze_layer:
-    	if layer in param.name:
-        	param.requires_grad = False
+        if layer in param.name:
+            param.requires_grad = False
 ```
 
 ### Set Learning Rate for Specific Layers
 
 To further improve the training accuracy of a fine-tuned model, we can set different learning rates for different layers in the network. This is because the shallow part of the network generally recognizes common contours or features, so even if parameters in this part will be updated, the learning rate should be set relatively small; The deep part generally recognizes the detailed personal characteristics of an object, so the learning rate can be set relatively large; Compared with the feature network that needs to retain the pre-training information as much as possible, the classifier needs to be trained from the beginning, hence the learning rate can be appropriately increased. Since this operation is elaborate, we need to enter finetune.py to specify the parameter names of specific layers and the corresponding learning rates.
 
-MindCV uses [` create_optimizer `](https://mindspore-lab.github.io/mindcv/zh/reference/optim/#mindcv.optim.optim_factory.cre ate_optimizer) to generate the optimizer and passes the learning rate to the optimizer. To set the tiered learning rate, simply **change the `params` parameter of `create_optimizer` function in finetune.py from `network.trainable_params()` to a list containing the names of the specific parameters and the corresponding learning rate**, which you can refer to the [API documentation of optimizers](https://www.mindspore.cn/docs/zh-CN/r2.0/api_python/mindspore.nn.html#%E4%BC%98%E5%8C%96%E5%99%A8). The specific structure of the network and the parameter names in each layer can be viewed by printing the result of `create_model` -- `network`.
+MindCV uses [` create_optimizer `](https://mindspore-lab.github.io/mindcv/zh/reference/optim/#mindcv.optim.optim_factory.create_optimizer) to generate the optimizer and passes the learning rate to the optimizer. To set the tiered learning rate, simply **change the `params` parameter of `create_optimizer` function in finetune.py from `network.trainable_params()` to a list containing the names of the specific parameters and the corresponding learning rate**, which you can refer to the [API documentation of optimizers](https://www.mindspore.cn/docs/zh-CN/r2.0/api_python/mindspore.nn.html#%E4%BC%98%E5%8C%96%E5%99%A8). The specific structure of the network and the parameter names in each layer can be viewed by printing the result of `create_model` -- `network`.
 
 > Tips: You can also use the same operation to set different weight_decay for parameters.
 
@@ -276,8 +278,8 @@ Taking mobilenet v3-small as an example, the model classifier name starts with "
 params_lr_group = [{"params": list(filter(lambda x: 'classifier' in x.name, network.trainable_params())),
                     "lr": [i*1.2 for i in lr_scheduler]},
                    {"params": list(filter(lambda x: 'classifier' not in x.name, network.trainable_params())),
-                    "lr": lr_scheduler}，
-                  {"order_params": network.trainable_params()}]
+                    "lr": lr_scheduler},
+                   {"order_params": network.trainable_params()}]
 
 optimizer = create_optimizer(params_lr_group,
                              opt=args.opt,
@@ -285,9 +287,9 @@ optimizer = create_optimizer(params_lr_group,
                              ...)
 ```
 
-#### Set Learning Rate for Specific Layers
+#### Set Learning Rate for Any Layers in Feature Network
 
-Similar to adjusting the learning rate of a classifier alone, setting the learning rate of layers in feature network requires a list specifying the learning rate for each layer. Assuming that we only increase the learning rate of the last three layers of the feature network (features.13, features.14, features.15), the code for creating the optimizer in finetune.py will be changed as follows:
+Similar to adjusting the learning rate of a classifier alone, setting the learning rate of layers in feature network requires a list specifying the learning rate for each layer. Assuming that we only increase the learning rate of the last three layers of the feature network (with prefix features.13, features.14, features.15), the code for creating the optimizer in finetune.py will be changed as follows:
 
 ```python
 # ...
@@ -323,7 +325,7 @@ python validate.py --config=./configs/mobilenetv3/mobilnet_v3_small_ascend.yaml 
 
 The following table summarizes the Top-1 accuracy of the fine-tuned mobilenet v3-small on the Aircraft dataset with the same training configuration but different fine-tuning skills:
 
-| Network            | Freeze all the feature work | freeze shallow part of feature network | full fine-tuning | full fine-tuning with increasing learning rate of classifier | full fine-tuning with increasing learning rate of deep layers |
+| Network            | Freeze All the Feature Work | Freeze Shallow Part of Feature Network | Full Fine-tuning | Full Fine-tuning with Increasing Learning Rate of Classifier | Full Fine-tuning with Increasing Learning Rate of Deep Layers |
 | ------------------ | --------------------------- | -------------------------------------- | ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | mobilenet v3-small | 48.66%                      | 76.83%                                 | 88.35%           | 88.89%                                                       | 88.68%                                                       |
 
@@ -349,7 +351,7 @@ np.savetxt("./ckpt/pred.txt", prediction, fmt="%s", header="pred \t real")
 
 The following table shows the Top-1 accuracy (%) of full-model fine-tuning on the Aircraft dataset on several CNNs. For the classification accuracy that can be achieved on this dataset, see [Aircraft Leaderboard](https://fgvc.org/leaderboard/Aircraft.html) and [Paper With Code](https://paperswithcode.com/sota/fine-grained-image-classification-on-fgvc).
 
-| Network            | Full Fine-tuning Accuracy with Mindcv | Accuracy in papers                                           |
+| Network            | Full Fine-tuning Accuracy with Mindcv | Accuracy in Papers                                           |
 | ------------------ | ------------------------------------- | ------------------------------------------------------------ |
 | mobilenet v3-small | 88.35%                                | -                                                            |
 | mobilenet v3-large | 92.22%                                | [83.8%](https://opus.lib.uts.edu.au/handle/10453/156186)     |
