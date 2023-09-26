@@ -1,13 +1,5 @@
 This folder contains examples for various tasks, which users can run easily.
 
-### Finetune
-```
-python examples/finetune.py
-
-```
-This example shows how to finetune a pretrained model on your own dataset. You can also specifiy `--freeze_backbone` to choose whether to freeze the backbone and finetune the classifier head only.
-
-
 ### Single process with model training and evaluation
 ```
 python examples/train_with_func_example.py
