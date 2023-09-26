@@ -22,7 +22,9 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 | Model           | Context   |  Top-1 (%)  |  Top-5 (%)  | Params (M) | Recipe                                                                                   | Weight                                                                            |
 |-----------------|-----------|-------|------------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
 | volo_d1 | D910x8-G | 82.59 | 95.99 | 27    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/volo/volo_d1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/volo/volo_d1-c7efada9.ckpt) |
-
+| volo_d2 | D910x8-G | 82.95 | 96.13 | 59 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/volo/volo_d2_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/volo/volo_d2-0910a460.ckpt) |
+| volo_d3 | D910x8-G | 83.38 | 96.28 | 87 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/volo/volo_d3_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/volo/volo_d3-25916c36.ckpt) |
+| volo_d4 | D910x8-G | 82.5 | 95.86 | 193 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/volo/volo_d4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/volo/volo_d4-6c88cd33.ckpt) |
 </div>
 
 #### Notes

@@ -43,10 +43,10 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = {
-    'volo_d1': _cfg(url=''),
-    'volo_d2': _cfg(url=''),
-    'volo_d3': _cfg(url=''),
-    'volo_d4': _cfg(url='', crop_pct=1.15),
+    'volo_d1': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/volo/volo_d1-c7efada9.ckpt'),
+    'volo_d2': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/volo/volo_d2-0910a460.ckpt'),
+    'volo_d3': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/volo/volo_d3-25916c36.ckpt'),
+    'volo_d4': _cfg(url='https://download.mindspore.cn/toolkits/mindcv/volo/volo_d4-6c88cd33.ckpt', crop_pct=1.15),
     'volo_d5': _cfg(url='', crop_pct=1.15)
 }
 
