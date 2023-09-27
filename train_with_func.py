@@ -1,60 +1,82 @@
-"""Use the PYNATIVE mode to train the network"""
+"""Use the Mixed(PyNative+jit) mode to train the network"""
 import logging
 import os
 from time import time
 
-from tqdm import tqdm
+import numpy as np
 
 import mindspore as ms
 from mindspore import SummaryRecord, Tensor, nn, ops
-from mindspore.amp import StaticLossScaler
 from mindspore.communication import get_group_size, get_rank, init
-from mindspore.parallel._utils import _get_device_num, _get_gradients_mean
 
 from mindcv.data import create_dataset, create_loader, create_transforms
 from mindcv.loss import create_loss
 from mindcv.models import create_model
 from mindcv.optim import create_optimizer
 from mindcv.scheduler import create_scheduler
-from mindcv.utils import AllReduceSum, CheckpointManager, NoLossScaler
-from mindcv.utils.random import set_seed
+from mindcv.utils import AllReduceSum, CheckpointManager, get_metrics, set_logger, set_seed
 
-from config import parse_args  # isort: skip
+from config import parse_args, save_args  # isort: skip
 
 try:
     from mindspore import jit
 except ImportError:
     from mindspore import ms_function as jit
 
-logger = logging.getLogger("train")
-logger.setLevel(logging.INFO)
-h1 = logging.StreamHandler()
-formatter1 = logging.Formatter("%(message)s")
-logger.addHandler(h1)
-h1.setFormatter(formatter1)
+logger = logging.getLogger("mindcv.train_with_func")
 
 
-def train(args):
-    """Train network."""
+def check_args(args):
+    if args.mode == ms.GRAPH_MODE:
+        logger.warning("Mode of MindSpore has to be PYNATIVE(1)! Reset `args.mode` to `ms.PYNATIVE_MODE`.")
+        args.mode = ms.PYNATIVE_MODE
+    if args.dataset_sink_mode:
+        logger.warning("Data sink is not yet supported! Reset `args.dataset_sink_mode` to `False`.")
+        args.dataset_sink_mode = False
+    if args.ckpt_path != "" or args.resume_opt:
+        logger.warning(
+            "Resuming train is not yet supported! Reset `args.ckpt_path` to empty and `args.resume_opt` to False."
+        )
+        args.ckpt_path = ""
+        args.resume_opt = False
+    if args.amp_cast_list is not None:
+        logger.warning("Customized amp list is not yet supported! Reset `args.amp_cast_list` to `None`.")
+        args.amp_cast_list = None
+    if args.ema:
+        logger.warning("EMA is not yet supported! Reset `args.ema` to `False`.")
+        args.ema = False
+    if args.clip_grad:
+        logger.warning("Gradient clipping is not yet supported! Reset `args.clip_grad` to `False`.")
+        args.clip_grad = False
+    if args.gradient_accumulation_steps != 1:
+        logger.warning("Gradient accumulation is not yet supported! Reset `args.gradient_accumulation_steps` to `1`.")
+        args.gradient_accumulation_steps = 1
+    return args
 
+
+def main():
+    args = parse_args()
+    args = check_args(args)
     ms.set_context(mode=args.mode)
-
     if args.distribute:
         init()
-        device_num = get_group_size()
-        rank_id = get_rank()
+        rank_id, device_num = get_rank(), get_group_size()
         ms.set_auto_parallel_context(
             device_num=device_num,
             parallel_mode="data_parallel",
             gradients_mean=True,
         )
-        dist_sum = AllReduceSum()
+        all_reduce = AllReduceSum()
     else:
-        device_num = None
-        rank_id = None
-        dist_sum = None
+        rank_id, device_num = None, None
+        all_reduce = None
 
-    set_seed(args.seed, rank_id)
+    set_seed(args.seed)
+    set_logger(name="mindcv", output_dir=args.ckpt_save_dir, rank=rank_id, color=False)
+    logger.info(
+        "We recommend installing `termcolor` via `pip install termcolor` "
+        "and setup logger by `set_logger(..., color=True)`"
+    )
 
     # create dataset
     dataset_train = create_dataset(
@@ -69,13 +91,17 @@ def train(args):
         download=args.dataset_download,
         num_aug_repeats=args.aug_repeats,
     )
-
     if args.num_classes is None:
         num_classes = dataset_train.num_classes()
     else:
         num_classes = args.num_classes
 
     # create transforms
+    num_aug_splits = 0
+    if args.aug_splits > 0:
+        assert args.aug_splits == 3, "Currently, only support 3 splits of augmentation"
+        assert args.auto_augment is not None, "aug_splits should be set with one auto_augment"
+        num_aug_splits = args.aug_splits
     transform_list = create_transforms(
         dataset_name=args.dataset,
         is_training=True,
@@ -94,13 +120,14 @@ def train(args):
         re_ratio=args.re_ratio,
         re_value=args.re_value,
         re_max_attempts=args.re_max_attempts,
+        separate=num_aug_splits > 0,
     )
 
     # load dataset
     loader_train = create_loader(
         dataset=dataset_train,
         batch_size=args.batch_size,
-        drop_remainder=False,
+        drop_remainder=args.drop_remainder,
         is_training=True,
         mixup=args.mixup,
         cutmix=args.cutmix,
@@ -108,7 +135,12 @@ def train(args):
         num_classes=num_classes,
         transform=transform_list,
         num_parallel_workers=args.num_parallel_workers,
+        separate=num_aug_splits > 0,
     )
+    num_batches = loader_train.get_dataset_size()
+    train_count = dataset_train.get_dataset_size()
+    if args.distribute:
+        train_count = all_reduce(Tensor(train_count, ms.int32))
 
     if args.val_while_train:
         dataset_eval = create_dataset(
@@ -139,16 +171,12 @@ def train(args):
             transform=transform_list_eval,
             num_parallel_workers=args.num_parallel_workers,
         )
-        # validation dataset count
         eval_count = dataset_eval.get_dataset_size()
         if args.distribute:
-            eval_count = dist_sum(Tensor(eval_count, ms.int32))
-
-    num_batches = loader_train.get_dataset_size()
-    # Train dataset count
-    train_count = dataset_train.get_dataset_size()
-    if args.distribute:
-        train_count = dist_sum(Tensor(train_count, ms.int32))
+            eval_count = all_reduce(Tensor(eval_count, ms.int32))
+    else:
+        loader_eval = None
+        eval_count = None
 
     # create model
     network = create_model(
@@ -160,17 +188,19 @@ def train(args):
         pretrained=args.pretrained,
         checkpoint_path=args.ckpt_path,
     )
-
     num_params = sum([param.size for param in network.get_parameters()])
+    ms.amp.auto_mixed_precision(network, amp_level=args.amp_level)
+    # todo: support customized amp list
+    # todo: amp EMA model
 
     # create loss
-    ms.amp.auto_mixed_precision(network, amp_level=args.amp_level)
-    loss = create_loss(
+    criterion = create_loss(
         name=args.loss,
         reduction=args.reduction,
         label_smoothing=args.label_smoothing,
         aux_factor=args.aux_factor,
     )
+    criterion = criterion.to_float(ms.float32)  # keep loss in fp32, it will automatically cast input to fp32
 
     # create learning rate schedule
     lr_scheduler = create_scheduler(
@@ -184,13 +214,10 @@ def train(args):
         decay_rate=args.decay_rate,
         milestones=args.multi_step_decay_milestones,
         num_epochs=args.epoch_size,
+        num_cycles=args.num_cycles,
+        cycle_decay=args.cycle_decay,
+        lr_epoch_stair=args.lr_epoch_stair,
     )
-
-    # resume training if ckpt_path is given
-    if args.ckpt_path != "" and args.resume_opt:
-        opt_ckpt_path = os.path.join(args.ckpt_save_dir, f"optim_{args.model}.ckpt")
-    else:
-        opt_ckpt_path = ""
 
     # create optimizer
     optimizer = create_optimizer(
@@ -201,268 +228,289 @@ def train(args):
         momentum=args.momentum,
         nesterov=args.use_nesterov,
         filter_bias_and_bn=args.filter_bias_and_bn,
-        loss_scale=args.loss_scale,
-        checkpoint_path=opt_ckpt_path,
+        loss_scale=1.0,
+        eps=args.eps,
     )
 
-    # set loss scale for mixed precision training
-    if args.amp_level != "O0":
-        loss_scaler = StaticLossScaler(args.loss_scale)
-    else:
-        loss_scaler = NoLossScaler()
+    # define eval metrics.
+    metrics = get_metrics(num_classes)
 
-    # resume
-    begin_step = 0
-    begin_epoch = 0
-    if args.ckpt_path != "":
-        begin_step = optimizer.global_step.asnumpy()[0]
-        begin_epoch = args.ckpt_path.split("/")[-1].split("_")[0].split("-")[-1]
-        begin_epoch = int(begin_epoch)
+    # build train_step
+    train_step = build_train_step(
+        network,
+        criterion,
+        optimizer,
+        loss_scale_type=args.loss_scale_type,
+        loss_scale=args.loss_scale,
+        drop_overflow_update=args.drop_overflow_update,
+        distribute=args.distribute,
+    )
 
-    # log
-    if rank_id in [None, 0]:
-        logger.info("-" * 40)
-        logger.info(
-            f"Num devices: {device_num if device_num is not None else 1} \n"
-            f"Distributed mode: {args.distribute} \n"
-            f"Num training samples: {train_count}"
-        )
-        if args.val_while_train:
-            logger.info(f"Num validation samples: {eval_count}")
-        logger.info(
-            f"Num classes: {num_classes} \n"
-            f"Num batches: {num_batches} \n"
-            f"Batch size: {args.batch_size} \n"
-            f"Auto augment: {args.auto_augment} \n"
-            f"Model: {args.model} \n"
-            f"Model param: {num_params} \n"
-            f"Num epochs: {args.epoch_size} \n"
-            f"Optimizer: {args.opt} \n"
-            f"LR: {args.lr} \n"
-            f"LR Scheduler: {args.scheduler}"
-        )
-        logger.info("-" * 40)
-
-        if args.ckpt_path != "":
-            logger.info(f"Resume training from {args.ckpt_path}, last step: {begin_step}, last epoch: {begin_epoch}")
-        else:
-            logger.info("Start training")
-
-        if not os.path.exists(args.ckpt_save_dir):
-            os.makedirs(args.ckpt_save_dir)
-
-        log_path = os.path.join(args.ckpt_save_dir, "result.log")
-        if not (os.path.exists(log_path) and args.ckpt_path != ""):  # if not resume training
-            with open(log_path, "w") as fp:
-                fp.write("Epoch\tTrainLoss\tValAcc\tTime\n")
-
-    best_acc = 0
-    summary_dir = f"./{args.ckpt_save_dir}/summary_01"
+    essential_cfg_msg = "\n".join(
+        [
+            "Essential Experiment Configurations:",
+            f"MindSpore mode[GRAPH(0)/PYNATIVE(1)]: {args.mode}",
+            f"Distributed mode: {args.distribute}",
+            f"Number of devices: {device_num if device_num is not None else 1}",
+            f"Number of training samples: {train_count}",
+            f"Number of validation samples: {eval_count}",
+            f"Number of classes: {num_classes}",
+            f"Number of batches: {num_batches}",
+            f"Batch size: {args.batch_size}",
+            f"Auto augment: {args.auto_augment}",
+            f"MixUp: {args.mixup}",
+            f"CutMix: {args.cutmix}",
+            f"Model: {args.model}",
+            f"Model parameters: {num_params}",
+            f"Number of epochs: {args.epoch_size}",
+            f"Optimizer: {args.opt}",
+            f"Learning rate: {args.lr}",
+            f"LR Scheduler: {args.scheduler}",
+            f"Momentum: {args.momentum}",
+            f"Weight decay: {args.weight_decay}",
+            f"Auto mixed precision: {args.amp_level}",
+            f"Loss scale: {args.loss_scale}({args.loss_scale_type})",
+        ]
+    )
+    logger.info(essential_cfg_msg)
+    save_args(args, os.path.join(args.ckpt_save_dir, f"{args.model}.yaml"), rank_id)
+    logger.info("Start training")
 
     # Training
+    ckpt_settings = dict(
+        name=args.model,
+        path=args.ckpt_save_dir,
+        interval=args.ckpt_save_interval,
+        policy=args.ckpt_save_policy,
+        keep=args.keep_checkpoint_max,
+    )
+    with SummaryRecord(f"./{args.ckpt_save_dir}/summary") as summary_record:
+        # fmt: off
+        train(loader_train, loader_eval, network, criterion, optimizer, train_step, metrics, args.epoch_size, args.seed,
+              ckpt_settings, summary_record, args.val_interval, args.log_interval, rank_id, device_num, all_reduce)
+        # fmt: on
+
+
+def train(loader_train, loader_eval, network, criterion, optimizer, train_step, metrics, num_epochs, seed,
+          ckpt_settings, summary_record, val_interval, log_interval, rank_id, device_num, all_reduce):  # fmt: skip
+    num_batches = loader_train.get_dataset_size()
+    ckpt_save_name, ckpt_save_dir, ckpt_save_interval, ckpt_save_policy, ckpt_keep_max = ckpt_settings.values()
+    log_file = os.path.join(ckpt_save_dir, "result.log")
+    if rank_id in [0, None]:
+        os.makedirs(ckpt_save_dir, exist_ok=True)
+        log_line = "".join(
+            f"{s:<20}" for s in ["Epoch", "TrainLoss", *metrics.keys(), "TrainTime", "EvalTime", "TotalTime"]
+        )
+        with open(log_file, "w", encoding="utf-8") as fp:  # writing the title of result.log
+            fp.write(log_line + "\n")
+    best_acc, best_epoch = 0, -1
     need_flush_from_cache = True
-    assert (
-        args.ckpt_save_policy != "top_k" or args.val_while_train is True
-    ), "ckpt_save_policy is top_k, val_while_train must be True."
-    manager = CheckpointManager(ckpt_save_policy=args.ckpt_save_policy)
-    with SummaryRecord(summary_dir) as summary_record:
-        for t in range(begin_epoch, args.epoch_size):
-            epoch_start = time()
+    ckpt_manager = CheckpointManager(ckpt_save_policy=ckpt_save_policy)
 
-            train_loss = train_epoch(
-                network,
-                loader_train,
-                loss,
-                optimizer,
-                epoch=t,
-                n_epochs=args.epoch_size,
-                loss_scaler=loss_scaler,
-                reduce_fn=dist_sum,
-                summary_record=summary_record,
-                rank_id=rank_id,
-                log_interval=args.log_interval,
+    for epoch in range(num_epochs):
+        epoch_ts = time()
+        train_loss, train_acc = train_epoch(
+            loader_train,
+            network,
+            criterion,
+            optimizer,
+            train_step,
+            seed=seed,
+            epoch=epoch,
+            num_epochs=num_epochs,
+            reduce_fn=all_reduce,
+            summary_record=summary_record,
+            log_interval=log_interval,
+            rank_id=rank_id,
+        )
+        logger.info(f"Training accuracy: {(train_acc.asnumpy()):.4%}")
+        train_time = time() - epoch_ts
+
+        # val while train
+        val_time = 0
+        val_acc = np.zeros(len(metrics.keys()), dtype=np.float32)
+        if loader_eval is not None and (epoch + 1) % val_interval == 0:
+            val_time = time()
+            val_acc = test_epoch(loader_eval, network, metrics, all_reduce, device_num)
+            val_time = time() - val_time
+            metric_str = "Validation "
+            for metric_name, metric_value in zip(metrics.keys(), val_acc):
+                metric_str += f"{metric_name}: {metric_value:.4%}, "
+            metric_str += f"time: {val_time:.6f}s"
+            logger.info(metric_str)
+            if val_acc[0] > best_acc:
+                best_acc = val_acc[0]
+                best_epoch = epoch + 1
+                logger.info(f"=> New best val acc: {val_acc[0]:.4%}")
+
+        # save checkpoint
+        if rank_id in [0, None]:
+            if best_epoch == epoch + 1:  # always save ckpt if cur epoch got best acc
+                # todo: do we need to flush_from_cache first?
+                best_ckpt_save_path = os.path.join(ckpt_save_dir, f"{ckpt_save_name}-best.ckpt")
+                ms.save_checkpoint(network, best_ckpt_save_path, async_save=True)
+            if (epoch + 1) % ckpt_save_interval == 0 or epoch + 1 == num_epochs:
+                if need_flush_from_cache:
+                    need_flush_from_cache = flush_from_cache(network)
+                # save optim for resume
+                optim_save_path = os.path.join(ckpt_save_dir, f"{ckpt_save_name}_optim.ckpt")
+                ms.save_checkpoint(optimizer, optim_save_path, async_save=True)
+                ckpt_save_path = os.path.join(ckpt_save_dir, f"{ckpt_save_name}-{epoch + 1}_{num_batches}.ckpt")
+                logger.info(f"Saving model to {ckpt_save_path}")
+                ckpt_manager.save_ckpoint(network, num_ckpt=ckpt_keep_max, metric=val_acc[0], save_path=ckpt_save_path)
+
+        # logging
+        total_time = time() - epoch_ts
+        logger.info(
+            f"Total time since last epoch: {total_time:.6f}(train: {train_time:.6f}, val: {val_time:.6f})s, "
+            f"ETA: {(num_epochs - epoch - 1) * total_time:.6f}s"
+        )
+        logger.info("-" * 80)
+        if rank_id in [0, None]:
+            log_line = "".join(
+                f"{s:<20}"
+                for s in [
+                    f"{epoch + 1}",
+                    f"{train_loss.asnumpy():.6f}",
+                    *[f"{i:.4%}" for i in val_acc],
+                    f"{train_time:.2f}",
+                    f"{val_time:.2f}",
+                    f"{total_time:.2f}",
+                ]
             )
+            with open(log_file, "a", encoding="utf-8") as fp:
+                fp.write(log_line + "\n")
 
-            # val while train
-            test_acc = Tensor(-1.0)
-            if args.val_while_train:
-                if ((t + 1) % args.val_interval == 0) or (t + 1 == args.epoch_size):
-                    if rank_id in [None, 0]:
-                        logger.info("Validating...")
-                    val_start = time()
-                    test_acc = test_epoch(network, loader_eval, dist_sum, rank_id=rank_id)
-                    test_acc = 100 * test_acc
-                    if rank_id in [0, None]:
-                        val_time = time() - val_start
-                        logger.info(f"Val time: {val_time:.2f} \t Val acc: {test_acc:0.3f}")
-                        if test_acc > best_acc:
-                            best_acc = test_acc
-                            save_best_path = os.path.join(args.ckpt_save_dir, f"{args.model}-best.ckpt")
-                            ms.save_checkpoint(network, save_best_path, async_save=True)
-                            logger.info(f"=> New best val acc: {test_acc:0.3f}")
+        # summary
+        summary_record.add_value("scalar", f"train_acc_rank{rank_id}", train_acc)
+        for metric_name, metric_value in zip(metrics.keys(), val_acc):
+            summary_record.add_value("scalar", f"val_{metric_name}_rank{rank_id}", Tensor(metric_value))
+        summary_record.record((epoch + 1) * num_batches)
 
-                        # add to summary
-                        current_step = (t + 1) * num_batches + begin_step
-                        if not isinstance(test_acc, Tensor):
-                            test_acc = Tensor(test_acc)
-                        if summary_record is not None:
-                            summary_record.add_value("scalar", "test_dataset_accuracy", test_acc)
-                            summary_record.record(int(current_step))
-
-            # Save checkpoint
-            if rank_id in [0, None]:
-                if ((t + 1) % args.ckpt_save_interval == 0) or (t + 1 == args.epoch_size):
-                    if need_flush_from_cache:
-                        need_flush_from_cache = flush_from_cache(network)
-
-                    ms.save_checkpoint(
-                        optimizer, os.path.join(args.ckpt_save_dir, f"{args.model}_optim.ckpt"), async_save=True
-                    )
-                    save_path = os.path.join(args.ckpt_save_dir, f"{args.model}-{t + 1}_{num_batches}.ckpt")
-                    ckpoint_filelist = manager.save_ckpoint(
-                        network, num_ckpt=args.keep_checkpoint_max, metric=test_acc, save_path=save_path
-                    )
-                    if args.ckpt_save_policy == "top_k":
-                        checkpoints_str = "Top K accuracy checkpoints: \n"
-                        for ch in ckpoint_filelist:
-                            checkpoints_str += "{}\n".format(ch)
-                        logger.info(checkpoints_str)
-                    else:
-                        logger.info(f"Saving model to {save_path}")
-
-                epoch_time = time() - epoch_start
-                logger.info(f"Epoch {t + 1} time:{epoch_time:.3f}s")
-                logger.info("-" * 80)
-                with open(log_path, "a") as fp:
-                    fp.write(f"{t+1}\t{train_loss.asnumpy():.7f}\t{test_acc.asnumpy():.3f}\t{epoch_time:.2f}\n")
-
-    logger.info("Done!")
+    logger.info("Finish training!")
+    if loader_eval is not None:
+        logger.info(f"The best validation {list(metrics.keys())[0]} is: {best_acc:.4%} at epoch {best_epoch}.")
+    logger.info("=" * 80)
 
 
 def train_epoch(
+    dataloader,
     network,
-    dataset,
-    loss_fn,
+    criterion,
     optimizer,
+    train_step,
+    seed,
     epoch,
-    n_epochs,
-    loss_scaler,
+    num_epochs,
     reduce_fn=None,
     summary_record=None,
-    rank_id=None,
     log_interval=100,
+    rank_id=None,
 ):
-    """Training an epoch network"""
+    network.set_train()
+    criterion.set_train()
+    optimizer.set_train()
+    ms.dataset.config.set_seed(seed + epoch)
 
-    # Define forward function
+    num_batches = dataloader.get_dataset_size()
+    epoch_width, batch_width = len(str(num_epochs)), len(str(num_batches))
+    loss, correct, total = Tensor(0, ms.float32), Tensor(0, ms.float32), Tensor(0, ms.float32)
+    step_ts = time()
+    step_time_accum = 0
+    for batch, (data, label) in enumerate(dataloader.create_tuple_iterator()):
+        step = epoch * num_batches + batch
+        loss, logits = train_step(data, label)
+        if len(label.shape) == 1:
+            correct += ops.equal(logits.argmax(1), label).sum()
+        else:  # one-hot or soft label
+            correct += ops.equal(logits.argmax(1), label.argmax(1)).sum()
+        total += len(data)
+
+        step_time_accum += time() - step_ts
+        if (batch + 1) % log_interval == 0 or (batch + 1) == num_batches or batch == 0:
+            summary_record.add_value("scalar", f"train_loss_rank{rank_id}", loss)
+            summary_record.record(step + 1)
+            if optimizer.dynamic_lr:
+                lr = optimizer.learning_rate(Tensor(step))  # todo: this is not the real lr since may drop overflow
+            else:
+                lr = optimizer.learning_rate
+            logger.info(
+                f"Epoch: [{epoch + 1:{epoch_width}d}/{num_epochs:{epoch_width}d}], "
+                f"batch: [{batch + 1:{batch_width}d}/{num_batches:{batch_width}d}], "
+                f"loss: {loss.asnumpy():.6f}, "
+                f"lr: {lr.asnumpy():.6f}, "
+                f"time: {step_time_accum:.6f}s"
+            )
+            step_time_accum = 0
+        step_ts = time()
+
+    dataloader.reset()  # why do we need this?
+    if reduce_fn:
+        correct, total = reduce_fn(correct), reduce_fn(total)
+    correct /= total
+
+    return loss, correct
+
+
+def build_train_step(
+    network, criterion, optimizer, loss_scale_type, loss_scale, drop_overflow_update=True, distribute=True
+):
+    from mindspore.amp import DynamicLossScaler, StaticLossScaler, all_finite
+
+    grad_reducer = nn.DistributedGradReducer(optimizer.parameters) if distribute else ops.identity
+    if loss_scale_type == "fixed":
+        loss_scaler = StaticLossScaler(scale_value=loss_scale)
+    elif loss_scale_type == "dynamic":
+        loss_scaler = DynamicLossScaler(scale_value=loss_scale, scale_factor=2, scale_window=2000)
+    else:
+        raise ValueError(f"Loss scale type only support ['fixed', 'dynamic'], but got{loss_scale_type}.")
+
     def forward_fn(data, label):
         logits = network(data)
-        loss = loss_fn(logits, label)
+        loss = criterion(logits, label)
         loss = loss_scaler.scale(loss)
         return loss, logits
 
-    # Get gradient function
     grad_fn = ops.value_and_grad(forward_fn, None, optimizer.parameters, has_aux=True)
-    if args.distribute:
-        mean = _get_gradients_mean()
-        degree = _get_device_num()
-        grad_reducer = nn.DistributedGradReducer(optimizer.parameters, mean, degree)
-    else:
-        grad_reducer = ops.functional.identity
 
-    # Define function of one-step training
     @jit
     def train_step(data, label):
         (loss, logits), grads = grad_fn(data, label)
         grads = grad_reducer(grads)
-        status = ms.amp.all_finite(grads)
-        if status:
-            loss = loss_scaler.unscale(loss)
-            grads = loss_scaler.unscale(grads)
+        loss = loss_scaler.unscale(loss)
+        grads = loss_scaler.unscale(grads)
+        status = all_finite(grads)
+
+        if drop_overflow_update:
+            if status:
+                loss = ops.depend(loss, optimizer(grads))
+        else:
             loss = ops.depend(loss, optimizer(grads))
         loss = ops.depend(loss, loss_scaler.adjust(status))
 
+        # if you want to get anything about training status, return it from here and logging it outside!
         return loss, logits
 
-    network.set_train()
-    n_batches = dataset.get_dataset_size()
-    n_steps = n_batches * n_epochs
-    epoch_width, batch_width, step_width = len(str(n_epochs)), len(str(n_batches)), len(str(n_steps))  # noqa: F841
-    total, correct = 0, 0
-
-    start = time()
-
-    num_batches = dataset.get_dataset_size()
-    for batch, (data, label) in enumerate(dataset.create_tuple_iterator()):
-        loss, logits = train_step(data, label)
-
-        if len(label.shape) == 1:
-            correct += (logits.argmax(1) == label).asnumpy().sum()
-        else:  # one-hot or soft label
-            correct += (logits.argmax(1) == label.argmax(1)).asnumpy().sum()
-        total += len(data)
-
-        if (batch + 1) % log_interval == 0 or (batch + 1) >= num_batches or batch == 0:
-            step = epoch * n_batches + batch
-            if optimizer.dynamic_lr:
-                cur_lr = optimizer.learning_rate(Tensor(step)).asnumpy()
-            else:
-                cur_lr = optimizer.learning_rate.asnumpy()
-            logger.info(
-                f"Epoch:[{epoch+1:{epoch_width}d}/{n_epochs:{epoch_width}d}], "
-                f"batch:[{batch+1:{batch_width}d}/{n_batches:{batch_width}d}], "
-                f"loss:{loss.asnumpy():8.6f}, lr: {cur_lr:.7f},  time:{time() - start:.6f}s"
-            )
-            start = time()
-            if rank_id in [0, None]:
-                if not isinstance(loss, Tensor):
-                    loss = Tensor(loss)
-                if summary_record is not None:
-                    summary_record.add_value("scalar", "loss", loss)
-                    summary_record.record(step)
-
-    if args.distribute:
-        correct = reduce_fn(Tensor(correct, ms.float32))
-        total = reduce_fn(Tensor(total, ms.float32))
-        correct /= total
-        correct = correct.asnumpy()
-    else:
-        correct /= total
-
-    if rank_id in [0, None]:
-        logger.info(f"Training accuracy: {(100 * correct):0.3f}")
-        if not isinstance(correct, Tensor):
-            correct = Tensor(correct)
-        if summary_record is not None:
-            summary_record.add_value("scalar", "train_dataset_accuracy", correct)
-            summary_record.record(step)
-
-    return loss
+    return train_step
 
 
-def test_epoch(network, dataset, reduce_fn=None, rank_id=None):
+def test_epoch(dataloader, network, metrics, reduce_fn=None, device_num=1):
     """Test network accuracy and loss."""
-    network.set_train(False)  # TODO: check freeze
+    network.set_train(False)
 
-    correct, total = 0, 0
-    for data, label in tqdm(dataset.create_tuple_iterator()):
+    for metric_name, metric in metrics.items():
+        metric.clear()
+    for data, label in dataloader.create_tuple_iterator():
         pred = network(data)
-        total += len(data)
-        if len(label.shape) == 1:
-            correct += (pred.argmax(1) == label).asnumpy().sum()
-        else:  # one-hot or soft label
-            correct += (pred.argmax(1) == label.argmax(1)).asnumpy().sum()
+        for metric_name, metric in metrics.items():
+            metric.update(pred, label)
+    res_array = ms.Tensor([metric.eval() for metric_name, metric in metrics.items()], ms.float32)
+    if reduce_fn:
+        res_array = reduce_fn(res_array)
+        res_array /= device_num
+    res_array = res_array.asnumpy()
 
-    if rank_id is not None:
-        # dist_sum = AllReduceSum()
-        correct = reduce_fn(Tensor(correct, ms.float32))
-        total = reduce_fn(Tensor(total, ms.float32))
-        correct /= total
-        correct = correct.asnumpy()
-    else:
-        correct /= total
-
-    return correct
+    return res_array
 
 
 def flush_from_cache(network):
@@ -473,24 +521,8 @@ def flush_from_cache(network):
         if param.cache_enable:
             has_cache_params = True
             Tensor(param).flush_from_cache()
-    if not has_cache_params:
-        need_flush_from_cache = False
-    else:
-        need_flush_from_cache = True
-    return need_flush_from_cache
+    return has_cache_params
 
 
 if __name__ == "__main__":
-    args = parse_args()
-
-    # data sync for cloud platform if enabled
-    if args.enable_modelarts:
-        import moxing as mox
-
-        args.data_dir = f"/cache/{args.data_url}"
-        mox.file.copy_parallel(src_url=os.path.join(args.data_url, args.dataset), dst_url=args.data_dir)
-
-    train(args)
-
-    if args.enable_modelarts:
-        mox.file.copy_parallel(src_url=args.ckpt_save_dir, dst_url=args.train_url)
+    main()
