@@ -1,8 +1,6 @@
 import argparse
 import os
 
-import numpy as np
-
 from mindspore.mindrecord import FileWriter
 
 seg_schema = {"file_name": {"type": "string"}, "label": {"type": "bytes"}, "data": {"type": "bytes"}}
@@ -12,10 +10,9 @@ def parse_args():
     parser = argparse.ArgumentParser("mindrecord")
 
     parser.add_argument("--data_root", type=str, default="", help="root path of data")
-    parser.add_argument("--data_lst", type=str, default="", help="list of data")
+    parser.add_argument("--data_list", type=str, default="", help="list of data")
     parser.add_argument("--dst_path", type=str, default="", help="save path of mindrecords")
     parser.add_argument("--num_shards", type=int, default=8, help="number of shards")
-    parser.add_argument("--shuffle", type=bool, default=True, help="shuffle or not")
 
     parser_args, _ = parser.parse_known_args()
     return parser_args
@@ -25,10 +22,8 @@ if __name__ == "__main__":
     args = parse_args()
 
     data = []
-    with open(args.data_lst) as f:
+    with open(args.data_list) as f:
         lines = f.readlines()
-    if args.shuffle:
-        np.random.shuffle(lines)
 
     dst_dir = "/".join(args.dst_path.split("/")[:-1])
     if not os.path.exists(dst_dir):

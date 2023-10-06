@@ -33,38 +33,44 @@ This example provides implementations of DeepLabV3 and DeepLabV3+ using backbone
 
 ### Preparation
 
-1. Clone MindCV repository by running
+1. Clone MindCV repository, enter `mindcv`  and assume we are always in this project root.
 
    ```shell
    git clone https://github.com/mindspore-lab/mindcv.git
+   cd mindcv
    ```
-2. Install dependencies as shown [here](https://mindspore-lab.github.io/mindcv/installation/)
+
+2. Install dependencies as shown [here](https://mindspore-lab.github.io/mindcv/installation/), and also install `cv2`, `addict`.
+
+   ```shell
+   pip install opencv-python
+   pip install addict
+   ```
 
 3. Prepare dataset
 
-- Download Pascal VOC 2012 dataset,  [VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/) and Semantic Boundaries Dataset, [SBD](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/semantic_contours/benchmark.tgz).
+   * Download Pascal VOC 2012 dataset,  [VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/) and Semantic Boundaries Dataset, [SBD](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/semantic_contours/benchmark.tgz).
 
-- Prepare training and test data list files with the path to image and annotation pairs. You could simply run `python examples/seg/deeplabv3/preprocess/get_dataset_lst.py --data_root=/path/to/data` to generate the list files. The lines in a list file should be like as follows:
+   * Prepare training and test data list files with the path to image and annotation pairs. You could simply run `python examples/seg/deeplabv3/preprocess/get_dataset_list.py --data_root=/path/to/data` to generate the list files. This command results in 5 data list files. The lines in a list file should be like as follows:
 
-  ```
-  /path/to/data/JPEGImages/2007_000032.jpg /path/to/data/SegmentationClassGray/2007_000032.png
-  /path/to/data/JPEGImages/2007_000039.jpg /path/to/data/SegmentationClassGray/2007_000039.png
-  /path/to/data/JPEGImages/2007_000063.jpg /path/to/data/SegmentationClassGray/2007_000063.png
-  ......
-  ```
+     ```
+     /path/to/data/JPEGImages/2007_000032.jpg /path/to/data/SegmentationClassGray/2007_000032.png
+     /path/to/data/JPEGImages/2007_000039.jpg /path/to/data/SegmentationClassGray/2007_000039.png
+     /path/to/data/JPEGImages/2007_000063.jpg /path/to/data/SegmentationClassGray/2007_000063.png
+     ......
+     ```
 
-- Convert training dataset to mindrecords by running  ``build_seg_data.py`` script.
+   * Convert training dataset to mindrecords by running  ``build_seg_data.py`` script. In accord with paper, we train on *trainaug* dataset (*voc train* + *SBD*). You can train on other dataset by changing the data list path at keyword `data_list`  with the path of your target training set.
 
-  ```shell
-  python examples/seg/deeplabv3/preprocess/build_seg_data.py \
-  		--data_root=[root path of training data] \
-  		--data_lst=[path of data list file prepared above] \
-  		--dst_path=[path to save mindrecords] \
-  		--num_shards=8 \
-  		--shuffle=True
-  ```
+     ```shell
+     python examples/seg/deeplabv3/preprocess/build_seg_data.py \
+     		--data_root=[root path of training data] \
+     		--data_list=[path of data list file prepared above] \
+     		--dst_path=[path to save mindrecords] \
+     		--num_shards=8
+     ```
 
-* In accord with paper, we train on *trainaug* dataset (voc train + SBD) and evaluate on *voc val* dataset.
+   * Note: the training steps use datasets in mindrecord format, while the evaluation steps directly use the data list files.
 
 4. Backbone: download pre-trained backbone from MindCV, here we use [ResNet101](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet101-689c5e77.ckpt).
 
@@ -104,7 +110,7 @@ For single-device training, simply set the keyword ``distributed`` to ``False`` 
 python examples/seg/deeplabv3/train.py --config [the path to the config file]
 ```
 
-**The training steps are as follow**:
+**Take mpirun command as an example, the training steps are as follow**:
 
 - Step 1: Employ output_stride=16 and fine-tune pretrained resnet101 on *trainaug* dataset. In config file, please specify the path of pretrained backbone checkpoint in keyword `backbone_ckpt_path` and set `output_stride` to `16`.
 
@@ -116,7 +122,7 @@ python examples/seg/deeplabv3/train.py --config [the path to the config file]
   mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/deeplabv3plus_s16_dilated_resnet101.yaml
   ```
 
-* Step 2: Employ output_stride=8, fine-tune model from step 1 on  *trainaug* dataset with smaller base learning rate. In config file, please specify the path of checkpoint from previous step in `ckpt_path`, set  `ckpt_pre_trained` to `True` and set `output_stride` to `8` .
+- Step 2: Employ output_stride=8, fine-tune model from step 1 on  *trainaug* dataset with smaller base learning rate. In config file, please specify the path of checkpoint from previous step in `ckpt_path`, set  `ckpt_pre_trained` to `True` and set `output_stride` to `8` .
 
   ```shell
   # for deeplabv3
