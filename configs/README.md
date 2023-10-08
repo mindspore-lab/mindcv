@@ -17,6 +17,13 @@ This folder contains training recipes and model readme files for each model. The
         ├── README.md //this file
 ```
 
+> Note: Our training recipes are verified on specific hardware, and the suffix `hardware` (ascend or gpu) in the
+> file name of training recipes indicates different hardware. Since Mindspore operators have different precision and
+> performance on different hardware, different training recipes are required under different hardware. However, if you
+> want to train on another hardware (e.g. GPU) using the training recipe under specific hardware (e.g. Ascend), you only
+> need to make minor or no adjustments to the hyperparameters, because the training recipe has a certain degree of
+> generalization across different hardware.
+
 ### Model Readme Writing Guideline
 The model readme file in each sub-folder provides the introduction, reproduced results, and running guideline for each model.
 
