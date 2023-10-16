@@ -1,18 +1,20 @@
 """Reference:https://github.com/apple/ml-fastvit"""
-import math
-import mindspore as ms
-from mindspore import ops,nn
-from mindspore.numpy import ones
-import mindspore.common.initializer as init
-import numpy as np
-from mindcv.models.registry import register_model
-from mindcv.models.layers.pooling import GlobalAvgPooling
-
-from typing import Union,Tuple,Optional,List
 import copy
-from collections import OrderedDict
+import math
 import os
+from collections import OrderedDict
 from functools import partial
+from typing import List, Optional, Tuple, Union
+
+import numpy as np
+
+import mindspore as ms
+import mindspore.common.initializer as init
+from mindspore import nn, ops
+from mindspore.numpy import ones
+
+from mindcv.models.layers.pooling import GlobalAvgPooling
+from mindcv.models.registry import register_model
 
 IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD = (0.485,0.456,0.406),(0.229,0.224,0.225)
 
@@ -135,7 +137,7 @@ class MHSA(nn.Cell):
             .reshape((B, N, 3, self.num_heads, self.head_dim))
             .permute(2, 0, 3, 1, 4)
         )
-        q, k, v = ops.Unstack(axis=0)(qkv)  
+        q, k, v = ops.Unstack(axis=0)(qkv)
 
         # trick here to make q@k.t more stable
         attn = self.batch_matmul(q*self.scale,k.transpose(0,1,-1,-2))
@@ -1644,4 +1646,3 @@ class DistillationLoss(nn.Cell):
 
         loss = base_loss * (1 - self.alpha) + distillation_loss * self.alpha
         return loss
-
