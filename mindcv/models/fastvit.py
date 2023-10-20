@@ -6,8 +6,6 @@ from collections import OrderedDict
 from functools import partial
 from typing import List, Optional, Tuple, Union
 
-import numpy as np
-
 import mindspore as ms
 import mindspore.common.initializer as init
 from mindspore import nn, ops
@@ -16,7 +14,8 @@ from mindspore.numpy import ones
 from mindcv.models.layers.pooling import GlobalAvgPooling
 from mindcv.models.registry import register_model
 
-IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD = (0.485,0.456,0.406),(0.229,0.224,0.225)
+IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD = (0.485, 0.456, 0.406), (0.229, 0.224, 0.225)
+
 
 def _cfg(url="", **kwargs):
     return {
@@ -114,7 +113,7 @@ class MHSA(nn.Cell):
             attn_drop: Dropout rate for attention tensor.
             proj_drop: Dropout rate for projection tensor.
         """
-        super(MHSA,self).__init__()
+        super(MHSA, self).__init__()
         assert dim % head_dim == 0, "dim should be divisible by head_dim"
         self.head_dim = head_dim
         self.num_heads = dim // head_dim
@@ -131,7 +130,7 @@ class MHSA(nn.Cell):
         B, C, H, W = shape
         N = H * W
         if len(shape) == 4:
-            x = nn.flatten(x, start_dim=2).transpose((0,-1,-2))  # (B, N, C)
+            x = nn.flatten(x, start_dim=2).transpose((0, -1, -2))  # (B, N, C)
         qkv = (
             self.qkv(x)
             .reshape((B, N, 3, self.num_heads, self.head_dim))
@@ -140,15 +139,15 @@ class MHSA(nn.Cell):
         q, k, v = ops.Unstack(axis=0)(qkv)
 
         # trick here to make q@k.t more stable
-        attn = self.batch_matmul(q*self.scale,k.transpose(0,1,-1,-2))
+        attn = self.batch_matmul(q*self.scale, k.transpose(0, 1, -1, -2))
         attn = nn.Softmax(axis=-1)(attn)
         attn = self.attn_drop(attn)
 
-        x = (attn @ v).transpose((0,2,1,-1)).reshape((B, N, C))
+        x = (attn @ v).transpose((0, 2, 1, -1)).reshape((B, N, C))
         x = self.proj(x)
         x = self.proj_drop(x)
         if len(shape) == 4:
-            x = x.transpose((0,-1,-2)).reshape(B, C, H, W)
+            x = x.transpose((0, -1, -2)).reshape(B, C, H, W)
 
         return x
 
@@ -210,7 +209,7 @@ class RepMixer(nn.Cell):
     """Reparameterizable token mixer.
 
     For more details, please refer to our paper:
-    `FastViT: A Fast Hybrid Vision Transformer using Structural Reparameterization <https://arxiv.org/pdf/2303.14189.pdf>`_
+    FastViT: A Fast Hybrid Vision Transformer using Structural Reparameterization <https://arxiv.org/pdf/2303.14189.pdf>
     """
 
     def __init__(
@@ -269,7 +268,7 @@ class RepMixer(nn.Cell):
             self.use_layer_scale = use_layer_scale
             if use_layer_scale:
                 self.layer_scale = ms.Parameter(
-                    layer_scale_init_value * ops.ones((dim, 1, 1),ms.float32), name = 'w',requires_grad=True
+                    layer_scale_init_value * ops.ones((dim, 1, 1), ms.float32), name='w', requires_grad=True
                 )
 
     def construct(self, x: ms.Tensor) -> ms.Tensor:
@@ -294,7 +293,7 @@ class RepMixer(nn.Cell):
         self.norm.reparameterize()
 
         if self.use_layer_scale:
-            w = self.mixer.id_tensor + ops.ExpandDims()(self.layer_scale,-1) * (
+            w = self.mixer.id_tensor + ops.ExpandDims()(self.layer_scale, -1) * (
                 self.mixer.reparam_conv.weight - self.norm.reparam_conv.weight
             )
             b = ops.Squeeze()(self.layer_scale) * (
@@ -354,18 +353,14 @@ class ConvFFN(nn.Cell):
         hidden_channels = hidden_channels or in_channels
         self.conv = nn.SequentialCell(
             OrderedDict(
-                [("conv",
-            nn.Conv2d(
-                in_channels=in_channels,
-                out_channels=out_channels,
-                kernel_size=7,
-                pad_mode = 'pad',
-                padding=3,
-                group=in_channels,
-                has_bias=False,
-            )),("bn", nn.BatchNorm2d(num_features=out_channels))]
-            )
-        )
+                [("conv", nn.Conv2d(in_channels=in_channels,
+                                    out_channels=out_channels,
+                                    kernel_size=7,
+                                    pad_mode='pad',
+                                    padding=3,
+                                    group=in_channels,
+                                    has_bias=False,)),
+                 ("bn", nn.BatchNorm2d(num_features=out_channels))]))
         self.fc1 = nn.Conv2d(in_channels, hidden_channels, kernel_size=1)
         self.act = act_layer()
         self.fc2 = nn.Conv2d(hidden_channels, out_channels, kernel_size=1)
@@ -373,11 +368,14 @@ class ConvFFN(nn.Cell):
         self._init_weights()
 
     def _init_weights(self) -> None:
-        for _,cell in self.cells_and_names():
-            if isinstance(cell,nn.Conv2d):
-                cell.weight.set_data(init.initializer(init.TruncatedNormal(sigma=0.02),cell.weight.shape,cell.weight.dtype))
+        for _, cell in self.cells_and_names():
+            if isinstance(cell, nn.Conv2d):
+                cell.weight.set_data(init.initializer(init.TruncatedNormal(sigma=0.02),
+                                                      cell.weight.shape,
+                                                      cell.weight.dtype))
                 if cell.bias is not None:
-                    cell.bias.set_data(init.initializer(init.Zero(),cell.bias.shape,cell.bias.dtype))
+                    cell.bias.set_data(init.initializer(init.Zero(), cell.bias.shape, cell.bias.dtype))
+
     def construct(self, x: ms.Tensor) -> ms.Tensor:
         x = self.conv(x)
         x = self.fc1(x)
@@ -469,7 +467,7 @@ class RepCPE(nn.Cell):
                 input_dim,
                 self.spatial_shape[0],
                 self.spatial_shape[1],
-            ),ms.float32
+            ), ms.float32
         )
         for i in range(self.in_channels):
             kernel_value[
@@ -564,7 +562,7 @@ class RepMixerBlock(nn.Cell):
         self.use_layer_scale = use_layer_scale
         if use_layer_scale:
             self.layer_scale = ms.Parameter(
-                layer_scale_init_value * ops.ones((dim, 1, 1),ms.float32), requires_grad=True
+                layer_scale_init_value * ops.ones((dim, 1, 1), ms.float32), requires_grad=True
             )
 
     def construct(self, x):
@@ -631,10 +629,10 @@ class AttentionBlock(nn.Cell):
         self.use_layer_scale = use_layer_scale
         if use_layer_scale:
             self.layer_scale_1 = ms.Parameter(
-                layer_scale_init_value * ops.ones((dim, 1, 1),ms.float32), requires_grad=True
+                layer_scale_init_value * ops.ones((dim, 1, 1), ms.float32), requires_grad=True
             )
             self.layer_scale_2 = ms.Parameter(
-                layer_scale_init_value * ops.ones((dim, 1, 1),ms.float32), requires_grad=True
+                layer_scale_init_value * ops.ones((dim, 1, 1), ms.float32), requires_grad=True
             )
 
     def construct(self, x):
@@ -808,8 +806,6 @@ class FastViT(nn.Cell):
                         inference_mode=inference_mode,
                     )
                 )
-
-
         # For segmentation and detection, extract intermediate output
         if self.fork_feat:
             # add a norm layer for each output
@@ -849,11 +845,13 @@ class FastViT(nn.Cell):
 
     def cls_init_weights(self) -> None:
         """Init. for classification"""
-        for _,cell in self.cells_and_names():
-            if isinstance(cell,nn.Dense):
-                cell.weight.set_data(init.initializer(init.TruncatedNormal(sigma=0.02),cell.weight.shape,cell.weight.dtype))
-            if isinstance(cell,nn.Dense) and cell.bias is not None:
-                cell.bias.set_data(init.initializer(init.Zero(),cell.bias.shape,cell.bias.dtype))
+        for _, cell in self.cells_and_names():
+            if isinstance(cell, nn.Dense):
+                cell.weight.set_data(init.initializer(init.TruncatedNormal(sigma=0.02),
+                                                      cell.weight.shape,
+                                                      cell.weight.dtype))
+            if isinstance(cell, nn.Dense) and cell.bias is not None:
+                cell.bias.set_data(init.initializer(init.Zero(), cell.bias.shape, cell.bias.dtype))
 
     def forward_embeddings(self, x: ms.Tensor) -> ms.Tensor:
         x = self.patch_embed(x)
@@ -1052,6 +1050,7 @@ def fastvit_ma36(pretrained=False, **kwargs):
         raise ValueError("Functionality not implemented.")
     return model
 
+
 class DropPath(nn.Cell):
     """DropPath (Stochastic Depth) regularization layers"""
 
@@ -1068,11 +1067,12 @@ class DropPath(nn.Cell):
     def construct(self, x: ms.Tensor) -> ms.Tensor:
         if self.keep_prob == 1.0 or not self.training:
             return x
-        shape = (x.shape[0],) + (1,) * (x.ndim - 1)
+        shape = (x.shape[0], ) + (1,) * (x.ndim - 1)
         random_tensor = self.dropout(ones(shape))
         if not self.scale_by_keep:
             random_tensor = ops.mul(random_tensor, self.keep_prob)
         return x * random_tensor
+
 
 class SEBlock(nn.Cell):
 
@@ -1104,7 +1104,7 @@ class SEBlock(nn.Cell):
     def construct(self, inputs: ms.Tensor) -> ms.Tensor:
         """Apply forward pass."""
         b, c, h, w = inputs.shape
-        x = ops.AvgPool(pad_mode='valid',kernel_size=(h,w))(inputs)
+        x = ops.AvgPool(pad_mode='valid', kernel_size=(h, w))(inputs)
         x = self.reduce(x)
         x = nn.ReLU()(x)
         x = self.expand(x)
@@ -1284,7 +1284,7 @@ class MobileOneBlock(nn.Cell):
             kernel_scale, bias_scale = self._fuse_bn_tensor(self.rbr_scale)
             # Pad scale branch kernel to match conv branch kernel size.
             pad = self.kernel_size // 2
-            pad_op = nn.Pad(paddings=((0,0),(0,0),(pad,pad),(pad,pad)))
+            pad_op = nn.Pad(paddings=((0, 0), (0, 0), (pad, pad), (pad, pad)))
             kernel_scale = pad_op(kernel_scale)
 
         # get weights and bias of skip branch
@@ -1359,20 +1359,19 @@ class MobileOneBlock(nn.Cell):
             Conv-BN module.
         """
         mod_list = nn.SequentialCell(
-            OrderedDict([("conv",
-            nn.Conv2d(
-                in_channels=self.in_channels,
-                out_channels=self.out_channels,
-                kernel_size=kernel_size,
-                stride=self.stride,
-                pad_mode='pad',
-                padding=padding,
-                group=self.group,
-                has_bias=False,
-            )),
-            ("bn",nn.BatchNorm2d(num_features=self.out_channels))])
-        )
+            OrderedDict(
+                [("conv", nn.Conv2d(
+                    in_channels=self.in_channels,
+                    out_channels=self.out_channels,
+                    kernel_size=kernel_size,
+                    stride=self.stride,
+                    pad_mode='pad',
+                    padding=padding,
+                    group=self.group,
+                    has_bias=False, )),
+                 ("bn", nn.BatchNorm2d(num_features=self.out_channels))]))
         return mod_list
+
 
 class ReparamLargeKernelConv(nn.Cell):
     """Building Block of RepLKNet
@@ -1466,7 +1465,10 @@ class ReparamLargeKernelConv(nn.Cell):
         if hasattr(self, "small_conv"):
             small_k, small_b = self._fuse_bn(self.small_conv.conv, self.small_conv.bn)
             eq_b += small_b
-            pad_op = nn.Pad(paddings=((0,0),(0,0),((self.kernel_size - self.small_kernel) // 2,(self.kernel_size - self.small_kernel) // 2),((self.kernel_size - self.small_kernel) // 2,(self.kernel_size - self.small_kernel) // 2)))
+            pad_op = nn.Pad(paddings=((0, 0), (0, 0), ((self.kernel_size - self.small_kernel) // 2,
+                                                       (self.kernel_size - self.small_kernel) // 2),
+                                                      ((self.kernel_size - self.small_kernel) // 2,
+                                                       (self.kernel_size - self.small_kernel) // 2)))
             eq_k += pad_op(small_k)
         return eq_k, eq_b
 
@@ -1531,19 +1533,18 @@ class ReparamLargeKernelConv(nn.Cell):
         """
         mod_list = nn.SequentialCell(
             OrderedDict(
-                [("conv",nn.Conv2d(
-                in_channels=self.in_channels,
-                out_channels=self.out_channels,
-                kernel_size=kernel_size,
-                stride=self.stride,
-                pad_mode = 'pad',
-                padding=padding,
-                group=self.group,
-                has_bias=False,
-            )),
-            ("bn", nn.BatchNorm2d(num_features=self.out_channels))])
-        )
+                [("conv", nn.Conv2d(
+                    in_channels=self.in_channels,
+                    out_channels=self.out_channels,
+                    kernel_size=kernel_size,
+                    stride=self.stride,
+                    pad_mode='pad',
+                    padding=padding,
+                    group=self.group,
+                    has_bias=False,)),
+                 ("bn", nn.BatchNorm2d(num_features=self.out_channels))]))
         return mod_list
+
 
 def reparameterize_model(model: nn.Cell) -> nn.Cell:
     """Method returns a model where a multi-branched structure
@@ -1558,10 +1559,11 @@ def reparameterize_model(model: nn.Cell) -> nn.Cell:
     """
     # Avoid editing original graph
     model = copy.deepcopy(model)
-    for _,cell in model.cells_and_names():
+    for _, cell in model.cells_and_names():
         if hasattr(cell, "reparameterize"):
             cell.reparameterize()
     return model
+
 
 class CosineWDSchedule:
     def __init__(self, optimizer, t_max, eta_min=0, last_epoch=-1):
@@ -1596,6 +1598,7 @@ class CosineWDSchedule:
             if param_group["weight_decay"] > 0.0:
                 param_group["weight_decay"] = wd
 
+
 class DistillationLoss(nn.Cell):
     """
     This module wraps a standard criterion and adds an extra knowledge distillation loss by
@@ -1610,7 +1613,7 @@ class DistillationLoss(nn.Cell):
         alpha: float,
         tau: float,
     ):
-        super(DistillationLoss,self).__init__()
+        super(DistillationLoss, self).__init__()
         self.base_criterion = base_criterion
         self.teacher_model = teacher_model
         assert distillation_type in ["none", "soft", "hard"]
