@@ -22,10 +22,10 @@ from .registry import register_model
 __all__ = [
     "CaiT",
     "cait_xxs24_224",
-    "cait_xs24_384",
+    "cait_xs24_224",
     "cait_s24_224",
     "cait_s24_384",
-    "cait_s36_384",
+    "cait_s36_224",
     "cait_m36_384",
     "cait_m48_448",
 ]
@@ -42,10 +42,10 @@ def _cfg(url='', **kwargs):
 
 default_cfgs = {
     "cait_xxs24_224": _cfg(url=''),
-    "cait_xs24_384": _cfg(url='', input_size=(3, 384, 384)),
+    "cait_xs24_224": _cfg(url=''),
     "cait_s24_224": _cfg(url=''),
     "cait_s24_384": _cfg(url='', input_size=(3, 384, 384)),
-    "cait_s36_384": _cfg(url='', input_size=(3, 384, 384)),
+    "cait_s36_224": _cfg(url=''),
     "cait_m36_384": _cfg(url='', input_size=(3, 384, 384)),
     "cait_m48_448": _cfg(url='', input_size=(3, 448, 448)),
 }
@@ -156,7 +156,12 @@ class AttentionTalkingHead(nn.Cell):
         head_dim = dim // num_heads
         self.scale = qk_scale or head_dim ** -0.5
 
-        self.qkv = nn.Dense(dim, dim * 3, has_bias=qkv_bias)
+        # self.qkv = nn.Dense(dim, dim * 3, has_bias=qkv_bias)
+
+        self.q = nn.Dense(dim, dim, has_bias=qkv_bias)
+        self.k = nn.Dense(dim, dim, has_bias=qkv_bias)
+        self.v = nn.Dense(dim, dim, has_bias=qkv_bias)
+
         self.attn_drop = Dropout(p=attn_drop_rate)
 
         self.proj = nn.Dense(dim, dim, has_bias=False)
@@ -173,12 +178,21 @@ class AttentionTalkingHead(nn.Cell):
 
     def construct(self, x) -> Tensor:
         B, N, C = x.shape
-        qkv = ops.reshape(self.qkv(x), (B, N, 3, self.num_heads, C // self.num_heads))
-        qkv = ops.transpose(qkv, (2, 0, 3, 1, 4))
-        q, k, v = ops.unstack(qkv, axis=0)
-        q = ops.mul(q, self.scale)
+        # qkv = ops.reshape(self.qkv(x), (B, N, 3, self.num_heads, C // self.num_heads))
+        # qkv = ops.transpose(qkv, (2, 0, 3, 1, 4))
+        # q, k, v = ops.unstack(qkv, axis=0)
+        # q = ops.mul(q, self.scale)
+        #
+        # attn = self.q_matmul_k(q, k)
 
-        attn = self.q_matmul_k(q, k)
+        q = ops.reshape(self.q(x), (B, N, self.num_heads, C // self.num_heads))
+        q = ops.transpose(q, (0, 2, 1, 3)) * self.scale
+        k = ops.reshape(self.k(x), (B, N, self.num_heads, C // self.num_heads))
+        k = ops.transpose(k, (0, 2, 3, 1))
+        v = ops.reshape(self.v(x), (B, N, self.num_heads, C // self.num_heads))
+        v = ops.transpose(v, (0, 2, 1, 3))
+
+        attn = ops.BatchMatMul()(q, k)
 
         attn = ops.transpose(attn, (0, 2, 3, 1))
         attn = self.proj_l(attn)
@@ -369,8 +383,8 @@ def cait_xxs24_224(pretrained: bool = False, num_classes: int = 1000, in_channel
 
 
 @register_model
-def cait_xs24_384(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> CaiT:
-    model = CaiT(img_size=384, patch_size=16, in_channels=in_channels, num_classes=num_classes,
+def cait_xs24_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> CaiT:
+    model = CaiT(img_size=224, patch_size=16, in_channels=in_channels, num_classes=num_classes,
                  embed_dim=288, depth=24, num_heads=6, mlp_ratio=4, qkv_bias=False,
                  norm_layer=partial(nn.LayerNorm, epsilon=1e-6), init_values=1e-5, depth_token_only=2,
                  **kwargs)
@@ -405,8 +419,8 @@ def cait_s24_384(pretrained: bool = False, num_classes: int = 1000, in_channels=
 
 
 @register_model
-def cait_s36_384(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> CaiT:
-    model = CaiT(img_size=384, patch_size=16, in_channels=in_channels, num_classes=num_classes,
+def cait_s36_224(pretrained: bool = False, num_classes: int = 1000, in_channels=3, **kwargs) -> CaiT:
+    model = CaiT(img_size=224, patch_size=16, in_channels=in_channels, num_classes=num_classes,
                  embed_dim=384, depth=36, num_heads=8, mlp_ratio=4, qkv_bias=False,
                  norm_layer=partial(nn.LayerNorm, epsilon=1e-6), init_values=1e-6, depth_token_only=2,
                  **kwargs)
