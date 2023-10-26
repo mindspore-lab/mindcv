@@ -26,23 +26,22 @@ from config import parse_args, save_args  # isort: skip
 logger = logging.getLogger("mindcv.train")
 
 
-def train(args):
-    """main train function"""
-
+def main():
+    args = parse_args()
     ms.set_context(mode=args.mode)
     if args.distribute:
         init()
-        device_num = get_group_size()
-        rank_id = get_rank()
+        rank_id, device_num = get_rank(), get_group_size()
         ms.set_auto_parallel_context(
             device_num=device_num,
             parallel_mode="data_parallel",
             gradients_mean=True,
             # we should but cannot set parameter_broadcast=True, which will cause error on gpu.
         )
+        all_reduce = AllReduceSum()
     else:
-        device_num = None
-        rank_id = None
+        rank_id, device_num = None, None
+        all_reduce = None
 
     set_seed(args.seed)
     set_logger(name="mindcv", output_dir=args.ckpt_save_dir, rank=rank_id, color=False)
@@ -64,7 +63,6 @@ def train(args):
         download=args.dataset_download,
         num_aug_repeats=args.aug_repeats,
     )
-
     if args.num_classes is None:
         num_classes = dataset_train.num_classes()
     else:
@@ -76,7 +74,6 @@ def train(args):
         assert args.aug_splits == 3, "Currently, only support 3 splits of augmentation"
         assert args.auto_augment is not None, "aug_splits should be set with one auto_augment"
         num_aug_splits = args.aug_splits
-
     transform_list = create_transforms(
         dataset_name=args.dataset,
         is_training=True,
@@ -112,6 +109,10 @@ def train(args):
         num_parallel_workers=args.num_parallel_workers,
         separate=num_aug_splits > 0,
     )
+    num_batches = loader_train.get_dataset_size()
+    train_count = dataset_train.get_dataset_size()
+    if args.distribute:
+        train_count = all_reduce(Tensor(train_count, ms.int32))
 
     if args.val_while_train:
         dataset_eval = create_dataset(
@@ -142,21 +143,12 @@ def train(args):
             transform=transform_list_eval,
             num_parallel_workers=args.num_parallel_workers,
         )
-        # validation dataset count
         eval_count = dataset_eval.get_dataset_size()
         if args.distribute:
-            all_reduce = AllReduceSum()
             eval_count = all_reduce(Tensor(eval_count, ms.int32))
     else:
         loader_eval = None
         eval_count = None
-
-    num_batches = loader_train.get_dataset_size()
-    # Train dataset count
-    train_count = dataset_train.get_dataset_size()
-    if args.distribute:
-        all_reduce = AllReduceSum()
-        train_count = all_reduce(Tensor(train_count, ms.int32))
 
     # create model
     network = create_model(
@@ -169,7 +161,6 @@ def train(args):
         checkpoint_path=args.ckpt_path,
         ema=args.ema,
     )
-
     num_params = sum([param.size for param in network.get_parameters()])
 
     # create loss
@@ -231,7 +222,7 @@ def train(args):
         eps=args.eps,
     )
 
-    # Define eval metrics.
+    # define eval metrics.
     metrics = get_metrics(num_classes)
 
     # create trainer
@@ -324,17 +315,4 @@ def train(args):
 
 
 if __name__ == "__main__":
-    args = parse_args()
-
-    # data sync for cloud platform if enabled
-    if args.enable_modelarts:
-        import moxing as mox
-
-        args.data_dir = f"/cache/{args.data_url}"
-        mox.file.copy_parallel(src_url=os.path.join(args.data_url, args.dataset), dst_url=args.data_dir)
-
-    # core training
-    train(args)
-
-    if args.enable_modelarts:
-        mox.file.copy_parallel(src_url=args.ckpt_save_dir, dst_url=args.train_url)
+    main()

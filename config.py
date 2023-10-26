@@ -256,20 +256,6 @@ def create_parser():
     group.add_argument('--drop_overflow_update', type=bool, default=False,
                        help='Whether to execute optimizer if there is an overflow (default=False)')
 
-    # modelarts
-    group = parser.add_argument_group('modelarts')
-    group.add_argument('--enable_modelarts', type=str2bool, nargs='?', const=True, default=False,
-                       help='Run on modelarts platform (default=False)')
-    group.add_argument('--device_target', type=str, default='Ascend')
-    group.add_argument('--multi_data_url', type=str, default='/cache/data/',
-                       help='path to multi dataset')
-    group.add_argument('--data_url', type=str, default='/cache/data/',
-                       help='path to dataset')
-    group.add_argument('--ckpt_url', type=str, default='/cache/output/',
-                       help='pre_train_model path in obs')
-    group.add_argument('--train_url', type=str, default='/cache/output/',
-                       help='model folder to save/load')
-
     return parser_config, parser
 # fmt: on
 
