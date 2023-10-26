@@ -9,6 +9,7 @@ from mindspore.ops import functional as F
 from mindspore.train import DynamicLossScaleManager, FixedLossScaleManager, Model
 
 from .amp import auto_mixed_precision
+from .distillation import DistillLossCell
 from .train_step import TrainStep
 
 __all__ = [
@@ -38,6 +39,7 @@ def require_customized_train_step(
     clip_grad: bool = False,
     gradient_accumulation_steps: int = 1,
     amp_cast_list: Optional[str] = None,
+    distillation_type: Optional[str] = None,
 ):
     if ema:
         return True
@@ -46,6 +48,8 @@ def require_customized_train_step(
     if gradient_accumulation_steps > 1:
         return True
     if amp_cast_list:
+        return True
+    if distillation_type:
         return True
     return False
 
@@ -88,6 +92,9 @@ def create_trainer(
     clip_grad: bool = False,
     clip_value: float = 15.0,
     gradient_accumulation_steps: int = 1,
+    distillation_type: Optional[str] = None,
+    teacher_network: Optional[nn.Cell] = None,
+    distillation_alpha: float = 0.5,
 ):
     """Create Trainer.
 
@@ -106,6 +113,9 @@ def create_trainer(
         clip_grad: whether to gradient clip.
         clip_value: The value at which to clip gradients.
         gradient_accumulation_steps: Accumulate the gradients of n batches before update.
+        distillation_type: The type of distillation.
+        teacher_network: The teacher network for distillation.
+        distillation_alpha: The coefficient to balance the distillation loss and base loss.
 
     Returns:
         mindspore.Model
@@ -120,7 +130,7 @@ def create_trainer(
     if gradient_accumulation_steps < 1:
         raise ValueError("`gradient_accumulation_steps` must be >= 1!")
 
-    if not require_customized_train_step(ema, clip_grad, gradient_accumulation_steps, amp_cast_list):
+    if not require_customized_train_step(ema, clip_grad, gradient_accumulation_steps, amp_cast_list, distillation_type):
         mindspore_kwargs = dict(
             network=network,
             loss_fn=loss,
@@ -149,7 +159,10 @@ def create_trainer(
     else:  # require customized train step
         eval_network = nn.WithEvalCell(network, loss, amp_level in ["O2", "O3", "auto"])
         auto_mixed_precision(network, amp_level, amp_cast_list)
-        net_with_loss = add_loss_network(network, loss, amp_level)
+        if distillation_type:
+            net_with_loss = DistillLossCell(network, loss, distillation_type, teacher_network, distillation_alpha)
+        else:
+            net_with_loss = add_loss_network(network, loss, amp_level)
         train_step_kwargs = dict(
             network=net_with_loss,
             optimizer=optimizer,
