@@ -74,6 +74,7 @@ def set_logger(
     Returns:
         logging.Logger: A initialized logger.
     """
+    rank = 0 if rank is None else rank
     if name in logger_initialized:
         return logger_initialized[name]
 

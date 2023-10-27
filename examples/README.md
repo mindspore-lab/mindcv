@@ -1,14 +1,19 @@
-This folder contains examples for various tasks, which users can run easily.
+# Examples based on MindCV
 
-### Single process with model training and evaluation
-```
-python examples/train_with_func_example.py
-```
-This example shows how to train and evaluate a model on your own dataset.
+This folder contains examples for various downstream tasks, which users can run easily.
 
-### Multiprocess with model training and evaluation
-```
-export CUDA_VISIBLE_DEVICES=0,1,2,3  # suppose there are 4 GPUs
-mpirun --allow-run-as-root -n 4 python examples/train_parallel_with_func_example.py
-```
-This example shows how to train and evaluate a mode with multiprocess on your own dataset on GPU.
+## Finetune
+
+- A detailed [sample](./finetune), aimed to easily adapt pretrained models to customized datasets.
+
+## Detection
+
+- [SSD](./det/ssd)
+
+## Segmentation
+
+- [DeepLabV3 & DeepLabV3+](./seg/deeplabv3)
+
+## Vision Foundation Models
+
+- coming soon.
