@@ -35,6 +35,9 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
+    "mae_b_16_224_pretrain": _cfg(url=""),
+    "mae_l_16_224_pretrain": _cfg(url=""),
+    "mae_h_16_224_pretrain": _cfg(url=""),
     "mae_b_16_224_finetune": _cfg(
         url="https://download.mindspore.cn/toolkits/mindcv/mae/mae_b_16_224_finetune-cc05b899.ckpt"
     ),
