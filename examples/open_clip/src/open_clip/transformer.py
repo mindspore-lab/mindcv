@@ -195,7 +195,7 @@ class ResidualAttentionBlock(nn.Cell):
             OrderedDict(
                 [
                     ("c_fc", nn.Dense(d_model, mlp_width, weight_init="HeUniform")),
-                    ("gelu", act_layer),
+                    ("gelu", act_layer()),
                     ("c_proj", nn.Dense(mlp_width, d_model, weight_init="HeUniform")),
                 ]
             )

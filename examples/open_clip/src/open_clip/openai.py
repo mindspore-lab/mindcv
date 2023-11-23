@@ -50,11 +50,7 @@ def load_openai_model(
 
     param_dict = ms.load_checkpoint(model_path)
 
-    try:
-        model = build_model_from_openai_ckpt(param_dict)
-    except KeyError:
-        sd = {k[7:]: v for k, v in param_dict["state_dict"].items()}
-        model = build_model_from_openai_ckpt(sd)
+    model = build_model_from_openai_ckpt(param_dict)
 
     # add mean / std attributes for consistency with OpenCLIP models
     model.visual.image_mean = OPENAI_DATASET_MEAN
