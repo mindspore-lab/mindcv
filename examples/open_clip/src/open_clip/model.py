@@ -245,7 +245,7 @@ def convert_weights_to_lp(model: nn.Cell):
     """Convert applicable model parameters to fp16"""
 
     def _convert_weights(cell):
-        if isinstance(cell, (nn.Conv1d, nn.Conv2d, nn.Dense, nn.MultiheadAttention, Attention)):
+        if isinstance(cell, (nn.Conv1d, nn.Conv2d, nn.Dense, Attention)):
             cell.to_float(ms.float16)
 
     model.apply(_convert_weights)
@@ -304,8 +304,8 @@ def build_model_from_openai_ckpt(
 
     embed_dim = param_dict["text_projection"].shape[1]
     context_length = param_dict["positional_embedding"].shape[0]
-    vocab_size = param_dict["token_embedding.weight"].shape[0]
-    transformer_width = param_dict["ln_final.weight"].shape[0]
+    vocab_size = param_dict["token_embedding.embedding_table"].shape[0]
+    transformer_width = param_dict["ln_final.gamma"].shape[0]
     transformer_heads = transformer_width // 64
     transformer_layers = len(set(k.split(".")[2] for k in param_dict if k.startswith("transformer.resblocks")))
 

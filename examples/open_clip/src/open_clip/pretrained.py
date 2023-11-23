@@ -1,5 +1,5 @@
 import os
-import urllib
+import urllib.request
 from typing import Dict, Union
 
 from tqdm import tqdm

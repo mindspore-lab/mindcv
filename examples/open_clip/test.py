@@ -1,6 +1,9 @@
 """
 Generate a folder containing all the main variables' value.
 
+Example:
+python test.py --mode=0 --device_target="Ascend" --model_name="RN50" --pretrained="openai" --quickgelu=True
+
 P.S. This generated folder can be used by difference.py to calculate the difference statistics.
 
 """
@@ -74,23 +77,24 @@ def main(args):
     image_features = model.encode_image(image)
     text_features = model.encode_text(text)
 
-    if not os.path.exists("./" + args.model_name):
-        root = "./" + args.model_name
+    root = "./" + args.model_name + args.pretrained
+    if not os.path.exists(root):
+        root = "./" + args.model_name + args.pretrained
         os.mkdir(root)
 
-    file = open(root + "image.txt", "w+")
-    file.write(str(image.asnumpy().tolist()))
-    file.close()
+    # file = open(root + "/image.txt", "w+")
+    # file.write(str(image.asnumpy().tolist()))
+    # file.close()
+    #
+    # file = open(root + "/text.txt", "w+")
+    # file.write(str(text.asnumpy().tolist()))
+    # file.close()
 
-    file = open(root + "text.txt", "w+")
-    file.write(str(text.asnumpy().tolist()))
-    file.close()
-
-    file = open(root + "image_features.txt", "w+")
+    file = open(root + "/image_features.txt", "w+")
     file.write(str(image_features.asnumpy().tolist()))
     file.close()
 
-    file = open(root + "text_features.txt", "w+")
+    file = open(root + "/text_features.txt", "w+")
     file.write(str(text_features.asnumpy().tolist()))
     file.close()
 
@@ -99,10 +103,11 @@ def main(args):
 
     text_probs = ops.softmax(100.0 * image_features @ text_features.T, axis=-1)
 
-    file = open(root + "text_probs.txt", "w+")
+    file = open(root + "/text_probs.txt", "w+")
     file.write(str(text_probs.asnumpy().tolist()))
     file.close()
 
 
 if __name__ == "__main__":
     main(sys.argv[1:])
+    print("Done!")
