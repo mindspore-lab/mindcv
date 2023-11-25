@@ -147,9 +147,9 @@ class CLIP(nn.Cell):
         self.ln_final = text.ln_final
         self.text_projection = text.text_projection
         self.attn_mask = text.attn_mask
-        self.logit_scale = Parameter(ops.ones([]) * init_logit_scale)
+        self.logit_scale = Parameter(ops.ones(()) * init_logit_scale)
         if init_logit_bias is not None:
-            self.logit_bias = Parameter(ops.ones([]) * init_logit_bias)
+            self.logit_bias = Parameter(ops.ones(()) * init_logit_bias)
         else:
             self.logit_bias = None
 
