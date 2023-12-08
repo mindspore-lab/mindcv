@@ -298,6 +298,37 @@ python train.py --model=resnet50 --dataset=cifar10 \
 
 ## 更新
 
+- 2024/1/17
+
+新版本`0.3.0`发布。我们将在未来的发布中丢弃对MindSpore1.x版本的支持
+
+1. 新模型:
+   - [RegNet](configs/regnet)的Y-16GF规格
+   - [SwinTransformerV2](configs/swintransformerv2)
+   - [VOLO](configs/volo)
+   - [CMT](configs/cmt)
+   - [HaloNet](configs/halonet)
+   - [SSD](examples/det/ssd)
+   - [DeepLabV3](examples/seg/deeplabv3)
+   - [CLIP](examples/clip) & [OpenCLIP](examples/open_clip)
+2. 特性:
+   - 损失函数AsymmetricLoss及JSDCrossEntropy
+   - 数据增强分离(Augmentations Split)
+   - 自定义混合精度策略
+3. 错误修复:
+   - 由于分类器参数未完全弹出，您在新建预训练模型时传入参数`num_classes`可能会导致错误。
+4. 重构:
+   - 许多模型的名字发生了变更，以便更好的理解。
+   - `VisionTransformer`的模型定义[脚本](mindcv/models/vit.py)。
+   - 混合模式(PyNative+jit)的训练[脚本](train_with_func.py)。
+5. 文档:
+   - 如何提取多尺度特征的教程指引。
+   - 如何在自定义数据集上微调预训练模型的教程指引。
+6. BREAKING CHANGES:
+   - 我们将在此小版本的未来发布中丢弃对MindSpore1.x的支持。
+   - 配置项`filter_bias_and_bn`将被移除并更名为`weight_decay_filter`。
+   我们会对已有训练策略进行迁移，但函数`create_optimizer`的签名变更将是不兼容的，且未迁移旧版本的训练策略也将变得不兼容。详见[PR/752](https://github.com/mindspore-lab/mindcv/pull/752)。
+
 - 2023/6/16
 1. 新版本 `0.2.2` 发布啦！我们将`MindSpore`升级到了2.0版本，同时保持了对1.8版本的兼容
 2. 新模型:
