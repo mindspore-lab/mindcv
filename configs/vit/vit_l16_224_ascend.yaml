@@ -9,52 +9,55 @@ val_interval: 1
 dataset: "imagenet"
 data_dir: "/path/to/imagenet"
 shuffle: True
-dataset_download: False
-batch_size: 48
-drop_remainder: True
+batch_size: 512
 
 # augmentation
 image_resize: 224
 scale: [0.08, 1.0]
 ratio: [0.75, 1.333]
 hflip: 0.5
+vflip: 0.0
 interpolation: "bicubic"
-re_prob: 0.15
-mixup: 0.2
+auto_augment: "randaug-m9-mstd0.5"
+re_prob: 0.0
 cutmix: 1.0
 cutmix_prob: 1.0
-crop_pct: 0.875
-color_jitter: [0.4, 0.4, 0.4]
-auto_augment: "randaug-m9-mstd0.5"
+mixup: 0.8
 
 # model
 model: "vit_l_16_224"
-drop_rate: 0.12
-drop_path_rate: 0.1
 num_classes: 1000
-pretrained: False
-ckpt_path: ""
+drop_rate: 0.15
+drop_path_rate: 0.2
 keep_checkpoint_max: 10
-ckpt_save_policy: "top_k"
 ckpt_save_dir: "./ckpt"
+ckpt_save_interval: 1
+ckpt_save_policy: "top_k"
 epoch_size: 300
 dataset_sink_mode: True
-amp_level: "O2"
 
 # loss
 loss: "CE"
-loss_scale: 1024.0
 label_smoothing: 0.1
 
 # lr scheduler
-scheduler: "warmup_cosine_decay"
-lr: 0.0005
-min_lr: 1e-5
-warmup_epochs: 32
-decay_epochs: 268
-lr_epoch_stair: False
+scheduler: "cosine_decay"
+lr: 1.6e-3
+min_lr: 0.0
+warmup_epochs: 30
+decay_epochs: 270
+warmup_factor: 0.01
 
 # optimizer
 opt: "adamw"
-weight_decay: 0.05
+weight_decay_filter: "norm_and_bias"
+weight_decay: 0.3
 use_nesterov: False
+
+# amp
+amp_level: "O2"
+val_amp_level: 'O2'
+loss_scale_type: 'fixed'
+loss_scale: 1024
+
+ema: True
