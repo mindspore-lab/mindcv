@@ -1,4 +1,5 @@
 """ optim factory """
+import logging
 import os
 from typing import Optional
 
@@ -11,11 +12,18 @@ from .nadam import NAdam
 
 __all__ = ["create_optimizer"]
 
+_logger = logging.getLogger(__name__)
 
-def init_group_params(params, weight_decay):
+
+def init_group_params(params, weight_decay, weight_decay_filter):
+    if weight_decay_filter == "disable":
+        return [
+            {"params": params, "weight_decay": weight_decay},
+            {"order_params": params},
+        ]
+
     decay_params = []
     no_decay_params = []
-
     for param in params:
         if "beta" not in param.name and "gamma" not in param.name and "bias" not in param.name:
             decay_params.append(param)
@@ -23,7 +31,7 @@ def init_group_params(params, weight_decay):
             no_decay_params.append(param)
     return [
         {"params": decay_params, "weight_decay": weight_decay},
-        {"params": no_decay_params},
+        {"params": no_decay_params, "weight_decay": 0.0},
         {"order_params": params},
     ]
 
@@ -35,7 +43,7 @@ def create_optimizer(
     weight_decay: float = 0,
     momentum: float = 0.9,
     nesterov: bool = False,
-    filter_bias_and_bn: bool = True,
+    weight_decay_filter: str = "disable",
     loss_scale: float = 1.0,
     schedule_decay: float = 4e-3,
     checkpoint_path: str = "",
@@ -59,8 +67,11 @@ def create_optimizer(
             of current step. Default: 0.
         momentum: momentum if the optimizer supports. Default: 0.9.
         nesterov: Whether to use Nesterov Accelerated Gradient (NAG) algorithm to update the gradients. Default: False.
-        filter_bias_and_bn: whether to filter batch norm parameters and bias from weight decay.
-            If True, weight decay will not apply on BN parameters and bias in Conv or Dense layers. Default: True.
+        weight_decay_filter: filters to filter parameters from weight_decay.
+            - "disable": No parameters to filter.
+            - "auto": We do not apply weight decay filtering to any parameters. However, MindSpore currently
+                    automatically filters the parameters of Norm layer from weight decay.
+            - "norm_and_bias": Filter the paramters of Norm layer and Bias from weight decay.
         loss_scale: A floating point value for the loss scale, which must be larger than 0.0. Default: 1.0.
 
     Returns:
@@ -68,9 +79,19 @@ def create_optimizer(
     """
 
     opt = opt.lower()
-
-    if weight_decay and filter_bias_and_bn:
-        params = init_group_params(params, weight_decay)
+    if weight_decay_filter == "auto":
+        _logger.warning(
+            "You are using AUTO weight decay filter, which means the weight decay filter isn't explicitly pass in "
+            "when creating an mindspore.nn.Optimizer instance. "
+            "NOTE: mindspore.nn.Optimizer will filter Norm parmas from weight decay. "
+        )
+    elif weight_decay_filter == "disable" or "norm_and_bias":
+        params = init_group_params(params, weight_decay, weight_decay_filter)
+        weight_decay = 0.0
+    else:
+        raise ValueError(
+            f"weight decay filter only support ['disable', 'auto', 'norm_and_bias'], but got{weight_decay_filter}."
+        )
 
     opt_args = dict(**kwargs)
     # if lr is not None:

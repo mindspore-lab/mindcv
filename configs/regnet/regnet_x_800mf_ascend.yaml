@@ -52,4 +52,3 @@ momentum: 0.9
 weight_decay: 0.0001
 loss_scale: 128
 use_nesterov: False
-filter_bias_and_bn: True

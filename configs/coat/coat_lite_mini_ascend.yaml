@@ -54,6 +54,5 @@ cycle_decay: 1.0
 # optimizer
 opt: 'adamw'
 weight_decay: 0.025
-filter_bias_and_bn: True
 loss_scale: 1024
 use_nesterov: False

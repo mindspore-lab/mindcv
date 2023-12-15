@@ -55,7 +55,6 @@ opt: 'momentum'
 momentum: 0.9
 weight_decay: 4e-5
 use_nesterov: False
-filter_bias_and_bn: True
 
 # amp
 amp_level: 'O2'

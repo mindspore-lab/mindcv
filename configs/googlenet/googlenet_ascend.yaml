@@ -44,7 +44,6 @@ warmup_epochs: 5
 
 # optimizer
 opt: 'momentum'
-filter_bias_and_bn: True
 momentum: 0.9
 weight_decay: 0.00004
 loss_scale: 1024

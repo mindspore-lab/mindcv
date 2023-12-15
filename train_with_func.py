@@ -227,7 +227,7 @@ def main():
         weight_decay=args.weight_decay,
         momentum=args.momentum,
         nesterov=args.use_nesterov,
-        filter_bias_and_bn=args.filter_bias_and_bn,
+        weight_decay_filter=args.weight_decay_filter,
         loss_scale=1.0,
         eps=args.eps,
     )

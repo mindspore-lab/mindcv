@@ -55,7 +55,6 @@ decay_rate: 0.01
 
 # optimizer
 opt: 'adamw'
-filter_bias_and_bn: True
 momentum: 0.9
 weight_decay: 2e-05
 loss_scale: 1024

@@ -43,7 +43,6 @@ decay_epochs: 345
 
 # optimizer
 opt: 'rmsprop'
-filter_bias_and_bn: True
 momentum: 0.9
 weight_decay: 1e-5
 loss_scale: 256

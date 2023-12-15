@@ -118,7 +118,7 @@ def train(args):
         lr=lr_scheduler,
         weight_decay=args.weight_decay,
         momentum=args.momentum,
-        filter_bias_and_bn=args.filter_bias_and_bn,
+        weight_decay_filter=args.weight_decay_filter,
         loss_scale=optimizer_loss_scale,
     )
 

@@ -53,7 +53,6 @@ warmup_factor: 0.002
 
 # optimizer
 opt: "adamw"
-filter_bias_and_bn: True
 momentum: 0.9
 weight_decay: 0.05
 loss_scale_type: "auto"

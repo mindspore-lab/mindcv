@@ -354,7 +354,7 @@
 
    - opt：优化器名称。
 
-   - filter_bias_and_bn：参数中是否包含bias，gamma或者beta。
+   - weight_decay_filter：权重衰减过滤器 （过滤一些参数， 使其在跟新时不做权重衰减）。
 
    - momentum：移动平均的动量。
 
@@ -368,7 +368,7 @@
 
     ```yaml
     opt: 'momentum'
-    filter_bias_and_bn: True
+    weight_decay_filter: 'norm_and_bias'
     momentum: 0.9
     weight_decay: 0.00007
     loss_scale: 1024
@@ -379,7 +379,7 @@
 3. parse参数设置
 
     ```shell
-    python train.py ... --opt momentum --filter_bias_and_bn True --weight_decay 0.00007 \
+    python train.py ... --opt momentum --weight_decay_filter 'norm_and_bias" --weight_decay 0.00007 \
         --loss_scale 1024 --use_nesterov False ...
     ```
 
@@ -395,7 +395,7 @@
                 weight_decay=args.weight_decay,
                 momentum=args.momentum,
                 nesterov=args.use_nesterov,
-                filter_bias_and_bn=args.filter_bias_and_bn,
+                weight_decay_filter=args.weight_decay_filter,
                 loss_scale=args.loss_scale,
                 checkpoint_path=opt_ckpt_path,
                 eps=args.eps
@@ -407,7 +407,7 @@
                 weight_decay=args.weight_decay,
                 momentum=args.momentum,
                 nesterov=args.use_nesterov,
-                filter_bias_and_bn=args.filter_bias_and_bn,
+                weight_decay_filter=args.weight_decay_filter,
                 checkpoint_path=opt_ckpt_path,
                 eps=args.eps
             )

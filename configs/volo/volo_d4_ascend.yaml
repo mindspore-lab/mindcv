@@ -60,7 +60,6 @@ decay_rate: 0.1
 opt: 'adamw'
 weight_decay: 0.05
 momentum: 0.9
-filter_bias_and_bn: True
 loss_scale_type: 'dynamic'
 loss_scale: 1024
 use_nesterov: False

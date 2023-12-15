@@ -55,7 +55,6 @@ decay_rate: 0.1
 # optimizer
 opt: 'adamw'
 weight_decay: 0.05
-filter_bias_and_bn: True
 loss_scale: 1024
 drop_overflow_update: True
 loss_scale_type: 'dynamic'
