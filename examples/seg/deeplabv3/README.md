@@ -51,7 +51,7 @@ This example provides implementations of DeepLabV3 and DeepLabV3+ using backbone
 
    * Download Pascal VOC 2012 dataset,  [VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/) and Semantic Boundaries Dataset, [SBD](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/semantic_contours/benchmark.tgz).
 
-   * Prepare training and test data list files with the path to image and annotation pairs. You could simply run `python examples/seg/deeplabv3/preprocess/get_dataset_list.py --data_root=/path/to/data` to generate the list files. This command results in 5 data list files. The lines in a list file should be like as follows:
+   * Prepare training and test data list files with the path to image and annotation pairs. You could simply run `python examples/seg/deeplabv3/preprocess/get_data_list.py --data_root=/path/to/data` to generate the list files. This command results in 5 data list files. The lines in a list file should be like as follows:
 
      ```
      /path/to/data/JPEGImages/2007_000032.jpg /path/to/data/SegmentationClassGray/2007_000032.png
@@ -116,20 +116,20 @@ python examples/seg/deeplabv3/train.py --config [the path to the config file]
 
   ```shell
   # for deeplabv3
-  mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/deeplabv3_s16_dilated_resnet101.yaml
+  mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/config/deeplabv3_s16_dilated_resnet101.yaml
 
   # for deeplabv3+
-  mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/deeplabv3plus_s16_dilated_resnet101.yaml
+  mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/config/deeplabv3plus_s16_dilated_resnet101.yaml
   ```
 
 - Step 2: Employ output_stride=8, fine-tune model from step 1 on  *trainaug* dataset with smaller base learning rate. In config file, please specify the path of checkpoint from previous step in `ckpt_path`, set  `ckpt_pre_trained` to `True` and set `output_stride` to `8` .
 
   ```shell
   # for deeplabv3
-  mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/deeplabv3_s8_dilated_resnet101.yaml
+  mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/config/deeplabv3_s8_dilated_resnet101.yaml
 
   # for deeplabv3+
-  mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/deeplabv3plus_s8_dilated_resnet101.yaml
+  mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/config/deeplabv3plus_s8_dilated_resnet101.yaml
   ```
 
 ### Test
@@ -138,7 +138,7 @@ For testing the trained model, first specify the path to the model checkpoint at
 
 For example, after replacing  `ckpt_path` in config file with [checkpoint](https://download.mindspore.cn/toolkits/mindcv/deeplabv3/deeplabv3_s8_resnet101-a297e7af.ckpt) from 2-step training of deeplabv3, commands below employ os=8 without left-right filpped or muticale inputs.
 ```shell
-python examples/seg/deeplabv3/eval.py --config examples/seg/deeplabv3/deeplabv3_s8_dilated_resnet101.yaml
+python examples/seg/deeplabv3/eval.py --config examples/seg/deeplabv3/config/deeplabv3_s8_dilated_resnet101.yaml
 ```
 
 ## Results
