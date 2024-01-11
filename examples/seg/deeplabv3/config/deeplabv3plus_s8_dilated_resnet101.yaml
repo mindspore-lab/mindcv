@@ -18,7 +18,7 @@ image_std: [57.375, 57.120, 58.395]
 max_scale: 2.0
 min_scale: 0.5
 ignore_label: 255
-num_classes: 21x
+num_classes: 21
 shuffle: True
 
 # backbone

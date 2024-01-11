@@ -4,7 +4,7 @@ import logging
 import yaml
 from addict import Dict
 from data import create_segment_dataset
-from deeplabv3 import DeeplabInferNetwork, DeepLabV3, DeeplabV3Plus
+from deeplabv3 import DeepLabInferNetwork, DeepLabV3, DeepLabV3Plus
 from dilated_resnet import *  # noqa: F403, F401
 from postprocess import apply_eval
 
@@ -34,11 +34,11 @@ def eval(args):
     if args.model == "deeplabv3":
         deeplab = DeepLabV3(backbone, args, is_training=False)
     elif args.model == "deeplabv3plus":
-        deeplab = DeeplabV3Plus(backbone, args, is_training=False)
+        deeplab = DeepLabV3Plus(backbone, args, is_training=False)
     else:
         NotImplementedError("support deeplabv3 and deeplabv3plus only")
 
-    eval_model = DeeplabInferNetwork(deeplab, input_format=args.input_format)
+    eval_model = DeepLabInferNetwork(deeplab, input_format=args.input_format)
 
     param_dict = load_checkpoint(args.ckpt_path)
     net_param_not_load, _ = load_param_into_net(eval_model, param_dict)
