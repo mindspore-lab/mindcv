@@ -1,0 +1,58 @@
+# system
+mode: 0
+distribute: True
+num_parallel_workers: 8
+val_while_train: True
+
+# dataset
+dataset: "imagenet"
+data_dir: "/path/to/imagenet"
+shuffle: True
+dataset_download: False
+batch_size: 32
+drop_remainder: True
+
+# augmentation
+image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+interpolation: "bicubic"
+auto_augment: "randaug-m9-mstd0.5-inc1"
+re_prob: 0.25
+mixup: 0.8
+cutmix: 1.0
+re_value: "random"
+
+# model
+model: "mae_b_16_224_finetune"
+drop_rate: 0.0
+drop_path_rate: 0.1
+pretrained: False
+ckpt_path: ""
+keep_checkpoint_max: 10
+ckpt_save_dir: "./ckpt"
+epoch_size: 100
+dataset_sink_mode: True
+amp_level: "O2"
+
+# loss
+loss: "CE"
+loss_scale: 1024.0
+label_smoothing: 0.1
+
+# lr scheduler
+scheduler: "warmup_cosine_decay"
+lr: 5e-4
+min_lr: 1e-6
+warmup_epochs: 5
+warmup_factor: 0
+decay_epochs: 95
+layer_decay: 0.65
+lr_epoch_stair: False
+
+# optimizer
+opt: "adamw"
+weight_decay: 0.05
+filter_bias_and_bn: True
+use_nesterov: False

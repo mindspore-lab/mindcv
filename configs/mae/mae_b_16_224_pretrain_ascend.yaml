@@ -1,0 +1,57 @@
+# system
+mode: 0
+distribute: True
+num_parallel_workers: 8
+
+# dataset
+dataset: "imagenet"
+data_dir: "/path/to/imagenet"
+shuffle: True
+dataset_download: False
+batch_size: 64
+drop_remainder: True
+
+# augmentation
+scale: [0.2, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+color_jitter: [0.4, 0.4, 0.4]
+
+# model
+model: "mae_b_16_224_pretrain"
+drop_rate: 0.0
+drop_path_rate: 0.0
+pretrained: False
+ckpt_path: ""
+keep_checkpoint_max: 10
+ckpt_save_dir: "./ckpt"
+epoch_size: 800
+dataset_sink_mode: True
+amp_level: "O2"
+clip_grad: True
+clip_value: 3.0
+
+# loss
+loss: "None"
+loss_scale: 1024.0
+
+# lr scheduler
+scheduler: "warmup_cosine_decay"
+lr: 1.5e-4
+min_lr: 0
+warmup_epochs: 40
+warmup_factor: 0
+decay_epochs: 760
+lr_epoch_stair: False
+
+# optimizer
+opt: "adamw"
+weight_decay: 0.05
+filter_bias_and_bn: True
+use_nesterov: False
+
+# pre-train
+pretrain_resize: [224]
+pretrain_interpolations: ["bicubic"]
+mask_type: "random"
+mask_ratio: 0.75

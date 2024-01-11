@@ -6,7 +6,7 @@ from time import time
 import numpy as np
 
 import mindspore as ms
-from mindspore import ParameterTuple, Tensor, ops
+from mindspore import ParameterTuple, Tensor, nn, ops
 from mindspore.train import Callback, SummaryRecord, load_param_into_net, save_checkpoint
 
 from .checkpoint_manager import CheckpointManager
@@ -209,7 +209,7 @@ class StateMonitor(Callback):
                 self.ckpt_manager.save_ckpoint(
                     cb_params.train_network,
                     num_ckpt=self.ckpt_keep_max,
-                    metric=res[0],
+                    metric=res[0] if len(self.metric_name) > 0 else 0.0,
                     save_path=ckpt_save_path,
                 )
 
@@ -278,7 +278,7 @@ class StateMonitor(Callback):
         else:  # if the optimizer is successfully called, the global_step will actually be the value of next step.
             optim_step = optimizer.global_step - 1
         if optimizer.dynamic_lr:
-            if isinstance(optimizer.learning_rate, ms.nn.CellList):
+            if isinstance(optimizer.learning_rate, nn.CellList):
                 # return the learning rates of the first parameter if dynamic_lr
                 lr = optimizer.learning_rate[0](optim_step)[0]
             else:
