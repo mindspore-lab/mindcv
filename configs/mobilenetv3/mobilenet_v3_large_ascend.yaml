@@ -45,7 +45,7 @@ decay_epochs: 416
 
 # optimizer
 opt: 'momentum'
-filter_bias_and_bn: False
+weight_decay_filter: 'auto'
 momentum: 0.9
 weight_decay: 0.00002
 loss_scale: 1024

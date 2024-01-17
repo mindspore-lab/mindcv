@@ -52,7 +52,6 @@ decay_rate: 0.1
 
 # optimizer
 opt: 'adamw'
-filter_bias_and_bn: True
 weight_decay: 0.05
 loss_scale: 1024
 use_nesterov: False

@@ -43,8 +43,8 @@ class SimpleCNN(nn.Cell):
 
 @pytest.mark.parametrize("opt", ["sgd", "momentum"])
 @pytest.mark.parametrize("nesterov", [True, False])
-@pytest.mark.parametrize("filter_bias_and_bn", [True, False])
-def test_sgd_optimizer(opt, nesterov, filter_bias_and_bn):
+@pytest.mark.parametrize("weight_decay_filter", ["disable", "auto", "norm_and_bias"])
+def test_sgd_optimizer(opt, nesterov, weight_decay_filter):
     network = SimpleCNN(in_channels=1, num_classes=10)
     net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
 
@@ -55,7 +55,7 @@ def test_sgd_optimizer(opt, nesterov, filter_bias_and_bn):
         weight_decay=1e-5,
         momentum=0.9,
         nesterov=nesterov,
-        filter_bias_and_bn=filter_bias_and_bn,
+        weight_decay_filter=weight_decay_filter,
     )
 
     bs = 8
@@ -171,7 +171,7 @@ def test_param_lr_001_filter_bias_and_bn_optimizer():
     ]
     net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
     net_opt = create_optimizer(
-        group_params, "adamW", lr=0.01, weight_decay=1e-5, momentum=0.9, nesterov=False, filter_bias_and_bn=False
+        group_params, "adamW", lr=0.01, weight_decay=1e-5, momentum=0.9, nesterov=False, weight_decay_filter="auto"
     )
 
     bs = 8
@@ -203,7 +203,7 @@ def test_param_lr_0001_filter_bias_and_bn_optimizer():
     ]
     net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
     net_opt = create_optimizer(
-        group_params, "adamW", lr=0.01, weight_decay=1e-5, momentum=0.9, nesterov=False, filter_bias_and_bn=False
+        group_params, "adamW", lr=0.01, weight_decay=1e-5, momentum=0.9, nesterov=False, weight_decay_filter="auto"
     )
 
     bs = 8
@@ -237,7 +237,7 @@ def test_wrong_momentum_optimizer(momentum):
             momentum=momentum,
             loss_scale=1.0,
             nesterov=False,
-            filter_bias_and_bn=True,
+            weight_decay_filter="disable",
         )
 
         bs = 8
@@ -271,7 +271,7 @@ def test_wrong_loss_scale_optimizer(loss_scale):
             momentum=0.9,
             loss_scale=loss_scale,
             nesterov=False,
-            filter_bias_and_bn=True,
+            weight_decay_filter="disable",
         )
 
         bs = 8
@@ -306,7 +306,7 @@ def test_wrong_weight_decay_optimizer(weight_decay):
             momentum=0.9,
             loss_scale=1.0,
             nesterov=False,
-            filter_bias_and_bn=True,
+            weight_decay_filter="disable",
         )
 
         bs = 8
@@ -340,7 +340,7 @@ def test_wrong_lr_optimizer(lr):
             momentum=0.9,
             loss_scale=1.0,
             nesterov=False,
-            filter_bias_and_bn=True,
+            weight_decay_filter="disable",
         )
 
         bs = 8
@@ -372,7 +372,7 @@ def test_param_lr_01_filter_bias_and_bn_optimizer():
     ]
     net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
     net_opt = create_optimizer(
-        group_params, "momentum", lr=0.01, weight_decay=1e-5, momentum=0.9, nesterov=False, filter_bias_and_bn=False
+        group_params, "momentum", lr=0.01, weight_decay=1e-5, momentum=0.9, nesterov=False, weight_decay_filter="auto"
     )
 
     bs = 8
@@ -406,7 +406,7 @@ def test_wrong_opt_optimizer(opt):
             momentum=0.9,
             loss_scale=1.0,
             nesterov=False,
-            filter_bias_and_bn=True,
+            weight_decay_filter="disable",
         )
 
         bs = 8
@@ -447,7 +447,7 @@ def test_wrong_params_more_optimizer():
             momentum=0.9,
             loss_scale=1.0,
             nesterov=False,
-            filter_bias_and_bn=False,
+            weight_decay_filter="auto",
         )
 
         bs = 8
@@ -487,7 +487,7 @@ def test_wrong_params_input_optimizer():
             momentum=0.9,
             loss_scale=1.0,
             nesterov=False,
-            filter_bias_and_bn=False,
+            weight_decay_filter="auto",
         )
 
         bs = 8
@@ -527,7 +527,7 @@ def test_mode_mult_single_optimizer(mode):
     ]
     net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
     net_opt = create_optimizer(
-        group_params, "momentum", lr=0.01, weight_decay=1e-5, momentum=0.9, nesterov=False, filter_bias_and_bn=False
+        group_params, "momentum", lr=0.01, weight_decay=1e-5, momentum=0.9, nesterov=False, weight_decay_filter="auto"
     )
 
     bs = 8

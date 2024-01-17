@@ -47,5 +47,4 @@ decay_epochs: 200
 # optimizer
 opt: 'adamw'
 weight_decay: 0.025
-filter_bias_and_bn: True
 use_nesterov: False

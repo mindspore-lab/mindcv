@@ -51,7 +51,7 @@ drop_overflow_update: False
 loss_scale: 3072.0
 momentum: 0.9
 weight_decay: 0.0001
-filter_bias_and_bn: False
+weight_decay_filter": 'auto'
 gradient_accumulation_steps: 1
 
 # callbacks

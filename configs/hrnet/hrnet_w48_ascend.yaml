@@ -52,4 +52,3 @@ decay_epochs: 280
 opt: 'adamw'
 weight_decay: 0.05
 loss_scale: 1024
-filter_bias_and_bn: True

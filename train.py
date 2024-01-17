@@ -210,13 +210,14 @@ def main():
     else:
         optimizer_loss_scale = 1.0
     optimizer = create_optimizer(
-        network.trainable_params(),
+        network,
         opt=args.opt,
         lr=lr_scheduler,
         weight_decay=args.weight_decay,
         momentum=args.momentum,
         nesterov=args.use_nesterov,
-        filter_bias_and_bn=args.filter_bias_and_bn,
+        weight_decay_filter=args.weight_decay_filter,
+        layer_decay=args.layer_decay,
         loss_scale=optimizer_loss_scale,
         checkpoint_path=opt_ckpt_path,
         eps=args.eps,

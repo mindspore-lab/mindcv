@@ -283,7 +283,7 @@ def finetune_train(args):
         weight_decay=args.weight_decay,
         momentum=args.momentum,
         nesterov=args.use_nesterov,
-        filter_bias_and_bn=args.filter_bias_and_bn,
+        weight_decay_filter=args.weight_decay_filter,
         loss_scale=optimizer_loss_scale,
         checkpoint_path=opt_ckpt_path,
         eps=args.eps,

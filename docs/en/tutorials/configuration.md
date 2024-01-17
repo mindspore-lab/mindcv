@@ -354,7 +354,7 @@ Let's use squeezenet_1.0 model as an example to explain how to configure the cor
 
    - opt: name of optimizer.
 
-   - filter_bias_and_bn: filter Bias and BatchNorm.
+   - weight_decay_filter: weight decay filter (filter parameters from weight decay).
 
    - momentum: Hyperparameter of type float, means momentum for the moving average.
 
@@ -368,7 +368,7 @@ Let's use squeezenet_1.0 model as an example to explain how to configure the cor
 
     ```yaml
     opt: 'momentum'
-    filter_bias_and_bn: True
+    weight_decay_filter: 'norm_and_bias'
     momentum: 0.9
     weight_decay: 0.00007
     loss_scale: 1024
@@ -379,7 +379,7 @@ Let's use squeezenet_1.0 model as an example to explain how to configure the cor
 3. Parse parameter setting
 
     ```shell
-    python train.py ... --opt momentum --filter_bias_and_bn True --weight_decay 0.00007 \
+    python train.py ... --opt momentum --weight_decay_filter 'norm_and_bias' --weight_decay 0.00007 \
         --loss_scale 1024 --use_nesterov False ...
     ```
 
@@ -395,7 +395,7 @@ Let's use squeezenet_1.0 model as an example to explain how to configure the cor
                 weight_decay=args.weight_decay,
                 momentum=args.momentum,
                 nesterov=args.use_nesterov,
-                filter_bias_and_bn=args.filter_bias_and_bn,
+                weight_decay_filter=args.weight_decay_filter,
                 loss_scale=args.loss_scale,
                 checkpoint_path=opt_ckpt_path,
                 eps=args.eps
@@ -407,7 +407,7 @@ Let's use squeezenet_1.0 model as an example to explain how to configure the cor
                 weight_decay=args.weight_decay,
                 momentum=args.momentum,
                 nesterov=args.use_nesterov,
-                filter_bias_and_bn=args.filter_bias_and_bn,
+                weight_decay_filter=args.weight_decay_filter,
                 checkpoint_path=opt_ckpt_path,
                 eps=args.eps
             )

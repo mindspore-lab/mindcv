@@ -167,6 +167,8 @@ def create_parser():
                        help='Whether use clip grad (default=False)')
     group.add_argument('--clip_value', type=float, default=15.0,
                        help='Clip value (default=15.0)')
+    group.add_argument('--layer_decay', type=float, default=None,
+                       help='layer-wise learning rate decay (default: None)')
     group.add_argument('--gradient_accumulation_steps', type=int, default=1,
                        help="Accumulate the gradients of n batches before update.")
 
@@ -182,8 +184,14 @@ def create_parser():
                        help='Weight decay (default=1e-6)')
     group.add_argument('--use_nesterov', type=str2bool, nargs='?', const=True, default=False,
                        help='Enables the Nesterov momentum (default=False)')
-    group.add_argument('--filter_bias_and_bn', type=str2bool, nargs='?', const=True, default=True,
-                       help='Filter Bias and BatchNorm (default=True)')
+    group.add_argument('--weight_decay_filter', type=str, default="disable",
+                       choices=['disable', 'auto', 'norm_and_bias'],
+                       help='filter parameters from weight_decay. '
+                            'choice: "disable" - No parameters to filter from weight_decay; "auto" - In this case, '
+                            'we do not apply weight decay filtering to any parameters. However, MindSpore currently '
+                            'automatically filters norm parameters from weight decay. It is unclear whether there '
+                            'will be any changes in future versions of MindSpore, so it is recommended to stay updated;'
+                            '"norm_and_bias" - Filter the paramtersof Norm layer and Bias from weight decay')
     group.add_argument('--eps', type=float, default=1e-10,
                        help='Term Added to the Denominator to Improve Numerical Stability (default=1e-10)')
 
