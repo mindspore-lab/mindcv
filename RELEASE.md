@@ -1,5 +1,38 @@
 # Release Note
 
+## 0.3.0 (2024/1/17)
+
+Release `0.3.0` is published. We will drop MindSpore 1.x in the future release.
+
+1. New models:
+   - Y-16GF of [RegNet](configs/regnet)
+   - [SwinTransformerV2](configs/swintransformerv2)
+   - [VOLO](configs/volo)
+   - [CMT](configs/cmt)
+   - [HaloNet](configs/halonet)
+   - [SSD](examples/det/ssd)
+   - [DeepLabV3](examples/seg/deeplabv3)
+   - [CLIP](examples/clip) & [OpenCLIP](examples/open_clip)
+2. Features:
+   - AsymmetricLoss & JSDCrossEntropy
+   - Augmentations Split
+   - Customized AMP
+3. Bug fixes:
+   - Since the classifier weights are not fully deleted, you may encounter an error passing in the `num_classes` when creating a pre-trained model.
+4. Refactoring:
+   - The names of many models have been refactored for better understanding.
+   - [Script](mindcv/models/vit.py) of `VisionTransformer`.
+   - [Script](train_with_func.py) of Mixed(PyNative+jit) mode training.
+5. Documentation:
+   - A guide of how to extract multiscale features from backbone.
+   - A guide of how to finetune the pre-trained model on a custom dataset.
+6. BREAKING CHANGES:
+   - We are going to drop support of MindSpore 1.x for it's EOL.
+   - Configuration `filter_bias_and_bn` will be removed and renamed as `weight_decay_filter`,
+   due to a prolonged misunderstanding of the MindSpore optimizer.
+   We will migrate the existing training recipes, but the signature change of function a will be incompatible
+   and the old version training recipes will also be incompatible. See [PR/752](https://github.com/mindspore-lab/mindcv/pull/752) for details.
+
 ## 0.2.2 (2023/6/16)
 
 1. New version `0.2.2` is released! We upgrade to support `MindSpore` v2.0 while maintaining compatibility of v1.8
