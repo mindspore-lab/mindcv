@@ -53,6 +53,27 @@ class NAdam(Optimizer):
         self.mu_schedule = Parameter(initializer(1, [1], ms.float32), name="mu_schedule")
         self.beta2_power = Parameter(initializer(1, [1], ms.float32), name="beta2_power")
 
+    def get_lr(self):
+        """
+        The optimizer calls this interface to get the learning rate for the current step. User-defined optimizers based
+        on :class:`mindspore.nn.Optimizer` can also call this interface before updating the parameters.
+
+        Returns:
+            float, the learning rate of current step.
+        """
+        lr = self.learning_rate
+        if self.dynamic_lr:
+            if self.is_group_lr:
+                lr = ()
+                for learning_rate in self.learning_rate:
+                    current_dynamic_lr = learning_rate(self.global_step).reshape(())
+                    lr += (current_dynamic_lr,)
+            else:
+                lr = self.learning_rate(self.global_step).reshape(())
+        if self._is_dynamic_lr_or_weight_decay():
+            self.assignadd(self.global_step, self.global_step_increase_tensor)
+        return lr
+
     @jit
     def construct(self, gradients):
         lr = self.get_lr()
