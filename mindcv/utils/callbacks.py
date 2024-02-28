@@ -46,6 +46,7 @@ class StateMonitor(Callback):
         log_interval=100,
         rank_id=None,
         device_num=None,
+        update_dataloader_groups=False,
     ):
         super().__init__()
         # model
@@ -93,6 +94,8 @@ class StateMonitor(Callback):
             self.hyper_map = ops.HyperMap()
             self.online_params = ParameterTuple(self.model.train_network.get_parameters())
             self.swap_params = self.online_params.clone("swap", "zeros")
+        # data
+        self.update_dataloader_groups = update_dataloader_groups
 
     def __enter__(self):
         self.summary_record = SummaryRecord(self.summary_dir)
@@ -242,6 +245,10 @@ class StateMonitor(Callback):
                 "scalar", f"val_{self.metric_name[i]}_{self.rank_id}", Tensor(res[i], dtype=ms.float32)
             )
         self.summary_record.record(cur_step)
+
+        # dataloader
+        if self.update_dataloader_groups:
+            cb_params.train_dataset.children[0].source.update_groups()
 
     def on_train_end(self, run_context):
         _logger.info("Finish training!")
