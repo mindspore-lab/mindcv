@@ -41,9 +41,9 @@ def _cal_size_train(w: int, h: int, max_size: int, min_size: int) -> Tuple[int, 
     u = np.clip(u, -1, 1)
     target = mapping(u)
 
-    # sample the long side to [min_size, maxsize], using clipped norm
-    # resize the short side without change the aspect ratio (most of the cases)
-    if w > h:
+    # sample the a random side to [min_size, maxsize],
+    # resize the another side without change the aspect ratio (most of the cases)
+    if np.random.random() > 0.5:
         new_w = target
         new_h = np.clip(h / w * target, min_size, max_size)
     else:
@@ -102,7 +102,7 @@ class ImageTokenDataset:
         interpolation: str = "bilinear",
         image_resize: int = 384,
         image_resize_min: int = 64,
-        max_num_each_group: int = 20,
+        max_num_each_group: int = 32,
     ) -> None:
         self.is_train = split == "train"
         self.patch_size = patch_size
@@ -192,12 +192,11 @@ class ImageTokenDataset:
         # create the image index within each batch, use to generate image-level mask
         img_patch_index = [i * np.ones(len(x), dtype=np.int32) for i, x in enumerate(img_patch_seq)]
 
-        img_patch_seq = np.concatenate(img_patch_seq)
-        pos_seq = np.concatenate(pos_seq)
-        img_patch_index = np.concatenate(img_patch_index)
-        img_patch_mask = np.ones(img_patch_seq.shape[0], dtype=np.bool_)
+        img_patch_seq = np.concatenate(img_patch_seq, dtype=np.float32)
+        pos_seq = np.concatenate(pos_seq, dtype=np.int32)
+        img_patch_index = np.concatenate(img_patch_index, dtype=np.int32)
         label_index = np.array(label_seq, dtype=np.int32)
-        return img_patch_seq, pos_seq, img_patch_index, img_patch_mask, label_index
+        return img_patch_seq, pos_seq, img_patch_index, label_index
 
     def _inspect_images(
         self, root: str, enable_cache: bool = True, cache_path: str = "train_db_info.json"
@@ -240,6 +239,10 @@ class ImageTokenDataset:
     def _group_by_max_seq_length(self, images_info: List[Dict[str, Any]]) -> List[List[Dict[str, Any]]]:
         groups, group = list(), list()
         seq_len = 0
+
+        if self.is_train:
+            random.shuffle(images_info)
+
         for image_info in images_info:
             w, h = _cal_size(
                 image_info["shape"],

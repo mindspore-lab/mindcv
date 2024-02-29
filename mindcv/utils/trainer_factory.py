@@ -99,8 +99,8 @@ def add_token_loss_network(network, loss_fn, amp_level):
             self._backbone = backbone
             self._loss_fn = loss_fn
 
-        def construct(self, token, pos, image_ind, mask, label):
-            out = self._backbone(token, pos, image_ind, mask)
+        def construct(self, token, pos, image_ind, label):
+            out = self._backbone(token, pos, image_ind)
             label = F.mixed_precision_cast(mstype.float32, label)
             return self._loss_fn(F.mixed_precision_cast(mstype.float32, out), label)
 
@@ -239,8 +239,8 @@ def create_trainer(
 
 
 class TokenModelEval(nn.WithEvalCell):
-    def construct(self, token, pos, image_ind, mask, label):
-        outputs = self._network(token, pos, image_ind, mask)
+    def construct(self, token, pos, image_ind, label):
+        outputs = self._network(token, pos, image_ind)
         if self.add_cast_fp32:
             label = F.mixed_precision_cast(mstype.float32, label)
             outputs = F.cast(outputs, mstype.float32)

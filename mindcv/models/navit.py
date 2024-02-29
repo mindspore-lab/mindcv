@@ -48,7 +48,7 @@ class RMSNorm(nn.Cell):
         super(RMSNorm, self).__init__()
         self.epsilon = epsilon
         self.gamma = Parameter(initializer(gamma_init, shape, dtype=dtype), name="gamma")
-        self.scale = Tensor(1. / np.sqrt(shape[-1]), dtype=dtype)
+        self.scale = Tensor(np.sqrt(shape[-1]), dtype=dtype)
         self.norm = ops.L2Normalize(axis=-1, epsilon=self.epsilon)
 
     def construct(self, input_x):
@@ -65,10 +65,11 @@ class Attention(nn.Cell):
     Args:
         dim (int): The dimension of input features.
         num_heads (int): The number of attention heads. Default: 8.
-        qkv_bias (bool): Specifies whether the linear layer uses a bias vector. Default: True.
-        qk_norm (bool): Specifies whether to do normalization to q and k.
+        qkv_bias (bool): Specifies whether the linear layer uses a bias vector. Default: False.
+        qk_norm (bool): Specifies whether to do normalization to q and k. Default: True.
         attn_drop (float): The drop rate of attention, greater than 0 and less equal than 1. Default: 0.0.
         proj_drop (float): The drop rate of output, greater than 0 and less equal than 1. Default: 0.0.
+        norm_layer (nn.Cell): The normalization layer to apply. Default: RMSNorm
 
     Returns:
         Tensor, output tensor.
@@ -81,7 +82,7 @@ class Attention(nn.Cell):
         self,
         dim: int,
         num_heads: int = 8,
-        qkv_bias: bool = True,
+        qkv_bias: bool = False,
         qk_norm: bool = True,
         attn_drop: float = 0.0,
         proj_drop: float = 0.0,
@@ -138,7 +139,6 @@ class Attention(nn.Cell):
             token_mask = ops.unsqueeze(token_mask, 1)
             attn = ops.masked_fill(attn, ~token_mask, -ms.numpy.inf)
 
-        attn = attn.astype(ms.float32)
         attn = ops.softmax(attn, axis=-1)
         attn = self.attn_drop(attn)
 
@@ -157,7 +157,7 @@ class Block(nn.Cell):
     Args:
         dim (int): The dimension of embedding.
         num_heads (int): The number of attention heads.
-        qkv_bias (bool): Specifies whether the linear layer uses a bias vector. Default: True.
+        qkv_bias (bool): Specifies whether the linear layer uses a bias vector. Default: False.
         attn_drop (float): The drop rate of attention, greater than 0 and less equal than 1. Default: 0.0.
         proj_drop (float): The drop rate of dense layer output, greater than 0 and less equal than 1. Default: 0.0.
         mlp_ratio (float): The ratio used to scale the input dimensions to obtain the dimensions of the hidden layer.
@@ -165,7 +165,7 @@ class Block(nn.Cell):
         act_layer (nn.Cell): Activation function which will be stacked on top of the
             normalization layer (if not None), otherwise on top of the conv layer. Default: nn.GELU.
         norm_layer (nn.Cell): Norm layer that will be stacked on top of the convolution
-            layer. Default: LayerNorm.
+            layer. Default: RMSNorm.
 
     Returns:
         Tensor, output tensor.
@@ -235,7 +235,7 @@ class NativeResolutionVisionTransformer(nn.Cell):
         block_fn: Callable = Block,
         num_classes: int = 1000,
         pool_type: str = "attn",
-        max_num_each_group: int = 24,
+        max_num_each_group: int = 32,
     ):
         super().__init__()
 
@@ -304,54 +304,53 @@ class NativeResolutionVisionTransformer(nn.Cell):
         x = x + h_pos + w_pos
         return self.pos_drop(x)
 
-    def _token_mask(self, ind, mask):
-        mask = mask.to(ms.int16)  # TODO: remove cast operation once logic op. is supported
+    def _token_mask(self, ind):
+        mask = ind >= 0
         token_mask = ind[:, None, :] == ind[:, :, None]
-        token_mask = token_mask.to(ms.int16)
-        token_mask = token_mask & mask[:, None, :]
+        token_mask = ops.logical_and(token_mask, mask[:, None, :])
         return token_mask
 
-    def _pool_mask(self, ind, mask):
-        mask = mask.to(ms.int16)
+    def _pool_mask(self, ind):
+        mask = ind >= 0
         image_mask = ind[:, None, :] == self.image_id_range[None, :, None]
-        attn_pool_mask = image_mask & mask[:, None, :]
-        return attn_pool_mask
+        pool_mask = ops.logical_and(image_mask, mask[:, None, :])
+        return pool_mask
 
-    def _avg_pool_with_mask(self, x, ind, mask):
-        pool_mask = self._pool_mask(ind, mask)
+    def _avg_pool_with_mask(self, x, ind):
+        pool_mask = self._pool_mask(ind)
         total = ops.BatchMatMul()(pool_mask.to(x.dtype), x)
         num = ops.sum(pool_mask, dim=-1, keepdim=True)
         num[num == 0] = 1
         return total / num
 
-    def _attn_pool_with_mask(self, x, ind, mask):
-        pool_mask = self._pool_mask(ind, mask)
+    def _attn_pool_with_mask(self, x, ind):
+        pool_mask = self._pool_mask(ind)
         attn_pool_queries = ops.tile(self.attn_pool_queries, (x.shape[0], self.max_num_each_group, 1))
         x = self.attn_pool(attn_pool_queries, context=x, token_mask=pool_mask) + attn_pool_queries
         return x
 
-    def forward_features(self, x, pos, ind, mask):
+    def forward_features(self, x, pos, ind):
         x = self.patch_embed(x)
         x = self._pos_embed(x, pos)
         x = self.norm_pre(x)
-        token_mask = self._token_mask(ind, mask)
+        token_mask = self._token_mask(ind)
         for block in self.blocks:
             x = block(x, token_mask=token_mask)
         return x
 
-    def forward_head(self, x, ind, mask):
+    def forward_head(self, x, ind):
         if self.pool_type == "avg":
-            x = self._avg_pool_with_mask(x, ind, mask)
+            x = self._avg_pool_with_mask(x, ind)
         elif self.pool_type == "attn":
-            x = self._attn_pool_with_mask(x, ind, mask)
+            x = self._attn_pool_with_mask(x, ind)
 
         x = self.head_drop(x)
         x = self.head(x)
         return x
 
-    def construct(self, x, pos, ind, mask):
-        x = self.forward_features(x, pos, ind, mask)
-        x = self.forward_head(x, ind, mask)
+    def construct(self, x, pos, ind):
+        x = self.forward_features(x, pos, ind)
+        x = self.forward_head(x, ind)
         return x
 
 

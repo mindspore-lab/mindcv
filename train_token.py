@@ -55,8 +55,7 @@ def main():
     pad_info = {
         "token": ([args.max_seq_length, 3 * args.patch_size * args.patch_size], 0),
         "pos": ([args.max_seq_length, 2], 0),
-        "ind": ([args.max_seq_length], 0),
-        "mask": ([args.max_seq_length], 0),
+        "ind": ([args.max_seq_length], -1),
         "y": ([args.max_num_each_group], -1),  # ignore_index in loss function
     }
 
@@ -78,7 +77,7 @@ def main():
     # load dataset
     loader_train = GeneratorDataset(
         dataset_train,
-        column_names=["token", "pos", "ind", "mask", "y"],
+        column_names=["token", "pos", "ind", "y"],
         num_shards=device_num,
         shard_id=rank_id,
         num_parallel_workers=args.num_parallel_workers,
@@ -106,7 +105,7 @@ def main():
 
         loader_eval = GeneratorDataset(
             dataset_eval,
-            column_names=["token", "pos", "ind", "mask", "y"],
+            column_names=["token", "pos", "ind", "y"],
             num_shards=device_num,
             shard_id=rank_id,
             num_parallel_workers=args.num_parallel_workers,

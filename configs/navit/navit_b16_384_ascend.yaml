@@ -15,7 +15,7 @@ batch_size: 12
 drop_remainder: True
 patch_size: 16
 max_seq_length: 2048
-max_num_each_group: 24
+max_num_each_group: 32
 
 # augmentation
 image_resize: 384
