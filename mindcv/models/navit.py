@@ -235,7 +235,7 @@ class NativeResolutionVisionTransformer(nn.Cell):
         block_fn: Callable = Block,
         num_classes: int = 1000,
         pool_type: str = "attn",
-        max_num_each_group: int = 32,
+        max_num_each_group: int = 40,
     ):
         super().__init__()
 
