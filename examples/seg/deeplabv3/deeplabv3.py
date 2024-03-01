@@ -95,7 +95,7 @@ class ASPPPooling(nn.Cell):
 
     def construct(self, x):
         size = ops.shape(x)
-        out = nn.AvgPool2d(size[2])(x)
+        out = ops.mean(x, (2, 3), True)
         out = self.conv(out)
         out = ops.ResizeNearestNeighbor((size[2], size[3]), True)(out)
         return out
