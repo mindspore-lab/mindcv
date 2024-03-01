@@ -11,7 +11,7 @@ dataset: "imagenet"
 data_dir: "/path/to/imagenet"
 shuffle: True
 dataset_download: False
-batch_size: 64
+batch_size: 116
 drop_remainder: True
 
 # augmentation
@@ -26,7 +26,7 @@ drop_path_rate: 0.1
 num_classes: 1000
 pretrained: False
 ckpt_path: ""
-keep_checkpoint_max: 3
+keep_checkpoint_max: 1
 ckpt_save_policy: "top_k"
 ckpt_save_dir: "./ckpt"
 epoch_size: 100

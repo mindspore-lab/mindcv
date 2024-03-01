@@ -1,7 +1,11 @@
 import numpy as np
 
-from mindspore.train.metrics.metric import _check_onehot_data, rearrange_inputs
-from mindspore.train.metrics.topk import TopKCategoricalAccuracy
+try:
+    from mindspore.train.metrics.metric import rearrange_inputs
+    from mindspore.train.metrics.topk import TopKCategoricalAccuracy
+except ImportError:  # MS Version < 2.0
+    from mindspore.nn.metrics.metric import rearrange_inputs
+    from mindspore.nn.metrics.topk import TopKCategoricalAccuracy
 
 
 class TopKCategoricalAccuracyForTokenData(TopKCategoricalAccuracy):
@@ -23,7 +27,7 @@ class TopKCategoricalAccuracyForTokenData(TopKCategoricalAccuracy):
         y_pred = y_pred[inds]
         y = y[inds]
 
-        if y_pred.ndim == y.ndim and _check_onehot_data(y):
+        if y_pred.ndim == y.ndim:
             y = y.argmax(axis=1)
         indices = np.argsort(-y_pred, axis=1)[:, : self.k]
         repeated_y = y.reshape(-1, 1).repeat(self.k, axis=1)
