@@ -284,7 +284,11 @@ class ImageTokenDataset:
         u = scipy.stats.truncnorm.rvs(-0.5, 1.5, -0.5, 1, size=len(images_info))
 
         for i, image_info in tqdm.tqdm(
-            enumerate(images_info), desc="packing group", total=len(images_info), miniters=len(images_info) // 10
+            enumerate(images_info),
+            desc="packing group",
+            total=len(images_info),
+            miniters=len(images_info) // 10,
+            mininterval=1,
         ):
             w, h = _cal_size(
                 image_info["shape"],
