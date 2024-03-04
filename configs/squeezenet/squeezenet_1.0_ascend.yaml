@@ -40,7 +40,7 @@ label_smoothing: 0.1
 scheduler: 'warmup_cosine_decay'
 min_lr: 0.0
 lr: 0.1
-warmup_epochs: 0
+warmup_epochs: 5
 decay_epochs: 200
 
 # optimizer
