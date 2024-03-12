@@ -135,12 +135,12 @@ class Attention(nn.Cell):
         attn = self.q_matmul_k(q, k)
         attn = ops.mul(attn, self.scale)
 
+        # fp32 for softmax
+        attn = attn.to(ms.float32)
         if token_mask is not None:
             token_mask = ops.unsqueeze(token_mask, 1)
             attn = ops.masked_fill(attn, ~token_mask, -ms.numpy.inf)
-
-        dtype = attn.dtype
-        attn = ops.softmax(attn.to(ms.float32), axis=-1).to(dtype)
+        attn = ops.softmax(attn, axis=-1).to(v.dtype)
         attn = self.attn_drop(attn)
 
         out = self.attn_matmul_v(attn, v)
