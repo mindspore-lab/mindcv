@@ -7,6 +7,7 @@ __all__ = [
     "Dropout",
     "Interpolate",
     "Split",
+    "ResizeBilinear",
 ]
 
 
@@ -83,3 +84,24 @@ class Split(nn.Cell):
 
     def construct(self, x):
         return ops.split(x, **self.kwargs)
+
+
+class ResizeBilinear(nn.Cell):
+    def __init__(self, size, align_corners=False, half_pixel_centers=False):
+        super().__init__()
+        if hasattr(nn, "ResizeBilinearV2"):
+            self.resize_bilinear = ops.ResizeBilinearV2(
+                align_corners=align_corners, half_pixel_centers=half_pixel_centers
+            )
+            self.size = size
+        else:
+            self.resize_bilinear = ops.ResizeBilinear(
+                size=size, align_corners=align_corners, half_pixel_centers=half_pixel_centers
+            )
+            self.size = None
+
+    def construct(self, x):
+        if self.size:
+            return self.resize_bilinear(x, self.size)
+        else:
+            return self.resize_bilinear(x)
