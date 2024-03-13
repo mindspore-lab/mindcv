@@ -89,7 +89,7 @@ class Split(nn.Cell):
 class ResizeBilinear(nn.Cell):
     def __init__(self, size, align_corners=False, half_pixel_centers=False):
         super().__init__()
-        if hasattr(nn, "ResizeBilinearV2"):
+        if hasattr(ops, "ResizeBilinearV2"):
             self.resize_bilinear = ops.ResizeBilinearV2(
                 align_corners=align_corners, half_pixel_centers=half_pixel_centers
             )
