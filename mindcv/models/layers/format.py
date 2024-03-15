@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Union
 
 import mindspore
 
@@ -9,9 +8,6 @@ class Format(str, Enum):
     NHWC = 'NHWC'
     NCL = 'NCL'
     NLC = 'NLC'
-
-
-FormatT = Union[str, Format]
 
 
 def nchw_to(x: mindspore.Tensor, fmt: Format):
