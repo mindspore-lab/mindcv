@@ -1,4 +1,4 @@
-This folder contains scripts for fine-tuning on your own custom dataset, do refer to [tutorials](https://mindspore-lab.github.io/mindcv/how_to_guides/finetune_with_a_custom_dataset/) for details.
+This folder contains scripts for fine-tuning on your own custom dataset with a pretrained model offered by MindCV, do refer to [tutorials](https://mindspore-lab.github.io/mindcv/how_to_guides/finetune_with_a_custom_dataset/) for details.
 
 ### split_files.py
 ```shell
@@ -14,4 +14,4 @@ This is an example demonstrating how to read the raw images as well as the label
 ```shell
 python examples/finetune/finetune.py --config=./configs/mobilenetv3/mobilnet_v3_small_ascend.yaml
 ```
-A script for fine-tuning with some example code of fine-tuning methods in it (refer to the tutorial mentioned above).
+A script for fine-tuning with some example code of fine-tuning methods in it (all settings during fine-tuning are inside the config file, for more details, please refer to the tutorial mentioned above).
