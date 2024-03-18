@@ -1,11 +1,12 @@
 """ViT"""
+import functools
 from typing import Callable, Optional
 
 import numpy as np
 
 import mindspore as ms
 from mindspore import Parameter, Tensor, nn, ops
-from mindspore.common.initializer import HeUniform, TruncatedNormal, initializer
+from mindspore.common.initializer import TruncatedNormal, XavierUniform, initializer
 
 from .helpers import load_pretrained
 from .layers.compatibility import Dropout
@@ -34,7 +35,7 @@ def _cfg(url="", **kwargs):
         "num_classes": 1000,
         "input_size": (3, 224, 224),
         "first_conv": "patch_embed.proj",
-        "classifier": "head.classifier",
+        "classifier": "head",
         **kwargs,
     }
 
@@ -44,15 +45,15 @@ default_cfgs = {
     "vit_b_16_384": _cfg(
         url="", input_size=(3, 384, 384)
     ),
-    "vit_l_16_224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224-97d0fdbc.ckpt"),
+    "vit_l_16_224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224-d2635f8b.ckpt"),
     "vit_l_16_384": _cfg(
         url="", input_size=(3, 384, 384)
     ),
-    "vit_b_32_224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224-f50866e8.ckpt"),
+    "vit_b_32_224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224-4a1c9d8e.ckpt"),
     "vit_b_32_384": _cfg(
         url="", input_size=(3, 384, 384)
     ),
-    "vit_l_32_224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224-b80441df.ckpt"),
+    "vit_l_32_224": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224-8c8ea164.ckpt"),
 }
 
 
@@ -114,11 +115,11 @@ class Attention(nn.Cell):
         q, k, v = self.unstack(qkv)
         q, k = self.q_norm(q), self.k_norm(k)
 
+        q = self.mul(q, self.scale**0.5)
+        k = self.mul(k, self.scale**0.5)
         attn = self.q_matmul_k(q, k)
-        attn = self.mul(attn, self.scale)
 
-        attn = attn.astype(ms.float32)
-        attn = ops.softmax(attn, axis=-1)
+        attn = ops.softmax(attn.astype(ms.float32), axis=-1).astype(attn.dtype)
         attn = self.attn_drop(attn)
 
         out = self.attn_matmul_v(attn, v)
@@ -325,14 +326,14 @@ class VisionTransformer(nn.Cell):
     def get_num_layers(self):
         return len(self.blocks)
 
-    def no_weight_decay(self):
-        return {'pos_embed', 'cls_token'}
-
     def _init_weights(self):
+        w = self.patch_embed.proj.weight
+        w_shape_flatted = (w.shape[0], functools.reduce(lambda x, y: x*y, w.shape[1:]))
+        w.set_data(initializer(XavierUniform(), w_shape_flatted, w.dtype).reshape(w.shape))
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Dense):
                 cell.weight.set_data(
-                    initializer(TruncatedNormal(0.02), cell.weight.shape, cell.weight.dtype)
+                    initializer(XavierUniform(), cell.weight.shape, cell.weight.dtype)
                 )
                 if cell.bias is not None:
                     cell.bias.set_data(
@@ -345,14 +346,6 @@ class VisionTransformer(nn.Cell):
                 cell.beta.set_data(
                     initializer('zeros', cell.beta.shape, cell.beta.dtype)
                 )
-            elif isinstance(cell, nn.Conv2d):
-                cell.weight.set_data(
-                    initializer(HeUniform(), cell.weight.shape, cell.weight.dtype)
-                )
-                if cell.bias is not None:
-                    cell.bias.set_data(
-                        initializer("zeros", cell.bias.shape, cell.bias.dtype)
-                    )
 
     def _pos_embed(self, x):
         if self.dynamic_img_size or self.dynamic_img_pad:
