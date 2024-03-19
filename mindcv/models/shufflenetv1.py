@@ -7,6 +7,7 @@ import mindspore.common.initializer as init
 from mindspore import Tensor, nn, ops
 
 from .helpers import load_pretrained
+from .layers.compatibility import Split
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
 
@@ -49,6 +50,51 @@ default_cfgs = {
 }
 
 
+class GroupConv(nn.Cell):
+    """
+    Group convolution operation.
+    Due to MindSpore doesn't support group conv in shufflenet, we need to define the group convolution manually, instead
+    of using the origin nn.Conv2d by changing the parameter `group`.
+
+    Args:
+        in_channels (int): Input channels of feature map.
+        out_channels (int): Output channels of feature map.
+        kernel_size (int): Size of convolution kernel.
+        stride (int): Stride size for the group convolution layer.
+        pad_mode (str): Specifies padding mode.
+        pad (int): The number of padding on the height and width directions of the input.
+        groups (int): Splits filter into groups, `in_channels` and `out_channels` must be divisible by `group`.
+        has_bias (bool): Whether the Conv2d layer has a bias parameter.
+    """
+
+    def __init__(self, in_channels, out_channels, kernel_size, stride, pad_mode="pad", pad=0, groups=1, has_bias=False):
+        super(GroupConv, self).__init__()
+        assert in_channels % groups == 0 and out_channels % groups == 0
+        self.groups = groups
+        self.convs = nn.CellList()
+        self.split = Split(split_size_or_sections=in_channels // groups, output_num=self.groups, axis=1)
+        for _ in range(groups):
+            self.convs.append(
+                nn.Conv2d(
+                    in_channels // groups,
+                    out_channels // groups,
+                    kernel_size=kernel_size,
+                    stride=stride,
+                    has_bias=has_bias,
+                    padding=pad,
+                    pad_mode=pad_mode,
+                )
+            )
+
+    def construct(self, x):
+        features = self.split(x)
+        outputs = ()
+        for i in range(self.groups):
+            outputs = outputs + (self.convs[i](features[i]),)
+        out = ops.concat(outputs, axis=1)
+        return out
+
+
 class ShuffleV1Block(nn.Cell):
     """Basic block of ShuffleNetV1. 1x1 GC -> CS -> 3x3 DWC -> 1x1 GC"""
 
@@ -71,8 +117,15 @@ class ShuffleV1Block(nn.Cell):
 
         branch_main_1 = [
             # pw
-            nn.Conv2d(in_channels, mid_channels, kernel_size=1, stride=1,
-                      group=1 if first_group else group),
+            GroupConv(
+                in_channels=in_channels,
+                out_channels=mid_channels,
+                kernel_size=1,
+                stride=1,
+                pad_mode="pad",
+                pad=0,
+                groups=1 if first_group else group,
+            ),
             nn.BatchNorm2d(mid_channels),
             nn.ReLU(),
         ]
@@ -83,7 +136,15 @@ class ShuffleV1Block(nn.Cell):
                       group=mid_channels),
             nn.BatchNorm2d(mid_channels),
             # pw-linear
-            nn.Conv2d(mid_channels, out_channels, kernel_size=1, stride=1, group=group),
+            GroupConv(
+                in_channels=mid_channels,
+                out_channels=out_channels,
+                kernel_size=1,
+                stride=1,
+                pad_mode="pad",
+                pad=0,
+                groups=group,
+            ),
             nn.BatchNorm2d(out_channels),
         ]
         self.branch_main_1 = nn.SequentialCell(branch_main_1)

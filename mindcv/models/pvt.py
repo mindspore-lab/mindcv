@@ -6,6 +6,8 @@ import math
 from functools import partial
 from typing import Optional
 
+import numpy as np
+
 import mindspore
 import mindspore.nn as nn
 import mindspore.ops as ops
@@ -13,7 +15,7 @@ from mindspore import Tensor
 from mindspore.common import initializer as weight_init
 
 from .helpers import load_pretrained
-from .layers.compatibility import Dropout
+from .layers.compatibility import Dropout, ResizeBilinear
 from .layers.drop_path import DropPath
 from .layers.identity import Identity
 from .layers.mlp import Mlp
@@ -198,9 +200,7 @@ class PyramidVisionTransformer(nn.Cell):
         self.num_classes = num_classes
         self.depths = depths
         self.num_stages = num_stages
-        start = Tensor(0, mindspore.float32)
-        stop = Tensor(drop_path_rate, mindspore.float32)
-        dpr = [float(x) for x in ops.linspace(start, stop, sum(depths))]  # stochastic depth decay rule
+        dpr = [x.item() for x in np.linspace(0, drop_path_rate, sum(depths))]  # stochastic depth decay rule
         cur = 0
         b_list = []
         self.pos_embed = []
@@ -292,7 +292,7 @@ class PyramidVisionTransformer(nn.Cell):
             return pos_embed
         else:
             pos_embed = self.transpose(self.reshape(pos_embed, (1, ph, pw, -1)), (0, 3, 1, 2))
-            resize_bilinear = ops.ResizeBilinear((H, W))
+            resize_bilinear = ResizeBilinear((H, W))
             pos_embed = resize_bilinear(pos_embed)
 
             pos_embed = self.transpose(self.reshape(pos_embed, (1, -1, H * W)), (0, 2, 1))
