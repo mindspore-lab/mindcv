@@ -2,7 +2,7 @@
 
 # system
 seed: 1
-mode: 0
+mode: 1
 distribute: True
 num_parallel_workers: 8
 device_target: "Ascend"
@@ -33,7 +33,7 @@ output_stride: 16
 model: "deeplabv3plus"
 ckpt_pre_trained: False
 ckpt_path: ""
-amp_level: "O2"
+amp_level: "O3"
 amp_cast_list: None
 
 # scheduler
