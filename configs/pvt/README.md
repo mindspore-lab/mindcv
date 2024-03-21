@@ -51,7 +51,6 @@ It is easy to reproduce the reported results with the pre-defined training recip
 mpirun -n 8 python train.py --config configs/pvt/pvt_tiny_ascend.yaml --data_dir /path/to/imagenet
 ```
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
-> If use Ascend 910 devices, need to open SATURATION_MODE via `export MS_ASCEND_CHECK_OVERFLOW_MODE="SATURATION_MODE"`
 
 Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
@@ -67,7 +66,6 @@ If you want to train or finetune the model on a smaller dataset without distribu
 # standalone training on a CPU/GPU/Ascend device
 python train.py --config configs/pvt/pvt_tiny_ascend.yaml --data_dir /path/to/imagenet --distribute False
 ```
-> If use Ascend 910 devices, need to open SATURATION_MODE via `export MS_ASCEND_CHECK_OVERFLOW_MODE="SATURATION_MODE"`
 
 ### Validation
 

@@ -29,7 +29,7 @@ def _cfg(url="", **kwargs):
 
 
 default_cfgs = {
-    "squeezenet1_0": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_0-eb911778.ckpt"),
+    "squeezenet1_0": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_0-e2d78c4a.ckpt"),
     "squeezenet1_1": _cfg(url="https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_1-da256d3a.ckpt"),
 }
 
