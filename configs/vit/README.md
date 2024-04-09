@@ -73,7 +73,9 @@ Similarly, you can train the model on multiple GPU devices with the above `mpiru
 
 For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
 
-**Note:**  As the global batch size  (batch_size x num_devices) is an important hyper-parameter, it is recommended to keep the global batch size unchanged for reproduction or adjust the learning rate linearly to a new global batch size.
+**Note:**
+1) As the global batch size  (batch_size x num_devices) is an important hyper-parameter, it is recommended to keep the global batch size unchanged for reproduction or adjust the learning rate linearly to a new global batch size.
+2) The current configuration with a batch_size of 512, was initially set for a machine with 64GB of VRAM. To avoid running out of memory (OOM) on machines with smaller VRAM, consider reducing the batch_size to 256 or lower.
 
 * Standalone Training
 
