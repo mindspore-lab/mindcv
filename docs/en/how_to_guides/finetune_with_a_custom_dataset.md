@@ -55,21 +55,24 @@ DATASET_NAME
 Next, we'll take the annotation file ./aircraft/data/images_variant_trainval.txt as an example, locally generate the file of train set ./aircraft/data/images/trainval/, which meets the request of a tree-structure directory.
 
 ```python
-import shutil
 import os
+import shutil
+
 
 # only for Aircraft dataset but not a general one
 def extract_images(images_path, subset_name, annotation_file_path, copy=True):
     # read the annotation file to get the label of each image
     def annotations(annotation_file_path):
         image_label = {}
-        for i in open(annotation_file_path, "r"):
-            label = " ".join(i.split(" ")[1:]).replace("\n", "").replace("/", "_")
-            if label not in image_label.keys():
-                image_label[label] = []
-                image_label[label].append(i.split(" ")[0])
-            else:
-                image_label[label].append(i.split(" ")[0])
+        with open(annotation_file_path, "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                label = " ".join(line.split(" ")[1:]).replace("\n", "").replace("/", "_")
+                if label not in image_label.keys():
+                    image_label[label] = []
+                    image_label[label].append(line.split(" ")[0])
+                else:
+                    image_label[label].append(line.split(" ")[0])
         return image_label
 
     # make a new folder for subset
@@ -89,6 +92,7 @@ def extract_images(images_path, subset_name, annotation_file_path, copy=True):
                 shutil.move(images_path + image_name, label_folder)
 
 
+# take train set of aircraft dataset as an example
 images_path = "./aircraft/data/images/"
 subset_name = "trainval"
 annotation_file_path = "./aircraft/data/images_variant_trainval.txt"
@@ -138,6 +142,7 @@ Here's how we generate a random-accessible dataset object that stores the images
 
 ```python
 import numpy as np
+
 from mindspore.dataset import GeneratorDataset
 
 
@@ -145,11 +150,13 @@ class ImageClsDataset:
     def __init__(self, annotation_dir, images_dir):
         # Read annotations
         self.annotation = {}
-        for i in open(annotation_dir, "r"):
-            image_label = i.replace("\n", "").replace("/", "_").split(" ")
-            image = image_label[0] + ".jpg"
-            label = " ".join(image_label[1:])
-            self.annotation[image] = label
+        with open(annotation_dir, "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                image_label = line.replace("\n", "").replace("/", "_").split(" ")
+                image = image_label[0] + ".jpg"
+                label = " ".join(image_label[1:])
+                self.annotation[image] = label
 
         # Transfer string-type label to int-type label
         self.label2id = {}
@@ -161,13 +168,13 @@ class ImageClsDataset:
             self.annotation[image] = self.label2id[label]
 
         # Read image-labels as mappable object
-        images = dict.fromkeys(self.label2id.values(), [])
+        label2images = {key: [] for key in self.label2id.values()}
         for image, label in self.annotation.items():
             read_image = np.fromfile(images_dir + image, dtype=np.uint8)
-            images[label].append(read_image)
+            label2images[label].append(read_image)
 
-        self._data = sum(list(images.values()), [])
-        self._label = sum([[i] * len(images[i]) for i in images.keys()], [])
+        self._data = sum(list(label2images.values()), [])
+        self._label = sum([[i] * len(label2images[i]) for i in label2images.keys()], [])
 
     # make class ImageClsDataset a mappable object
     def __getitem__(self, index):
@@ -176,10 +183,12 @@ class ImageClsDataset:
     def __len__(self):
         return len(self._data)
 
+
+# take aircraft dataset as an example
 annotation_dir = "./aircraft/data/images_variant_trainval.txt"
-images_dir = "./aircraft/data/iamges/"
-dataset = ImageClsDataset(annotation_dir)
-ataset_train = GeneratorDataset(source=dataset, column_names=["image", "label"], shuffle=True)
+images_dir = "./aircraft/data/images/"
+dataset = ImageClsDataset(annotation_dir, images_dir)
+dataset_train = GeneratorDataset(source=dataset, column_names=["image", "label"], shuffle=True)
 ```
 
 Compared with the offline way, the online way skipped the step of splitting the data file locally and reading the local file with the `create_dataset` function. So in the subsequent training, simply **replace the part of finetune.py that uses `create_dataset` with the above code**, then you can start training by running finetune.py directly as what you do after reading the dataset offline.

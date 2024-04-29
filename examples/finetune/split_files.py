@@ -8,13 +8,15 @@ def extract_images(images_path, subset_name, annotation_file_path, copy=True):
     # read the annotation file to get the label of each image
     def annotations(annotation_file_path):
         image_label = {}
-        for i in open(annotation_file_path, "r"):
-            label = " ".join(i.split(" ")[1:]).replace("\n", "").replace("/", "_")
-            if label not in image_label.keys():
-                image_label[label] = []
-                image_label[label].append(i.split(" ")[0])
-            else:
-                image_label[label].append(i.split(" ")[0])
+        with open(annotation_file_path, "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                label = " ".join(line.split(" ")[1:]).replace("\n", "").replace("/", "_")
+                if label not in image_label.keys():
+                    image_label[label] = []
+                    image_label[label].append(line.split(" ")[0])
+                else:
+                    image_label[label].append(line.split(" ")[0])
         return image_label
 
     # make a new folder for subset

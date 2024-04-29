@@ -131,6 +131,7 @@ python examples/seg/deeplabv3/train.py --config [the path to the config file]
   # for deeplabv3+
   mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/config/deeplabv3plus_s8_dilated_resnet101.yaml
   ```
+> If use Ascend 910 devices, need to open SATURATION_MODE via `export MS_ASCEND_CHECK_OVERFLOW_MODE="SATURATION_MODE"`.
 
 ### Test
 

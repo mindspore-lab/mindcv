@@ -5,7 +5,8 @@ Refer to PVTv2: PVTv2: Improved Baselines with Pyramid Vision Transformer
 import math
 from functools import partial
 
-import mindspore
+import numpy as np
+
 import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore import Tensor
@@ -256,9 +257,7 @@ class PyramidVisionTransformerV2(nn.Cell):
         self.depths = depths
         self.num_stages = num_stages
 
-        start = Tensor(0, mindspore.float32)
-        stop = Tensor(drop_path_rate, mindspore.float32)
-        dpr = [float(x) for x in ops.linspace(start, stop, sum(depths))]  # stochastic depth decay rule
+        dpr = [x.item() for x in np.linspace(0, drop_path_rate, sum(depths))]  # stochastic depth decay rule
         cur = 0
 
         patch_embed_list = []
