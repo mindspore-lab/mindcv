@@ -1,3 +1,4 @@
+import inspect
 import os
 
 import cv2
@@ -175,14 +176,21 @@ def create_ssd_dataset(
             output_columns = ["img_id", "image", "image_shape"]
             trans = [normalize_op, change_swap_op]
 
+        # Note: mindspore-2.0 delete the parameter column_order
+        sig = inspect.signature(ds.map)
+        pass_column_order = False if "kwargs" in sig.parameters else True
+
         ds = ds.map(
             operations=compose_map_func,
             input_columns=["img_id", "image", "annotation"],
             output_columns=output_columns,
-            column_order=output_columns,
+            column_order=output_columns if pass_column_order else None,
             python_multiprocessing=python_multiprocessing,
             num_parallel_workers=num_parallel_workers,
         )
+        if not pass_column_order:
+            ds.project(output_columns=output_columns)
+
         ds = ds.map(
             operations=trans,
             input_columns=["image"],
