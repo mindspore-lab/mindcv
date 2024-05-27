@@ -226,7 +226,7 @@ class ResNetEBV(nn.Cell):
 
         self.pool = GlobalAvgPooling()
         self.num_features = 512 * block.expansion
-        self.classifier = nn.Dense(self.num_features, num_classes)
+        self.classifier = nn.Dense(self.num_features, dim)
         self.ebv = EBV(num_classes, dim, thre, slice_size, lr, steps, tau)
 
         self._initialize_weights()
