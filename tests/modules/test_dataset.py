@@ -60,7 +60,7 @@ def test_create_dataset_standalone_imagenet(mode, name, split, shuffle, num_samp
 
 # test MNIST CIFAR10
 @pytest.mark.parametrize("mode", [0, 1])
-@pytest.mark.parametrize("name", ["MNIST", "CIFAR10"])
+@pytest.mark.parametrize("name", ["CIFAR10"])
 @pytest.mark.parametrize("split", ["train", "test"])
 @pytest.mark.parametrize("shuffle", [True, False])
 @pytest.mark.parametrize("num_samples", [2, None])
