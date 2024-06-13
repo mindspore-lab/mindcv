@@ -9,10 +9,12 @@ from mindspore.ops import functional as F
 from mindspore.train import DynamicLossScaleManager, FixedLossScaleManager, Model
 
 from .amp import auto_mixed_precision
+from .top_k import Top1CategoricalAccuracyForTokenData, Top5CategoricalAccuracyForTokenData
 from .train_step import TrainStep
 
 __all__ = [
     "get_metrics",
+    "get_metrics_for_token_model",
     "require_customized_train_step",
     "create_trainer",
 ]
@@ -29,6 +31,19 @@ def get_metrics(num_classes):
     else:
         metrics = {
             "Top_1_Accuracy": nn.Top1CategoricalAccuracy(),
+        }
+    return metrics
+
+
+def get_metrics_for_token_model(num_classes):
+    if num_classes >= 5:
+        metrics = {
+            "Top_1_Accuracy": Top1CategoricalAccuracyForTokenData(),
+            "Top_5_Accuracy": Top5CategoricalAccuracyForTokenData(),
+        }
+    else:
+        metrics = {
+            "Top_1_Accuracy": Top1CategoricalAccuracyForTokenData(),
         }
     return metrics
 
@@ -73,6 +88,29 @@ def add_loss_network(network, loss_fn, amp_level):
     return network
 
 
+def add_token_loss_network(network, loss_fn, amp_level):
+    """Add loss network for token training"""
+
+    class WithLossCell(nn.Cell):
+        "Wrap loss for amp. Cast network output back to float32"
+
+        def __init__(self, backbone, loss_fn):
+            super(WithLossCell, self).__init__(auto_prefix=False)
+            self._backbone = backbone
+            self._loss_fn = loss_fn
+
+        def construct(self, token, pos, image_ind, label):
+            out = self._backbone(token, pos, image_ind)
+            label = F.mixed_precision_cast(mstype.float32, label)
+            return self._loss_fn(F.mixed_precision_cast(mstype.float32, out), label)
+
+    if amp_level == "O2" or amp_level == "O3":
+        network = WithLossCell(network, loss_fn)
+    else:
+        network = nn.WithLossCell(network, loss_fn)
+    return network
+
+
 def create_trainer(
     network: nn.Cell,
     loss: nn.Cell,
@@ -88,6 +126,7 @@ def create_trainer(
     clip_grad: bool = False,
     clip_value: float = 15.0,
     gradient_accumulation_steps: int = 1,
+    method: str = "image",
 ):
     """Create Trainer.
 
@@ -106,6 +145,7 @@ def create_trainer(
         clip_grad: whether to gradient clip.
         clip_value: The value at which to clip gradients.
         gradient_accumulation_steps: Accumulate the gradients of n batches before update.
+        method: use image level or token level trainer, choices: "image" or "token"
 
     Returns:
         mindspore.Model
@@ -120,7 +160,12 @@ def create_trainer(
     if gradient_accumulation_steps < 1:
         raise ValueError("`gradient_accumulation_steps` must be >= 1!")
 
-    if not require_customized_train_step(ema, clip_grad, gradient_accumulation_steps, amp_cast_list):
+    _require_customized_train_step = require_customized_train_step(
+        ema, clip_grad, gradient_accumulation_steps, amp_cast_list
+    )
+    _require_customized_train_step = _require_customized_train_step or method == "token"
+
+    if not _require_customized_train_step:
         mindspore_kwargs = dict(
             network=network,
             loss_fn=loss,
@@ -147,9 +192,15 @@ def create_trainer(
             raise ValueError(f"Loss scale type only support ['fixed', 'dynamic', 'auto'], but got{loss_scale_type}.")
         model = Model(**mindspore_kwargs)
     else:  # require customized train step
-        eval_network = nn.WithEvalCell(network, loss, amp_level in ["O2", "O3", "auto"])
+        if method == "token":
+            eval_network = TokenModelEval(network, loss, amp_level in ["O2", "O3", "auto"])
+        else:
+            eval_network = nn.WithEvalCell(network, loss, amp_level in ["O2", "O3", "auto"])
         auto_mixed_precision(network, amp_level, amp_cast_list)
-        net_with_loss = add_loss_network(network, loss, amp_level)
+        if method == "token":
+            net_with_loss = add_token_loss_network(network, loss, amp_level)
+        else:
+            net_with_loss = add_loss_network(network, loss, amp_level)
         train_step_kwargs = dict(
             network=net_with_loss,
             optimizer=optimizer,
@@ -185,3 +236,13 @@ def create_trainer(
         model = Model(train_step_cell, eval_network=eval_network, metrics=metrics, eval_indexes=[0, 1, 2])
         # todo: do we need to set model._loss_scale_manager
     return model
+
+
+class TokenModelEval(nn.WithEvalCell):
+    def construct(self, token, pos, image_ind, label):
+        outputs = self._network(token, pos, image_ind)
+        if self.add_cast_fp32:
+            label = F.mixed_precision_cast(mstype.float32, label)
+            outputs = F.cast(outputs, mstype.float32)
+        loss = self._loss_fn(outputs, label)
+        return loss, outputs, label
