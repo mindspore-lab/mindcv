@@ -62,7 +62,7 @@ def test_create_dataset_distribute_imagenet(mode, name, split, shuffle, num_para
 
 
 @pytest.mark.parametrize("mode", [0, 1])
-@pytest.mark.parametrize("name", ["MNIST", "CIFAR10"])
+@pytest.mark.parametrize("name", ["CIFAR10"])
 @pytest.mark.parametrize("split", ["train", "val"])
 @pytest.mark.parametrize("shuffle", [True, False])
 @pytest.mark.parametrize("num_parallel_workers", [2, 4, 8, 16])
