@@ -1,0 +1,61 @@
+# system config
+mode: 0
+distribute: True
+num_parallel_workers: 8
+val_while_train: True
+
+# dataset config
+dataset: 'imagenet'
+data_dir: '/path/to/imagenet'
+shuffle: True
+dataset_download: False
+batch_size: 64
+drop_remainder: True
+
+# augmentation config
+image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+vflip: 0.
+interpolation: 'bicubic'
+auto_augment: 'randaug-m9-mstd0.5-inc1'
+re_prob: 0.25
+mixup: 0.8
+cutmix: 1
+color_jitter: 0.3
+crop_pct: 1.0
+ema: True
+ema_decay: 0.99996
+
+# model config
+model: 'cait_s24_224'
+num_classes: 1000
+pretrained: False
+ckpt_path: ''
+keep_checkpoint_max: 10
+ckpt_save_dir: '/cache/output/'
+epoch_size: 400
+dataset_sink_mode: True
+amp_level: 'O2'
+drop_path_rate: 0.1
+
+# loss config
+loss: 'CE'
+label_smoothing: 0.1
+
+# lr scheduler config
+scheduler: 'warmup_cosine_decay'
+lr: 0.001
+min_lr: 0.000001
+warmup_epochs: 30
+decay_epochs: 370
+num_cycles: 2
+
+
+# optimizer config
+opt: 'adamw'
+weight_decay: 0.05
+filter_bias_and_bn: True
+loss_scale: 1024
+use_nesterov: False
