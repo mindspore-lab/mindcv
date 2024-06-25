@@ -126,6 +126,8 @@ def load(name: str, device: str = "Ascend", mode: int = 1, download_root: str = 
         take as its input.
     """
     ms.set_context(device_target=device, mode=mode)
+    if mode == ms.GRAPH_MODE:
+        ms.set_context(jit_config={"jit_level": "O2"})
     if name in _MODELS:
         model_path = _download(_MODELS[name], download_root or os.path.expanduser("~/.cache/clip"))
         ckp_dict = load_checkpoint(model_path)

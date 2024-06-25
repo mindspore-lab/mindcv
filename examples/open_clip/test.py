@@ -58,6 +58,8 @@ def parse_args(args):
 def main(args):
     args = parse_args(args)
     ms.set_context(device_target=args.device_target, mode=args.mode)
+    if args.mode == ms.GRAPH_MODE:
+        ms.set_context(jit_config={"jit_level": "O2"})
     model, preprocess_train, preprocess_val = create_model_and_transforms(
         args.model_name,
         args.pretrained,

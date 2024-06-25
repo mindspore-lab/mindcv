@@ -22,6 +22,8 @@ def train(args):
     """main train function"""
 
     ms.set_context(mode=args.mode)
+    if args.mode == ms.GRAPH_MODE:
+        ms.set_context(jit_config={"jit_level": "O2"})
 
     if args.distribute:
         init()

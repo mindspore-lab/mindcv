@@ -58,6 +58,8 @@ def main():
     args = parse_args()
     args = check_args(args)
     ms.set_context(mode=args.mode)
+    if args.mode == ms.GRAPH_MODE:
+        ms.set_context(jit_config={"jit_level": "O2"})
     if args.distribute:
         init()
         rank_id, device_num = get_rank(), get_group_size()
