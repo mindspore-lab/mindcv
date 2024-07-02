@@ -1,0 +1,2799 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://mindspore-lab.github.io/mindcv/zh/modelzoo/">
+      
+      
+        <link rel="prev" href="../installation/">
+      
+      
+        <link rel="next" href="../tutorials/quick_start/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.28">
+    
+    
+      
+        <title>模型仓库 - MindCV Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../" title="MindCV Docs" class="md-header__button md-logo" aria-label="MindCV Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MindCV Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              模型仓库
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../modelzoo/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/mindspore-lab/mindcv" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    mindspore-lab/mindcv
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../" class="md-tabs__link">
+        
+  
+    
+  
+  主页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../installation/" class="md-tabs__link">
+        
+  
+    
+  
+  安装
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+    
+  
+  模型仓库
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../tutorials/quick_start/" class="md-tabs__link">
+          
+  
+    
+  
+  教程
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../how_to_guides/write_a_new_model/" class="md-tabs__link">
+          
+  
+    
+  
+  How-To Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../reference/data/" class="md-tabs__link">
+          
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../notes/changelog/" class="md-tabs__link">
+          
+  
+    
+  
+  说明
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../" title="MindCV Docs" class="md-nav__button md-logo" aria-label="MindCV Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    MindCV Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/mindspore-lab/mindcv" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    mindspore-lab/mindcv
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    主页
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    安装
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    模型仓库
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    模型仓库
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Notes
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    教程
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            教程
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/quick_start/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    快速开始
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/configuration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    配置
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/finetune/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    微调
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/inference/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    推理
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/deployment/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    部署
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    How-To Guides
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            How-To Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how_to_guides/write_a_new_model/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Write A New Model
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how_to_guides/feature_extraction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Multi-Scale Feature Extraction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how_to_guides/finetune_with_a_custom_dataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fine-tune with A Custom Dataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/data/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    data
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/loss/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    loss
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/models.layers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    models.layers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    models
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/optim/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    optim
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/scheduler/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    scheduler
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/utils/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    utils
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    说明
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            说明
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notes/changelog/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    更新日志
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notes/contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notes/code_of_conduct/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    行为准则
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notes/faq/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    常见问题
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Notes
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+    <a href="https://github.com/mindspore-lab/mindcv/edit/master/docs/zh/modelzoo.md" title="编辑此页" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/mindspore-lab/mindcv/raw/master/docs/zh/modelzoo.md" title="查看本页的源代码" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"/></svg>
+    </a>
+  
+
+
+<h1 id="_1">模型仓库<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<!-- BEGIN INCLUDE ../../benchmark_results.md -->
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Context</th>
+<th>Top-1 (%)</th>
+<th>Top-5 (%)</th>
+<th>Params(M)</th>
+<th>Recipe</th>
+<th>Download</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bit_resnet50</td>
+<td>D910x8-G</td>
+<td>76.81</td>
+<td>93.17</td>
+<td>25.55</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet50_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50-1e4795a4.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>bit_resnet50x3</td>
+<td>D910x8-G</td>
+<td>80.63</td>
+<td>95.12</td>
+<td>217.31</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet50x3_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50x3-a960f91f.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>bit_resnet101</td>
+<td>D910x8-G</td>
+<td>77.93</td>
+<td>93.75</td>
+<td>44.54</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet101_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet101-2efa9106.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>cmt_small</td>
+<td>D910x8-G</td>
+<td>83.24</td>
+<td>96.41</td>
+<td>26.09</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/cmt/cmt_small_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/cmt/cmt_small-6858ee22.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>coat_lite_tiny</td>
+<td>D910x8-G</td>
+<td>77.35</td>
+<td>93.43</td>
+<td>5.72</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_tiny_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_tiny-fa7bf894.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>coat_lite_mini</td>
+<td>D910x8-G</td>
+<td>78.51</td>
+<td>93.84</td>
+<td>11.01</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_mini_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_mini-55a52f05.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>coat_tiny</td>
+<td>D910x8-G</td>
+<td>79.67</td>
+<td>94.88</td>
+<td>5.50</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_tiny_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/coat/coat_tiny-071cb792.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>coat_mini</td>
+<td>D910x8-G</td>
+<td>81.08</td>
+<td>95.34</td>
+<td>10.34</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_mini_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/coat/coat_mini-57c5bce7.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>convit_tiny</td>
+<td>D910x8-G</td>
+<td>73.66</td>
+<td>91.72</td>
+<td>5.71</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_tiny_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny-e31023f2.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>convit_tiny_plus</td>
+<td>D910x8-G</td>
+<td>77.00</td>
+<td>93.60</td>
+<td>9.97</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_tiny_plus_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny_plus-e9d7fb92.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>convit_small</td>
+<td>D910x8-G</td>
+<td>81.63</td>
+<td>95.59</td>
+<td>27.78</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_small_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/convit/convit_small-ba858604.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>convit_small_plus</td>
+<td>D910x8-G</td>
+<td>81.80</td>
+<td>95.42</td>
+<td>48.98</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_small_plus_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/convit/convit_small_plus-2352b9f7.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>convit_base</td>
+<td>D910x8-G</td>
+<td>82.10</td>
+<td>95.52</td>
+<td>86.54</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_base_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/convit/convit_base-c61b808c.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>convit_base_plus</td>
+<td>D910x8-G</td>
+<td>81.96</td>
+<td>95.04</td>
+<td>153.13</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_base_plus_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/convit/convit_base_plus-5c61c9ce.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>convnext_tiny</td>
+<td>D910x64-G</td>
+<td>81.91</td>
+<td>95.79</td>
+<td>28.59</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_tiny_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_tiny-ae5ff8d7.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>convnext_small</td>
+<td>D910x64-G</td>
+<td>83.40</td>
+<td>96.36</td>
+<td>50.22</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_small_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_small-e23008f3.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>convnext_base</td>
+<td>D910x64-G</td>
+<td>83.32</td>
+<td>96.24</td>
+<td>88.59</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_base_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_base-ee3544b8.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>convnextv2_tiny</td>
+<td>D910x8-G</td>
+<td>82.43</td>
+<td>95.98</td>
+<td>28.64</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/convnextv2/convnextv2_tiny_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/convnextv2/convnextv2_tiny-d441ba2c.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>crossvit_9</td>
+<td>D910x8-G</td>
+<td>73.56</td>
+<td>91.79</td>
+<td>8.55</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/crossvit/crossvit_9_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_9-e74c8e18.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>crossvit_15</td>
+<td>D910x8-G</td>
+<td>81.08</td>
+<td>95.33</td>
+<td>27.27</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/crossvit/crossvit_15_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_15-eaa43c02.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>crossvit_18</td>
+<td>D910x8-G</td>
+<td>81.93</td>
+<td>95.75</td>
+<td>43.27</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/crossvit/crossvit_18_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/crossvit/crossvit_18-ca0a2e43.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>densenet121</td>
+<td>D910x8-G</td>
+<td>75.64</td>
+<td>92.84</td>
+<td>8.06</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/densenet/densenet121-120_5004_Ascend.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>densenet161</td>
+<td>D910x8-G</td>
+<td>79.09</td>
+<td>94.66</td>
+<td>28.90</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_161_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/densenet/densenet161-120_5004_Ascend.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>densenet169</td>
+<td>D910x8-G</td>
+<td>77.26</td>
+<td>93.71</td>
+<td>14.31</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_169_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/densenet/densenet169-120_5004_Ascend.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>densenet201</td>
+<td>D910x8-G</td>
+<td>78.14</td>
+<td>94.08</td>
+<td>20.24</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_201_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/densenet/densenet201-120_5004_Ascend.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>dpn92</td>
+<td>D910x8-G</td>
+<td>79.46</td>
+<td>94.49</td>
+<td>37.79</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/dpn/dpn92_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/dpn/dpn92-e3e0fca.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>dpn98</td>
+<td>D910x8-G</td>
+<td>79.94</td>
+<td>94.57</td>
+<td>61.74</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/dpn/dpn98_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/dpn/dpn98-119a8207.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>dpn107</td>
+<td>D910x8-G</td>
+<td>80.05</td>
+<td>94.74</td>
+<td>87.13</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/dpn/dpn107_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/dpn/dpn107-7d7df07b.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>dpn131</td>
+<td>D910x8-G</td>
+<td>80.07</td>
+<td>94.72</td>
+<td>79.48</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/dpn/dpn131_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/dpn/dpn131-47f084b3.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>edgenext_xx_small</td>
+<td>D910x8-G</td>
+<td>71.02</td>
+<td>89.99</td>
+<td>1.33</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_xx_small-afc971fb.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>edgenext_x_small</td>
+<td>D910x8-G</td>
+<td>75.14</td>
+<td>92.50</td>
+<td>2.34</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_x_small_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_x_small-a200c6fc.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>edgenext_small</td>
+<td>D910x8-G</td>
+<td>79.15</td>
+<td>94.39</td>
+<td>5.59</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_small_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small-f530c372.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>edgenext_base</td>
+<td>D910x8-G</td>
+<td>82.24</td>
+<td>95.94</td>
+<td>18.51</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_base_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_base-4335e9dc.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>efficientnet_b0</td>
+<td>D910x64-G</td>
+<td>76.89</td>
+<td>93.16</td>
+<td>5.33</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b0_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>efficientnet_b1</td>
+<td>D910x64-G</td>
+<td>78.95</td>
+<td>94.34</td>
+<td>7.86</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b1_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b1-f8c6b13f.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>ghostnet_050</td>
+<td>D910x8-G</td>
+<td>66.03</td>
+<td>86.64</td>
+<td>2.60</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/ghostnet/ghostnet_050_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/ghostnet/ghostnet_050-85b91860.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>ghostnet_100</td>
+<td>D910x8-G</td>
+<td>73.78</td>
+<td>91.66</td>
+<td>5.20</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/ghostnet/ghostnet_100_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/ghostnet/ghostnet_100-bef8025a.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>ghostnet_130</td>
+<td>D910x8-G</td>
+<td>75.50</td>
+<td>92.56</td>
+<td>7.39</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/ghostnet/ghostnet_130_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/ghostnet/ghostnet_130-cf4c235c.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>googlenet</td>
+<td>D910x8-G</td>
+<td>72.68</td>
+<td>90.89</td>
+<td>6.99</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/googlenet/googlenet_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/googlenet/googlenet-5552fcd3.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>halonet_50t</td>
+<td>D910X8-G</td>
+<td>79.53</td>
+<td>94.79</td>
+<td>22.79</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/halonet/halonet_50t_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/halonet/halonet_50t-533da6be.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>hrnet_w32</td>
+<td>D910x8-G</td>
+<td>80.64</td>
+<td>95.44</td>
+<td>41.30</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w32_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w32-cc4fbd91.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>hrnet_w48</td>
+<td>D910x8-G</td>
+<td>81.19</td>
+<td>95.69</td>
+<td>77.57</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w48_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w48-2e3399cd.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>inception_v3</td>
+<td>D910x8-G</td>
+<td>79.11</td>
+<td>94.40</td>
+<td>27.20</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv3/inception_v3_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/inception_v3/inception_v3-38f67890.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>inception_v4</td>
+<td>D910x8-G</td>
+<td>80.88</td>
+<td>95.34</td>
+<td>42.74</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv4/inception_v4_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/inception_v4/inception_v4-db9c45b3.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mixnet_s</td>
+<td>D910x8-G</td>
+<td>75.52</td>
+<td>92.52</td>
+<td>4.17</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_s_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_s-2a5ef3a3.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mixnet_m</td>
+<td>D910x8-G</td>
+<td>76.64</td>
+<td>93.05</td>
+<td>5.06</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_m_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_m-74cc4cb1.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mixnet_l</td>
+<td>D910x8-G</td>
+<td>78.73</td>
+<td>94.31</td>
+<td>7.38</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_l_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_l-978edf2b.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mnasnet_050</td>
+<td>D910x8-G</td>
+<td>68.07</td>
+<td>88.09</td>
+<td>2.14</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.5_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_050-7d8bf4db.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mnasnet_075</td>
+<td>D910x8-G</td>
+<td>71.81</td>
+<td>90.53</td>
+<td>3.20</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.75_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_075-465d366d.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mnasnet_100</td>
+<td>D910x8-G</td>
+<td>74.28</td>
+<td>91.70</td>
+<td>4.42</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.0_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_100-1bcf43f8.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mnasnet_130</td>
+<td>D910x8-G</td>
+<td>75.65</td>
+<td>92.64</td>
+<td>6.33</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.3_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_130-a43a150a.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mnasnet_140</td>
+<td>D910x8-G</td>
+<td>76.01</td>
+<td>92.83</td>
+<td>7.16</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.4_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_140-7e20bb30.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mobilenet_v1_025</td>
+<td>D910x8-G</td>
+<td>53.87</td>
+<td>77.66</td>
+<td>0.47</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.25_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025-d3377fba.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mobilenet_v1_050</td>
+<td>D910x8-G</td>
+<td>65.94</td>
+<td>86.51</td>
+<td>1.34</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.5_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_050-23e9ddbe.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mobilenet_v1_075</td>
+<td>D910x8-G</td>
+<td>70.44</td>
+<td>89.49</td>
+<td>2.60</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.75_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_075-5bed0c73.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mobilenet_v1_100</td>
+<td>D910x8-G</td>
+<td>72.95</td>
+<td>91.01</td>
+<td>4.25</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_1.0_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_100-91c7b206.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mobilenet_v2_075</td>
+<td>D910x8-G</td>
+<td>69.98</td>
+<td>89.32</td>
+<td>2.66</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_0.75_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_075-bd7bd4c4.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mobilenet_v2_100</td>
+<td>D910x8-G</td>
+<td>72.27</td>
+<td>90.72</td>
+<td>3.54</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_1.0_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_100-d5532038.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mobilenet_v2_140</td>
+<td>D910x8-G</td>
+<td>75.56</td>
+<td>92.56</td>
+<td>6.15</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_1.4_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_140-98776171.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mobilenet_v3_small_100</td>
+<td>D910x8-G</td>
+<td>68.10</td>
+<td>87.86</td>
+<td>2.55</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_small_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-509c6047.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mobilenet_v3_large_100</td>
+<td>D910x8-G</td>
+<td>75.23</td>
+<td>92.31</td>
+<td>5.51</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_large_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-1279ad5f.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mobilevit_xx_small</td>
+<td>D910x8-G</td>
+<td>68.91</td>
+<td>88.91</td>
+<td>1.27</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_xx_small_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_xx_small-af9da8a0.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mobilevit_x_small</td>
+<td>D910x8-G</td>
+<td>74.99</td>
+<td>92.32</td>
+<td>2.32</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_x_small_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_x_small-673fc6f2.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>mobilevit_small</td>
+<td>D910x8-G</td>
+<td>78.47</td>
+<td>94.18</td>
+<td>5.59</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_small_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_small-caf79638.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>nasnet_a_4x1056</td>
+<td>D910x8-G</td>
+<td>73.65</td>
+<td>91.25</td>
+<td>5.33</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/nasnet/nasnet_a_4x1056_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/nasnet/nasnet_a_4x1056-0fbb5cdd.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>pit_ti</td>
+<td>D910x8-G</td>
+<td>72.96</td>
+<td>91.33</td>
+<td>4.85</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_ti_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/pit/pit_ti-e647a593.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>pit_xs</td>
+<td>D910x8-G</td>
+<td>78.41</td>
+<td>94.06</td>
+<td>10.61</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_xs_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/pit/pit_xs-fea0d37e.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>pit_s</td>
+<td>D910x8-G</td>
+<td>80.56</td>
+<td>94.80</td>
+<td>23.46</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_s_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/pit/pit_s-3c1ba36f.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>pit_b</td>
+<td>D910x8-G</td>
+<td>81.87</td>
+<td>95.04</td>
+<td>73.76</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_b_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/pit/pit_b-2411c9b6.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>poolformer_s12</td>
+<td>D910x8-G</td>
+<td>77.33</td>
+<td>93.34</td>
+<td>11.92</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/poolformer_s12_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/poolformer/poolformer_s12-5be5c4e4.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>pvt_tiny</td>
+<td>D910x8-G</td>
+<td>74.81</td>
+<td>92.18</td>
+<td>13.23</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_tiny_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_tiny-6abb953d.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>pvt_small</td>
+<td>D910x8-G</td>
+<td>79.66</td>
+<td>94.71</td>
+<td>24.49</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_small_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_small-213c2ed1.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>pvt_medium</td>
+<td>D910x8-G</td>
+<td>81.82</td>
+<td>95.81</td>
+<td>44.21</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_medium_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_medium-469e6802.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>pvt_large</td>
+<td>D910x8-G</td>
+<td>81.75</td>
+<td>95.70</td>
+<td>61.36</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_large_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_large-bb6895d7.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>pvt_v2_b0</td>
+<td>D910x8-G</td>
+<td>71.50</td>
+<td>90.60</td>
+<td>3.67</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b0_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b0-1c4f6683.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>pvt_v2_b1</td>
+<td>D910x8-G</td>
+<td>78.91</td>
+<td>94.49</td>
+<td>14.01</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b1_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b1-3ceb171a.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>pvt_v2_b2</td>
+<td>D910x8-G</td>
+<td>81.99</td>
+<td>95.74</td>
+<td>25.35</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b2_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b2-0565d18e.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>pvt_v2_b3</td>
+<td>D910x8-G</td>
+<td>82.84</td>
+<td>96.24</td>
+<td>45.24</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b3_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b3-feaae3fc.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>pvt_v2_b4</td>
+<td>D910x8-G</td>
+<td>83.14</td>
+<td>96.27</td>
+<td>62.56</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b4_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b4-1cf4bc03.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>regnet_x_200mf</td>
+<td>D910x8-G</td>
+<td>68.74</td>
+<td>88.38</td>
+<td>2.68</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_200mf_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_200mf-0c2b1eb5.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>regnet_x_400mf</td>
+<td>D910x8-G</td>
+<td>73.16</td>
+<td>91.35</td>
+<td>5.16</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_400mf_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_400mf-4848837d.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>regnet_x_600mf</td>
+<td>D910x8-G</td>
+<td>74.34</td>
+<td>92.00</td>
+<td>6.20</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_600mf_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_600mf-ccd76c94.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>regnet_x_800mf</td>
+<td>D910x8-G</td>
+<td>76.04</td>
+<td>92.97</td>
+<td>7.26</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_800mf_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_800mf-617227f4.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>regnet_y_200mf</td>
+<td>D910x8-G</td>
+<td>70.30</td>
+<td>89.61</td>
+<td>3.16</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_y_200mf_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_200mf-76a2f720.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>regnet_y_400mf</td>
+<td>D910x8-G</td>
+<td>73.91</td>
+<td>91.84</td>
+<td>4.34</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_y_400mf_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_400mf-d496799d.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>regnet_y_600mf</td>
+<td>D910x8-G</td>
+<td>75.69</td>
+<td>92.50</td>
+<td>6.06</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_y_600mf_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_600mf-a84e19b2.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>regnet_y_800mf</td>
+<td>D910x8-G</td>
+<td>76.52</td>
+<td>93.10</td>
+<td>6.26</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_y_800mf_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_800mf-9b5211bd.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>regnet_y_16gf</td>
+<td>D910x8-G</td>
+<td>82.92</td>
+<td>96.29</td>
+<td>83.71</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_y_16gf_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_y_16gf-c30a856f.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>repmlp_t224</td>
+<td>D910x8-G</td>
+<td>76.71</td>
+<td>93.30</td>
+<td>38.30</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/repmlp/repmlp_t224_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/repmlp/repmlp_t224-8dbedd00.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>repvgg_a0</td>
+<td>D910x8-G</td>
+<td>72.19</td>
+<td>90.75</td>
+<td>9.13</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a0_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a0-6e71139d.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>repvgg_a1</td>
+<td>D910x8-G</td>
+<td>74.19</td>
+<td>91.89</td>
+<td>14.12</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a1_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a1-539513ac.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>repvgg_a2</td>
+<td>D910x8-G</td>
+<td>76.63</td>
+<td>93.42</td>
+<td>28.25</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a2_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a2-cdc90b11.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>repvgg_b0</td>
+<td>D910x8-G</td>
+<td>74.99</td>
+<td>92.40</td>
+<td>15.85</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b0_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b0-54d5862c.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>repvgg_b1</td>
+<td>D910x8-G</td>
+<td>78.81</td>
+<td>94.37</td>
+<td>57.48</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b1_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b1-4673797.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>repvgg_b2</td>
+<td>D910x64-G</td>
+<td>79.29</td>
+<td>94.66</td>
+<td>89.11</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b2_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b2-7c91ccd4.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>repvgg_b3</td>
+<td>D910x64-G</td>
+<td>80.46</td>
+<td>95.34</td>
+<td>123.19</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b3_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b3-30b35f52.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>repvgg_b1g2</td>
+<td>D910x8-G</td>
+<td>78.03</td>
+<td>94.09</td>
+<td>45.85</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b1g2_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b1g2-f0dc714f.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>repvgg_b1g4</td>
+<td>D910x8-G</td>
+<td>77.64</td>
+<td>94.03</td>
+<td>40.03</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b1g4_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b1g4-bd93230e.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>repvgg_b2g4</td>
+<td>D910x8-G</td>
+<td>78.8</td>
+<td>94.36</td>
+<td>61.84</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_b2g4_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_b2g4-e79eeadd.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>res2net50</td>
+<td>D910x8-G</td>
+<td>79.35</td>
+<td>94.64</td>
+<td>25.76</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/res2net/res2net_50_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/res2net/res2net50-f42cf71b.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>res2net101</td>
+<td>D910x8-G</td>
+<td>79.56</td>
+<td>94.70</td>
+<td>45.33</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/res2net/res2net_101_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/res2net/res2net101-8ae60132.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>res2net50_v1b</td>
+<td>D910x8-G</td>
+<td>80.32</td>
+<td>95.09</td>
+<td>25.77</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/res2net/res2net_50_v1b_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/res2net/res2net50_v1b-99304e92.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>res2net101_v1b</td>
+<td>D910x8-G</td>
+<td>81.14</td>
+<td>95.41</td>
+<td>45.35</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/res2net/res2net_101_v1b_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/res2net/res2net101_v1b-7e6db001.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>resnest50</td>
+<td>D910x8-G</td>
+<td>80.81</td>
+<td>95.16</td>
+<td>27.55</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/resnest/resnest50_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/resnest/resnest50-f2e7fc9c.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>resnest101</td>
+<td>D910x8-G</td>
+<td>82.90</td>
+<td>96.12</td>
+<td>48.41</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/resnest/resnest101_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/resnest/resnest101-7cc5c258.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>resnet18</td>
+<td>D910x8-G</td>
+<td>70.21</td>
+<td>89.62</td>
+<td>11.70</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_18_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet18-1e65cd21.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>resnet34</td>
+<td>D910x8-G</td>
+<td>74.15</td>
+<td>91.98</td>
+<td>21.81</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_34_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet34-f297d27e.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>resnet50</td>
+<td>D910x8-G</td>
+<td>76.69</td>
+<td>93.50</td>
+<td>25.61</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_50_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet50-e0733ab8.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>resnet101</td>
+<td>D910x8-G</td>
+<td>78.24</td>
+<td>94.09</td>
+<td>44.65</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_101_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet101-689c5e77.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>resnet152</td>
+<td>D910x8-G</td>
+<td>78.72</td>
+<td>94.45</td>
+<td>60.34</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_152_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/resnet/resnet152-beb689d8.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>resnetv2_50</td>
+<td>D910x8-G</td>
+<td>76.90</td>
+<td>93.37</td>
+<td>25.60</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_50_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_50-3c2f143b.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>resnetv2_101</td>
+<td>D910x8-G</td>
+<td>78.48</td>
+<td>94.23</td>
+<td>44.55</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_101_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_101-5d4c49a1.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>resnext50_32x4d</td>
+<td>D910x8-G</td>
+<td>78.53</td>
+<td>94.10</td>
+<td>25.10</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/resnext/resnext50_32x4d_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext50_32x4d-af8aba16.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>resnext101_32x4d</td>
+<td>D910x8-G</td>
+<td>79.83</td>
+<td>94.80</td>
+<td>44.32</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/resnext/resnext101_32x4d_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext101_32x4d-3c1e9c51.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>resnext101_64x4d</td>
+<td>D910x8-G</td>
+<td>80.30</td>
+<td>94.82</td>
+<td>83.66</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/resnext/resnext101_64x4d_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext101_64x4d-8929255b.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>resnext152_64x4d</td>
+<td>D910x8-G</td>
+<td>80.52</td>
+<td>95.00</td>
+<td>115.27</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/resnext/resnext152_64x4d_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/resnext/resnext152_64x4d-3aba275c.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>rexnet_09</td>
+<td>D910x8-G</td>
+<td>77.06</td>
+<td>93.41</td>
+<td>4.13</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x09_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_09-da498331.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>rexnet_10</td>
+<td>D910x8-G</td>
+<td>77.38</td>
+<td>93.60</td>
+<td>4.84</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x10_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_10-c5fb2dc7.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>rexnet_13</td>
+<td>D910x8-G</td>
+<td>79.06</td>
+<td>94.28</td>
+<td>7.61</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x13_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_13-a49c41e5.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>rexnet_15</td>
+<td>D910x8-G</td>
+<td>79.95</td>
+<td>94.74</td>
+<td>9.79</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x15_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_15-37a931d3.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>rexnet_20</td>
+<td>D910x8-G</td>
+<td>80.64</td>
+<td>94.99</td>
+<td>16.45</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x20_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/rexnet/rexnet_20-c5810914.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>seresnet18</td>
+<td>D910x8-G</td>
+<td>71.81</td>
+<td>90.49</td>
+<td>11.80</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet18_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/senet/seresnet18-7880643b.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>seresnet34</td>
+<td>D910x8-G</td>
+<td>75.38</td>
+<td>92.50</td>
+<td>21.98</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet34_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/senet/seresnet34-8179d3c9.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>seresnet50</td>
+<td>D910x8-G</td>
+<td>78.32</td>
+<td>94.07</td>
+<td>28.14</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet50_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/senet/seresnet50-ff9cd214.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>seresnext26_32x4d</td>
+<td>D910x8-G</td>
+<td>77.17</td>
+<td>93.42</td>
+<td>16.83</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnext26_32x4d_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/senet/seresnext26_32x4d-5361f5b6.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>seresnext50_32x4d</td>
+<td>D910x8-G</td>
+<td>78.71</td>
+<td>94.36</td>
+<td>27.63</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnext50_32x4d_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/senet/seresnext50_32x4d-fdc35aca.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>shufflenet_v1_g3_05</td>
+<td>D910x8-G</td>
+<td>57.05</td>
+<td>79.73</td>
+<td>0.73</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv1/shufflenet_v1_0.5_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_05-42cfe109.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>shufflenet_v1_g3_10</td>
+<td>D910x8-G</td>
+<td>67.77</td>
+<td>87.73</td>
+<td>1.89</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv1/shufflenet_v1_1.0_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_10-245f0ccf.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>shufflenet_v2_x0_5</td>
+<td>D910x8-G</td>
+<td>60.53</td>
+<td>82.11</td>
+<td>1.37</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv2/shufflenet_v2_0.5_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x0_5-8c841061.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>shufflenet_v2_x1_0</td>
+<td>D910x8-G</td>
+<td>69.47</td>
+<td>88.88</td>
+<td>2.29</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv2/shufflenet_v2_1.0_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_0-0da4b7fa.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>shufflenet_v2_x1_5</td>
+<td>D910x8-G</td>
+<td>72.79</td>
+<td>90.93</td>
+<td>3.53</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv2/shufflenet_v2_1.5_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x1_5-00b56131.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>shufflenet_v2_x2_0</td>
+<td>D910x8-G</td>
+<td>75.07</td>
+<td>92.08</td>
+<td>7.44</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv2/shufflenet_v2_2.0_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x2_0-ed8e698d.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>skresnet18</td>
+<td>D910x8-G</td>
+<td>73.09</td>
+<td>91.20</td>
+<td>11.97</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/sknet/skresnet18_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/sknet/skresnet18-868228e5.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>skresnet34</td>
+<td>D910x8-G</td>
+<td>76.71</td>
+<td>93.10</td>
+<td>22.31</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/sknet/skresnet34_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/sknet/skresnet34-d668b629.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>skresnext50_32x4d</td>
+<td>D910x8-G</td>
+<td>79.08</td>
+<td>94.60</td>
+<td>37.31</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/sknet/skresnext50_32x4d_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/sknet/skresnext50_32x4d-395413a2.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>squeezenet1_0</td>
+<td>D910x8-G</td>
+<td>59.01</td>
+<td>81.01</td>
+<td>1.25</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.0_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_0-e2d78c4a.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>squeezenet1_0</td>
+<td>GPUx8-G</td>
+<td>58.83</td>
+<td>81.08</td>
+<td>1.25</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.0_gpu.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_0_gpu-685f5941.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>squeezenet1_1</td>
+<td>D910x8-G</td>
+<td>58.44</td>
+<td>80.84</td>
+<td>1.24</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.1_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_1-da256d3a.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>squeezenet1_1</td>
+<td>GPUx8-G</td>
+<td>59.18</td>
+<td>81.41</td>
+<td>1.24</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.1_gpu.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/squeezenet/squeezenet1_1_gpu-0e33234a.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>swin_tiny</td>
+<td>D910x8-G</td>
+<td>80.82</td>
+<td>94.80</td>
+<td>33.38</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformer/swin_tiny_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/swin/swin_tiny-0ff2f96d.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>swinv2_tiny_window8</td>
+<td>D910x8-G</td>
+<td>81.42</td>
+<td>95.43</td>
+<td>28.78</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformerv2/swinv2_tiny_window8_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/swinv2/swinv2_tiny_window8-3ef8b787.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>vgg11</td>
+<td>D910x8-G</td>
+<td>71.86</td>
+<td>90.50</td>
+<td>132.86</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg11_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/vgg/vgg11-ef31d161.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>vgg13</td>
+<td>D910x8-G</td>
+<td>72.87</td>
+<td>91.02</td>
+<td>133.04</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg13_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/vgg/vgg13-da805e6e.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>vgg16</td>
+<td>D910x8-G</td>
+<td>74.61</td>
+<td>91.87</td>
+<td>138.35</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg16_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/vgg/vgg16-95697531.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>vgg19</td>
+<td>D910x8-G</td>
+<td>75.21</td>
+<td>92.56</td>
+<td>143.66</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg19_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/vgg/vgg19-bedee7b6.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>visformer_tiny</td>
+<td>D910x8-G</td>
+<td>78.28</td>
+<td>94.15</td>
+<td>10.33</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny-daee0322.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>visformer_tiny_v2</td>
+<td>D910x8-G</td>
+<td>78.82</td>
+<td>94.41</td>
+<td>9.38</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_v2_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny_v2-6711a758.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>visformer_small</td>
+<td>D910x8-G</td>
+<td>81.76</td>
+<td>95.88</td>
+<td>40.25</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small-6c83b6db.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>visformer_small_v2</td>
+<td>D910x8-G</td>
+<td>82.17</td>
+<td>95.90</td>
+<td>23.52</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_small_v2_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_small_v2-63674ade.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>vit_b_32_224</td>
+<td>D910x8-G</td>
+<td>75.86</td>
+<td>92.08</td>
+<td>87.46</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_b32_224_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/vit/vit_b_32_224-7553218f.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>vit_l_16_224</td>
+<td>D910x8-G</td>
+<td>76.34</td>
+<td>92.79</td>
+<td>303.31</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l16_224_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_16_224-f02b2487.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>vit_l_32_224</td>
+<td>D910x8-G</td>
+<td>73.71</td>
+<td>90.92</td>
+<td>305.52</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l32_224_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/vit/vit_l_32_224-3a961018.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>volo_d1</td>
+<td>D910x8-G</td>
+<td>82.59</td>
+<td>95.99</td>
+<td>27</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/volo/volo_d1_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/volo/volo_d1-c7efada9.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>xception</td>
+<td>D910x8-G</td>
+<td>79.01</td>
+<td>94.25</td>
+<td>22.91</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/xception/xception_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/xception/xception-2c1e711df.ckpt">weights</a></td>
+</tr>
+<tr>
+<td>xcit_tiny_12_p16_224</td>
+<td>D910x8-G</td>
+<td>77.67</td>
+<td>93.79</td>
+<td>7.00</td>
+<td><a href="https://github.com/mindspore-lab/mindcv/blob/main/configs/xcit/xcit_tiny_12_p16_ascend.yaml">yaml</a></td>
+<td><a href="https://download.mindspore.cn/toolkits/mindcv/xcit/xcit_tiny_12_p16_224-1b1c9301.ckpt">weights</a></td>
+</tr>
+</tbody>
+</table>
+<h4 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.</li>
+<li>Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.</li>
+</ul>
+<!-- END INCLUDE -->
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+  
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+        
+      
+      <nav class="md-footer__inner md-grid" aria-label="页脚" >
+        
+          
+          <a href="../installation/" class="md-footer__link md-footer__link--prev" aria-label="上一页: 安装">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                上一页
+              </span>
+              <div class="md-ellipsis">
+                安装
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../tutorials/quick_start/" class="md-footer__link md-footer__link--next" aria-label="下一页: 快速开始">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                下一页
+              </span>
+              <div class="md-ellipsis">
+                快速开始
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2022 - 2023 MindSpore Lab
+    </div>
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+    <a href="mailto:mindspore-lab@huawei.com" target="_blank" rel="noopener" title="" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480v-83.6c0-4 1.5-7.8 4.2-10.7l167.6-182.9c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8l-88.3-44.2C7.1 311.3.3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/mindspore-lab/mindcv" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.zhihu.com/people/mindsporelab" target="_blank" rel="noopener" title="www.zhihu.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M170.54 148.13v217.54l23.43.01 7.71 26.37 42.01-26.37h49.53V148.13H170.54zm97.75 193.93h-27.94l-27.9 17.51-5.08-17.47-11.9-.04V171.75h72.82v170.31zm-118.46-94.39H97.5c1.74-27.1 2.2-51.59 2.2-73.46h51.16s1.97-22.56-8.58-22.31h-88.5c3.49-13.12 7.87-26.66 13.12-40.67 0 0-24.07 0-32.27 21.57-3.39 8.9-13.21 43.14-30.7 78.12 5.89-.64 25.37-1.18 36.84-22.21 2.11-5.89 2.51-6.66 5.14-14.53h28.87c0 10.5-1.2 66.88-1.68 73.44H20.83c-11.74 0-15.56 23.62-15.56 23.62h65.58C66.45 321.1 42.83 363.12 0 396.34c20.49 5.85 40.91-.93 51-9.9 0 0 22.98-20.9 35.59-69.25l53.96 64.94s7.91-26.89-1.24-39.99c-7.58-8.92-28.06-33.06-36.79-41.81L87.9 311.95c4.36-13.98 6.99-27.55 7.87-40.67h61.65s-.09-23.62-7.59-23.62v.01zm412.02-1.6c20.83-25.64 44.98-58.57 44.98-58.57s-18.65-14.8-27.38-4.06c-6 8.15-36.83 48.2-36.83 48.2l19.23 14.43zm-150.09-59.09c-9.01-8.25-25.91 2.13-25.91 2.13s39.52 55.04 41.12 57.45l19.46-13.73s-25.67-37.61-34.66-45.86h-.01zM640 258.35c-19.78 0-130.91.93-131.06.93v-101c4.81 0 12.42-.4 22.85-1.2 40.88-2.41 70.13-4 87.77-4.81 0 0 12.22-27.19-.59-33.44-3.07-1.18-23.17 4.58-23.17 4.58s-165.22 16.49-232.36 18.05c1.6 8.82 7.62 17.08 15.78 19.55 13.31 3.48 22.69 1.7 49.15.89 24.83-1.6 43.68-2.43 56.51-2.43v99.81H351.41s2.82 22.31 25.51 22.85h107.94v70.92c0 13.97-11.19 21.99-24.48 21.12-14.08.11-26.08-1.15-41.69-1.81 1.99 3.97 6.33 14.39 19.31 21.84 9.88 4.81 16.17 6.57 26.02 6.57 29.56 0 45.67-17.28 44.89-45.31v-73.32h122.36c9.68 0 8.7-23.78 8.7-23.78l.03-.01z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.highlight", "search.share", "search.suggest", "content.action.view", "content.action.edit", "content.tabs.link", "content.code.copy", "content.code.select", "content.code.annotations"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      
+    
+  </body>
+</html>
