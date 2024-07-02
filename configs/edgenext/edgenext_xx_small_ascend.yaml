@@ -25,7 +25,7 @@ color_jitter: 0.4
 re_prob: 0.0
 cutmix: 1.0
 cutmix_prob: 0.0
-ema: True
+ema: False
 ema_decay: 0.9995
 
 # model
