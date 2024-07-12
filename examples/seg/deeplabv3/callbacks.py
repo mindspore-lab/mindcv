@@ -100,7 +100,7 @@ class EvalCallBack(Callback):
 
 def get_segment_train_callback(args, steps_per_epoch, rank_id):
     callbacks = [TimeMonitor(data_size=steps_per_epoch), LossMonitor()]
-    if rank_id == 0:
+    if rank_id == 0 or rank_id is None:
         ckpt_config = CheckpointConfig(
             save_checkpoint_steps=args.save_steps,
             keep_checkpoint_max=args.keep_checkpoint_max,
