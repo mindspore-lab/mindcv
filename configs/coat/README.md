@@ -10,14 +10,18 @@ Co-Scale Conv-Attentional Image Transformer (CoaT) is a Transformer-based image 
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
+*coming soon*
+
+
+performance tested on ascend 910(8p) with graph mode
+
 <div align="center">
 
-| Model           | Context   |  Top-1 (%)  |  Top-5 (%)  | Params (M) | Recipe                                                                                   | Weight                                                                            |
-|-----------------|-----------|-------|------------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| coat_lite_tiny | D910x8-G | 77.35 | 93.43 | 5.72      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_tiny-fa7bf894.ckpt) |
-| coat_lite_mini | D910x8-G | 78.51 | 93.84 | 11.01 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_mini_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_lite_mini-55a52f05.ckpt) |
-| coat_tiny | D910x8-G | 79.67 | 94.88 | 5.50 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_tiny-071cb792.ckpt) |
-| coat_mini | D910x8-G | 81.08 | 95.34 | 10.34 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_mini_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_mini-57c5bce7.ckpt) |
+| Model     | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                       | Weight                                                                                |
+| --------- | --------- | --------- | ---------- | ---------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| coat_tiny | 79.67     | 94.88     | 5.50       | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_tiny-071cb792.ckpt) |
 
 </div>
 

@@ -17,13 +17,19 @@ too low. 5) With BiT fine-tuning, good performance can be achieved even if there
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
+*coming soon*
+
+performance tested on ascend 910(8p) with graph mode
+
+
 <div align="center">
 
-| Model          | Context  | Top-1 (%) | Top-5 (%) | Params(M) | Recipe                                                                                           |                                    Download                                 |
-|----------------| -------- |-----------|-----------|-----------|--------------------------------------------------------------------------------------------------|  -------------------------------------------------------------------------- |
-| bit_resnet50   | D910x8-G | 76.81     | 93.17     | 25.55     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet50_ascend.yaml)   | [weights](https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50-1e4795a4.ckpt) |
-| bit_resnet50x3 | D910x8-G | 80.63     | 95.12     | 217.31    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet50x3_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50x3-a960f91f.ckpt) |
-| bit_resnet101  | D910x8-G | 77.93     | 93.75     | 44.54     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet101_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet101-2efa9106.ckpt) |
+| Model        | Top-1 (%) | Top-5 (%) | Params(M) | Batch Size | Recipe                                                                                         | Download                                                                                |
+| ------------ | --------- | --------- | --------- | ---------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| bit_resnet50 | 76.81     | 93.17     | 25.55     | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50-1e4795a4.ckpt) |
+
 
 </div>
 

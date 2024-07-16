@@ -21,13 +21,25 @@ simplicity and efficiency of standard ConvNets.[[1](#references)]
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-| Model          | Context   | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                | Download                                                                                       |
-|----------------|-----------|-----------|-----------|------------|-------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| convnext_tiny  | D910x64-G | 81.91     | 95.79     | 28.59      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_tiny_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_tiny-ae5ff8d7.ckpt)  |
-| convnext_small | D910x64-G | 83.40     | 96.36     | 50.22      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_small-e23008f3.ckpt) |
-| convnext_base  | D910x64-G | 83.32     | 96.24     | 88.59      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_base_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_base-ee3544b8.ckpt)  |
+| Model         | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                               | Download    |
+| ------------- | --------- | --------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------- |-------------|
+| convnext_tiny | 81.28     | 95.61     | 28.59      | 16         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convnext/convnext_tiny-db11dc82-910v2.ckpt) |
+
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+| Model         | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                               | Download                                                                                      |
+| ------------- | --------- | --------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| convnext_tiny | 81.91     | 95.79     | 28.59      | 16         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_tiny-ae5ff8d7.ckpt) |
+
 
 </div>
 

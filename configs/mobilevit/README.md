@@ -16,13 +16,25 @@ MobileViT, a light-weight and general-purpose vision transformer for mobile devi
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-| Model       | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                  | Download                                                                              |
-|-------------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| mobilevit_xx_small | D910x8-G | 68.91 | 88.91 | 1.27 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_xx_small-af9da8a0.ckpt) |
-| mobilevit_x_small | D910x8-G | 74.99 | 92.32 | 2.32 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_x_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_x_small-673fc6f2.ckpt) |
-| mobilevit_small | D910x8-G | 78.47 | 94.18 | 5.59 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_small-caf79638.ckpt) |
+| Model              | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                     | Download    |
+| ------------------ | --------- | --------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------- |-------------|
+| mobilevit_xx_small | 67.11     | 87.85     | 1.27       | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_xx_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilevit/mobilevit_xx_small-6f2745c3-910v2.ckpt) |
+
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+| Model              | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                     | Download                                                                                            |
+| ------------------ | --------- | --------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| mobilevit_xx_small | 68.91     | 88.91     | 1.27       | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_xx_small-af9da8a0.ckpt) |
+
 
 </div>
 

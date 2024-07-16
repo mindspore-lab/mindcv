@@ -29,11 +29,17 @@ Down Sampling：In order to reduce the amount of computation, each block is samp
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
+*coming soon*
+
+performance tested on ascend 910(8p) with graph mode
+
 <div align="center">
 
-| Model       | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                       | Download                                                     |
-| ----------- | -------- | --------- | --------- | ---------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| halonet_50t | D910X8-G | 79.53     | 94.79     | 22.79      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/halonet/halonet_50t_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/halonet/halonet_50t-533da6be.ckpt) |
+| Model       | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                            | Download                                                                                   |
+| ----------- | --------- | --------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| halonet_50t | 79.53     | 94.79     | 22.79      | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/halonet/halonet_50t_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/halonet/halonet_50t-533da6be.ckpt) |
 
 </div>
 
