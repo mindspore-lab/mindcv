@@ -263,6 +263,8 @@ def create_parser():
                        help='Loss scale (default=1.0)')
     group.add_argument('--drop_overflow_update', type=bool, default=False,
                        help='Whether to execute optimizer if there is an overflow (default=False)')
+    group.add_argument('--eval_shuffle', type=bool, default=False,
+                       help='Whether to shuffle the evaluation data (default=False)')
 
     return parser_config, parser
 # fmt: on
