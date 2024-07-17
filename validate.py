@@ -35,6 +35,7 @@ def validate(args):
         split=args.val_split,
         num_parallel_workers=args.num_parallel_workers,
         download=args.dataset_download,
+        shuffle=args.eval_shuffle,
     )
 
     # create transform
