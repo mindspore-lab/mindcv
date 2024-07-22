@@ -21,13 +21,25 @@ and efficiency for existing MobileNets on both ImageNet classification and COCO 
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-| Model    | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                        | Download                                                                               |
-|----------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
-| mixnet_s | D910x8-G | 75.52     | 92.52     | 4.17       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_s_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_s-2a5ef3a3.ckpt) |
-| mixnet_m | D910x8-G | 76.64     | 93.05     | 5.06       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_m_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_m-74cc4cb1.ckpt) |
-| mixnet_l | D910x8-G | 78.73     | 94.31     | 7.38       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_l_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_l-978edf2b.ckpt) |
+| Model    | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                        | Download    |
+| -------- | --------- | --------- | ---------- | ---------- | --------------------------------------------------------------------------------------------- |-------------|
+| mixnet_s | 75.58     | 95.54     | 4.17       | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_s_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mixnet/mixnet_s-fe4fcc63-910v2.ckpt) |
+
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+| Model    | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                        | Download                                                                               |
+| -------- | --------- | --------- | ---------- | ---------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| mixnet_s | 75.52     | 92.52     | 4.17       | 128           | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_s_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_s-2a5ef3a3.ckpt) |
+
 
 </div>
 

@@ -30,14 +30,18 @@ Table Format:
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
+*coming soon*
+
+performance tested on ascend 910(8p) with graph mode
+
 <div align="center">
 
-| Model   | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                   | Download                                                                          |
-|---------|----------|-----------|-----------|------------|------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
-| dpn92   | D910x8-G | 79.46     | 94.49     | 37.79      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/dpn/dpn92_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/dpn/dpn92-e3e0fca.ckpt)   |
-| dpn98   | D910x8-G | 79.94     | 94.57     | 61.74      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/dpn/dpn98_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/dpn/dpn98-119a8207.ckpt)  |
-| dpn107  | D910x8-G | 80.05     | 94.74     | 87.13      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/dpn/dpn107_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/dpn/dpn107-7d7df07b.ckpt) |
-| dpn131  | D910x8-G | 80.07     | 94.72     | 79.48      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/dpn/dpn131_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/dpn/dpn131-47f084b3.ckpt) |
+| Model | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                  | Download                                                                        |
+| ----- | --------- | --------- | ---------- | ---------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| dpn92 | 79.46     | 94.49     | 37.79      | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/dpn/dpn92_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/dpn/dpn92-e3e0fca.ckpt) |
+
 
 </div>
 

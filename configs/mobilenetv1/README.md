@@ -16,14 +16,25 @@ Compared with the traditional convolutional neural network, MobileNetV1's parame
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-| Model            | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                     | Download                                                                                                          |
-|------------------|----------|-----------|-----------|------------|------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| mobilenet_v1_025 | D910x8-G | 53.87     | 77.66     | 0.47       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.25_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025-d3377fba.ckpt) |
-| mobilenet_v1_050 | D910x8-G | 65.94     | 86.51     | 1.34       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_050-23e9ddbe.ckpt) |
-| mobilenet_v1_075 | D910x8-G | 70.44     | 89.49     | 2.60       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_075-5bed0c73.ckpt) |
-| mobilenet_v1_100 | D910x8-G | 72.95     | 91.01     | 4.25       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_100-91c7b206.ckpt) |
+| Model            | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                      | Download    |
+| ---------------- | --------- | --------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------- |-------------|
+| mobilenet_v1_025 | 54.05     | 77.74     | 0.47       | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.25_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025-cbe3d3b3-910v2.ckpt) |
+
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+| Model            | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                      | Download                                                                                                      |
+| ---------------- | --------- | --------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| mobilenet_v1_025 | 53.87     | 77.66     | 0.47       | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv1/mobilenet_v1_0.25_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv1/mobilenet_v1_025-d3377fba.ckpt) |
+
 
 </div>
 
