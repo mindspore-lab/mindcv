@@ -16,15 +16,25 @@ Designing convolutional neural networks (CNN) for mobile devices is challenging 
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-| Model       | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                            | Download                                                                                 |
-|-------------|----------|-----------|-----------|------------|---------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
-| mnasnet_050 | D910x8-G | 68.07     | 88.09     | 2.14       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_050-7d8bf4db.ckpt) |
-| mnasnet_075 | D910x8-G | 71.81     | 90.53     | 3.20       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_075-465d366d.ckpt) |
-| mnasnet_100 | D910x8-G | 74.28     | 91.70     | 4.42       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_100-1bcf43f8.ckpt)  |
-| mnasnet_130 | D910x8-G | 75.65     | 92.64     | 6.33       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.3_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_130-a43a150a.ckpt)  |
-| mnasnet_140 | D910x8-G | 76.01     | 92.83     | 7.16       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_1.4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_140-7e20bb30.ckpt)  |
+| Model       | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                             | Download    |
+| ----------- | --------- | --------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------- |-------------|
+| mnasnet_075 | 71.77     | 90.52     | 3.20       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.75_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mnasnet/mnasnet_075-083b2bc4-910v2.ckpt) |
+
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+| Model       | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                             | Download                                                                                   |
+| ----------- | --------- | --------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| mnasnet_075 | 71.81     | 90.53     | 3.20       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mnasnet/mnasnet_075-465d366d.ckpt) |
+
 
 </div>
 

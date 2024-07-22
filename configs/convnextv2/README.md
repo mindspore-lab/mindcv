@@ -20,11 +20,23 @@ benchmarks, including ImageNet classification, COCO detection, and ADE20K segmen
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-| Model            | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                   | Download                                                                                          |
-|------------------|----------|-----------|-----------|------------|----------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
-| convnextv2_tiny | D910x8-G | 82.43     | 95.98     | 28.64      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnextv2/convnextv2_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/convnextv2/convnextv2_tiny-d441ba2c.ckpt) |
+| Model           | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                   | Download    |
+| --------------- | --------- | --------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------- |-------------|
+| convnextv2_tiny | 82.39     | 95.95     | 28.64      | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnextv2/convnextv2_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convnextv2/convnextv2_tiny-a35b79ce-910v2.ckpt) |
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+| Model           | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                   | Download                                                                                          |
+| --------------- | --------- | --------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| convnextv2_tiny | 82.43     | 95.98     | 28.64      | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnextv2/convnextv2_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/convnextv2/convnextv2_tiny-d441ba2c.ckpt) |
 
 </div>
 

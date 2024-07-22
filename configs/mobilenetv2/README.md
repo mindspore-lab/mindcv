@@ -18,13 +18,25 @@ The main innovation of the model is the proposal of a new layer module: The Inve
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-| Model                | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                     | Download                                                                                                         |
-|----------------------|----------|-----------|-----------|------------|------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| mobilenet_v2_075 | D910x8-G | 69.98     | 89.32     | 2.66       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_075-bd7bd4c4.ckpt) |
-| mobilenet_v2_100 | D910x8-G | 72.27     | 90.72     | 3.54       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_1.0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_100-d5532038.ckpt) |
-| mobilenet_v2_140 | D910x8-G | 75.56     | 92.56     | 6.15       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_1.4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_140-98776171.ckpt) |
+| Model            | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                      | Download    |
+| ---------------- | --------- | --------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------- |-------------|
+| mobilenet_v2_075 | 69.73     | 89.35     | 2.66       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_0.75_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_075-755932c4-910v2.ckpt) |
+
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+| Model            | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                      | Download                                                                                                      |
+| ---------------- | --------- | --------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| mobilenet_v2_075 | 69.98     | 89.32     | 2.66       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_075-bd7bd4c4.ckpt) |
+
 
 </div>
 

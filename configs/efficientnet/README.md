@@ -31,12 +31,26 @@ Table Format:
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-| Model           | Context   | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                     | Download                                                               |
-|-----------------|-----------|-----------|-----------|------------|------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|
-| efficientnet_b0 | D910x64-G | 76.89     | 93.16     | 5.33       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt) |
-| efficientnet_b1 | D910x64-G | 78.95     | 94.34     | 7.86       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b1-f8c6b13f.ckpt) |
+| Model           | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                     | Download    |
+| --------------- | --------- | --------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------- |-------------|
+| efficientnet_b0 | 76.88     | 93.28     | 5.33       | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/efficientnet/efficientnet_b0-f8d7aa2a-910v2.ckpt) |
+
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+
+<div align="center">
+
+| Model           | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                     | Download                                                                                            |
+| --------------- | --------- | --------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| efficientnet_b0 | 76.89     | 93.16     | 5.33       | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt) |
+
 
 </div>
 

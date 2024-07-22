@@ -14,11 +14,17 @@ on ImageNet-1K dataset.
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
+*coming soon*
+
+performance tested on ascend 910(8p) with graph mode
+
 <div align="center">
 
-| Model     | Context  | Top-1 (%) | Top-5 (%) | Params(M) | Recipe                                                                                      | Download                                                                             |
-|-----------| -------- |-----------|-----------|-----------|---------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
-| cmt_small | D910x8-G | 83.24     | 96.41     | 26.09     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/cmt/cmt_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/cmt/cmt_small-6858ee22.ckpt) |
+| Model     | Top-1 (%) | Top-5 (%) | Params(M) | Batch Size | Recipe                                                                                      | Download                                                                             |
+| --------- | --------- | --------- | --------- | ---------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| cmt_small | 83.24     | 96.41     | 26.09     | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/cmt/cmt_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/cmt/cmt_small-6858ee22.ckpt) |
 
 
 </div>

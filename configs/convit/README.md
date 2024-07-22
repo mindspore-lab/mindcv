@@ -24,16 +24,24 @@ while offering a much improved sample efficiency.[[1](#references)]
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
+
 <div align="center">
 
-| Model             | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                 | Download                                                                               |
-|-------------------|----------|-----------|-----------|------------|--------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
-| convit_tiny       | D910x8-G | 73.66     | 91.72     | 5.71       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_tiny_ascend.yaml)       | [weights](https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny-e31023f2.ckpt)       |
-| convit_tiny_plus  | D910x8-G | 77.00     | 93.60     | 9.97       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_tiny_plus_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny_plus-e9d7fb92.ckpt)  |
-| convit_small      | D910x8-G | 81.63     | 95.59     | 27.78      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_small_ascend.yaml)      | [weights](https://download.mindspore.cn/toolkits/mindcv/convit/convit_small-ba858604.ckpt)      |
-| convit_small_plus | D910x8-G | 81.80     | 95.42     | 48.98      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_small_plus_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/convit/convit_small_plus-2352b9f7.ckpt) |
-| convit_base       | D910x8-G | 82.10     | 95.52     | 86.54      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_base_ascend.yaml)       | [weights](https://download.mindspore.cn/toolkits/mindcv/convit/convit_base-c61b808c.ckpt)       |
-| convit_base_plus  | D910x8-G | 81.96     | 95.04     | 153.13     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_base_plus_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/convit/convit_base_plus-5c61c9ce.ckpt)  |
+| Model       | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                           | Download    |
+| ----------- | --------- | --------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------ |-------------|
+| convit_tiny | 73.79     | 91.70     | 5.71       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convit/convit_tiny-1961717e-910v2.ckpt) |
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+| Model       | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                           | Download                                                                                  |
+| ----------- | --------- | --------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| convit_tiny | 73.66     | 91.72     | 5.71       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/convit/convit_tiny-e31023f2.ckpt) |
 
 </div>
 
