@@ -1,4 +1,5 @@
 # Xception
+
 > [Xception: Deep Learning with Depthwise Separable Convolutions](https://arxiv.org/pdf/1610.02357.pdf)
 
 ## Introduction
@@ -9,7 +10,8 @@ interprets the Inception module in convolutional neural networks as an intermedi
 depthwise separable convolution operations. From this point of view, the depthwise separable convolution can be
 understood as having the largest number of Inception modules, that is, the extreme idea proposed in the paper, combined
 with the idea of residual network, Google proposed a new type of deep convolutional neural network inspired by Inception
-Network architecture where the Inception module has been replaced by a depthwise separable convolution module.[[1](#references)]
+Network architecture where the Inception module has been replaced by a depthwise separable convolution
+module.[[1](#references)]
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/53842165/210751172-90b49732-33d1-4e68-adf7-6881b07a3c54.jpg" width=800 />
@@ -22,17 +24,22 @@ Network architecture where the Inception module has been replaced by a depthwise
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
+*coming soon*
+
+performance tested on ascend 910(8p) with graph mode
+
 <div align="center">
 
-| Model    | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                          | Download                                                                            |
-|----------|----------|-----------|-----------|------------|-------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
-| xception | D910x8-G | 79.01     | 94.25     | 22.91      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/xception/xception_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/xception/xception-2c1e711df.ckpt) |
+|  Model   | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                          | Download                                                                                  |
+|:--------:|:---------:|:---------:|:----------:|------------|-------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
+| xception |   79.01   |   94.25   |   22.91    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/xception/xception_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/xception/xception-2c1e711df.ckpt) |
 
 </div>
 
 #### Notes
 
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
 - Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
@@ -40,16 +47,20 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 ### Preparation
 
 #### Installation
+
 Please refer to the [installation instruction](https://github.com/mindspore-ecosystem/mindcv#installation) in MindCV.
 
 #### Dataset Preparation
-Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/2012/index.php) dataset for model training and validation.
+
+Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/2012/index.php) dataset for model training
+and validation.
 
 ### Training
 
 * Distributed Training
 
-It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
+It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple
+Ascend 910 devices, please run
 
 ```shell
 # distributed training on multiple GPU/Ascend devices
@@ -60,9 +71,11 @@ mpirun -n 8 python train.py --config configs/xception/xception_ascend.yaml --dat
 
 Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
-For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
+For detailed illustration of all hyper-parameters, please refer
+to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
 
-**Note:**  As the global batch size  (batch_size x num_devices) is an important hyper-parameter, it is recommended to keep the global batch size unchanged for reproduction or adjust the learning rate linearly to a new global batch size.
+**Note:**  As the global batch size  (batch_size x num_devices) is an important hyper-parameter, it is recommended to
+keep the global batch size unchanged for reproduction or adjust the learning rate linearly to a new global batch size.
 
 * Standalone Training
 
@@ -75,7 +88,8 @@ python train.py --config configs/xception/xception_ascend.yaml --data_dir /path/
 
 ### Validation
 
-To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
+To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path
+with `--ckpt_path`.
 
 ```shell
 python validate.py -c configs/xception/xception_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
@@ -87,4 +101,5 @@ Please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv
 
 ## References
 
-[1] Chollet F. Xception: Deep learning with depthwise separable convolutions[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2017: 1251-1258.
+[1] Chollet F. Xception: Deep learning with depthwise separable convolutions[C]//Proceedings of the IEEE conference on
+computer vision and pattern recognition. 2017: 1251-1258.

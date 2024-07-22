@@ -4,7 +4,8 @@
 
 ## Introduction
 
-Author analyzes the propagation formulations behind the residual building blocks, which suggest that the forward and backward signals can be directly propagated from one block
+Author analyzes the propagation formulations behind the residual building blocks, which suggest that the forward and
+backward signals can be directly propagated from one block
 to any other block, when using identity mappings as the skip connections and after-addition activation.
 
 <p align="center">
@@ -18,35 +19,49 @@ to any other block, when using identity mappings as the skip connections and aft
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-| Model        | Context   | Top-1 (%) | Top-5 (%) |  Params (M) | Recipe  | Download                                                                           |
-|--------------|-----------|-----------|-----------|-------|-------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| resnetv2_50  | D910x8-G | 76.90     | 93.37     | 25.60 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_50_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_50-3c2f143b.ckpt)  |
-| resnetv2_101 | D910x8-G | 78.48     | 94.23     | 44.55 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_101_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_101-5d4c49a1.ckpt)  |
+|    Model    | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                             | Download                                                                                                  |
+|:-----------:|:---------:|:---------:|:----------:|------------|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| resnetv2_50 |   77.03   |   93.29   |   25.60    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/resnetv2/resnetv2_50-a0b9f7f8-910v2.ckpt) |
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+|    Model    | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                             | Download                                                                                    |
+|:-----------:|:---------:|:---------:|:----------:|------------|----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| resnetv2_50 |   76.90   |   93.37   |   25.60    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_50-3c2f143b.ckpt) |
 
 </div>
 
 #### Notes
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
+- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
 ### Preparation
 
 #### Installation
+
 Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
 
 #### Dataset Preparation
-Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/2012/index.php) dataset for model training and validation.
+
+Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/2012/index.php) dataset for model training
+and validation.
 
 ### Training
 
 * Distributed Training
 
-It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
+It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple
+Ascend 910 devices, please run
 
 ```shell
 # distributed training on multiple GPU/Ascend devices
@@ -57,9 +72,11 @@ mpirun -n 8 python train.py --config configs/resnetv2/resnetv2_50_ascend.yaml --
 
 Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
-For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
+For detailed illustration of all hyper-parameters, please refer
+to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
 
-**Note:**  As the global batch size  (batch_size x num_devices) is an important hyper-parameter, it is recommended to keep the global batch size unchanged for reproduction or adjust the learning rate linearly to a new global batch size.
+**Note:**  As the global batch size  (batch_size x num_devices) is an important hyper-parameter, it is recommended to
+keep the global batch size unchanged for reproduction or adjust the learning rate linearly to a new global batch size.
 
 * Standalone Training
 
@@ -72,7 +89,8 @@ python train.py --config configs/resnetv2/resnetv2_50_ascend.yaml --data_dir /pa
 
 ### Validation
 
-To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
+To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path
+with `--ckpt_path`.
 
 ```shell
 python validate.py -c configs/resnetv2/resnetv2_50_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
@@ -80,8 +98,11 @@ python validate.py -c configs/resnetv2/resnetv2_50_ascend.yaml --data_dir /path/
 
 ### Deployment
 
-To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/).
+To deploy online inference services with the trained model efficiently, please refer to
+the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/).
 
 ## References
 
-[1] He K, Zhang X, Ren S, et al. Identity mappings in deep residual networks[C]//Computer Vision–ECCV 2016: 14th European Conference, Amsterdam, The Netherlands, October 11–14, 2016, Proceedings, Part IV 14. Springer International Publishing, 2016: 630-645.
+[1] He K, Zhang X, Ren S, et al. Identity mappings in deep residual networks[C]//Computer Vision–ECCV 2016: 14th
+European Conference, Amsterdam, The Netherlands, October 11–14, 2016, Proceedings, Part IV 14. Springer International
+Publishing, 2016: 630-645.
