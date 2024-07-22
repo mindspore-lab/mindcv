@@ -27,7 +27,16 @@ English | [中文](README_CN.md)
 
 MindCV is an open-source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pre-trained weights and training strategies. SoTA methods such as auto augmentation are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks.
 
-The main branch works with **MindSpore 1.8+**, including **MindSpore 2.0🔥**.
+The following is the corresponding `mindcv` versions and supported `mindspore` versions.
+
+| mindcv | mindspore  |
+|:------:|:----------:|
+|  main  |   master   |
+| v0.4.0 |   2.3.0    |
+| 0.3.0  |   2.2.10   |
+|  0.2   |    2.0     |
+|  0.1   |    1.8     |
+
 
 ### Major Features
 
