@@ -260,7 +260,7 @@ class DeepLabInferNetwork(nn.Cell):
     """
 
     def __init__(self, network, input_format="NCHW"):
-        super(DeepLabInferNetwork, self).__init__()
+        super(DeepLabInferNetwork, self).__init__(auto_prefix=False)
         self.network = network
         self.softmax = nn.Softmax(axis=1)
         self.format = input_format
