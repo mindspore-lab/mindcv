@@ -30,12 +30,26 @@ Table Format:
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-| Model     | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                        | Download                                                                          |
-|-----------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
-| hrnet_w32 | D910x8-G | 80.64     | 95.44     | 41.30      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w32_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w32-cc4fbd91.ckpt) |
-| hrnet_w48 | D910x8-G | 81.19     | 95.69     | 77.57      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w48_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w48-2e3399cd.ckpt) |
+| Model     | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                        | Download    |
+| --------- | --------- | --------- | ---------- | ---------- | --------------------------------------------------------------------------------------------- |-------------|
+| hrnet_w32 | 80.66     | 95.30     | 41.30      | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w32_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/hrnet/hrnet_w32-e616cdcb-910v2.ckpt) |
+
+
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+| Model     | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                        | Download                                                                               |
+| --------- | --------- | --------- | ---------- | ---------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| hrnet_w32 | 80.64     | 95.44     | 41.30      | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w32_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w32-cc4fbd91.ckpt) |
+
 
 
 </div>

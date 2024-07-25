@@ -4,12 +4,15 @@
 
 ## Introduction
 
-The local receptive fields (RFs) of neurons in the primary visual cortex (V1) of cats [[1](#references)] have inspired the
-construction of Convolutional Neural Networks (CNNs) [[2](#references)] in the last century, and it continues to inspire mordern CNN
+The local receptive fields (RFs) of neurons in the primary visual cortex (V1) of cats [[1](#references)] have inspired
+the
+construction of Convolutional Neural Networks (CNNs) [[2](#references)] in the last century, and it continues to inspire
+mordern CNN
 structure construction. For instance, it is well-known that in the visual cortex, the RF sizes of neurons in the
 same area (e.g.,V1 region) are different, which enables the neurons to collect multi-scale spatial information in the
 same processing stage. This mechanism has been widely adopted in recent Convolutional Neural Networks (CNNs).
-A typical example is InceptionNets [[3](#references), [4](#references), [5](#references), [6](#references)], in which a simple concatenation is designed to aggregate
+A typical example is InceptionNets [[3](#references), [4](#references), [5](#references), [6](#references)], in which a
+simple concatenation is designed to aggregate
 multi-scale information from, e.g., 3×3, 5×5, 7×7 convolutional kernels inside the “inception” building block.
 
 <p align="center">
@@ -23,36 +26,51 @@ multi-scale information from, e.g., 3×3, 5×5, 7×7 convolutional kernels insid
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-| Model             | Context | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                               | Download                                                                                    |
-|-------------------|---------|-----------|-----------|------------|------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
-| skresnet18        | D910x8-G | 73.09     | 91.20 | 11.97 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/sknet/skresnet18_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/sknet/skresnet18-868228e5.ckpt) |
-| skresnet34        | D910x8-G | 76.71     | 93.10 | 22.31 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/sknet/skresnet34_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/sknet/skresnet34-d668b629.ckpt) |
-| skresnext50_32x4d | D910x8-G | 79.08     | 94.60 | 37.31 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/sknet/skresnext50_32x4d_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/sknet/skresnext50_32x4d-395413a2.ckpt) |
+|   Model    | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                         | Download                                                                                              |
+|:----------:|:---------:|:---------:|:----------:|------------|------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| skresnet18 |   72.85   |   90.83   |   11.97    | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/sknet/skresnet18_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/sknet/skresnet18-9d8b1afc-910v2.ckpt) |
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+|   Model    | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                         | Download                                                                                |
+|:----------:|:---------:|:---------:|:----------:|------------|------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| skresnet18 |   73.09   |   91.20   |   11.97    | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/sknet/skresnet18_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/sknet/skresnet18-868228e5.ckpt) |
 
 </div>
 
 #### Notes
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
+
 - Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
-
 ## Quick Start
+
 ### Preparation
 
 #### Installation
+
 Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
 
 #### Dataset Preparation
-Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/2012/index.php) dataset for model training and validation.
+
+Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/2012/index.php) dataset for model training
+and validation.
 
 ### Training
+
 <!--- Guideline: Avoid using shell script in the command line. Python script preferred. -->
 
 * Distributed Training
 
-It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
+It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple
+Ascend 910 devices, please run
 
 ```shell
 # distributed training on multiple GPU/Ascend devices
@@ -61,9 +79,11 @@ mpirun -n 8 python train.py --config configs/sknet/skresnext50_32x4d_ascend.yaml
 
 Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
 
-For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
+For detailed illustration of all hyper-parameters, please refer
+to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
 
-**Note:**  As the global batch size  (batch_size x num_devices) is an important hyper-parameter, it is recommended to keep the global batch size unchanged for reproduction or adjust the learning rate linearly to a new global batch size.
+**Note:**  As the global batch size  (batch_size x num_devices) is an important hyper-parameter, it is recommended to
+keep the global batch size unchanged for reproduction or adjust the learning rate linearly to a new global batch size.
 
 * Standalone Training
 
@@ -76,7 +96,8 @@ python train.py --config configs/sknet/skresnext50_32x4d_ascend.yaml --data_dir 
 
 ### Validation
 
-To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
+To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path
+with `--ckpt_path`.
 
 ```
 python validate.py -c configs/sknet/skresnext50_32x4d_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
@@ -84,24 +105,29 @@ python validate.py -c configs/sknet/skresnext50_32x4d_ascend.yaml --data_dir /pa
 
 ### Deployment
 
-To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/).
-
+To deploy online inference services with the trained model efficiently, please refer to
+the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/).
 
 ## References
+
 <!--- Guideline: Citation format GB/T 7714 is suggested. -->
-[1] D. H. Hubel and T. N. Wiesel. Receptive fields, binocular interaction and functional architecture in the cat’s visual
+[1] D. H. Hubel and T. N. Wiesel. Receptive fields, binocular interaction and functional architecture in the cat’s
+visual
 cortex. The Journal of Physiology, 1962.
 
 [2] Y . LeCun, B. Boser, J. S. Denker, D. Henderson, R. E. Howard, W. Hubbard, and L. D. Jackel. Backpropagation
 applied to handwritten zip code recognition. Neural Computation, 1989.
 
-[3] C. Szegedy, V . V anhoucke, S. Ioffe, J. Shlens, and Z. Wojna. Rethinking the inception architecture for computer vision. In
+[3] C. Szegedy, V . V anhoucke, S. Ioffe, J. Shlens, and Z. Wojna. Rethinking the inception architecture for computer
+vision. In
 CVPR, 2016.
 
-[4] S. Ioffe and C. Szegedy. Batch normalization: Accelerating deep network training by reducing internal covariate shift.
+[4] S. Ioffe and C. Szegedy. Batch normalization: Accelerating deep network training by reducing internal covariate
+shift.
 arXiv preprint arXiv:1502.03167, 2015.
 
-[5] C. Szegedy, V . V anhoucke, S. Ioffe, J. Shlens, and Z. Wojna. Rethinking the inception architecture for computer vision. In
+[5] C. Szegedy, V . V anhoucke, S. Ioffe, J. Shlens, and Z. Wojna. Rethinking the inception architecture for computer
+vision. In
 CVPR, 2016.
 
 [6] C. Szegedy, S. Ioffe, V . V anhoucke, and A. A. Alemi. Inception-v4, inception-resnet and the impact of residual

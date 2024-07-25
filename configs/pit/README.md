@@ -18,14 +18,25 @@ PiT (Pooling-based Vision Transformer) is an improvement of Vision Transformer (
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-| Model  | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                   | Download                                                                          |
-|--------|----------|-----------|-----------|------------|------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
-| pit_ti | D910x8-G | 72.96     | 91.33     | 4.85       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_ti_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pit/pit_ti-e647a593.ckpt) |
-| pit_xs | D910x8-G | 78.41     | 94.06     | 10.61      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_xs_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pit/pit_xs-fea0d37e.ckpt) |
-| pit_s  | D910x8-G | 80.56     | 94.80     | 23.46      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_s_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/pit/pit_s-3c1ba36f.ckpt)  |
-| pit_b  | D910x8-G | 81.87     | 95.04     | 73.76      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_b_ascend.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/pit/pit_b-2411c9b6.ckpt)  |
+| Model  | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                   | Download    |
+| ------ | --------- | --------- | ---------- | ---------- | ---------------------------------------------------------------------------------------- |-------------|
+| pit_ti | 73.26     | 91.57     | 4.85       | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_ti_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/pit/pit_ti-33466a0d-910v2.ckpt) |
+
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+| Model  | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                   | Download                                                                          |
+| ------ | --------- | --------- | ---------- | ---------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| pit_ti | 72.96     | 91.33     | 4.85       | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_ti_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pit/pit_ti-e647a593.ckpt) |
+
 
 </div>
 

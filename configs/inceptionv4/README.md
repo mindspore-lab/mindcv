@@ -19,11 +19,23 @@ performance with Inception-ResNet v2.[[1](#references)]
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-| Model        | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                  | Download                                                                                    |
-|--------------|----------|-----------|-----------|------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
-| inception_v4 | D910x8-G | 80.88     | 95.34     | 42.74      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv4/inception_v4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/inception_v4/inception_v4-db9c45b3.ckpt) |
+| Model        | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                 | Download    |
+| ------------ | --------- | --------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------ |-------------|
+| inception_v4 | 80.98     | 95.25     | 42.74      | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv4/inception_v4_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/inception_v4/inception_v4-56e798fc-910v2.ckpt) |
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+| Model        | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                 | Download                                                                                         |
+| ------------ | --------- | --------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| inception_v4 | 80.88     | 95.34     | 42.74      | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv4/inception_v4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/inception_v4/inception_v4-db9c45b3.ckpt) |
 
 </div>
 

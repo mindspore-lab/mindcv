@@ -21,14 +21,25 @@ to implicitly increase the receptive field and encode multi-scale features.[[1](
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-| Model          | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                | Download                                                                              |
-|----------------|----------|-----------|-----------|------------|-------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| edgenext_xx_small | D910x8-G | 71.02     | 89.99     | 1.33       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_xx_small-afc971fb.ckpt) |
-| edgenext_x_small | D910x8-G | 75.14     | 92.50     | 2.34       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_x_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_x_small-a200c6fc.ckpt) |
-| edgenext_small | D910x8-G | 79.15     | 94.39     | 5.59       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_small-f530c372.ckpt) |
-| edgenext_base | D910x8-G | 82.24     | 95.94     | 18.51       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_base_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_base-4335e9dc.ckpt) |
+| Model             | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                   | Download    |
+| ----------------- | --------- | --------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------- |-------------|
+| edgenext_xx_small | 70.64     | 89.75     | 1.33       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/edgenext/edgenext_xx_small-cad13d2c-910v2.ckpt) |
+
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+| Model             | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                   | Download                                                                                          |
+| ----------------- | --------- | --------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| edgenext_xx_small | 71.02     | 89.99     | 1.33       | 256           | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_xx_small-afc971fb.ckpt) |
+
 
 </div>
 
