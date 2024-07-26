@@ -43,6 +43,8 @@ def create_parser():
                        help='Interval for print training log. Unit: step (default=100)')
     group.add_argument('--seed', type=int, default=42,
                        help='Seed value for determining randomness in numpy, random, and mindspore (default=42)')
+    group.add_argument('--device_target', type=str, default='Ascend',
+                       help='Device target for computing, which can be Ascend, GPU or CPU. (default=Ascend)')
 
     # Dataset parameters
     group = parser.add_argument_group('Dataset parameters')
@@ -94,7 +96,7 @@ def create_parser():
                             'Example: "randaug-m10-n2-w0-mstd0.5-mmax10-inc0", "autoaug-mstd0.5" or autoaugr-mstd0.5.')
     group.add_argument('--aug_splits', type=int, default=0,
                        help='Number of augmentation splits (default: 0, valid: 3 (currently, only support 3 splits))'
-                       'it should be set with one auto_augment')
+                            'it should be set with one auto_augment')
     group.add_argument('--re_prob', type=float, default=0.0,
                        help='Probability of performing erasing (default=0.0)')
     group.add_argument('--re_scale', type=tuple, default=(0.02, 0.33),
@@ -267,6 +269,8 @@ def create_parser():
                        help='Whether to shuffle the evaluation data (default=False)')
 
     return parser_config, parser
+
+
 # fmt: on
 
 
