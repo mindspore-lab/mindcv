@@ -36,9 +36,7 @@ def _gen_page(lang):
             try:
                 print(f"\n\n## {parts[-1]}", file=fd)
                 identifier = ".".join(parts)  # eg: mindcv.models.resnet
-                mod = importlib.import_module(identifier)
-                for mem in sorted(set(mod.__all__)):
-                    print(f"\n### ::: {identifier}.{mem}", file=fd)
+                print(f"\n### ::: {identifier}", file=fd)
             except Exception as err:
                 _logger.warning(f"Cannot generate reference of {identifier}, error: {err}.")
 
@@ -57,3 +55,7 @@ def on_startup(command, dirty):
 def on_shutdown():
     for lang in _langs:
         _del_page(lang)
+
+
+if __name__ == '__main__':
+    _gen_page('en')

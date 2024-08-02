@@ -190,7 +190,7 @@ python validate.py --model=resnet50 --dataset=imagenet --data_dir=/path/to/data 
 - [了解模型配置](./tutorials/configuration.md)
 - [模型推理](./tutorials/inference.md)
 - [自定义数据集上的模型微调训练](./tutorials/finetune.md)
-- [如何自定义模型]() //coming soon
+- [如何自定义模型](./how_to_guides/write_a_new_model.md)
 - [视觉transformer性能优化]() //coming soon
 - [部署推理服务](./tutorials/deployment.md)
 
