@@ -5,7 +5,7 @@ hide:
 
 ## 依赖
 
-- mindspore >= 1.8.1
+- mindspore == 2.3.0
 - numpy >= 1.17.0
 - pyyaml >= 5.3
 - tqdm
@@ -53,40 +53,27 @@ MindCV被发布为一个[Python包]并能够通过`pip`进行安装。我们推�
     我们强烈推荐您通过[官方指引](https://www.mindspore.cn/install)来安装[MindSpore]。
 
 [Python包]: https://pypi.org/project/mindcv/
+
 [虚拟环境]: https://realpython.com/what-is-pip/#using-pip-in-a-python-virtual-environment
+
 [MindSpore]: https://www.mindspore.cn/
+
 [OpenMPI]: https://www.open-mpi.org/
+
 [NumPy]: https://numpy.org/
+
 [PyYAML]: https://pyyaml.org/
+
 [tqdm]: https://tqdm.github.io/
+
 [使用Python的pip来管理您的项目的依赖关系]: https://realpython.com/what-is-pip/
 
+## 源码安装
 
-## 源码安装 (未经测试版本)
-
-### from VSC
+### VCS源码安装
 
 ```shell
 pip install git+https://github.com/mindspore-lab/mindcv.git
-```
-
-### from local src
-
-!!! tip
-
-    由于本项目处于活跃开发阶段，如果您是开发者或者贡献者，请优先选择此安装方式。
-
-MindCV可以在由 [GitHub] 克隆仓库到本地文件夹后直接使用。 这对于想使用最新版本的开发者十分方便:
-
-```shell
-git clone https://github.com/mindspore-lab/mindcv.git
-```
-
-在克隆到本地之后，推荐您使用"可编辑"模式进行安装，这有助于解决潜在的模块导入问题。
-
-```shell
-cd mindcv
-pip install -e .
 ```
 
 [GitHub]: https://github.com/mindspore-lab/mindcv

@@ -25,7 +25,8 @@
 
 ## 简介
 
-MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力于计算机视觉相关技术研发的开源工具箱。它提供大量的计算机视觉领域的经典模型和SoTA模型以及它们的预训练权重和训练策略。同时，还提供了自动增强等SoTA算法来提高模型性能。通过解耦的模块设计，您可以轻松地将MindCV应用到您自己的CV任务中。
+MindCV是一个基于 [MindSpore](https://www.mindspore.cn/)
+开发的，致力于计算机视觉相关技术研发的开源工具箱。它提供大量的计算机视觉领域的经典模型和SoTA模型以及它们的预训练权重和训练策略。同时，还提供了自动增强等SoTA算法来提高模型性能。通过解耦的模块设计，您可以轻松地将MindCV应用到您自己的CV任务中。
 
 主分支代码目前支持 **MindSpore 1.8+** 以上的版本，包含 **MindSpore 2.0🔥** 版本。
 
@@ -41,7 +42,7 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
     >>> network = mindcv.create_model('resnet50', pretrained=True)
     ```
 
-    用户可通过预定义的训练和微调脚本，快速配置并完成训练或迁移学习任务。
+  用户可通过预定义的训练和微调脚本，快速配置并完成训练或迁移学习任务。
 
     ```shell
     # 配置和启动迁移学习任务
@@ -54,7 +55,8 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
 
 ## 模型支持
 
-基于MindCV进行模型实现和重训练的汇总结果详见[模型仓库](https://mindspore-lab.github.io/mindcv/zh/modelzoo/), 所用到的训练策略和训练后的模型权重均可通过表中链接获取。
+基于MindCV进行模型实现和重训练的汇总结果详见[模型仓库](https://mindspore-lab.github.io/mindcv/zh/modelzoo/),
+所用到的训练策略和训练后的模型权重均可通过表中链接获取。
 
 各模型讲解和训练说明详见[configs](configs)目录。
 
@@ -113,11 +115,12 @@ python infer.py --model=swin_tiny --image_path='./dog.jpg'
     python train.py --model resnet50 --dataset cifar10 --dataset_download
     ```
 
-    以上代码是在CIFAR10数据集上单卡（CPU/GPU/Ascend）训练ResNet的示例，通过`model`和`dataset`参数分别指定需要训练的模型和数据集。
+  以上代码是在CIFAR10数据集上单卡（CPU/GPU/Ascend）训练ResNet的示例，通过`model`和`dataset`参数分别指定需要训练的模型和数据集。
 
 - 分布式训练
 
-    对于像ImageNet这样的大型数据集，有必要在多个设备上以分布式模式进行训练。基于MindSpore对分布式相关功能的良好支持，用户可以使用`mpirun`来进行模型的分布式训练。
+  对于像ImageNet这样的大型数据集，有必要在多个设备上以分布式模式进行训练。基于MindSpore对分布式相关功能的良好支持，用户可以使用`mpirun`
+  来进行模型的分布式训练。
 
     ```shell
     # 分布式训练
@@ -126,26 +129,27 @@ python infer.py --model=swin_tiny --image_path='./dog.jpg'
         --model densenet121 --dataset imagenet --data_dir ./datasets/imagenet
     ```
 
-    完整的参数列表及说明在`config.py`中定义，可运行`python train.py --help`快速查看。
+  完整的参数列表及说明在`config.py`中定义，可运行`python train.py --help`快速查看。
 
-    如需恢复训练，请指定`--ckpt_path`和`--ckpt_save_dir`参数，脚本将加载路径中的模型权重和优化器状态，并恢复中断的训练进程。
+  如需恢复训练，请指定`--ckpt_path`和`--ckpt_save_dir`参数，脚本将加载路径中的模型权重和优化器状态，并恢复中断的训练进程。
 
 - 超参配置和预训练策略
 
-    您可以编写yaml文件或设置外部参数来指定配置数据、模型、优化器等组件及其超参数。以下是使用预设的训练策略（yaml文件）进行模型训练的示例。
+  您可以编写yaml文件或设置外部参数来指定配置数据、模型、优化器等组件及其超参数。以下是使用预设的训练策略（yaml文件）进行模型训练的示例。
 
     ```shell
     mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml
     ```
 
-    **预定义的训练策略**
-    MindCV目前提供了超过20种模型训练策略，在ImageNet取得SoTA性能。
-    具体的参数配置和详细精度性能汇总请见[`configs`](configs)文件夹。
-    您可以便捷地将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）。
+  **预定义的训练策略**
+  MindCV目前提供了超过20种模型训练策略，在ImageNet取得SoTA性能。
+  具体的参数配置和详细精度性能汇总请见[`configs`](configs)文件夹。
+  您可以便捷地将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）。
 
 - 在ModelArts/OpenI平台上训练
 
-    在[ModelArts](https://www.huaweicloud.com/intl/en-us/product/modelarts.html)或[OpenI](https://openi.pcl.ac.cn/)云平台上进行训练，需要执行以下操作：
+  在[ModelArts](https://www.huaweicloud.com/intl/en-us/product/modelarts.html)或[OpenI](https://openi.pcl.ac.cn/)
+  云平台上进行训练，需要执行以下操作：
 
     ```text
     1、在云平台上创建新的训练任务。
@@ -156,12 +160,16 @@ python infer.py --model=swin_tiny --image_path='./dog.jpg'
 
 **静态图和动态图模式**
 
-在默认情况下，模型训练（`train.py`）在MindSpore上以[图模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html) 运行，该模式对使用静态图编译对性能和并行计算进行了优化。
-相比之下，[pynative模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html#%E5%8A%A8%E6%80%81%E5%9B%BE)的优势在于灵活性和易于调试。为了方便调试，您可以将参数`--mode`设为1以将运行模式设置为调试模式。
+在默认情况下，模型训练（`train.py`
+）在MindSpore上以[图模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html)
+运行，该模式对使用静态图编译对性能和并行计算进行了优化。
+相比之下，[pynative模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/mode.html#%E5%8A%A8%E6%80%81%E5%9B%BE)
+的优势在于灵活性和易于调试。为了方便调试，您可以将参数`--mode`设为1以将运行模式设置为调试模式。
 
 **混合模式**
 
-[基于mindspore.jit的混合模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html) 是兼顾了MindSpore的效率和灵活的混合模式。用户可通过使用`train_with_func.py`文件来使用该混合模式进行训练。
+[基于mindspore.jit的混合模式](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/pynative_graph/combine.html)
+是兼顾了MindSpore的效率和灵活的混合模式。用户可通过使用`train_with_func.py`文件来使用该混合模式进行训练。
 
 ```shell
 python train_with_func.py --model=resnet50 --dataset=cifar10 --dataset_download --epoch_size=10
@@ -287,8 +295,8 @@ python train.py --model=resnet50 --dataset=cifar10 \
     * Stochastic Depth (depends on networks)
     * Dropout (depends on networks)
 * 损失函数
-    * Cross Entropy (w/ class weight and auxiliary  logit support)
-    * Binary Cross Entropy  (w/ class weight and auxiliary  logit support)
+    * Cross Entropy (w/ class weight and auxiliary logit support)
+    * Binary Cross Entropy  (w/ class weight and auxiliary logit support)
     * Soft Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
     * Soft Binary Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
 * 模型融合
@@ -303,54 +311,58 @@ python train.py --model=resnet50 --dataset=cifar10 \
 新版本`0.3.0`发布。我们将在未来的发布中丢弃对MindSpore1.x版本的支持
 
 1. 新模型:
-   - [RegNet](configs/regnet)的Y-16GF规格
-   - [SwinTransformerV2](configs/swintransformerv2)
-   - [VOLO](configs/volo)
-   - [CMT](configs/cmt)
-   - [HaloNet](configs/halonet)
-   - [SSD](examples/det/ssd)
-   - [DeepLabV3](examples/seg/deeplabv3)
-   - [CLIP](examples/clip) & [OpenCLIP](examples/open_clip)
+    - [RegNet](configs/regnet)的Y-16GF规格
+    - [SwinTransformerV2](configs/swintransformerv2)
+    - [VOLO](configs/volo)
+    - [CMT](configs/cmt)
+    - [HaloNet](configs/halonet)
+    - [SSD](examples/det/ssd)
+    - [DeepLabV3](examples/seg/deeplabv3)
+    - [CLIP](examples/clip) & [OpenCLIP](examples/open_clip)
 2. 特性:
-   - 损失函数AsymmetricLoss及JSDCrossEntropy
-   - 数据增强分离(Augmentations Split)
-   - 自定义混合精度策略
+    - 损失函数AsymmetricLoss及JSDCrossEntropy
+    - 数据增强分离(Augmentations Split)
+    - 自定义混合精度策略
 3. 错误修复:
-   - 由于分类器参数未完全弹出，您在新建预训练模型时传入参数`num_classes`可能会导致错误。
+    - 由于分类器参数未完全弹出，您在新建预训练模型时传入参数`num_classes`可能会导致错误。
 4. 重构:
-   - 许多模型的名字发生了变更，以便更好的理解。
-   - `VisionTransformer`的模型定义[脚本](mindcv/models/vit.py)。
-   - 混合模式(PyNative+jit)的训练[脚本](train_with_func.py)。
+    - 许多模型的名字发生了变更，以便更好的理解。
+    - `VisionTransformer`的模型定义[脚本](mindcv/models/vit.py)。
+    - 混合模式(PyNative+jit)的训练[脚本](train_with_func.py)。
 5. 文档:
-   - 如何提取多尺度特征的教程指引。
-   - 如何在自定义数据集上微调预训练模型的教程指引。
+    - 如何提取多尺度特征的教程指引。
+    - 如何在自定义数据集上微调预训练模型的教程指引。
 6. BREAKING CHANGES:
-   - 我们将在此小版本的未来发布中丢弃对MindSpore1.x的支持。
-   - 配置项`filter_bias_and_bn`将被移除并更名为`weight_decay_filter`。
-   我们会对已有训练策略进行迁移，但函数`create_optimizer`的签名变更将是不兼容的，且未迁移旧版本的训练策略也将变得不兼容。详见[PR/752](https://github.com/mindspore-lab/mindcv/pull/752)。
+    - 我们将在此小版本的未来发布中丢弃对MindSpore1.x的支持。
+    - 配置项`filter_bias_and_bn`将被移除并更名为`weight_decay_filter`。
+      我们会对已有训练策略进行迁移，但函数`create_optimizer`
+      的签名变更将是不兼容的，且未迁移旧版本的训练策略也将变得不兼容。详见[PR/752](https://github.com/mindspore-lab/mindcv/pull/752)。
 
 - 2023/6/16
+
 1. 新版本 `0.2.2` 发布啦！我们将`MindSpore`升级到了2.0版本，同时保持了对1.8版本的兼容
 2. 新模型:
-   - [ConvNextV2](configs/convnextv2)
-   - [CoAT](configs/coat)的mini规格
-   - [MnasNet](configs/mnasnet)的1.3规格
-   - [ShuffleNetV2](configs/shufflenetv2)的混合精度(O3)版本
+    - [ConvNextV2](configs/convnextv2)
+    - [CoAT](configs/coat)的mini规格
+    - [MnasNet](configs/mnasnet)的1.3规格
+    - [ShuffleNetV2](configs/shufflenetv2)的混合精度(O3)版本
 3. 新特性:
-   - 梯度累加
-   - 自定义[TrainStep](mindcv/utils/train_step.py)支持了动态损失缩放
-   - `OneCycleLR`和`CyclicLR`学习率调度器
-   - 更好的日志打印与记录
-   - 金字塔特征抽取
+    - 梯度累加
+    - 自定义[TrainStep](mindcv/utils/train_step.py)支持了动态损失缩放
+    - `OneCycleLR`和`CyclicLR`学习率调度器
+    - 更好的日志打印与记录
+    - 金字塔特征抽取
 4. 错误修复:
-   - `Serving`部署教程(mobilenet_v3在昇腾后端的MindSpore1.8版本上不支持)
-   - 文档网站上的损坏链接
+    - `Serving`部署教程(mobilenet_v3在昇腾后端的MindSpore1.8版本上不支持)
+    - 文档网站上的损坏链接
 
 - 2023/6/2
+
 1. 新版本：`0.2.1` 发布
 2. 新[文档](https://mindspore-lab.github.io/mindcv/zh/)上线
 
 - 2023/5/30
+
 1. 新模型:
     - [VGG](configs/vgg)混合精度(O2)版本
     - [GhostNet](configs/ghostnet)
@@ -365,6 +377,7 @@ python train.py --model=resnet50 --dataset=cifar10 \
     - ViT 池化模式
 
 - 2023/04/28
+
 1. 增添了一些新模型，列出如下：
     - [VGG](configs/vgg)
     - [DPN](configs/dpn)
@@ -387,6 +400,7 @@ python train.py --model=resnet50 --dataset=cifar10 \
     - 修正了优化器`Adan`中标志变量不为`Tensor`的错误
 
 - 2023/03/25
+
 1. 更新ResNet网络预训练权重，现在预训练权重有更高Top1精度
     - ResNet18精度从70.09提升到70.31
     - ResNet34精度从73.69提升到74.15
@@ -396,6 +410,7 @@ python train.py --model=resnet50 --dataset=cifar10 \
 2. 按照规则(model_scale-sha256sum.ckpt)更新预训练权重名字和相应下载URL链接
 
 - 2023/03/05
+
 1. 增加Lion (EvoLved Sign Momentum)优化器，论文 https://arxiv.org/abs/2302.06675
     - Lion所使用的学习率一般比Adamw小3到10倍，而权重衰减(weigt_decay)要大3到10倍
 2. 增加6个模型及其训练策略、预训练权重：
@@ -408,36 +423,42 @@ python train.py --model=resnet50 --dataset=cifar10 \
 3. 支持梯度裁剪
 
 - 2023/01/10
+
 1. MindCV v0.1发布! 支持通过PyPI安装 (`pip install mindcv`)
 2. 新增4个模型的预训练权重及其策略： googlenet, inception_v3, inception_v4, xception
 
 - 2022/12/09
+
 1. 支持在所有学习率策略中添加学习率预热操作，除cosine decay策略外
 2. 支持`Repeated Augmenation`操作，可以通过`--aug_repeats`对其进行设置，设置值应大于1(通常为3或4)
 3. 支持EMA
 4. 通过支持mixup和cutmix操作进一步优化BCE损失函数
 
 - 2022/11/21
+
 1. 支持模型损失和正确率的可视化
 2. 支持轮次维度的cosine decay策略的学习率预热操作（之前仅支持步维度）
 
 - 2022/11/09
+
 1. 支持2个ViT预训练模型
 2. 支持RandAugment augmentation操作
 3. 提高了CutMix操作的可用性，CutMix和Mixup目前可以一起使用
 4. 解决了学习率画图的bug
 
 - 2022/10/12
+
 1. BCE和CE损失函数目前都支持class-weight config操作、label smoothing操作、auxilary logit input操作（适用于类似Inception模型）
 
 - 2022/09/13
+
 1. 支持Adan优化器(试用版)
 
 ## 贡献方式
 
 欢迎开发者用户提issue或提交代码PR，或贡献更多的算法和模型，一起让MindCV变得更好。
 
-有关贡献指南，请参阅[CONTRIBUTING.md](CONTRIBUTING.md)。
+有关贡献指南，请参阅[CONTRIBUTING_CN.md](CONTRIBUTING_CN)。
 请遵循[模型编写指南](docs/zh/how_to_guides/write_a_new_model.md)所规定的规则来贡献模型接口：)
 
 ## 许可证

@@ -8,24 +8,16 @@ nav:
   - Home: index.md
   - Installation: installation.md
   - Model Zoo: modelzoo.md
-  - Tutorials:  # Learning Oriented
+  - Tutorials: # Learning Oriented
       - Quick Start: tutorials/quick_start.md
       - Configuration: tutorials/configuration.md
       - Finetune: tutorials/finetune.md
       - Inference: tutorials/inference.md
       - Deployment: tutorials/deployment.md
-  - How-To Guides:  # Problem Oriented
+  - How-To Guides: # Problem Oriented
       - Write A New Model: how_to_guides/write_a_new_model.md
       - Multi-Scale Feature Extraction: how_to_guides/feature_extraction.md
       - Fine-tune with A Custom Dataset: how_to_guides/finetune_with_a_custom_dataset.md
-  - Reference:
-      - data: reference/data.md
-      - loss: reference/loss.md
-      - models.layers: reference/models.layers.md
-      - models: reference/models.md
-      - optim: reference/optim.md
-      - scheduler: reference/scheduler.md
-      - utils: reference/utils.md
   - Notes:
       - Change Log: notes/changelog.md
       - Contributing: notes/contributing.md
@@ -139,8 +131,13 @@ plugins:
             Finetune: 微调
             Inference: 推理
             Deployment: 部署
+            How-To Guides: 操作指南
+            Write A New Model: 编写一个新模型
+            Multi-Scale Feature Extraction: 多尺度特征提取
+            Fine-tune with A Custom Dataset: 自定义数据集的模型微调指南
             Notes: 说明
             Change Log: 更新日志
+            Contributing: 贡献
             Code of Conduct: 行为准则
             FAQ: 常见问题
 

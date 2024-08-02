@@ -6,4 +6,4 @@ hide:
 
 # 模型仓库
 
-{% include-markdown "../../benchmark_results.md" %}
+{% include-markdown "../../benchmark_results_CN.md" %}
