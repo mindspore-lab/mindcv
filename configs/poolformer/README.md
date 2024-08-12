@@ -16,11 +16,23 @@ Figure 2. (a) The overall framework of PoolFormer. (b) The architecture of PoolF
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
+performance tested on ascend 910*(8p) with graph mode
+
 <div align="center">
 
-|     Model      | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                                  | Download                                                                                         |
-|:--------------:|:--------:|:---------:|:---------:|:----------:|---------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| poolformer_s12 | D910x8-G |   77.33   |   93.34   |   11.92    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/poolformer_s12_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/poolformer/poolformer_s12-5be5c4e4.ckpt) |
+|     Model      | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                  | Download    |
+| :------------: | :-------: | :-------: | :--------: | ---------- | ------------------------------------------------------------------------------------------------------- |-------------|
+| poolformer_s12 |   77.49   |   93.55   |   11.92    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/poolformer_s12_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/poolformer/poolformer_s12-c7e14eea-910v2.ckpt) |
+
+</div>
+
+performance tested on ascend 910(8p) with graph mode
+
+<div align="center">
+
+|     Model      | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                  | Download                                                                                         |
+| :------------: | :-------: | :-------: | :--------: | ---------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| poolformer_s12 |   77.33   |   93.34   |   11.92    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/poolformer_s12_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/poolformer/poolformer_s12-5be5c4e4.ckpt) |
 
 </div>
 

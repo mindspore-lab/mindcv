@@ -26,7 +26,10 @@ def check_batch_size(num_samples, ori_batch_size=32, refine=True):
 
 
 def validate(args):
+    ms.set_context(device_target=args.device_target)
     ms.set_context(mode=args.mode)
+    if args.mode == ms.GRAPH_MODE:
+        ms.set_context(jit_config={"jit_level": "O2"})
 
     # create dataset
     dataset_eval = create_dataset(
@@ -35,6 +38,7 @@ def validate(args):
         split=args.val_split,
         num_parallel_workers=args.num_parallel_workers,
         download=args.dataset_download,
+        shuffle=args.eval_shuffle,
     )
 
     # create transform

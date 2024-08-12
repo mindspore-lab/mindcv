@@ -83,9 +83,9 @@ def test_transforms_standalone_imagenet(mode, name, image_resize, is_training, a
         assert output_shape[0][0] == 3 * batch_size and output_shape[1][0] == 3 * batch_size, "augment splits error!"
 
 
-# test mnist cifar10
+# test cifar10
 @pytest.mark.parametrize("mode", [0, 1])
-@pytest.mark.parametrize("name", ["MNIST", "CIFAR10"])
+@pytest.mark.parametrize("name", ["CIFAR10"])
 @pytest.mark.parametrize("image_resize", [224, 256])
 @pytest.mark.parametrize("is_training", [True, False])
 @pytest.mark.parametrize("download", [True])

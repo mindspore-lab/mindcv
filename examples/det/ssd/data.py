@@ -189,7 +189,7 @@ def create_ssd_dataset(
             num_parallel_workers=num_parallel_workers,
         )
         if not pass_column_order:
-            ds.project(output_columns=output_columns)
+            ds = ds.project(columns=output_columns)
 
         ds = ds.map(
             operations=trans,
