@@ -48,7 +48,7 @@ It is easy to reproduce the reported results with the pre-defined training recip
 
 ```shell
 # distributed training on multiple GPU/Ascend devices
-mpirun -n 8 python train.py --config configs/resnest/resnest50_ebv_ascend.yaml --data_dir /path/to/imagenet
+mpirun -n 8 python train.py --config configs/resnet/resnet50_ebv_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
@@ -65,7 +65,7 @@ If you want to train or finetune the model on a smaller dataset without distribu
 
 ```shell
 # standalone training on a CPU/GPU/Ascend device
-python train.py --config configs/resnest/resnest50_ebv_ascend.yaml --data_dir /path/to/dataset --distribute False
+python train.py --config configs/resnet/resnet50_ebv_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
 ### Validation
@@ -73,7 +73,7 @@ python train.py --config configs/resnest/resnest50_ebv_ascend.yaml --data_dir /p
 To validate the accuracy of the trained model, you can use `validate.py` and parse the checkpoint path with `--ckpt_path`.
 
 ```shell
-python validate.py -c configs/resnest/resnest50_ebv_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
+python validate.py -c configs/resnet/resnet50_ebv_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
 ### Deployment
