@@ -40,6 +40,7 @@ from . import (
     res2net,
     resnest,
     resnet,
+    resnet_ebv,
     resnetv2,
     rexnet,
     senet,
@@ -97,6 +98,7 @@ from .repvgg import *
 from .res2net import *
 from .resnest import *
 from .resnet import *
+from .resnet_ebv import *
 from .resnetv2 import *
 from .rexnet import *
 from .senet import *
@@ -171,3 +173,4 @@ __all__.extend(vit.__all__)
 __all__.extend(volo.__all__)
 __all__.extend(["Xception", "xception"])
 __all__.extend(xcit.__all__)
+__all__.extend(resnet_ebv.__all__)
