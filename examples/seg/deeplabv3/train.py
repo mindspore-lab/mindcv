@@ -24,6 +24,8 @@ logger = logging.getLogger("deeplabv3.train")
 def train(args):
     """main train function"""
     ms.set_context(mode=args.mode)
+    if args.mode == ms.GRAPH_MODE:
+        ms.set_context(jit_config={"jit_level": "O2"})
 
     if args.distribute:
         init()
@@ -138,7 +140,7 @@ def train(args):
     callbacks = get_segment_train_callback(args, steps_per_epoch, rank_id)
 
     # eval when train
-    if args.eval_while_train and rank_id == 0:
+    if args.eval_while_train and (rank_id == 0 or rank_id is None):
         eval_model = DeepLabInferNetwork(deeplab, input_format=args.input_format)
         eval_dataset = create_segment_dataset(
             name=args.dataset,

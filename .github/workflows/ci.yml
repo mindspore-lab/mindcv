@@ -37,7 +37,7 @@ jobs:
         pip install "Pillow==9.1.1"
         # MindSpore must be installed following the instruction from official web, but not from pypi.
         # That's why we exclude mindspore from requirements.txt. Does this work?
-        pip install "mindspore>=1.8,<=1.10"
+        pip install "mindspore>=1.8"
     - name: Lint with pre-commit
       uses: pre-commit/action@v3.0.0
     - name: Test with pytest (UT)

@@ -45,7 +45,6 @@ decay_epochs: 235
 opt: "momentum"
 momentum: 0.9
 weight_decay: 0.0001
-loss_scale_type: "dynamic"
-drop_overflow_update: True
+loss_scale: 1024
 use_nesterov: False
 eps: 0.00000001

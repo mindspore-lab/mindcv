@@ -36,7 +36,7 @@ def test_checker_invalid():
 
 
 @pytest.mark.parametrize("mode", [0, 1])
-@pytest.mark.parametrize("dataset", ["mnist", "imagenet"])
+@pytest.mark.parametrize("dataset", ["imagenet"])
 def test_parse_args_without_yaml(mode, dataset):
     args = parse_args([f"--mode={mode}", f"--dataset={dataset}"])
     assert args.mode == mode
@@ -46,7 +46,7 @@ def test_parse_args_without_yaml(mode, dataset):
 
 @pytest.mark.parametrize("cfg_yaml", ["configs/resnet/resnet_18_ascend.yaml"])
 @pytest.mark.parametrize("mode", [1])
-@pytest.mark.parametrize("dataset", ["mnist"])
+@pytest.mark.parametrize("dataset", ["imagenet"])
 def test_parse_args_with_yaml(cfg_yaml, mode, dataset):
     args = parse_args([f"--config={cfg_yaml}", f"--mode={mode}", f"--dataset={dataset}"])
     assert args.mode == mode

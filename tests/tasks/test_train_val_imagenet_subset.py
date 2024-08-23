@@ -30,6 +30,7 @@ def test_train(mode, val_while_train, model="resnet18"):
         DownLoad().download_and_extract_archive(dataset_url, root_dir)
 
     # ---------------- test running train.py using the toy data ---------
+    device_target = "CPU"
     dataset = "imagenet"
     num_classes = 2
     ckpt_dir = "./tests/ckpt_tmp"
@@ -48,7 +49,8 @@ def test_train(mode, val_while_train, model="resnet18"):
         f"python {train_file} --dataset={dataset} --num_classes={num_classes} --model={model} "
         f"--epoch_size={num_epochs} --ckpt_save_interval=2 --lr=0.0001 --num_samples={num_samples} --loss=CE "
         f"--weight_decay=1e-6 --ckpt_save_dir={ckpt_dir} {download_str} --train_split=train --batch_size={batch_size} "
-        f"--pretrained --num_parallel_workers=2 --val_while_train={val_while_train} --val_split=val --val_interval=1"
+        f"--pretrained --num_parallel_workers=2 --val_while_train={val_while_train} --val_split=val --val_interval=1 "
+        f"--device_target={device_target}"
     )
 
     print(f"Running command: \n{cmd}")
@@ -57,10 +59,11 @@ def test_train(mode, val_while_train, model="resnet18"):
 
     # --------- Test running validate.py using the trained model ------------- #
     # begin_ckpt = os.path.join(ckpt_dir, f'{model}-1_1.ckpt')
-    end_ckpt = os.path.join(ckpt_dir, f"{model}-{num_epochs}_{num_samples//batch_size}.ckpt")
+    end_ckpt = os.path.join(ckpt_dir, f"{model}-{num_epochs}_{num_samples // batch_size}.ckpt")
     cmd = (
         f"python validate.py --model={model} --dataset={dataset} --val_split=val --data_dir={data_dir} "
-        f"--num_classes={num_classes} --ckpt_path={end_ckpt} --batch_size=40 --num_parallel_workers=2"
+        f"--num_classes={num_classes} --ckpt_path={end_ckpt} --batch_size=40 --num_parallel_workers=2 "
+        f"--device_target={device_target}"
     )
     # ret = subprocess.call(cmd.split(), stdout=sys.stdout, stderr=sys.stderr)
     print(f"Running command: \n{cmd}")
@@ -73,6 +76,9 @@ def test_train(mode, val_while_train, model="resnet18"):
         res = out.decode()
         idx = res.find("Accuracy")
         acc = res[idx:].split(",")[0].split(":")[1]
+        # python 3.9 acc will be np.float64(1.0)
+        if "(" in acc:
+            acc = acc.split("(")[-1].rstrip(")")
         print("Val acc: ", acc)
         assert float(acc) > 0.5, "Acc is too low"
 

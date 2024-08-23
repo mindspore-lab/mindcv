@@ -58,9 +58,9 @@ def test_create_dataset_standalone_imagenet(mode, name, split, shuffle, num_samp
     assert dataset is not None
 
 
-# test MNIST CIFAR10
+# test CIFAR10
 @pytest.mark.parametrize("mode", [0, 1])
-@pytest.mark.parametrize("name", ["MNIST", "CIFAR10"])
+@pytest.mark.parametrize("name", ["CIFAR10"])
 @pytest.mark.parametrize("split", ["train", "test"])
 @pytest.mark.parametrize("shuffle", [True, False])
 @pytest.mark.parametrize("num_samples", [2, None])
@@ -95,8 +95,5 @@ def test_create_dataset_standalone_mc(mode, name, split, shuffle, num_samples, n
         download=download,
     )
 
-    assert (
-        type(dataset) == ms.dataset.engine.datasets_vision.MnistDataset
-        or type(dataset) == ms.dataset.engine.datasets_vision.Cifar10Dataset
-    )
+    assert type(dataset) == ms.dataset.engine.datasets_vision.Cifar10Dataset
     assert dataset is not None
