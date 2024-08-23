@@ -20,7 +20,7 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 | Model      | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                           | Download                                                                                  |
 |------------|----------|-----------|-----------|------------|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
-| resnet50_ebv  | D910x8-G | 78.12     | 93.80     | 27.55      | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet_ebv/resnest50_ebv_ascend.yaml)  | \ |
+| resnet50_ebv  | D910x8-G | 78.12     | 93.80     | 27.55      | [yaml](./resnet50_ebv_ascend.yaml)  | \ |
 
 
 </div>
