@@ -2,6 +2,11 @@
 
 > [ResNeSt: Split-Attention Networks](https://arxiv.org/abs/2004.08955)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 In this paper, the authors present a modularized architecture, which applies the channel-wise attention on different
@@ -17,22 +22,22 @@ classification.[[1](#references)]
   <em>Figure 1. Architecture of ResNeSt [<a href="#references">1</a>] </em>
 </p>
 
-## Results
+## Performance
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-- ascend 910* with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 *coming soon*
 
-- ascend 910 with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 <div align="center">
 
 
-|   model   | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                          | download                                                                                 |
-| :-------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| resnest50 |   80.81   |   95.16   |   27.55    | 128        | 8     | 244.92  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnest/resnest50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnest/resnest50-f2e7fc9c.ckpt) |
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                          | weight                                                                                   |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| resnest50  | 27.55     | 8     | 128        | 224x224    | O2        | 83s           | 244.92  | 4552.73 | 80.81    | 95.16    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnest/resnest50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnest/resnest50-f2e7fc9c.ckpt) |
 
 </div>
 

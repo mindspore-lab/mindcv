@@ -2,6 +2,11 @@
 
 > [Big Transfer (BiT): General Visual Representation Learning](https://arxiv.org/abs/1912.11370)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 Transfer of pre-trained representations improves sample efficiency and simplifies hyperparameter tuning when training deep neural networks for vision.
@@ -13,23 +18,23 @@ BiT use GroupNorm combined with Weight Standardisation instead of BatchNorm. Sin
 too low. 5) With BiT fine-tuning, good performance can be achieved even if there are only a few examples of each type on natural images.[[1, 2](#References)]
 
 
-## Results
+## Performance
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-- ascend 910* with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 *coming soon*
 
-- ascend 910 with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 
 <div align="center">
 
 
-| model        | top-1 (%) | top-5 (%) | params(M) | batch size | cards | ms/step | jit_level | recipe                                                                                         | download                                                                                |
-| ------------ | --------- | --------- | --------- | ---------- | ----- |---------| --------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| bit_resnet50 | 76.81     | 93.17     | 25.55     | 32         | 8     | 74.52   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50-1e4795a4.ckpt) |
+| model name   | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                  |
+| ------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| bit_resnet50 | 25.55     | 8     | 32         | 224x224    | O2        | 146s          | 74.52   | 3413.33 | 76.81    | 93.17    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50-1e4795a4.ckpt) |
 
 
 </div>

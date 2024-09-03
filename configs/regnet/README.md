@@ -2,6 +2,11 @@
 
 > [Designing Network Design Spaces](https://arxiv.org/abs/2003.13678)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 In this work, the authors present a new network design paradigm that combines the advantages of manual design and NAS.
@@ -21,29 +26,29 @@ has a higher concentration of good models.[[1](#References)]
 
 ![RegNet](https://user-images.githubusercontent.com/74176172/210046899-4e83bb56-f7f6-49b2-9dde-dce200428e92.png)
 
-## Results
+## Performance
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-- ascend 910* with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 <div align="center">
 
 
-|     model      | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                              | download                                                                                                   |
-| :------------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| regnet_x_800mf |   76.11   |   93.00   |    7.26    | 64         | 8     | 50.74   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_800mf_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/regnet/regnet_x_800mf-68fe1cca-910v2.ckpt) |
+| model name     | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                              | weight                                                                                                     |
+| -------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| regnet_x_800mf | 7.26      | 8     | 64         | 224x224    | O2        | 228s          | 50.74   | 10090.66 | 76.11    | 93.00    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_800mf_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/regnet/regnet_x_800mf-68fe1cca-910v2.ckpt) |
 
 </div>
 
-- ascend 910 with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 <div align="center">
 
 
-|     model      | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                              | download                                                                                     |
-| :------------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| regnet_x_800mf |   76.04   |   92.97   |    7.26    | 64         | 8     | 42.49   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_800mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_800mf-617227f4.ckpt) |
+| model name     | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                              | weight                                                                                       |
+| -------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| regnet_x_800mf | 7.26      | 8     | 64         | 224x224    | O2        | 99s           | 42.49   | 12049.89 | 76.04    | 92.97    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_800mf_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/regnet/regnet_x_800mf-617227f4.ckpt) |
 
 </div>
 

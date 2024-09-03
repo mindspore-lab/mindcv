@@ -2,6 +2,11 @@
 
 > [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 Resnet is a residual learning framework to ease the training of networks that are substantially deeper than those used
@@ -16,29 +21,29 @@ networks are easier to optimize, and can gain accuracy from considerably increas
   <em>Figure 1. Architecture of ResNet [<a href="#references">1</a>] </em>
 </p>
 
-## Results
+## Performance
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-- ascend 910* with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 <div align="center">
 
 
-|  model   | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                         | download                                                                                             |
-| :------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| resnet50 |   76.76   |   93.31   |   25.61    | 32         | 8     | 31.9    | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/resnet/resnet50-f369a08d-910v2.ckpt) |
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                               |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| resnet50   | 25.61     | 8     | 32         | 224x224    | O2        | 77s           | 31.9    | 8025.08 | 76.76    | 93.31    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/resnet/resnet50-f369a08d-910v2.ckpt) |
 
 </div>
 
-- ascend 910 with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 <div align="center">
 
 
-|  model   | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                         | download                                                                               |
-| :------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| resnet50 |   76.69   |   93.50   |   25.61    | 32         | 8     | 31.41   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet50-e0733ab8.ckpt) |
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                 |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| resnet50   | 25.61     | 8     | 32         | 224x224    | O2        | 43s           | 31.41   | 8150.27 | 76.69    | 93.50    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet50-e0733ab8.ckpt) |
 
 </div>
 

@@ -33,9 +33,9 @@ Please follow the outline structure and **table format** shown in [densenet/READ
 
 <div align="center">
 
-| model       | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                              | download                                                                                                  |
-| ----------- | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| densenet121 | 75.67     | 92.77     | 8.06       | 32         | 8     | 47,34   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/densenet/densenet121-bf4ab27f-910v2.ckpt) |
+| model name  | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                              | weight                                                                                                    |
+| ----------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| densenet121 | 8.06      | 8     | 32         | 224x224    | O2        | 300s          | 47,34   | 5446.81 | 75.67    | 92.77    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/densenet/densenet121-bf4ab27f-910v2.ckpt) |
 
 </div>
 

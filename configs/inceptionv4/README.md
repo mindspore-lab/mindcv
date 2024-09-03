@@ -1,6 +1,11 @@
 # InceptionV4
 > [InceptionV4: Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning](https://arxiv.org/pdf/1602.07261.pdf)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 InceptionV4 studies whether the Inception module combined with Residual Connection can be improved. It is found that the
@@ -15,29 +20,29 @@ performance with Inception-ResNet v2.[[1](#references)]
   <em>Figure 1. Architecture of InceptionV4 [<a href="#references">1</a>] </em>
 </p>
 
-## Results
+## Performance
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-- ascend 910* with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 <div align="center">
 
 
-| model        | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                 | download                                                                                                       |
-| ------------ | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| inception_v4 | 80.98     | 95.25     | 42.74      | 32         | 8     | 80.97   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv4/inception_v4_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/inception_v4/inception_v4-56e798fc-910v2.ckpt) |
+| model name   | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                 | weight                                                                                                         |
+| ------------ | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| inception_v4 | 42.74     | 8     | 32         | 299x299    | O2        | 263s          | 80.97   | 3161.66 | 80.98    | 95.25    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv4/inception_v4_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/inception_v4/inception_v4-56e798fc-910v2.ckpt) |
 
 </div>
 
-- ascend 910 with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 <div align="center">
 
 
-| model        | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                 | download                                                                                         |
-| ------------ | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| inception_v4 | 80.88     | 95.34     | 42.74      | 32         | 8     | 76.19   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv4/inception_v4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/inception_v4/inception_v4-db9c45b3.ckpt) |
+| model name   | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                 | weight                                                                                           |
+| ------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| inception_v4 | 42.74     | 8     | 32         | 299x299    | O2        | 177s          | 76.19   | 3360.02 | 80.88    | 95.34    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv4/inception_v4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/inception_v4/inception_v4-db9c45b3.ckpt) |
 
 </div>
 

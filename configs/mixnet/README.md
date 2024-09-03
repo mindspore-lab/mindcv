@@ -1,6 +1,11 @@
 # MixNet
 > [MixConv: Mixed Depthwise Convolutional Kernels](https://arxiv.org/abs/1907.09595)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 Depthwise convolution is becoming increasingly popular in modern efficient ConvNets, but its kernel size is often
@@ -17,30 +22,30 @@ and efficiency for existing MobileNets on both ImageNet classification and COCO 
   <em>Figure 1. Architecture of MixNet [<a href="#references">1</a>] </em>
 </p>
 
-## Results
+## Performance
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-- ascend 910* with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 <div align="center">
 
 
-| model    | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                        | download                                                                                             |
-| -------- | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| mixnet_s | 75.58     | 95.54     | 4.17       | 128        | 8     | 228.03  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_s_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mixnet/mixnet_s-fe4fcc63-910v2.ckpt) |
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                        | weight                                                                                               |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| mixnet_s   | 4.17      | 8     | 128        | 224x224    | O2        | 706s          | 228.03  | 4490.64 | 75.58    | 95.54    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_s_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mixnet/mixnet_s-fe4fcc63-910v2.ckpt) |
 
 
 </div>
 
-- ascend 910 with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 <div align="center">
 
 
-| model    | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                        | download                                                                               |
-| -------- | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| mixnet_s | 75.52     | 92.52     | 4.17       | 128        | 8     | 252.49  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_s_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_s-2a5ef3a3.ckpt) |
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                        | weight                                                                                 |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| mixnet_s   | 4.17      | 8     | 128        | 224x224    | O2        | 556s          | 252.49  | 4055.61 | 75.52    | 92.52    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_s_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_s-2a5ef3a3.ckpt) |
 
 
 </div>

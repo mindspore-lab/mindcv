@@ -4,6 +4,11 @@
 
 > [ An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale](https://arxiv.org/abs/2010.11929)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 <!--- Guideline: Introduce the model and architectures. Cite if you use/adopt paper explanation from others. -->
@@ -28,7 +33,7 @@ fewer computational resources. [[2](#references)]
   <em> Figure 1. Architecture of ViT [<a href="#references">1</a>] </em>
 </p>
 
-## Results
+## Performance
 
 <!--- Guideline:
 Table Format:
@@ -41,11 +46,11 @@ Table Format:
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-- ascend 910* with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 *coming soon*
 
-- ascend 910 with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 *coming soon*
 

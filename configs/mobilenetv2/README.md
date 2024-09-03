@@ -1,6 +1,11 @@
 # MobileNetV2
 > [MobileNetV2: Inverted Residuals and Linear Bottlenecks](https://arxiv.org/abs/1801.04381)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 The model is a new neural network architecture that is specifically tailored for mobile and resource-constrained environments. This network pushes the state of the art for mobile custom computer vision models, significantly reducing the amount of operations and memory required while maintaining the same accuracy.
@@ -14,30 +19,30 @@ The main innovation of the model is the proposal of a new layer module: The Inve
   <em>Figure 1. Architecture of MobileNetV2 [<a href="#references">1</a>] </em>
 </p>
 
-## Results
+## Performance
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-- ascend 910* with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 <div align="center">
 
 
-| model            | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                      | download                                                                                                                    |
-| ---------------- | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| mobilenet_v2_075 | 69.73     | 89.35     | 2.66       | 256        | 8     | 174.65  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_0.75_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_075-755932c4-910v2.ckpt) |
+| model name       | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                      | weight                                                                                                                      |
+| ---------------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | -------- | -------- | -------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| mobilenet_v2_075 | 2.66      | 8     | 256        | 224x224    | O2        | 233s          | 174.65  | 11726.31 | 69.73    | 89.35    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_0.75_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_075-755932c4-910v2.ckpt) |
 
 
 </div>
 
-- ascend 910 with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 <div align="center">
 
 
-| model            | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                      | download                                                                                                      |
-| ---------------- | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| mobilenet_v2_075 | 69.98     | 89.32     | 2.66       | 256        | 8     | 155.94  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_075-bd7bd4c4.ckpt) |
+| model name       | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                      | weight                                                                                                        |
+| ---------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| mobilenet_v2_075 | 2.66      | 8     | 256        | 224x224    | O2        | 164s          | 155.94  | 13133.26 | 69.98    | 89.32    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_0.75_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_075-bd7bd4c4.ckpt) |
 
 
 </div>

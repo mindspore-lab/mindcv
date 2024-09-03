@@ -2,6 +2,11 @@
 <!--- Guideline: please use url linked to the paper abstract in ArXiv instead of PDF for fast loading.  -->
 > [EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks](https://arxiv.org/abs/1905.11946)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 <!--- Guideline: Introduce the model and architectures. Please cite if you use/adopt paper explanation from others. -->
 <!--- Guideline: If an architecture table/figure is available in the paper, please put one here and cite for intuitive illustration. -->
@@ -18,7 +23,7 @@ and resolution scaling could be found. EfficientNet could achieve better model p
   <em>Figure 1. Architecture of Efficientent [<a href="#references">1</a>] </em>
 </p>
 
-## Results
+## Performance
 <!--- Guideline:
 Table Format:
 - Model: model name in lower case with _ seperator.
@@ -30,27 +35,27 @@ Table Format:
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-- ascend 910* with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 <div align="center">
 
 
-| model           | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                     | download                                                                                                          |
-| --------------- | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| efficientnet_b0 | 76.88     | 93.28     | 5.33       | 128        | 8     | 172.64  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/efficientnet/efficientnet_b0-f8d7aa2a-910v2.ckpt) |
+| model name      | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                     | weight                                                                                                            |
+| --------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| efficientnet_b0 | 5.33      | 8     | 128        | 224x224    | O2        | 353s          | 172.64  | 5931.42 | 76.88    | 93.28    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/efficientnet/efficientnet_b0-f8d7aa2a-910v2.ckpt) |
 
 
 </div>
 
-- ascend 910 with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 
 <div align="center">
 
 
-| model           | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                     | download                                                                                            |
-| --------------- | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| efficientnet_b0 | 76.89     | 93.16     | 5.33       | 128        | 8     | 172.78  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt) |
+| model name      | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                     | weight                                                                                              |
+| --------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| efficientnet_b0 | 5.33      | 8     | 128        | 224x224    | O2        | 203s          | 172.78  | 5926.61 | 76.89    | 93.16    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/efficientnet/efficientnet_b0-103ec70c.ckpt) |
 
 
 </div>
