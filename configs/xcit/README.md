@@ -2,6 +2,11 @@
 
 > [XCiT: Cross-Covariance Image Transformers](https://arxiv.org/abs/2106.09681)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 XCiT models propose a “transposed” version of self-attention that operates across feature channels rather than tokens,
@@ -17,29 +22,29 @@ transformers with the scalability of convolutional architectures.
   <em>Figure 1. Architecture of XCiT [<a href="#references">1</a>] </em>
 </p>
 
-## Results
+## Performance
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-- ascend 910* with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 <div align="center">
 
 
-|        model         | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                              | download                                                                                                       |
-| :------------------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| xcit_tiny_12_p16_224 |   77.27   |   93.56   |    7.00    | 128        | 8     | 229.25  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/xcit/xcit_tiny_12_p16_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/xcit/xcit_tiny_12_p16_224-bd90776e-910v2.ckpt) |
+| model name           | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                              | weight                                                                                                         |
+| -------------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| xcit_tiny_12_p16_224 | 7.00      | 8     | 128        | 224x224    | O2        | 330s          | 229.25  | 4466.74 | 77.27    | 93.56    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/xcit/xcit_tiny_12_p16_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/xcit/xcit_tiny_12_p16_224-bd90776e-910v2.ckpt) |
 
 </div>
 
-- ascend 910 with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 <div align="center">
 
 
-|        model         | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                              | download                                                                                         |
-| :------------------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| xcit_tiny_12_p16_224 |   77.67   |   93.79   |    7.00    | 128        | 8     | 252.98  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/xcit/xcit_tiny_12_p16_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/xcit/xcit_tiny_12_p16_224-1b1c9301.ckpt) |
+| model name           | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                              | weight                                                                                           |
+| -------------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| xcit_tiny_12_p16_224 | 7.00      | 8     | 128        | 224x224    | O2        | 382s          | 252.98  | 4047.75 | 77.67    | 93.79    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/xcit/xcit_tiny_12_p16_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/xcit/xcit_tiny_12_p16_224-1b1c9301.ckpt) |
 
 </div>
 
