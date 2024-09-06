@@ -22,9 +22,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model  | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                   | Download    |
-| ------ | --------- | --------- | ---------- | ---------- | ---------------------------------------------------------------------------------------- |-------------|
-| pit_ti | 73.26     | 91.57     | 4.85       | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_ti_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/pit/pit_ti-33466a0d-910v2.ckpt) |
+| Model  | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                   | Download                                                                                        |
+| ------ | --------- | --------- | ------- | ---------- | ---------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| pit_ti | 73.26     | 91.57     | 343.45  | 4.85       | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_ti_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/pit/pit_ti-33466a0d-910v2.ckpt) |
 
 
 </div>

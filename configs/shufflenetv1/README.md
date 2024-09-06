@@ -25,9 +25,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-|        Model        | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                       | Download                                                                                                                         |
-|:-------------------:|:---------:|:---------:|:----------:|------------|--------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| shufflenet_v1_g3_05 |   57.08   |   79.89   |    0.73    | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv1/shufflenet_v1_0.5_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_05-56209ef3-910v2.ckpt) |
+|        Model        | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                       | Download                                                                                                                         |
+| :-----------------: | :-------: | :-------: | :-----: | :--------: | ---------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| shufflenet_v1_g3_05 |   57.08   |   79.89   |  45.44  |    0.73    | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv1/shufflenet_v1_0.5_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/shufflenet/shufflenetv1/shufflenet_v1_g3_05-56209ef3-910v2.ckpt) |
 
 </div>
 

@@ -22,10 +22,10 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model                  | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                       | Download    |
-| ---------------------- | --------- | --------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------ |-------------|
-| mobilenet_v3_small_100 | 68.07     | 87.77     | 2.55       | 75         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-6fa3c17d-910v2.ckpt) |
-| mobilenet_v3_large_100 | 75.59     | 92.57     | 5.51       | 75         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_large_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-bd4e7bdc-910v2.ckpt) |
+| Model                  | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                       | Download                                                                                                                          |
+| ---------------------- | --------- | --------- | ------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| mobilenet_v3_small_100 | 68.07     | 87.77     | 51.97   | 2.55       | 75         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-6fa3c17d-910v2.ckpt) |
+| mobilenet_v3_large_100 | 75.59     | 92.57     | 52.55   | 5.51       | 75         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_large_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-bd4e7bdc-910v2.ckpt) |
 
 </div>
 

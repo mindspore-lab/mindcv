@@ -25,9 +25,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model    | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                        | Download    |
-| -------- | --------- | --------- | ---------- | ---------- | --------------------------------------------------------------------------------------------- |-------------|
-| mixnet_s | 75.58     | 95.54     | 4.17       | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_s_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mixnet/mixnet_s-fe4fcc63-910v2.ckpt) |
+| Model    | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                        | Download                                                                                             |
+| -------- | --------- | --------- | ------- | ---------- | ---------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| mixnet_s | 75.58     | 95.54     | 306.16  | 4.17       | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_s_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mixnet/mixnet_s-fe4fcc63-910v2.ckpt) |
 
 
 </div>

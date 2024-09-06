@@ -22,11 +22,11 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 performance tested on ascend 910*(8p) with graph mode
 
-<div align="center">
 
-| Model           | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                   | Download    |
-| --------------- | --------- | --------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------- |-------------|
-| convnextv2_tiny | 82.39     | 95.95     | 28.64      | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnextv2/convnextv2_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convnextv2/convnextv2_tiny-a35b79ce-910v2.ckpt) |
+
+| Model           | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                   | Download                                                                                                        |
+| --------------- | --------- | --------- | ------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| convnextv2_tiny | 82.39     | 95.95     | 360.29  | 28.64      | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnextv2/convnextv2_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convnextv2/convnextv2_tiny-a35b79ce-910v2.ckpt) |
 
 </div>
 

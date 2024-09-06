@@ -23,9 +23,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model        | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                 | Download    |
-| ------------ | --------- | --------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------ |-------------|
-| inception_v4 | 80.98     | 95.25     | 42.74      | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv4/inception_v4_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/inception_v4/inception_v4-56e798fc-910v2.ckpt) |
+| Model        | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                 | Download                                                                                                       |
+| ------------ | --------- | --------- | ------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| inception_v4 | 80.98     | 95.25     | 84.59   | 42.74      | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv4/inception_v4_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/inception_v4/inception_v4-56e798fc-910v2.ckpt) |
 
 </div>
 

@@ -35,9 +35,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model           | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                               | Download    |
-| --------------- | --------- | --------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------- |-------------|
-| nasnet_a_4x1056 | 74.12     | 91.36     | 5.33       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/nasnet/nasnet_a_4x1056_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/nasnet/nasnet_a_4x1056-015ba575c-910v2.ckpt) |
+| Model           | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                               | Download                                                                                                     |
+| --------------- | --------- | --------- | ------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| nasnet_a_4x1056 | 74.12     | 91.36     | 401.34  | 5.33       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/nasnet/nasnet_a_4x1056_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/nasnet/nasnet_a_4x1056-015ba575c-910v2.ckpt) |
 
 </div>
 

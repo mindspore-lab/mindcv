@@ -27,9 +27,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-|     Model     | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                  | Download                                                                                                      |
-|:-------------:|:---------:|:---------:|:----------:|------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| squeezenet1_0 |   58.75   |   80.76   |    1.25    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/squeezenet/squeezenet1_0-24010b28-910v2.ckpt) |
+|     Model     | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                  | Download                                                                                                      |
+| :-----------: | :-------: | :-------: | :-----: | :--------: | ---------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| squeezenet1_0 |   58.75   |   80.76   |  24.28  |    1.25    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/squeezenet/squeezenet_1.0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/squeezenet/squeezenet1_0-24010b28-910v2.ckpt) |
 
 </div>
 
