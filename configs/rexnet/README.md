@@ -18,9 +18,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-|   Model   | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                          | Download                                                                                              |
-|:---------:|:---------:|:---------:|:----------:|------------|-------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
-| rexnet_09 |   76.14   |   92.96   |    4.13    | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x09_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/rexnet/rexnet_09-00223eb4-910v2.ckpt) |
+|   Model   | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                          | Download                                                                                              |
+| :-------: | :-------: | :-------: | :-----: | :--------: | ---------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| rexnet_09 |   76.14   |   92.96   | 142.77  |    4.13    | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/rexnet/rexnet_x09_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/rexnet/rexnet_09-00223eb4-910v2.ckpt) |
 
 </div>
 

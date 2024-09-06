@@ -29,9 +29,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-|     Model      | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                              | Download                                                                                                   |
-|:--------------:|:---------:|:---------:|:----------:|------------|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
-| regnet_x_800mf |   76.11   |   93.00   |    7.26    | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_800mf_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/regnet/regnet_x_800mf-68fe1cca-910v2.ckpt) |
+|     Model      | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                              | Download                                                                                                   |
+| :------------: | :-------: | :-------: | :-----: | :--------: | ---------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| regnet_x_800mf |   76.11   |   93.00   |  50.29  |    7.26    | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/regnet/regnet_x_800mf_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/regnet/regnet_x_800mf-68fe1cca-910v2.ckpt) |
 
 </div>
 

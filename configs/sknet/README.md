@@ -30,9 +30,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-|   Model    | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                         | Download                                                                                              |
-|:----------:|:---------:|:---------:|:----------:|------------|------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
-| skresnet18 |   72.85   |   90.83   |   11.97    | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/sknet/skresnet18_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/sknet/skresnet18-9d8b1afc-910v2.ckpt) |
+|   Model    | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                         | Download                                                                                              |
+| :--------: | :-------: | :-------: | :-----: | :--------: | ---------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| skresnet18 |   72.85   |   90.83   |  48.35  |   11.97    | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/sknet/skresnet18_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/sknet/skresnet18-9d8b1afc-910v2.ckpt) |
 
 </div>
 

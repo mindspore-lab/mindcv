@@ -26,9 +26,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model     | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                            | Download    |
-| --------- | --------- | --------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------- |-------------|
-| googlenet | 72.89     | 90.89     | 6.99       | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/googlenet/googlenet_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/googlenet/googlenet-de74c31d-910v2.ckpt) |
+| Model     | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                            | Download                                                                                                 |
+| --------- | --------- | --------- | ------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| googlenet | 72.89     | 90.89     | 24.29   | 6.99       | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/googlenet/googlenet_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/googlenet/googlenet-de74c31d-910v2.ckpt) |
 
 </div>
 

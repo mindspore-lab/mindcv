@@ -20,9 +20,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-|     Model      | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                  | Download    |
-| :------------: | :-------: | :-------: | :--------: | ---------- | ------------------------------------------------------------------------------------------------------- |-------------|
-| poolformer_s12 |   77.49   |   93.55   |   11.92    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/poolformer_s12_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/poolformer/poolformer_s12-c7e14eea-910v2.ckpt) |
+|     Model      | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                  | Download                                                                                                       |
+| :------------: | :-------: | :-------: | :-----: | :--------: | ---------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| poolformer_s12 |   77.49   |   93.55   | 294.54  |   11.92    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/poolformer_s12_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/poolformer/poolformer_s12-c7e14eea-910v2.ckpt) |
 
 </div>
 

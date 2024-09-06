@@ -34,9 +34,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model     | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                        | Download    |
-| --------- | --------- | --------- | ---------- | ---------- | --------------------------------------------------------------------------------------------- |-------------|
-| hrnet_w32 | 80.66     | 95.30     | 41.30      | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w32_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/hrnet/hrnet_w32-e616cdcb-910v2.ckpt) |
+| Model     | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                        | Download                                                                                             |
+| --------- | --------- | --------- | ------- | ---------- | ---------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| hrnet_w32 | 80.66     | 95.30     | 303.01  | 41.30      | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w32_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/hrnet/hrnet_w32-e616cdcb-910v2.ckpt) |
 
 
 

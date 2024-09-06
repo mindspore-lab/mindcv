@@ -25,9 +25,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model             | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                   | Download    |
-| ----------------- | --------- | --------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------- |-------------|
-| edgenext_xx_small | 70.64     | 89.75     | 1.33       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/edgenext/edgenext_xx_small-cad13d2c-910v2.ckpt) |
+| Model             | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                   | Download                                                                                                        |
+| ----------------- | --------- | --------- | ------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| edgenext_xx_small | 70.64     | 89.75     | 295.88  | 1.33       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/edgenext/edgenext_xx_small-cad13d2c-910v2.ckpt) |
 
 
 </div>

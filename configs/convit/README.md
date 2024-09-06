@@ -29,9 +29,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model       | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                           | Download    |
-| ----------- | --------- | --------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------ |-------------|
-| convit_tiny | 73.79     | 91.70     | 5.71       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convit/convit_tiny-1961717e-910v2.ckpt) |
+| Model       | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                           | Download                                                                                                |
+| ----------- | --------- | --------- | ------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| convit_tiny | 73.79     | 91.70     | 342.81  | 5.71       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convit/convit_tiny-1961717e-910v2.ckpt) |
 
 </div>
 
