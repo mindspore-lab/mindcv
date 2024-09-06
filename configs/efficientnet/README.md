@@ -35,9 +35,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model           | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                     | Download    |
-| --------------- | --------- | --------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------- |-------------|
-| efficientnet_b0 | 76.88     | 93.28     | 5.33       | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/efficientnet/efficientnet_b0-f8d7aa2a-910v2.ckpt) |
+| Model           | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                     | Download                                                                                                          |
+| --------------- | --------- | --------- | ------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| efficientnet_b0 | 76.88     | 93.28     | 168.78  | 5.33       | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/efficientnet/efficientnet_b0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/efficientnet/efficientnet_b0-f8d7aa2a-910v2.ckpt) |
 
 
 </div>

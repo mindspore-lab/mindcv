@@ -23,9 +23,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model      | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                            | Download    |
-| ---------- | --------- | --------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------- |-------------|
-| crossvit_9 | 73.38     | 91.51     | 8.55       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/crossvit/crossvit_9_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/crossvit/crossvit_9-32c69c96-910v2.ckpt) |
+| Model      | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                            | Download                                                                                                 |
+| ---------- | --------- | --------- | ------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| crossvit_9 | 73.38     | 91.51     | 711.19  | 8.55       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/crossvit/crossvit_9_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/crossvit/crossvit_9-32c69c96-910v2.ckpt) |
 
 </div>
 

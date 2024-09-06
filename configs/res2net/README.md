@@ -26,9 +26,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-|   Model   | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                           | Download                                                                                               |
-|:---------:|:---------:|:---------:|:----------:|------------|--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
-| res2net50 |   79.33   |   94.64   |   25.76    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/res2net/res2net_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/res2net/res2net50-aa758355-910v2.ckpt) |
+|   Model   | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                           | Download                                                                                               |
+| :-------: | :-------: | :-------: | :-----: | :--------: | ---------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| res2net50 |   79.33   |   94.64   |  43.22  |   25.76    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/res2net/res2net_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/res2net/res2net50-aa758355-910v2.ckpt) |
 
 </div>
 

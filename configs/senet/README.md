@@ -26,9 +26,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-|   Model    | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                         | Download                                                                                              |
-|:----------:|:---------:|:---------:|:----------:|------------|------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
-| seresnet18 |   72.05   |   90.59   |   11.80    | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet18_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/senet/seresnet18-7b971c78-910v2.ckpt) |
+|   Model    | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                         | Download                                                                                              |
+| :--------: | :-------: | :-------: | :-----: | :--------: | ---------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| seresnet18 |   72.05   |   90.59   |  48.72  |   11.80    | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet18_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/senet/seresnet18-7b971c78-910v2.ckpt) |
 
 </div>
 

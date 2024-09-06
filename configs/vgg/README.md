@@ -39,10 +39,10 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                  | Download                                                                                       |
-|:-----:|:---------:|:---------:|:----------:|------------|-----------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| vgg13 |   72.81   |   91.02   |   133.04   | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg13_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/vgg/vgg13-7756f33c-910v2.ckpt) |
-| vgg19 |   75.24   |   92.55   |   143.66   | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg19_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/vgg/vgg19-5104d1ea-910v2.ckpt) |
+| Model | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                  | Download                                                                                       |
+| :---: | :-------: | :-------: | :-----: | :--------: | ---------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| vgg13 |   72.81   |   91.02   |  30.97  |   133.04   | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg13_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/vgg/vgg13-7756f33c-910v2.ckpt) |
+| vgg19 |   75.24   |   92.55   |  40.02  |   143.66   | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg19_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/vgg/vgg19-5104d1ea-910v2.ckpt) |
 
 </div>
 
