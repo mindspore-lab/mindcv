@@ -24,9 +24,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-|  Model   | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                         | Download                                                                                             |
-|:--------:|:---------:|:---------:|:----------:|------------|------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| resnet50 |   76.76   |   93.31   |   25.61    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/resnet/resnet50-f369a08d-910v2.ckpt) |
+|  Model   | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                         | Download                                                                                             |
+| :------: | :-------: | :-------: | :-----: | :--------: | ---------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| resnet50 |   76.76   |   93.31   |  32.96  |   25.61    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnet/resnet_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/resnet/resnet50-f369a08d-910v2.ckpt) |
 
 </div>
 

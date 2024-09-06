@@ -25,9 +25,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-|   Model   | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                        | Download                                                                                              |
-|:---------:|:---------:|:---------:|:----------:|------------|-----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
-| pvt_v2_b0 |   71.25   |   90.50   |    3.67    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/pvt_v2/pvt_v2_b0-d9cd9d6a-910v2.ckpt) |
+|   Model   | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                        | Download                                                                                              |
+| :-------: | :-------: | :-------: | :-----: | :--------: | ---------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| pvt_v2_b0 |   71.25   |   90.50   | 343.22  |    3.67    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/pvt_v2/pvt_v2_b0-d9cd9d6a-910v2.ckpt) |
 
 </div>
 

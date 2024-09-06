@@ -28,9 +28,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-|        Model        | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                              | Download                                                                                                        |
-|:-------------------:|:---------:|:---------:|:----------:|------------|---------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| swinv2_tiny_window8 |   81.38   |   95.46   |   28.78    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformerv2/swinv2_tiny_window8_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/swinv2/swinv2_tiny_window8-70c5e903-910v2.ckpt) |
+|        Model        | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                              | Download                                                                                                        |
+| :-----------------: | :-------: | :-------: | :-----: | :--------: | ---------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| swinv2_tiny_window8 |   81.38   |   95.46   | 380.93  |   28.78    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformerv2/swinv2_tiny_window8_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/swinv2/swinv2_tiny_window8-70c5e903-910v2.ckpt) |
 
 </div>
 

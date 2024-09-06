@@ -1,4 +1,4 @@
-﻿# Pyramid Vision Transformer
+# Pyramid Vision Transformer
 
 > [Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions](https://arxiv.org/abs/2102.12122)
 
@@ -20,9 +20,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-|  Model   | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                     | Download                                                                                          |
-|:--------:|:---------:|:---------:|:----------:|------------|--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
-| pvt_tiny |   74.88   |   92.12   |   13.23    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/pvt/pvt_tiny-6676051f-910v2.ckpt) |
+|  Model   | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                     | Download                                                                                          |
+| :------: | :-------: | :-------: | :-----: | :--------: | ---------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| pvt_tiny |   74.88   |   92.12   | 308.02  |   13.23    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/pvt/pvt_tiny-6676051f-910v2.ckpt) |
 
 </div>
 

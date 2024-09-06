@@ -22,9 +22,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model            | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                      | Download    |
-| ---------------- | --------- | --------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------- |-------------|
-| mobilenet_v2_075 | 69.73     | 89.35     | 2.66       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_0.75_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_075-755932c4-910v2.ckpt) |
+| Model            | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                      | Download                                                                                                                    |
+| ---------------- | --------- | --------- | ------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| mobilenet_v2_075 | 69.73     | 89.35     | 170.41  | 2.66       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv2/mobilenet_v2_0.75_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_075-755932c4-910v2.ckpt) |
 
 
 </div>

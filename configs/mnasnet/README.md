@@ -20,9 +20,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model       | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                             | Download    |
-| ----------- | --------- | --------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------- |-------------|
-| mnasnet_075 | 71.77     | 90.52     | 3.20       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.75_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mnasnet/mnasnet_075-083b2bc4-910v2.ckpt) |
+| Model       | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                             | Download                                                                                                 |
+| ----------- | --------- | --------- | ------- | ---------- | ---------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| mnasnet_075 | 71.77     | 90.52     | 177.22  | 3.20       | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.75_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mnasnet/mnasnet_075-083b2bc4-910v2.ckpt) |
 
 
 </div>

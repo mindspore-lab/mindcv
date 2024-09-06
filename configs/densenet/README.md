@@ -40,9 +40,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model       | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                              | Download    |
-| ----------- | --------- | --------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------- |-------------|
-| densenet121 | 75.67     | 92.77     | 8.06       | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/densenet/densenet121-bf4ab27f-910v2.ckpt) |
+| Model       | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                              | Download                                                                                                  |
+| ----------- | --------- | --------- | ------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| densenet121 | 75.67     | 92.77     | 50.55   | 8.06       | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/densenet/densenet121-bf4ab27f-910v2.ckpt) |
 
 performance tested on ascend 910(8p) with graph mode
 

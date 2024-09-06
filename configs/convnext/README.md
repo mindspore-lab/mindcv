@@ -25,9 +25,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-| Model         | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                               | Download    |
-| ------------- | --------- | --------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------- |-------------|
-| convnext_tiny | 81.28     | 95.61     | 28.59      | 16         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convnext/convnext_tiny-db11dc82-910v2.ckpt) |
+| Model         | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                               | Download                                                                                                    |
+| ------------- | --------- | --------- | ------- | ---------- | ---------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| convnext_tiny | 81.28     | 95.61     | 54.08   | 28.59      | 16         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convnext/convnext_tiny-db11dc82-910v2.ckpt) |
 
 
 </div>

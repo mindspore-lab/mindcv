@@ -25,9 +25,9 @@ performance tested on ascend 910*(8p) with graph mode
 
 <div align="center">
 
-|        Model         | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                              | Download                                                                                                       |
-|:--------------------:|:---------:|:---------:|:----------:|------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|
-| xcit_tiny_12_p16_224 |   77.27   |   93.56   |    7.00    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/xcit/xcit_tiny_12_p16_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/xcit/xcit_tiny_12_p16_224-bd90776e-910v2.ckpt) |
+|        Model         | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                              | Download                                                                                                       |
+| :------------------: | :-------: | :-------: | :-----: | :--------: | ---------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| xcit_tiny_12_p16_224 |   77.27   |   93.56   | 320.25  |    7.00    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/xcit/xcit_tiny_12_p16_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/xcit/xcit_tiny_12_p16_224-bd90776e-910v2.ckpt) |
 
 </div>
 
