@@ -5,7 +5,7 @@ hide:
 
 ## Dependency
 
-- mindspore >= 1.8.1
+- mindspore == 2.3.0
 - numpy >= 1.17.0
 - pyyaml >= 5.3
 - tqdm
@@ -67,31 +67,12 @@ This will automatically install compatible versions of dependencies:
 [Using Python's pip to Manage Your Projects' Dependencies]: https://realpython.com/what-is-pip/
 
 
-## Install from Source (Bleeding Edge Version)
+## Install from Source
 
 ### from VCS
 
 ```shell
 pip install git+https://github.com/mindspore-lab/mindcv.git
-```
-
-### from local src
-
-!!! tip
-
-    As this project is in active development, if you are a developer or contributor, please prefer this installation!
-
-MindCV can be directly used from [GitHub] by cloning the repository into a local folder which might be useful if you want to use the very latest version:
-
-```shell
-git clone https://github.com/mindspore-lab/mindcv.git
-```
-
-After cloning from `git`, it is recommended that you install using "editable" mode, which can help resolve potential module import issues:
-
-```shell
-cd mindcv
-pip install -e .
 ```
 
 [GitHub]: https://github.com/mindspore-lab/mindcv

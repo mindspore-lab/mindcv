@@ -3,12 +3,6 @@
 Contributions are welcome, and they are greatly appreciated! Every little bit
 helps, and credit will always be given.
 
-## Contributor License Agreement
-
-It's required to sign CLA before your first code submission to MindCV community.
-
-For individual contributor, please refer to [ICLA online document](https://www.mindspore.cn/icla) for the detailed information.
-
 ## Types of Contributions
 
 ### Report Bugs
