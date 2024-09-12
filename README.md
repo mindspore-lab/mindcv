@@ -124,15 +124,24 @@ It is easy to train your model on a standard or customized dataset using `train.
 
 - Distributed Training
 
-    For large datasets like ImageNet, it is necessary to do training in distributed mode on multiple devices. This can be achieved with `mpirun` and parallel features supported by MindSpore.
+    For large datasets like ImageNet, it is necessary to do training in distributed mode on multiple devices. This can be achieved with `msrun` and parallel features supported by MindSpore.
 
     ```shell
     # distributed training
     # assume you have 4 GPUs/NPUs
-    mpirun -n 4 python train.py --distribute \
+    msrun --bind_core=True --worker_num 4 python train.py --distribute \
         --model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet
     ```
-    > Notes: If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
+
+    Notice that if you are using msrun startup with 2 devices, please add `--bind_core=True` to improve performance. For example:
+
+    ```shell
+    msrun --bind_core=True --worker_num=2--local_worker_num=2 --master_port=8118 \
+    --log_dir=msrun_log --join=True --cluster_time_out=300 \
+    python train.py --distribute --model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet
+    ```
+
+   > For more information, please refer to https://www.mindspore.cn/tutorials/experts/en/r2.3.1/parallel/startup_method.html
 
     Detailed parameter definitions can be seen in `config.py` and checked by running `python train.py --help'.
 
@@ -143,7 +152,7 @@ It is easy to train your model on a standard or customized dataset using `train.
     You can configure your model and other components either by specifying external parameters or by writing a yaml config file. Here is an example of training using a preset yaml file.
 
     ```shell
-    mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml
+    msrun --bind_core=True --worker_num 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml
     ```
 
     **Pre-defined Training Strategies:**

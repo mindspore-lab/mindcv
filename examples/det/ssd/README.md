@@ -69,15 +69,15 @@ Specify the path of the preprocessed dataset at keyword `data_dir` in the config
 
 It is highly recommended to use **distributed training** for this SSD implementation.
 
-For distributed training using **OpenMPI's `mpirun`**, simply run
+For distributed training using **`msrun`**, simply run
 ```
 cd mindcv  # change directory to the root of MindCV repository
-mpirun -n [# of devices] python examples/det/ssd/train.py --config [the path to the config file]
+msrun --bind_core=True --worker_num [# of devices] python examples/det/ssd/train.py --config [the path to the config file]
 ```
 For example, if train SSD distributively with the `MobileNetV2` configuration on 8 devices, run
 ```
 cd mindcv  # change directory to the root of MindCV repository
-mpirun -n 8 python examples/det/ssd/train.py --config examples/det/ssd/ssd_mobilenetv2.yaml
+msrun --bind_core=True --worker_num 8 python examples/det/ssd/train.py --config examples/det/ssd/ssd_mobilenetv2.yaml
 ```
 
 For distributed training with [Ascend rank table](https://github.com/mindspore-lab/mindocr/blob/main/docs/en/tutorials/distribute_train.md#12-configure-rank_table_file-for-training), configure `ascend8p.sh` as follows
