@@ -32,7 +32,7 @@ python -m build
 
 A simple clean launcher for distributed training on **_Ascend_**.
 Following [instruction](https://www.mindspore.cn/tutorials/experts/zh-CN/r2.1/parallel/startup_method.html) from Mindspore,
-except launching distributed training with `mpirun`, we can also use multiprocess
+except launching distributed training with `msrun`, we can also use multiprocess
 with multi-card networking configuration `rank_table.json` to manually start a process on each card.
 To get `rank_table.json` on your machine, try the hccl tools from [here](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
