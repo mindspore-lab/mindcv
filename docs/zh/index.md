@@ -109,14 +109,24 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
 
 - 分布式训练
 
-    对于像ImageNet这样的大型数据集，有必要在多个设备上以分布式模式进行训练。基于MindSpore对分布式相关功能的良好支持，用户可以使用`mpirun`来进行模型的分布式训练。
+    对于像ImageNet这样的大型数据集，有必要在多个设备上以分布式模式进行训练。基于MindSpore对分布式相关功能的良好支持，用户可以使用`msrun`来进行模型的分布式训练。
 
     ```shell
     # 分布式训练
     # 假设你有4张GPU或者NPU卡
-    mpirun --allow-run-as-root -n 4 python train.py --distribute \
+    msrun --bind_core=True --worker_num 4 python train.py --distribute \
         --model densenet121 --dataset imagenet --data_dir ./datasets/imagenet
     ```
+
+    注意，如果在两卡环境下选用msrun作为启动方式，请添加配置项 `--bind_core=True` 增加绑核操作以优化两卡性能，范例代码如下：
+
+    ```shell
+    msrun --bind_core=True --worker_num=2--local_worker_num=2 --master_port=8118 \
+    --log_dir=msrun_log --join=True --cluster_time_out=300 \
+    python train.py --distribute --model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet
+    ```
+
+   > 如需更多操作指导，请参考 https://www.mindspore.cn/tutorials/experts/zh-CN/r2.3.1/parallel/startup_method.html
 
     完整的参数列表及说明在`config.py`中定义，可运行`python train.py --help`快速查看。
 
@@ -127,7 +137,7 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
     您可以编写yaml文件或设置外部参数来指定配置数据、模型、优化器等组件及其超参。以下是使用预设的训练策略（yaml文件）进行模型训练的示例。
 
     ```shell
-    mpirun --allow-run-as-root -n 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml
+    msrun --bind_core=True --worker_num 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml
     ```
 
     !!! tip "预定义的训练策略"

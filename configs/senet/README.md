@@ -68,12 +68,12 @@ Ascend 910 devices, please run
 
 ```shell
 # distributed training on multiple GPU/Ascend devices
-mpirun -n 8 python train.py --config configs/senet/seresnet50_ascend.yaml --data_dir /path/to/imagenet
+msrun --bind_core=True --worker_num 8 python train.py --config configs/senet/seresnet50_ascend.yaml --data_dir /path/to/imagenet
 ```
 
-> If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
 
-Similarly, you can train the model on multiple GPU devices with the above `mpirun` command.
+
+Similarly, you can train the model on multiple GPU devices with the above `msrun` command.
 
 For detailed illustration of all hyper-parameters, please refer
 to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).

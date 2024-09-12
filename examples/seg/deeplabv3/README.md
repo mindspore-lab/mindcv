@@ -80,9 +80,9 @@ Specify `deeplabv3`  or  `deeplabv3plus` at the key word `model` in the config f
 
 It is highly recommended to use **distributed training** for this DeepLabV3 and DeepLabV3+ implementation.
 
-For distributed training using **OpenMPI's `mpirun`**, simply run
+For distributed training using **`msrun`**, simply run
 ```shell
-mpirun -n [# of devices] python examples/seg/deeplabv3/train.py --config [the path to the config file]
+msrun --bind_core=True --worker_num [# of devices] python examples/seg/deeplabv3/train.py --config [the path to the config file]
 ```
 
 For distributed training with [Ascend rank table](https://github.com/mindspore-lab/mindocr/blob/main/docs/en/tutorials/distribute_train.md#12-configure-rank_table_file-for-training), configure `ascend8p.sh` as follows
@@ -110,26 +110,26 @@ For single-device training, simply set the keyword ``distributed`` to ``False`` 
 python examples/seg/deeplabv3/train.py --config [the path to the config file]
 ```
 
-**Take mpirun command as an example, the training steps are as follow**:
+**Take msrun command as an example, the training steps are as follow**:
 
 - Step 1: Employ output_stride=16 and fine-tune pretrained resnet101 on *trainaug* dataset. In config file, please specify the path of pretrained backbone checkpoint in keyword `backbone_ckpt_path` and set `output_stride` to `16`.
 
   ```shell
   # for deeplabv3
-  mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/config/deeplabv3_s16_dilated_resnet101.yaml
+  msrun --bind_core=True --worker_num 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/config/deeplabv3_s16_dilated_resnet101.yaml
 
   # for deeplabv3+
-  mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/config/deeplabv3plus_s16_dilated_resnet101.yaml
+  msrun --bind_core=True --worker_num 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/config/deeplabv3plus_s16_dilated_resnet101.yaml
   ```
 
 - Step 2: Employ output_stride=8, fine-tune model from step 1 on  *trainaug* dataset with smaller base learning rate. In config file, please specify the path of checkpoint from previous step in `ckpt_path`, set  `ckpt_pre_trained` to `True` and set `output_stride` to `8` .
 
   ```shell
   # for deeplabv3
-  mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/config/deeplabv3_s8_dilated_resnet101.yaml
+  msrun --bind_core=True --worker_num 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/config/deeplabv3_s8_dilated_resnet101.yaml
 
   # for deeplabv3+
-  mpirun -n 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/config/deeplabv3plus_s8_dilated_resnet101.yaml
+  msrun --bind_core=True --worker_num 8 python examples/seg/deeplabv3/train.py --config examples/seg/deeplabv3/config/deeplabv3plus_s8_dilated_resnet101.yaml
   ```
 > If use Ascend 910 devices, need to open SATURATION_MODE via `export MS_ASCEND_CHECK_OVERFLOW_MODE="SATURATION_MODE"`.
 

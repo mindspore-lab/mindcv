@@ -59,17 +59,16 @@ Illustration:
 
 #### Training Script Format
 
-For consistency, it is recommended to provide distributed training commands based on `mpirun -n {num_devices} python train.py`, instead of using shell script such as `distrubuted_train.sh`.
+For consistency, it is recommended to provide distributed training commands based on `msrun --bind_core=True --worker_num {num_devices} python train.py`, instead of using shell script such as `distrubuted_train.sh`.
 
   ```shell
   # standalone training on a gpu or ascend device
   python train.py --config configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/dataset --distribute False
 
   # distributed training on gpu or ascend divices
-  mpirun -n 8 python train.py --config configs/densenet/densenet_121_ascend.yaml --data_dir /path/to/imagenet
+  msrun --bind_core=True --worker_num 8 python train.py --config configs/densenet/densenet_121_ascend.yaml --data_dir /path/to/imagenet
 
   ```
-  > If the script is executed by the root user, the `--allow-run-as-root` parameter must be added to `mpirun`.
 
 #### URL and Hyperlink Format
 Please use **absolute path** in the hyperlink or url for linking the target resource in the readme file and table.
