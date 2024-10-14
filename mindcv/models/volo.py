@@ -151,7 +151,7 @@ class OutlookAttention(nn.Cell):
 
         h = int((H - 1) / self.stride + 1)
         w = int((W - 1) / self.stride + 1)
-        v = ops.pad(v, ((0, 0), (0, 0), (1, 1), (1, 1)))
+        v = ops.pad(v, (1, 1, 1, 1))
         v = self.unfold(v)
         v = ops.reshape(v, (B, self.num_heads, C // self.num_heads, self.kernel_size * self.kernel_size, h * w))
         v = ops.transpose(v, (0, 1, 4, 3, 2))  # B,H,N,kxk,C/H
