@@ -202,7 +202,6 @@ We provide the following jupyter notebook tutorials to help users learn to use M
 - [Finetune a pretrained model on custom datasets](./tutorials/finetune.md)
 - [Customize your model]() //coming soon
 - [Optimizing performance for vision transformer]() //coming soon
-- [Deployment demo](./tutorials/deployment.md)
 
 ## Supported Algorithms
 
