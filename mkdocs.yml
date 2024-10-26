@@ -13,7 +13,6 @@ nav:
       - Configuration: tutorials/configuration.md
       - Finetune: tutorials/finetune.md
       - Inference: tutorials/inference.md
-      - Deployment: tutorials/deployment.md
   - How-To Guides:  # Problem Oriented
       - Write A New Model: how_to_guides/write_a_new_model.md
       - Multi-Scale Feature Extraction: how_to_guides/feature_extraction.md

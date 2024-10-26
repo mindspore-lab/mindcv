@@ -121,7 +121,7 @@ python infer.py --model=swin_tiny --image_path='./dog.jpg'
 
     ```shell
     # 分布式训练
-    # 假设你有4张GPU或者NPU卡
+    # 假设你有4张NPU卡
     msrun --bind_core=True --worker_num 4 python train.py --distribute \
         --model densenet121 --dataset imagenet --data_dir ./datasets/imagenet
     ```

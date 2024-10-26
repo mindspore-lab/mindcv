@@ -31,9 +31,9 @@ performance tested on ascend 910(8p) with graph mode
 
 <div align="center">
 
-|  Model  | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                     | Download                                                                            |
-|:-------:|:---------:|:---------:|:----------:|------------|--------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
-| volo_d1 |   82.59   |   95.99   |     27     | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/volo/volo_d1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/volo/volo_d1-c7efada9.ckpt) |
+|  model  | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                 | download                                                                                                      |
+| :-----: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| volo_d1 |   82.59   |   95.99   |     27     | 128        | 8     | 270.79  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/visformer/visformer_tiny-df995ba4-910v2.ckpt) |
 
 </div>
 
@@ -93,10 +93,6 @@ with `--ckpt_path`.
 python validate.py -c configs/volo/volo_d1_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
-### Deployment
-
-To deploy online inference services with the trained model efficiently, please refer to
-the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/).
 
 ## References
 
