@@ -30,7 +30,6 @@ on ImageNet-1K dataset compared with ViT and ResNet.[[1](#references)]
 <!--- Guideline:
 Table Format:
 - Model: model name in lower case with _ seperator.
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
 - Top-1 and Top-5: Keep 2 digits after the decimal point.
 - Params (M): # of model parameters in millions (10^6). Keep 2 digits after the decimal point
 - Recipe: Training recipe/configuration linked to a yaml config file. Use absolute url path.
@@ -39,23 +38,25 @@ Table Format:
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-performance tested on ascend 910*(8p) with graph mode
+- ascend 910* with graph mode
 
 <div align="center">
 
-|   Model   | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                  | Download                                                                                            |
-| :-------: | :-------: | :-------: | :-----: | :--------: | ---------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| swin_tiny |   80.90   |   94.90   | 637.41  |   33.38    | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformer/swin_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/swin/swin_tiny-72b3c5e6-910v2.ckpt) |
+
+|   model   | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                  | download                                                                                            |
+| :-------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| swin_tiny |   80.90   |   94.90   |   33.38    | 256        | 8     | 466.6   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformer/swin_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/swin/swin_tiny-72b3c5e6-910v2.ckpt) |
 
 </div>
 
-performance tested on ascend 910(8p) with graph mode
+- ascend 910 with graph mode
 
 <div align="center">
 
-|   Model   | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                  | Download                                                                              |
-|:---------:|:---------:|:---------:|:----------:|------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| swin_tiny |   80.82   |   94.80   |   33.38    | 256        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformer/swin_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/swin/swin_tiny-0ff2f96d.ckpt) |
+
+|   model   | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                  | download                                                                              |
+| :-------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| swin_tiny |   80.82   |   94.80   |   33.38    | 256        | 8     | 454.49  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformer/swin_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/swin/swin_tiny-0ff2f96d.ckpt) |
 
 </div>
 
@@ -69,7 +70,7 @@ performance tested on ascend 910(8p) with graph mode
 
 #### Installation
 
-Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
+Please refer to the [installation instruction](https://mindspore-lab.github.io/mindcv/installation/) in MindCV.
 
 #### Dataset Preparation
 
@@ -86,12 +87,11 @@ It is easy to reproduce the reported results with the pre-defined training recip
 Ascend 910 devices, please run
 
 ```shell
-# distributed training on multiple GPU/Ascend devices
+# distributed training on multiple NPU devices
 msrun --bind_core=True --worker_num 8 python train.py --config configs/swintransformer/swin_tiny_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 
-Similarly, you can train the model on multiple GPU devices with the above `msrun` command.
 
 For detailed illustration of all hyper-parameters, please refer
 to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
@@ -104,7 +104,7 @@ keep the global batch size unchanged for reproduction or adjust the learning rat
 If you want to train or finetune the model on a smaller dataset without distributed training, please run:
 
 ```shell
-# standalone training on a CPU/GPU/Ascend device
+# standalone training on single NPU device
 python train.py --config configs/swintransformer/swin_tiny_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
@@ -117,9 +117,6 @@ with `--ckpt_path`.
 python validate.py -c configs/swintransformer/swin_tiny_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
-### Deployment
-
-Please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/) in MindCV.
 
 ## References
 
