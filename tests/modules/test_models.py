@@ -56,6 +56,7 @@ model_name_list = [
     "visformer_tiny",
     "vit_b_32_224",
     "xception",
+    "resnet18_ebv"
 ]
 
 check_loss_decrease = False
