@@ -128,6 +128,9 @@ def create_parser():
                        help='Number of dataset repetition for repeated augmentation. '
                             'If 0 or 1, repeated augmentation is disabled. '
                             'Otherwise, repeated augmentation is enabled and the common choice is 3 (default=0)')
+    group.add_argument('--patch_size', type=int, default=32, help="Patch size in sequence packing.")
+    group.add_argument('--max_seq_length', type=int, default=2048, help="maximum sequence length in sequence packing.")
+    group.add_argument('--max_num_each_group', type=int, default=40, help="maximum number of images in each sequence")
 
     # Model parameters
     group = parser.add_argument_group('Model parameters')

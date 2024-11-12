@@ -1,0 +1,55 @@
+# system
+mode: 0
+distribute: True
+num_parallel_workers: 8
+val_while_train: True
+val_interval: 1
+val_split: val
+
+# dataset
+dataset: "imagenet"
+data_dir: "/path/to/imagenet"
+shuffle: True
+dataset_download: False
+batch_size: 64
+drop_remainder: True
+patch_size: 16
+max_seq_length: 768
+max_num_each_group: 16
+
+# augmentation
+image_resize: 384
+hflip: 0.5
+interpolation: "bicubic"
+
+# model
+model: "navit_b_16_384"
+drop_rate: 0.1
+drop_path_rate: 0.1
+num_classes: 1000
+pretrained: False
+ckpt_path: ""
+keep_checkpoint_max: 1
+ckpt_save_policy: "top_k"
+ckpt_save_dir: "./ckpt"
+epoch_size: 100
+dataset_sink_mode: False
+amp_level: "O2"
+
+# loss
+loss: "TOKEN_CE"
+loss_scale: 1024.0
+label_smoothing: 0.1
+
+# lr scheduler
+scheduler: "warmup_cosine_decay"
+lr: 0.0001
+min_lr: 1e-6
+warmup_epochs: 10
+decay_epochs: 90
+lr_epoch_stair: False
+
+# optimizer
+opt: "adamw"
+weight_decay: 0.1
+use_nesterov: False
