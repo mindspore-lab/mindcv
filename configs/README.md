@@ -31,24 +31,24 @@ Please follow the outline structure and **table format** shown in [densenet/READ
 
 #### Table Format
 
-<div align="center">
+
 
 | model name  | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                              | weight                                                                                                    |
 | ----------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | densenet121 | 8.06      | 8     | 32         | 224x224    | O2        | 300s          | 47,34   | 5446.81 | 75.67    | 92.77    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/densenet/densenet121-bf4ab27f-910v2.ckpt) |
 
-</div>
+
 
 Illustration:
-- Model: model name in lower case with _ seperator.
-- Top-1 and Top-5: Accuracy reported on the validatoin set of ImageNet-1K. Keep 2 digits after the decimal point.
-- Params (M): # of model parameters in millions (10^6). Keep **2 digits** after the decimal point
-- Batch Size: Training batch size
-- Cards: # of cards
-- Ms/step: Time used on training per step in ms
-- Jit_level: Jit level of mindspore context, which contains 3 levels: O0/O1/O2
-- Recipe: Training recipe/configuration linked to a yaml config file.
-- Download: url of the pretrained model weights
+- model name: model name in lower case with _ seperator.
+- top-1 and top-5: Accuracy reported on the validatoin set of ImageNet-1K. Keep 2 digits after the decimal point.
+- params(M): # of model parameters in millions (10^6). Keep **2 digits** after the decimal point
+- batch size: Training batch size
+- cards: # of cards
+- ms/step: Time used on training per step in ms
+- jit level: Jit level of mindspore context, which contains 3 levels: O0/O1/O2
+- recipe: Training recipe/configuration linked to a yaml config file.
+- weight: url of the pretrained model weights
 
 ### Model Checkpoint Format
  The checkpoint (i.e., model weight) name should follow this format:  **{model_name}_{specification}-{sha256sum}.ckpt**, e.g., `poolformer_s12-5be5c4e4.ckpt`.

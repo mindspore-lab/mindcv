@@ -1,11 +1,6 @@
 # ConvNeXt
 > [A ConvNet for the 2020s](https://arxiv.org/abs/2201.03545)
 
-## Requirements
-| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
-| :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
-
 ## Introduction
 
 In this work, the authors reexamine the design spaces and test the limits of what a pure ConvNet can achieve.
@@ -22,36 +17,12 @@ simplicity and efficiency of standard ConvNets.[[1](#references)]
   <em>Figure 1. Architecture of ConvNeXt [<a href="#references">1</a>] </em>
 </p>
 
-## Performance
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
-
-<div align="center">
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 
-| model name    | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                               | weight                                                                                                      |
-| ------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| convnext_tiny | 28.59     | 8     | 16         | 224x224    | O2        | 137s          | 48.7    | 2612.24 | 81.28    | 95.61    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convnext/convnext_tiny-db11dc82-910v2.ckpt) |
-
-
-</div>
-
-- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
-
-<div align="center">
-
-
-| model name    | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                               | weight                                                                                        |
-| ------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| convnext_tiny | 28.59     | 8     | 16         | 224x224    | O2        | 127s          | 66.79   | 1910.45 | 81.91    | 95.79    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_tiny-ae5ff8d7.ckpt) |
-
-
-</div>
-
-#### Notes
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -96,6 +67,25 @@ To validate the accuracy of the trained model, you can use `validate.py` and par
 ```shell
 python validate.py -c configs/convnext/convnext_tiny_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
+
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+| model name    | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                               | weight                                                                                                      |
+| ------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| convnext_tiny | 28.59     | 8     | 16         | 224x224    | O2        | 137s          | 48.7    | 2612.24 | 81.28    | 95.61    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convnext/convnext_tiny-db11dc82-910v2.ckpt) |
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+| model name    | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                               | weight                                                                                        |
+| ------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| convnext_tiny | 28.59     | 8     | 16         | 224x224    | O2        | 127s          | 66.79   | 1910.45 | 81.91    | 95.79    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_tiny-ae5ff8d7.ckpt) |
+
+### Notes
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## References
 

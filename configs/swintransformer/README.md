@@ -3,10 +3,7 @@
 <!--- Guideline: please use url linked to the paper abstract in ArXiv instead of PDF for fast loading.  -->
 > [Swin Transformer: Hierarchical Vision Transformer using Shifted Windows](https://arxiv.org/abs/2103.14030)
 
-## Requirements
-| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
-| :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 
 ## Introduction
 
@@ -30,44 +27,12 @@ on ImageNet-1K dataset compared with ViT and ResNet.[[1](#references)]
   <em>Figure 1. Architecture of Swin Transformer [<a href="#references">1</a>] </em>
 </p>
 
-## Performance
-
-<!--- Guideline:
-Table Format:
-- Model: model name in lower case with _ seperator.
-- Top-1 and Top-5: Keep 2 digits after the decimal point.
-- Params (M): # of model parameters in millions (10^6). Keep 2 digits after the decimal point
-- Recipe: Training recipe/configuration linked to a yaml config file. Use absolute url path.
-- Download: url of the pretrained model weights. Use absolute url path.
--->
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
-
-<div align="center">
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                  | weight                                                                                              |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| swin_tiny  | 33.38     | 8     | 256        | 224x224    | O2        | 266s          | 466.6   | 4389.20 | 80.90    | 94.90    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformer/swin_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/swin/swin_tiny-72b3c5e6-910v2.ckpt) |
-
-</div>
-
-- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
-
-<div align="center">
-
-
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                  | weight                                                                                |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| swin_tiny  | 33.38     | 8     | 256        | 224x224    | O2        | 226s          | 454.49  | 4506.15 | 80.82    | 94.80    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformer/swin_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/swin/swin_tiny-0ff2f96d.ckpt) |
-
-</div>
-
-#### Notes
-
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -122,6 +87,36 @@ with `--ckpt_path`.
 python validate.py -c configs/swintransformer/swin_tiny_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
+## Performance
+
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+
+
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                  | weight                                                                                              |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| swin_tiny  | 33.38     | 8     | 256        | 224x224    | O2        | 266s          | 466.6   | 4389.20 | 80.90    | 94.90    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformer/swin_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/swin/swin_tiny-72b3c5e6-910v2.ckpt) |
+
+
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+
+
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                  | weight                                                                                |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| swin_tiny  | 33.38     | 8     | 256        | 224x224    | O2        | 226s          | 454.49  | 4506.15 | 80.82    | 94.80    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformer/swin_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/swin/swin_tiny-0ff2f96d.ckpt) |
+
+
+
+### Notes
+
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## References
 

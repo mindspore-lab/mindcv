@@ -2,10 +2,6 @@
 
 > [EdgeNeXt: Efficiently Amalgamated CNN-Transformer Architecture for Mobile Vision Applications](https://arxiv.org/abs/2206.10589)
 
-## Requirements
-| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
-| :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 ## Introduction
 
@@ -22,36 +18,10 @@ to implicitly increase the receptive field and encode multi-scale features.[[1](
   <em>Figure 1. Architecture of EdgeNeXt [<a href="#references">1</a>] </em>
 </p>
 
-## Performance
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
-
-<div align="center">
-
-
-| model name        | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                   | weight                                                                                                        |
-| ----------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| edgenext_xx_small | 1.33      | 8     | 256        | 256x256    | O2        | 389s          | 239.38  | 8555.43 | 70.64    | 89.75    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/edgenext/edgenext_xx_small-cad13d2c-910v2.ckpt) |
-
-
-</div>
-
-- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
-
-<div align="center">
-
-
-| model name        | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                   | weight                                                                                          |
-| ----------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| edgenext_xx_small | 1.33      | 8     | 256        | 256x256    | O2        | 311s          | 191.24  | 10709.06 | 71.02    | 89.99    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_xx_small-afc971fb.ckpt) |
-
-
-</div>
-
-#### Notes
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 ## Quick Start
 
@@ -98,6 +68,25 @@ To validate the accuracy of the trained model, you can use `validate.py` and par
 ```
 python validate.py -c configs/edgenext/edgenext_small_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
+
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+| model name        | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                   | weight                                                                                                        |
+| ----------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| edgenext_xx_small | 1.33      | 8     | 256        | 256x256    | O2        | 389s          | 239.38  | 8555.43 | 70.64    | 89.75    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/edgenext/edgenext_xx_small-cad13d2c-910v2.ckpt) |
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+| model name        | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                   | weight                                                                                          |
+| ----------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| edgenext_xx_small | 1.33      | 8     | 256        | 256x256    | O2        | 311s          | 191.24  | 10709.06 | 71.02    | 89.99    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_xx_small-afc971fb.ckpt) |
+
+### Notes
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## References
 

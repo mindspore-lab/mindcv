@@ -1,11 +1,6 @@
 # GhostNet
 > [GhostNet: More Features from Cheap Operations](https://arxiv.org/abs/1911.11907)
 
-## Requirements
-| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
-| :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
-
 ## Introduction
 
 The redundancy in feature maps is an important characteristic of those successful CNNs, but has rarely been
@@ -26,28 +21,10 @@ dataset.[[1](#references)]
   <em>Figure 1. Architecture of GhostNet [<a href="#references">1</a>] </em>
 </p>
 
-## Performance
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
-
-*coming soon*
-
-- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
-
-<div align="center">
-
-
-| model name   | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                              | weight                                                                                       |
-| ------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| ghostnet_050 | 2.60      | 8     | 128        | 224x224    | O2        | 383s          | 211.13  | 4850.09 | 66.03    | 86.64    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/ghostnet/ghostnet_050_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/ghostnet/ghostnet_050-85b91860.ckpt) |
-
-
-</div>
-
-#### Notes
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 ## Quick Start
 
@@ -93,6 +70,23 @@ To validate the accuracy of the trained model, you can use `validate.py` and par
 ```shell
 python validate.py -c configs/ghostnet/ghostnet_100_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
+
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+*coming soon*
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+| model name   | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                              | weight                                                                                       |
+| ------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| ghostnet_050 | 2.60      | 8     | 128        | 224x224    | O2        | 383s          | 211.13  | 4850.09 | 66.03    | 86.64    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/ghostnet/ghostnet_050_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/ghostnet/ghostnet_050-85b91860.ckpt) |
+
+### Notes
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## References
 

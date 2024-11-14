@@ -114,5 +114,5 @@
 
 </details>
 
-#### Notes
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
+### Notes
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

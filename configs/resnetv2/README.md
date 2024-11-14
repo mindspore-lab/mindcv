@@ -2,10 +2,7 @@
 
 > [Identity Mappings in Deep Residual Networks](https://arxiv.org/abs/1603.05027)
 
-## Requirements
-| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
-| :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 
 ## Introduction
 
@@ -20,35 +17,12 @@ to any other block, when using identity mappings as the skip connections and aft
   <em>Figure 1. Architecture of ResNetV2 [<a href="#references">1</a>] </em>
 </p>
 
-## Performance
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
-
-<div align="center">
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 
-| model name  | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                             | weight                                                                                                    |
-| ----------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | ------- | -------- | -------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| resnetv2_50 | 25.60     | 8     | 32         | 224x224    | O2        | 120s          | 32.19   | 7781.16 | 77.03    | 93.29    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/resnetv2/resnetv2_50-a0b9f7f8-910v2.ckpt) |
-
-</div>
-
-- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
-
-<div align="center">
-
-
-| model name  | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                             | weight                                                                                      |
-| ----------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| resnetv2_50 | 25.60     | 8     | 32         | 224x224    | O2        | 52s           | 32.66   | 7838.33 | 76.90    | 93.37    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_50-3c2f143b.ckpt) |
-
-</div>
-
-#### Notes
-
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -102,6 +76,35 @@ with `--ckpt_path`.
 python validate.py -c configs/resnetv2/resnetv2_50_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+
+
+
+| model name  | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                             | weight                                                                                                    |
+| ----------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | ------- | -------- | -------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| resnetv2_50 | 25.60     | 8     | 32         | 224x224    | O2        | 120s          | 32.19   | 7781.16 | 77.03    | 93.29    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/resnetv2/resnetv2_50-a0b9f7f8-910v2.ckpt) |
+
+
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+
+
+
+| model name  | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                             | weight                                                                                      |
+| ----------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| resnetv2_50 | 25.60     | 8     | 32         | 224x224    | O2        | 52s           | 32.66   | 7838.33 | 76.90    | 93.37    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_50-3c2f143b.ckpt) |
+
+
+
+### Notes
+
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## References
 

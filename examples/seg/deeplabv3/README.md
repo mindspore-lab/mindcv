@@ -4,10 +4,6 @@
 >
 > DeeplabV3+:[Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation](https://arxiv.org/abs/1802.02611)
 
-## Requirements
-| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
-| :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 ## Introduction
 
@@ -33,6 +29,11 @@
 
 
 This example provides implementations of DeepLabV3 and DeepLabV3+ using backbones from MindCV. More details about feature extraction of MindCV are in [this tutorial](https://github.com/mindspore-lab/mindcv/blob/main/docs/en/how_to_guides/feature_extraction.md). Note that the ResNet in DeepLab contains atrous convolutions with different rates,  `dilated_resnet.py`  is provided as a modification of ResNet from MindCV, with atrous convolutions in block 3-4.
+
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 ## Quick Start
 
@@ -148,9 +149,9 @@ python examples/seg/deeplabv3/eval.py --config examples/seg/deeplabv3/config/dee
 ```
 
 ## Performance
-- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
 
-<div align="center">
+
 
 | model name        | params(M) | cards | batch size | jit level | graph compile | ms/step | img/s  | mIoU                | recipe                                                                                                                           | weight      |
 | ----------------- | --------- | ----- | ---------- | --------- | ------------- | ------- | ------ | ------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------- |
@@ -159,9 +160,9 @@ python examples/seg/deeplabv3/eval.py --config examples/seg/deeplabv3/config/dee
 | deeplabv3plus_s16 | 59.45     | 8     | 32         | O2        | 207s          | 312.15  | 820.12 | 78.99               | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3plus_s16_dilated_resnet101.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/deeplabv3/deeplabv3plus-s16-best.ckpt) |
 | deeplabv3plus_s8  | 59.45     | 8     | 16         | O2        | 170s          | 403.43  | 217.28 | 80.31\|80.99\|81.10 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3plus_s8_dilated_resnet101.yaml)  | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/deeplabv3/deeplabv3plus-s8-best.ckpt) |
 
-</div>
 
-- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
 
 *coming soon*
 

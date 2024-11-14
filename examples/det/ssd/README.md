@@ -2,10 +2,6 @@
 
 > [SSD: Single Shot MultiBox Detector](https://arxiv.org/abs/1512.02325)
 
-## Requirements
-| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
-| :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 ## Introduction
 
@@ -19,6 +15,11 @@ SSD is an single-staged object detector. It discretizes the output space of boun
 </p>
 
 In this example, by leveraging [the multi-scale feature extraction of MindCV](https://github.com/mindspore-lab/mindcv/blob/main/docs/en/how_to_guides/feature_extraction.md), we demonstrate that using backbones from MindCV much simplifies the implementation of SSD.
+
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 ## Configurations
 
@@ -68,7 +69,7 @@ Specify the path of the preprocessed dataset at keyword `data_dir` in the config
 |:----------------:|:----------------:|:----------------:|
 | [backbone weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_100-d5532038.ckpt) | [backbone weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet50-e0733ab8.ckpt) | [backbone weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-1279ad5f.ckpt) |
 
-</div>
+
 
 ### Train
 
@@ -130,28 +131,22 @@ cd mindcv  # change directory to the root of MindCV repository
 python examples/det/ssd/eval.py --config examples/det/ssd/ssd_mobilenetv2.yaml
 ```
 
-## Requirements
-| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
-| :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 ## Performance
 
-- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
 
 *coming soon*
 
-- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
 
-<div align="center">
+
 
 | model name       | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | mAP  | recipe                                                                                           | weight                                                                                      |
-| ---------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | ---- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| ---------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | ---- | ------------------------------------------------------------------------------------------------ |---------------------------------------------------------------------------------------------|
 | ssd_mobilenetv2  | 4.45      | 8     | 32         | 300x300    | O2        | 202s          | 60.14   | 4256.73 | 23.2 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_mobilenetv2.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_mobilenetv2-5bbd7411.ckpt)  |
 | ssd_resnet50_fpn | 33.37     | 8     | 32         | 640x640    | O2        | 130s          | 269.82  | 948.78  | 38.3 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_resnet50_fpn.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_resnet50_fpn-ac87ddac.ckpt) |
-| ssd_mobilenetv3  | 4.88      | 8     | 32         | 300x300    | O2        | 245s          | 59.91   | 4273.08 | 23.8 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_mobilenetv3.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_mobilenetv3-53d9f6e9.ckpt)  |
 
-</div>
 
 ## References
 
