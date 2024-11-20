@@ -315,12 +315,6 @@ def finetune_train(args):
     # callback
     # save checkpoint, summary training loss
     # record val acc and do model selection if val dataset is available
-    begin_step = 0
-    begin_epoch = 0
-    if args.ckpt_path != "":
-        begin_step = optimizer.global_step.asnumpy()[0]
-        begin_epoch = args.ckpt_path.split("/")[-1].split("-")[1].split("_")[0]
-        begin_epoch = int(begin_epoch)
 
     summary_dir = f"./{args.ckpt_save_dir}/summary"
     assert (
@@ -330,7 +324,6 @@ def finetune_train(args):
         trainer,
         model_name=args.model,
         model_ema=args.ema,
-        last_epoch=begin_epoch,
         dataset_sink_mode=args.dataset_sink_mode,
         dataset_val=loader_eval,
         metric_name=list(metrics.keys()),
@@ -375,10 +368,7 @@ def finetune_train(args):
     logger.info(essential_cfg_msg)
     save_args(args, os.path.join(args.ckpt_save_dir, f"{args.model}.yaml"), rank_id)
 
-    if args.ckpt_path != "":
-        logger.info(f"Resume training from {args.ckpt_path}, last step: {begin_step}, last epoch: {begin_epoch}")
-    else:
-        logger.info("Start training")
+    logger.info(f"Load checkpoint from {args.ckpt_path}. \nStart training")
 
     trainer.train(args.epoch_size, loader_train, callbacks=callbacks, dataset_sink_mode=args.dataset_sink_mode)
 
