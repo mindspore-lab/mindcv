@@ -1,0 +1,60 @@
+# system
+mode: 0
+distribute: False
+num_parallel_workers: 8
+val_while_train: True
+val_interval: 1
+log_interval: 100
+
+# dataset
+dataset: "imagenet"
+data_dir: "/path/to/imagenet"
+shuffle: True
+dataset_download: False
+batch_size: 128
+
+# augmentation
+image_resize: 224
+scale: [0.08, 1.0]
+ratio: [0.75, 1.333]
+hflip: 0.5
+vflip: 0.0
+interpolation: "bicubic"
+re_prob: 0.1
+mixup: 0.8
+cutmix: 1.0
+color_jitter: 0.4
+auto_augment: "randaug-m7-mstd0.5"
+
+# model
+model: "fastvit_t8"
+num_classes: 1000
+pretrained: False
+keep_checkpoint_max: 10
+ckpt_save_policy: "latest_k"
+ckpt_save_interval: 1
+ckpt_save_dir: "./ckpt"
+epoch_size: 300
+dataset_sink_mode: True
+ema_decay: 0.9995
+amp_level: "O2"
+loss_scale_type: 'auto'
+
+# loss
+loss: "CE"
+label_smoothing: 0.1
+
+# lr scheduler
+scheduler: "cosine_decay"
+lr: 0.001
+min_lr: 0.0
+warmup_epochs: 5
+warmup_factor: 0.01
+decay_epochs: 295
+
+# optimizer
+opt: "adamw"
+momentum: 0.9
+weight_decay: 0.05
+filter_bias_and_bn: True
+use_nesterov: False
