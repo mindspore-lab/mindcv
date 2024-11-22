@@ -2,6 +2,11 @@
 
 > [Squeeze-and-Excitation Networks](https://arxiv.org/abs/1709.01507)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 In this work, the authors focus instead on the channel relationship and propose a novel architectural unit, which the
@@ -18,27 +23,29 @@ additional computational cost.[[1](#references)]
   <em>Figure 1. Architecture of SENet [<a href="#references">1</a>] </em>
 </p>
 
-## Results
+## Performance
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-performance tested on ascend 910*(8p) with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 <div align="center">
 
-|   Model    | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                         | Download                                                                                              |
-| :--------: | :-------: | :-------: | :-----: | :--------: | ---------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| seresnet18 |   72.05   |   90.59   |  48.72  |   11.80    | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet18_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/senet/seresnet18-7b971c78-910v2.ckpt) |
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                                |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | -------- | -------- | -------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| seresnet18 | 11.80     | 8     | 64         | 224x224    | O2        | 90s           | 51.09   | 10021.53 | 72.05    | 90.59    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet18_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/senet/seresnet18-7b971c78-910v2.ckpt) |
 
 </div>
 
-performance tested on ascend 910(8p) with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 <div align="center">
 
-|   Model    | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                         | Download                                                                                |
-|:----------:|:---------:|:---------:|:----------:|------------|------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
-| seresnet18 |   71.81   |   90.49   |   11.80    | 64         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet18_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/senet/seresnet18-7880643b.ckpt) |
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                  |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | -------- | -------- | -------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| seresnet18 | 11.80     | 8     | 64         | 224x224    | O2        | 43s           | 44.40   | 11531.53 | 71.81    | 90.49    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet18_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/senet/seresnet18-7880643b.ckpt) |
 
 </div>
 
@@ -52,7 +59,7 @@ performance tested on ascend 910(8p) with graph mode
 
 #### Installation
 
-Please refer to the [installation instruction](https://github.com/mindspore-ecosystem/mindcv#installation) in MindCV.
+Please refer to the [installation instruction](https://mindspore-lab.github.io/mindcv/installation/) in MindCV.
 
 #### Dataset Preparation
 
@@ -67,13 +74,12 @@ It is easy to reproduce the reported results with the pre-defined training recip
 Ascend 910 devices, please run
 
 ```shell
-# distributed training on multiple GPU/Ascend devices
+# distributed training on multiple NPU devices
 msrun --bind_core=True --worker_num 8 python train.py --config configs/senet/seresnet50_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 
 
-Similarly, you can train the model on multiple GPU devices with the above `msrun` command.
 
 For detailed illustration of all hyper-parameters, please refer
 to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
@@ -86,7 +92,7 @@ keep the global batch size unchanged for reproduction or adjust the learning rat
 If you want to train or finetune the model on a smaller dataset without distributed training, please run:
 
 ```shell
-# standalone training on a CPU/GPU/Ascend device
+# standalone training on single NPU device
 python train.py --config configs/senet/seresnet50_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
@@ -99,9 +105,6 @@ with `--ckpt_path`.
 python validate.py -c configs/senet/seresnet50_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
-### Deployment
-
-Please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/) in MindCV.
 
 ## References
 

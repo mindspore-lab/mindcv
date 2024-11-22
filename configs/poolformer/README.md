@@ -2,6 +2,11 @@
 
 > [MetaFormer Is Actually What You Need for Vision](https://arxiv.org/abs/2111.11418)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 Instead of designing complicated token mixer to achieve SOTA performance, the target of this work is to demonstrate the competence of Transformer models largely stem from the general architecture MetaFormer. Pooling/PoolFormer are just the tools to support the authors' claim.
@@ -12,33 +17,34 @@ Figure 1. MetaFormer and performance of MetaFormer-based models on ImageNet-1K v
 ![PoolFormer](https://user-images.githubusercontent.com/74176172/210046845-6caa1574-b6a4-47f3-8298-c8ca3b4f8fa4.png)
 Figure 2. (a) The overall framework of PoolFormer. (b) The architecture of PoolFormer block. Compared with Transformer block, it replaces attention with an extremely simple non-parametric operator, pooling, to conduct only basic token mixing.[[1](#References)]
 
-## Results
+## Performance
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-performance tested on ascend 910*(8p) with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 <div align="center">
 
-|     Model      | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                  | Download                                                                                                       |
-| :------------: | :-------: | :-------: | :-----: | :--------: | ---------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| poolformer_s12 |   77.49   |   93.55   | 294.54  |   11.92    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/poolformer_s12_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/poolformer/poolformer_s12-c7e14eea-910v2.ckpt) |
+
+| model name     | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                  | weight                                                                                                         |
+| -------------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| poolformer_s12 | 11.92     | 8     | 128        | 224x224    | O2        | 177s          | 211.81  | 4834.52 | 77.49    | 93.55    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/poolformer_s12_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/poolformer/poolformer_s12-c7e14eea-910v2.ckpt) |
 
 </div>
 
-performance tested on ascend 910(8p) with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 <div align="center">
 
-|     Model      | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                  | Download                                                                                         |
-| :------------: | :-------: | :-------: | :--------: | ---------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| poolformer_s12 |   77.33   |   93.34   |   11.92    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/poolformer_s12_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/poolformer/poolformer_s12-5be5c4e4.ckpt) |
+
+
+| model name     | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                  | weight                                                                                           |
+| -------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| poolformer_s12 | 11.92     | 8     | 128        | 224x224    | O2        | 118s          | 220.13  | 4651.80 | 77.33    | 93.34    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/poolformer_s12_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/poolformer/poolformer_s12-5be5c4e4.ckpt) |
 
 </div>
 
 #### Notes
-
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
 - Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
@@ -47,7 +53,7 @@ performance tested on ascend 910(8p) with graph mode
 
 #### Installation
 
-Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
+Please refer to the [installation instruction](https://mindspore-lab.github.io/mindcv/installation/) in MindCV.
 
 #### Dataset Preparation
 
@@ -60,12 +66,11 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
 ```shell
-# distributed training on multiple GPU/Ascend devices
+# distributed training on multiple NPU devices
 msrun --bind_core=True --worker_num 8 python train.py --config configs/poolformer/poolformer_s12_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 
-Similarly, you can train the model on multiple GPU devices with the above `msrun` command.
 
 For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
 
@@ -76,7 +81,7 @@ For detailed illustration of all hyper-parameters, please refer to [config.py](h
 If you want to train or finetune the model on a smaller dataset without distributed training, please run:
 
 ```shell
-# standalone training on a CPU/GPU/Ascend device
+# standalone training on single NPU device
 python train.py --config configs/poolformer/poolformer_s12_ascend.yaml --data_dir /path/to/imagenet --distribute False
 ```
 
@@ -85,10 +90,6 @@ python train.py --config configs/poolformer/poolformer_s12_ascend.yaml --data_di
 ```
 validation of poolformer has to be done in amp O3 mode which is not supported, coming soon...
 ```
-
-### Deployment
-
-To deploy online inference services with the trained model efficiently, please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/).
 
 ## References
 

@@ -224,7 +224,7 @@ The following is an example of training SqueezenetV1 on [ImageNet] (you need to 
 > For detailed tutorials, please refer to the [tutorial](./configuration.md).
 
 ```shell
-# standalone training on a CPU/GPU/Ascend device
+# standalone training on single NPU device
 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml --data_dir /path/to/dataset --distribute False
 ```
 

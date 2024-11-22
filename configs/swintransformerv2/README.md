@@ -2,6 +2,11 @@
 
 > [Swin Transformer V2: Scaling Up Capacity and Resolution](https://arxiv.org/abs/2111.09883)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 This paper aims to explore large-scale models in computer vision. The authors tackle three major issues in training and
@@ -20,27 +25,29 @@ semantic segmentation, and Kinetics-400 video action classification.[[1](#refere
   <em>Figure 1. Architecture of Swin Transformer V2 [<a href="#references">1</a>] </em>
 </p>
 
-## Results
+## Performance
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-performance tested on ascend 910*(8p) with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 <div align="center">
 
-|        Model        | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                              | Download                                                                                                        |
-| :-----------------: | :-------: | :-------: | :-----: | :--------: | ---------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| swinv2_tiny_window8 |   81.38   |   95.46   | 380.93  |   28.78    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformerv2/swinv2_tiny_window8_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/swinv2/swinv2_tiny_window8-70c5e903-910v2.ckpt) |
+
+| model name          | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                              | weight                                                                                                          |
+| ------------------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| swinv2_tiny_window8 | 28.78     | 8     | 128        | 256x256    | O2        | 385s          | 335.18  | 3055.07 | 81.38    | 95.46    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformerv2/swinv2_tiny_window8_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/swinv2/swinv2_tiny_window8-70c5e903-910v2.ckpt) |
 
 </div>
 
-performance tested on ascend 910(8p) with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 <div align="center">
 
-|        Model        | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                              | Download                                                                                          |
-|:-------------------:|:---------:|:---------:|:----------:|------------|---------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
-| swinv2_tiny_window8 |   81.42   |   95.43   |   28.78    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformerv2/swinv2_tiny_window8_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/swinv2/swinv2_tiny_window8-3ef8b787.ckpt) |
+
+| model name          | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                              | weight                                                                                            |
+| ------------------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| swinv2_tiny_window8 | 28.78     | 8     | 128        | 256x256    | O2        | 273s          | 317.19  | 3228.35 | 81.42    | 95.43    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformerv2/swinv2_tiny_window8_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/swinv2/swinv2_tiny_window8-3ef8b787.ckpt) |
 
 </div>
 
@@ -54,7 +61,7 @@ performance tested on ascend 910(8p) with graph mode
 
 #### Installation
 
-Please refer to the [installation instruction](https://github.com/mindspore-ecosystem/mindcv#installation) in MindCV.
+Please refer to the [installation instruction](https://mindspore-lab.github.io/mindcv/installation/) in MindCV.
 
 #### Dataset Preparation
 
@@ -69,13 +76,12 @@ It is easy to reproduce the reported results with the pre-defined training recip
 Ascend 910 devices, please run
 
 ```shell
-# distributed training on multiple GPU/Ascend devices
+# distributed training on multiple NPU devices
 msrun --bind_core=True --worker_num 8 python train.py --config configs/swintransformerv2/swinv2_tiny_window8_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 
 
-Similarly, you can train the model on multiple GPU devices with the above `msrun` command.
 
 For detailed illustration of all hyper-parameters, please refer
 to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
@@ -88,7 +94,7 @@ keep the global batch size unchanged for reproduction or adjust the learning rat
 If you want to train or finetune the model on a smaller dataset without distributed training, please run:
 
 ```shell
-# standalone training on a CPU/GPU/Ascend device
+# standalone training on single NPU device
 python train.py --config configs/swintransformerv2/swinv2_tiny_window8_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
@@ -101,9 +107,6 @@ with `--ckpt_path`.
 python validate.py -c configs/swintransformerv2/swinv2_tiny_window8_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
-### Deployment
-
-Please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/) in MindCV.
 
 ## References
 

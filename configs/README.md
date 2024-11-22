@@ -33,17 +33,20 @@ Please follow the outline structure and **table format** shown in [densenet/READ
 
 <div align="center">
 
-| Model        | Context  | Top-1 (%) | Top-5 (%) | Params (M) | Recipe                                                                                              | Download                                                                                           |
-|--------------|----------|-----------|-----------|------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
-| densenet_121 | D910x8-G | 75.64     | 92.84     | 8.06       | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/densenet/densenet121-120_5004_Ascend.ckpt) |
+| model name  | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                              | weight                                                                                                    |
+| ----------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| densenet121 | 8.06      | 8     | 32         | 224x224    | O2        | 300s          | 47,34   | 5446.81 | 75.67    | 92.77    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/densenet/densenet121-bf4ab27f-910v2.ckpt) |
 
 </div>
 
 Illustration:
 - Model: model name in lower case with _ seperator.
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
 - Top-1 and Top-5: Accuracy reported on the validatoin set of ImageNet-1K. Keep 2 digits after the decimal point.
 - Params (M): # of model parameters in millions (10^6). Keep **2 digits** after the decimal point
+- Batch Size: Training batch size
+- Cards: # of cards
+- Ms/step: Time used on training per step in ms
+- Jit_level: Jit level of mindspore context, which contains 3 levels: O0/O1/O2
 - Recipe: Training recipe/configuration linked to a yaml config file.
 - Download: url of the pretrained model weights
 
@@ -62,10 +65,10 @@ Illustration:
 For consistency, it is recommended to provide distributed training commands based on `msrun --bind_core=True --worker_num {num_devices} python train.py`, instead of using shell script such as `distrubuted_train.sh`.
 
   ```shell
-  # standalone training on a gpu or ascend device
+  # standalone training on single NPU device
   python train.py --config configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/dataset --distribute False
 
-  # distributed training on gpu or ascend divices
+  # distributed training on NPU divices
   msrun --bind_core=True --worker_num 8 python train.py --config configs/densenet/densenet_121_ascend.yaml --data_dir /path/to/imagenet
 
   ```

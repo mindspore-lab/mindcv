@@ -2,6 +2,11 @@
 
 > [Res2Net: A New Multi-scale Backbone Architecture](https://arxiv.org/abs/1904.01169)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 Res2Net is a novel building block for CNNs proposed by constructing hierarchical residual-like connections within one
@@ -18,27 +23,29 @@ state-of-the-art baseline methods such as ResNet-50, DLA-60 and etc.
   <em>Figure 1. Architecture of Res2Net [<a href="#references">1</a>] </em>
 </p>
 
-## Results
+## Performance
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-performance tested on ascend 910*(8p) with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 <div align="center">
 
-|   Model   | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                           | Download                                                                                               |
-| :-------: | :-------: | :-------: | :-----: | :--------: | ---------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| res2net50 |   79.33   |   94.64   |  43.22  |   25.76    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/res2net/res2net_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/res2net/res2net50-aa758355-910v2.ckpt) |
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                           | weight                                                                                                 |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| res2net50  | 25.76     | 8     | 32         | 224x224    | O2        | 174s          | 39.6    | 6464.65 | 79.33    | 94.64    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/res2net/res2net_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/res2net/res2net50-aa758355-910v2.ckpt) |
 
 </div>
 
-performance tested on ascend 910(8p) with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 <div align="center">
 
-|   Model   | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                           | Download                                                                                 |
-|:---------:|:---------:|:---------:|:----------:|------------|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
-| res2net50 |   79.35   |   94.64   |   25.76    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/res2net/res2net_50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/res2net/res2net50-f42cf71b.ckpt) |
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                           | weight                                                                                   |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| res2net50  | 25.76     | 8     | 32         | 224x224    | O2        | 119s          | 39.68   | 6451.61 | 79.35    | 94.64    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/res2net/res2net_50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/res2net/res2net50-f42cf71b.ckpt) |
 
 </div>
 
@@ -52,7 +59,7 @@ performance tested on ascend 910(8p) with graph mode
 
 #### Installation
 
-Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
+Please refer to the [installation instruction](https://mindspore-lab.github.io/mindcv/installation/) in MindCV.
 
 #### Dataset Preparation
 
@@ -67,13 +74,12 @@ It is easy to reproduce the reported results with the pre-defined training recip
 Ascend 910 devices, please run
 
 ```shell
-# distributed training on multiple GPU/Ascend devices
+# distributed training on multiple NPU devices
 msrun --bind_core=True --worker_num 8 python train.py --config configs/res2net/res2net_50_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 
 
-Similarly, you can train the model on multiple GPU devices with the above `msrun` command.
 
 For detailed illustration of all hyper-parameters, please refer
 to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
@@ -86,7 +92,7 @@ keep the global batch size unchanged for reproduction or adjust the learning rat
 If you want to train or finetune the model on a smaller dataset without distributed training, please run:
 
 ```shell
-# standalone training on a CPU/GPU/Ascend device
+# standalone training on single NPU device
 python train.py --config configs/res2net/res2net_50_ascend.yaml --data_dir /path/to/imagenet --distribute False
 ```
 
@@ -99,10 +105,6 @@ with `--ckpt_path`.
 python validate.py -c configs/res2net/res2net_50_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
-### Deployment
-
-To deploy online inference services with the trained model efficiently, please refer to
-the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/).
 
 ## References
 

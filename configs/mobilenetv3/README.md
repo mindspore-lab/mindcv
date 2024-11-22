@@ -1,6 +1,11 @@
 # MobileNetV3
 > [Searching for MobileNetV3](https://arxiv.org/abs/1905.02244)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 MobileNet v3 was published in 2019, and this v3 version combines the deep separable convolution of v1, the Inverted Residuals and Linear Bottleneck of v2, and the SE module to search the configuration and parameters of the network using NAS (Neural Architecture Search).MobileNetV3 first uses MnasNet to perform a coarse structure search, and then uses reinforcement learning to select the optimal configuration from a set of discrete choices. Afterwards, MobileNetV3 then fine-tunes the architecture using NetAdapt, which exemplifies NetAdapt's complementary capability to tune underutilized activation channels with a small drop.
@@ -14,35 +19,35 @@ mobilenet-v3 offers two versions, mobilenet-v3 large and mobilenet-v3 small, for
   <em>Figure 1. Architecture of MobileNetV3 [<a href="#references">1</a>] </em>
 </p>
 
-## Results
+## Performance
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-performance tested on ascend 910*(8p) with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 <div align="center">
 
-| Model                  | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                       | Download                                                                                                                          |
-| ---------------------- | --------- | --------- | ------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| mobilenet_v3_small_100 | 68.07     | 87.77     | 51.97   | 2.55       | 75         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-6fa3c17d-910v2.ckpt) |
-| mobilenet_v3_large_100 | 75.59     | 92.57     | 52.55   | 5.51       | 75         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_large_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-bd4e7bdc-910v2.ckpt) |
+
+| model name             | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                       | weight                                                                                                                            |
+| ---------------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| mobilenet_v3_small_100 | 2.55      | 8     | 75         | 224x224    | O2        | 184s          | 52.38   | 11454.75 | 68.07    | 87.77    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-6fa3c17d-910v2.ckpt) |
+| mobilenet_v3_large_100 | 5.51      | 8     | 75         | 224x224    | O2        | 354s          | 55.89   | 10735.37 | 75.59    | 92.57    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_large_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-bd4e7bdc-910v2.ckpt) |
 
 </div>
 
-performance tested on ascend 910(8p) with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 <div align="center">
 
-| Model                  | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                       | Download                                                                                                            |
-| ---------------------- | --------- | --------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| mobilenet_v3_small_100 | 68.10     | 87.86     | 2.55       | 75         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-509c6047.ckpt) |
-| mobilenet_v3_large_100 | 75.23     | 92.31     | 5.51       | 75         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_large_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-1279ad5f.ckpt) |
+
+| model name             | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                       | weight                                                                                                              |
+| ---------------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| mobilenet_v3_small_100 | 2.55      | 8     | 75         | 224x224    | O2        | 145s          | 48.14   | 12463.65 | 68.10    | 87.86    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-509c6047.ckpt) |
+| mobilenet_v3_large_100 | 5.51      | 8     | 75         | 224x224    | O2        | 271s          | 47.49   | 12634.24 | 75.23    | 92.31    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_large_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-1279ad5f.ckpt) |
 
 </div>
 
 #### Notes
-
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
 - Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
@@ -50,7 +55,7 @@ performance tested on ascend 910(8p) with graph mode
 ### Preparation
 
 #### Installation
-Please refer to the [installation instruction](https://github.com/mindspore-ecosystem/mindcv#installation) in MindCV.
+Please refer to the [installation instruction](https://mindspore-lab.github.io/mindcv/installation/) in MindCV.
 
 #### Dataset Preparation
 Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/2012/index.php) dataset for model training and validation.
@@ -62,13 +67,12 @@ Please download the [ImageNet-1K](https://www.image-net.org/challenges/LSVRC/201
 It is easy to reproduce the reported results with the pre-defined training recipe. For distributed training on multiple Ascend 910 devices, please run
 
 ```shell
-# distributed training on multiple GPU/Ascend devices
+# distributed training on multiple NPU devices
 msrun --bind_core=True --worker_num 8 python train.py --config configs/mobilenetv3/mobilenet_v3_small_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 
 
-Similarly, you can train the model on multiple GPU devices with the above `msrun` command.
 
 For detailed illustration of all hyper-parameters, please refer to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
 
@@ -79,7 +83,7 @@ For detailed illustration of all hyper-parameters, please refer to [config.py](h
 If you want to train or finetune the model on a smaller dataset without distributed training, please run:
 
 ```shell
-# standalone training on a CPU/GPU/Ascend device
+# standalone training on single NPU device
 python train.py --config configs/mobilenetv3/mobilenet_v3_small_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
@@ -91,9 +95,6 @@ To validate the accuracy of the trained model, you can use `validate.py` and par
 python validate.py -c configs/mobilenetv3/mobilenet_v3_small_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
-### Deployment
-
-Please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/) in MindCV.
 
 ## References
 

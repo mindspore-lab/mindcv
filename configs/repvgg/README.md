@@ -3,6 +3,11 @@
 <!--- Guideline: please use url linked to the paper abstract in ArXiv instead of PDF for fast loading.  -->
 > [RepVGG: Making VGG-style ConvNets Great Again](https://arxiv.org/abs/2101.03697)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 <!--- Guideline: Introduce the model and architectures. Please cite if you use/adopt paper explanation from others. -->
@@ -22,12 +27,11 @@ previous methods.[[1](#references)]
   <em>Figure 1. Architecture of Repvgg [<a href="#references">1</a>] </em>
 </p>
 
-## Results
+## Performance
 
 <!--- Guideline:
 Table Format:
 - Model: model name in lower case with _ seperator.
-- Context: Training context denoted as {device}x{pieces}-{MS mode}, where mindspore mode can be G - graph mode or F - pynative mode with ms function. For example, D910x8-G is for training on 8 pieces of Ascend 910 NPU using graph mode.
 - Top-1 and Top-5: Keep 2 digits after the decimal point.
 - Params (M): # of model parameters in millions (10^6). Keep 2 digits after the decimal point
 - Recipe: Training recipe/configuration linked to a yaml config file. Use absolute url path.
@@ -36,25 +40,27 @@ Table Format:
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-performance tested on ascend 910*(8p) with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 <div align="center">
 
-|   Model   | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                         | Download                                                                                              |
-| :-------: | :-------: | :-------: | :-----: | :--------: | ---------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| repvgg_a0 |   72.29   |   90.78   |  25.14  |    9.13    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/repvgg/repvgg_a0-b67a9f15-910v2.ckpt) |
-| repvgg_a1 |   73.68   |   91.51   |  31.78  |   14.12    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a1_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/repvgg/repvgg_a1-a40aa623-910v2.ckpt) |
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                                |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | -------- | -------- | -------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| repvgg_a0  | 9.13      | 8     | 32         | 224x224    | O2        | 76s           | 24.12   | 10613.60 | 72.29    | 90.78    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/repvgg/repvgg_a0-b67a9f15-910v2.ckpt) |
+| repvgg_a1  | 14.12     | 8     | 32         | 224x224    | O2        | 81s           | 28.29   | 9096.13  | 73.68    | 91.51    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a1_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/repvgg/repvgg_a1-a40aa623-910v2.ckpt) |
 
 </div>
 
-performance tested on ascend 910(8p) with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 <div align="center">
 
-|   Model   | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                         | Download                                                                                |
-|:---------:|:---------:|:---------:|:----------:|------------|------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
-| repvgg_a0 |   72.19   |   90.75   |    9.13    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a0-6e71139d.ckpt) |
-| repvgg_a1 |   74.19   |   91.89   |   14.12    | 32         | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a1-539513ac.ckpt) |
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                  |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| repvgg_a0  | 9.13      | 8     | 32         | 224x224    | O2        | 50s<br>       | 20.58   | 12439.26 | 72.19    | 90.75    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a0-6e71139d.ckpt) |
+| repvgg_a1  | 14.12     | 8     | 32         | 224x224    | O2        | 29s           | 20.70   | 12367.15 | 74.19    | 91.89    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a1-539513ac.ckpt) |
 
 </div>
 
@@ -68,7 +74,7 @@ performance tested on ascend 910(8p) with graph mode
 
 #### Installation
 
-Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
+Please refer to the [installation instruction](https://mindspore-lab.github.io/mindcv/installation/) in MindCV.
 
 #### Dataset Preparation
 
@@ -85,12 +91,11 @@ It is easy to reproduce the reported results with the pre-defined training recip
 Ascend 910 devices, please run
 
 ```shell
-# distributed training on multiple GPU/Ascend devices
+# distributed training on multiple NPU devices
 msrun --bind_core=True --worker_num 8 python train.py --config configs/repvgg/repvgg_a1_ascend.yaml --data_dir /path/to/imagenet
 ```
 
 
-Similarly, you can train the model on multiple GPU devices with the above `msrun` command.
 
 For detailed illustration of all hyper-parameters, please refer
 to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
@@ -103,7 +108,7 @@ keep the global batch size unchanged for reproduction or adjust the learning rat
 If you want to train or finetune the model on a smaller dataset without distributed training, please run:
 
 ```shell
-# standalone training on a CPU/GPU/Ascend device
+# standalone training on single NPU device
 python train.py --config configs/repvgg/repvgg_a1_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
@@ -116,9 +121,6 @@ with `--ckpt_path`.
 python validate.py -c configs/repvgg/repvgg_a1_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
-### Deployment
-
-Please refer to the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/) in MindCV.
 
 ## References
 

@@ -2,6 +2,11 @@
 
 > [Visformer: The Vision-friendly Transformer](https://arxiv.org/abs/2104.12533)
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+
 ## Introduction
 
 Visformer, or Vision-friendly Transformer, is an architecture that combines Transformer-based architectural features
@@ -18,29 +23,31 @@ BatchNorm to patch embedding modules as in CNNs. [[2](#references)]
   <em>Figure 1. Network Configuration of Visformer  [<a href="https://arxiv.org/abs/2104.12533">1</a>] </em>
 </p>
 
-## Results
+## Performance
 
 ## ImageNet-1k
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-performance tested on ascend 910*(8p) with graph mode
+- Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode
 
 <div align="center">
 
-|     Model      | Top-1 (%) | Top-5 (%) | ms/step | Params (M) | Batch Size | Recipe                                                                                                 | Download                                                                                                      |
-| :------------: | :-------: | :-------: | :-----: | :--------: | ---------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| visformer_tiny |   78.40   |   94.30   | 311.34  |   10.33    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/visformer/visformer_tiny-df995ba4-910v2.ckpt) |
+
+| model name     | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                 | weight                                                                                                        |
+| -------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| visformer_tiny | 10.33     | 8     | 128        | 224x224    | O2        | 169s          | 201.14  | 5090.98 | 78.40    | 94.30    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/visformer/visformer_tiny-df995ba4-910v2.ckpt) |
 
 </div>
 
-performance tested on ascend 910(8p) with graph mode
+- Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode
 
 <div align="center">
 
-|     Model      | Top-1 (%) | Top-5 (%) | Params (M) | Batch Size | Recipe                                                                                                 | Download                                                                                        |
-|:--------------:|:---------:|:---------:|:----------:|------------|--------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
-| visformer_tiny |   78.28   |   94.15   |   10.33    | 128        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny-daee0322.ckpt) |
+
+| model name     | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                 | weight                                                                                          |
+| -------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| visformer_tiny | 10.33     | 8     | 128        | 224x224    | O2        | 137s          | 217.92  | 4698.97 | 78.28    | 94.15    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny-daee0322.ckpt) |
 
 </div>
 
@@ -54,7 +61,7 @@ performance tested on ascend 910(8p) with graph mode
 
 #### Installation
 
-Please refer to the [installation instruction](https://github.com/mindspore-lab/mindcv#installation) in MindCV.
+Please refer to the [installation instruction](https://mindspore-lab.github.io/mindcv/installation/) in MindCV.
 
 #### Dataset Preparation
 
@@ -69,11 +76,10 @@ It is easy to reproduce the reported results with the pre-defined training recip
 Ascend 910 devices, please run
 
 ```shell
-# distributed training on multiple GPU/Ascend devices
+# distributed training on multiple NPU devices
 msrun --bind_core=True --worker_num 8 python train.py --config configs/visformer/visformer_tiny_ascend.yaml --data_dir /path/to/imagenet
 ```
 
-Similarly, you can train the model on multiple GPU devices with the above `msrun` command.
 
 For detailed illustration of all hyper-parameters, please refer
 to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
@@ -86,7 +92,7 @@ keep the global batch size unchanged for reproduction or adjust the learning rat
 If you want to train or finetune the model on a smaller dataset without distributed training, please run:
 
 ```shell
-# standalone training on a CPU/GPU/Ascend device
+# standalone training on single NPU device
 python train.py --config configs/visformer/visformer_tiny_ascend.yaml --data_dir /path/to/dataset --distribute False
 ```
 
@@ -99,10 +105,6 @@ with `--ckpt_path`.
 python validate.py -c configs/visformer/visformer_tiny_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
-### Deployment
-
-To deploy online inference services with the trained model efficiently, please refer to
-the [deployment tutorial](https://mindspore-lab.github.io/mindcv/tutorials/deployment/).
 
 ## References
 
