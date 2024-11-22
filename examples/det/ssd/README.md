@@ -2,6 +2,7 @@
 
 > [SSD: Single Shot MultiBox Detector](https://arxiv.org/abs/1512.02325)
 
+
 ## Introduction
 
 SSD is an single-staged object detector. It discretizes the output space of bounding boxes into a set of default boxes over different aspect ratios and scales per feature map location, and combines predictions from multi-scale feature maps to detect objects with various sizes. At prediction time, SSD generates scores for the presence of each object category in each default box and produces adjustments to the box to better match the object shape.
@@ -14,6 +15,11 @@ SSD is an single-staged object detector. It discretizes the output space of boun
 </p>
 
 In this example, by leveraging [the multi-scale feature extraction of MindCV](https://github.com/mindspore-lab/mindcv/blob/main/docs/en/how_to_guides/feature_extraction.md), we demonstrate that using backbones from MindCV much simplifies the implementation of SSD.
+
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 ## Configurations
 
@@ -57,13 +63,13 @@ python examples/det/ssd/create_data.py coco --data_path [root of COCO 2017 Datas
 Specify the path of the preprocessed dataset at keyword `data_dir` in the config file.
 
 4. Download the pretrained backbone weights from the table below, and specify the path to the backbone weights at keyword `backbone_ckpt_path` in the config file.
-<div align="center">
+
 
 |    MobileNetV2   |     ResNet50     |    MobileNetV3   |
 |:----------------:|:----------------:|:----------------:|
 | [backbone weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv2/mobilenet_v2_100-d5532038.ckpt) | [backbone weights](https://download.mindspore.cn/toolkits/mindcv/resnet/resnet50-e0733ab8.ckpt) | [backbone weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-1279ad5f.ckpt) |
 
-</div>
+
 
 ### Train
 
@@ -125,18 +131,22 @@ cd mindcv  # change directory to the root of MindCV repository
 python examples/det/ssd/eval.py --config examples/det/ssd/ssd_mobilenetv2.yaml
 ```
 
+
 ## Performance
 
-Here are the performance resutls and the pretrained model weights for each configuration.
-<div align="center">
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
 
-|   Configuration   | Mixed Precision |  mAP | Config | Download |
-|:-----------------:|:---------------:|:----:|:------:|:--------:|
-|    MobileNetV2    |        O2       | 23.2 |  [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_mobilenetv2.yaml)  |  [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_mobilenetv2-5bbd7411.ckpt) |
-| ResNet50 with FPN |        O3       | 38.3 |  [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_resnet50_fpn.yaml)  |  [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_resnet50_fpn-ac87ddac.ckpt) |
-|    MobileNetV3    |        O2       | 23.8 |  [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_mobilenetv3.yaml)  |  [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_mobilenetv3-53d9f6e9.ckpt) |
+*coming soon*
 
-</div>
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+
+
+| model name       | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | mAP  | recipe                                                                                           | weight                                                                                      |
+| ---------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | ---- | ------------------------------------------------------------------------------------------------ |---------------------------------------------------------------------------------------------|
+| ssd_mobilenetv2  | 4.45      | 8     | 32         | 300x300    | O2        | 202s          | 60.14   | 4256.73 | 23.2 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_mobilenetv2.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_mobilenetv2-5bbd7411.ckpt)  |
+| ssd_resnet50_fpn | 33.37     | 8     | 32         | 640x640    | O2        | 130s          | 269.82  | 948.78  | 38.3 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_resnet50_fpn.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_resnet50_fpn-ac87ddac.ckpt) |
+
 
 ## References
 

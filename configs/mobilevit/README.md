@@ -1,6 +1,7 @@
 # MobileViT
 > [MobileViT：Light-weight, General-purpose, and Mobile-friendly Vision Transformer](https://arxiv.org/pdf/2110.02178.pdf)
 
+
 ## Introduction
 
 MobileViT, a light-weight and general-purpose vision transformer for mobile devices. MobileViT presents a different perspective for the global processing of information with transformers, i.e., transformers as convolutions. MobileViT significantly outperforms CNN- and ViT-based networks across different tasks and datasets. On the ImageNet-1k dataset, MobileViT achieves top-1 accuracy of 78.4% with about 6 million parameters, which is 3.2% and 6.2% more accurate than MobileNetv3 (CNN-based) and DeIT (ViT-based) for a similar number of parameters. On the MS-COCO object detection task, MobileViT is 5.7% more accurate than MobileNetv3 for a similar number of parameters.
@@ -12,36 +13,12 @@ MobileViT, a light-weight and general-purpose vision transformer for mobile devi
   <em>Figure 1. Architecture of MobileViT [<a href="#references">1</a>] </em>
 </p>
 
-## Results
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- ascend 910* with graph mode
-
-<div align="center">
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 
-| model              | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                     | download                                                                                                          |
-| ------------------ | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| mobilevit_xx_small | 67.11     | 87.85     | 1.27       | 64         | 8     | 67.24   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_xx_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilevit/mobilevit_xx_small-6f2745c3-910v2.ckpt) |
-
-
-</div>
-
-- ascend 910 with graph mode
-
-<div align="center">
-
-
-| model              | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                     | download                                                                                            |
-| ------------------ | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| mobilevit_xx_small | 68.91     | 88.91     | 1.27       | 64         | 8     | 53.52   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_xx_small-af9da8a0.ckpt) |
-
-
-</div>
-
-#### Notes
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -86,3 +63,25 @@ To validate the accuracy of the trained model, you can use `validate.py` and par
 ```
 python validate.py -c configs/mobilevit/mobilevit_xx_small_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
+
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+
+| model name         | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                     | weight                                                                                                            |
+| ------------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| mobilevit_xx_small | 1.27      | 8     | 64         | 256x256    | O2        | 437s          | 67.24   | 7614.52 | 67.11    | 87.85    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_xx_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilevit/mobilevit_xx_small-6f2745c3-910v2.ckpt) |
+
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+
+| model name         | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                     | weight                                                                                              |
+| ------------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| mobilevit_xx_small | 1.27      | 64    | 8          | 256x256    | O2        | 301s          | 53.52   | 9566.52 | 68.91    | 88.91    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_xx_small-af9da8a0.ckpt) |
+
+### Notes
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

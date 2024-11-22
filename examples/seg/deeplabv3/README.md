@@ -4,6 +4,7 @@
 >
 > DeeplabV3+:[Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation](https://arxiv.org/abs/1802.02611)
 
+
 ## Introduction
 
 **DeepLabV3** is a semantic segmentation architecture improved over previous version. Two main contributions of DeepLabV3 are as follows. 1) Modules are designed which employ atrous convolution in cascade or in parallel to capture multi-scale context by adopting multiple atrous rates to handle the problem of segmenting objects at multiple scale. 2) The Atrous Spatial Pyramid Pooling (ASPP) module is augmented with image-level features encoding global context and further boost performance. The improved ASPP applys global average pooling on the last feature map of the model, feeds the resulting image-level features to a 1 × 1 convolution with 256 filters (and batch normalization), and then bilinearly upsamples the feature to the desired spatial dimension. The DenseCRF post-processing from DeepLabV2 is deprecated.
@@ -28,6 +29,11 @@
 
 
 This example provides implementations of DeepLabV3 and DeepLabV3+ using backbones from MindCV. More details about feature extraction of MindCV are in [this tutorial](https://github.com/mindspore-lab/mindcv/blob/main/docs/en/how_to_guides/feature_extraction.md). Note that the ResNet in DeepLab contains atrous convolutions with different rates,  `dilated_resnet.py`  is provided as a modification of ResNet from MindCV, with atrous convolutions in block 3-4.
+
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 ## Quick Start
 
@@ -142,30 +148,28 @@ For example, after replacing  `ckpt_path` in config file with [checkpoint](https
 python examples/seg/deeplabv3/eval.py --config examples/seg/deeplabv3/config/deeplabv3_s8_dilated_resnet101.yaml
 ```
 
-## Results
-
-### Config
-
-|   Model    |                         OS=16 config                         |                         OS=8 config                          |                           Download                           |
-| :--------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
-| DeepLabV3  | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3_s16_dilated_resnet101.yaml) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3_s8_dilated_resnet101.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/deeplabv3/deeplabv3_dilated_resnet101-8614f6af.ckpt) |
-| DeepLabV3+ | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3plus_s16_dilated_resnet101.yaml) | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3plus_s8_dilated_resnet101.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/deeplabv3/deeplabv3plus_dilated_resnet101-59ea7d95.ckpt) |
-
-### Model results
+## Performance
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
 
 
-|   Model    | Infer OS |  MS  | FLIP | mIoU  |
-| :--------: | :------: | :--: | :--: | :---: |
-| DeepLabV3  |    16    |      |      | 77.33 |
-| DeepLabV3  |    8     |      |      | 79.16 |
-| DeepLabV3  |    8     |  √   |      | 79.93 |
-| DeepLabV3  |    8     |  √   |  √   | 80.14 |
-| DeepLabV3+ |    16    |      |      | 78.99 |
-| DeepLabV3+ |    8     |      |      | 80.31 |
-| DeepLabV3+ |    8     |  √   |      | 80.99 |
-| DeepLabV3+ |    8     |  √   |  √   | 81.10 |
 
-**Note**: **OS**: output stride.  **MS**: multiscale inputs during test. **Flip**: adding left-right flipped inputs during test. **Weights** are checkpoint files saved after two-step training.
+| model name        | params(M) | cards | batch size | jit level | graph compile | ms/step | img/s  | mIoU                | recipe                                                                                                                           | weight      |
+| ----------------- | --------- | ----- | ---------- | --------- | ------------- | ------- | ------ | ------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| deeplabv3_s16     | 58.15     | 8     | 32         | O2        | 122s          | 267.91  | 955.54 | 77.33               | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3_s16_dilated_resnet101.yaml)     | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/deeplabv3/deeplabv3-s16-best.ckpt) |
+| deeplabv3_s8      | 58.15     | 8     | 16         | O2        | 180s          | 390.81  | 327.52 | 79.16\|79.93\|80.14 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3_s8_dilated_resnet101.yaml)      | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/deeplabv3/deeplabv3-s8-best.ckpt) |
+| deeplabv3plus_s16 | 59.45     | 8     | 32         | O2        | 207s          | 312.15  | 820.12 | 78.99               | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3plus_s16_dilated_resnet101.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/deeplabv3/deeplabv3plus-s16-best.ckpt) |
+| deeplabv3plus_s8  | 59.45     | 8     | 16         | O2        | 170s          | 403.43  | 217.28 | 80.31\|80.99\|81.10 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3plus_s8_dilated_resnet101.yaml)  | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/deeplabv3/deeplabv3plus-s8-best.ckpt) |
+
+
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+*coming soon*
+
+### Notes
+- mIoU: mIoU of model "deeplabv3_s8" and "deeplabv3plus_s8" contains 3 results which tested respectively under conditions of no enhance/with MS/with MS and FLIP.
+- MS: multiscale inputs during test.
+- Flip: adding left-right flipped inputs during test.
 
 As illustrated in [<a href="#references">1</a>], adding left-right flipped inputs or muilt-scale inputs during test could improve the performence. Also, once the model is finally trained, employed output_stride=8 during inference bring improvement over using  output_stride=16.
 

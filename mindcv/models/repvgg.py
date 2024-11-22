@@ -145,7 +145,7 @@ class RepVGGBlock(nn.Cell):
     def _pad_1x1_to_3x3_tensor(self, kernel1x1):
         if kernel1x1 is None:
             return 0
-        return ops.pad(kernel1x1, ((1, 1), (1, 1)))
+        return ops.pad(kernel1x1, (1, 1, 1, 1))
 
     def _fuse_bn_tensor(self, branch):
         if branch is None:

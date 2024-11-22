@@ -3,6 +3,8 @@
 <!--- Guideline: please use url linked to the paper abstract in ArXiv instead of PDF for fast loading.  -->
 > [RepVGG: Making VGG-style ConvNets Great Again](https://arxiv.org/abs/2101.03697)
 
+
+
 ## Introduction
 
 <!--- Guideline: Introduce the model and architectures. Please cite if you use/adopt paper explanation from others. -->
@@ -22,46 +24,12 @@ previous methods.[[1](#references)]
   <em>Figure 1. Architecture of Repvgg [<a href="#references">1</a>] </em>
 </p>
 
-## Results
-
-<!--- Guideline:
-Table Format:
-- Model: model name in lower case with _ seperator.
-- Top-1 and Top-5: Keep 2 digits after the decimal point.
-- Params (M): # of model parameters in millions (10^6). Keep 2 digits after the decimal point
-- Recipe: Training recipe/configuration linked to a yaml config file. Use absolute url path.
-- Download: url of the pretrained model weights. Use absolute url path.
--->
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- ascend 910* with graph mode
-
-<div align="center">
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 
-|   model   | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                         | download                                                                                              |
-| :-------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| repvgg_a0 |   72.29   |   90.78   |    9.13    | 32         | 8     | 24.12   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/repvgg/repvgg_a0-b67a9f15-910v2.ckpt) |
-| repvgg_a1 |   73.68   |   91.51   |   14.12    | 32         | 8     | 28.29   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a1_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/repvgg/repvgg_a1-a40aa623-910v2.ckpt) |
-
-</div>
-
-- ascend 910 with graph mode
-
-<div align="center">
-
-
-|   model   | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                         | download                                                                                |
-| :-------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| repvgg_a0 |   72.19   |   90.75   |    9.13    | 32         | 8     | 20.58   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a0-6e71139d.ckpt) |
-| repvgg_a1 |   74.19   |   91.89   |   14.12    | 32         | 8     | 20.70   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a1-539513ac.ckpt) |
-
-</div>
-
-#### Notes
-
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -116,6 +84,31 @@ with `--ckpt_path`.
 python validate.py -c configs/repvgg/repvgg_a1_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
+
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                                |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | -------- | -------- | -------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| repvgg_a0  | 9.13      | 8     | 32         | 224x224    | O2        | 76s           | 24.12   | 10613.60 | 72.29    | 90.78    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/repvgg/repvgg_a0-b67a9f15-910v2.ckpt) |
+| repvgg_a1  | 14.12     | 8     | 32         | 224x224    | O2        | 81s           | 28.29   | 9096.13  | 73.68    | 91.51    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a1_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/repvgg/repvgg_a1-a40aa623-910v2.ckpt) |
+
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                  |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| repvgg_a0  | 9.13      | 8     | 32         | 224x224    | O2        | 50s<br>       | 20.58   | 12439.26 | 72.19    | 90.75    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a0-6e71139d.ckpt) |
+| repvgg_a1  | 14.12     | 8     | 32         | 224x224    | O2        | 29s           | 20.70   | 12367.15 | 74.19    | 91.89    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a1_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repvgg/repvgg_a1-539513ac.ckpt) |
+
+### Notes
+
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## References
 

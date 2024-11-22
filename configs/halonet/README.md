@@ -2,6 +2,7 @@
 
 > [Scaling Local Self-Attention for Parameter Efficient Visual Backbones](https://arxiv.org/abs/2103.12731)
 
+
 ## Introduction
 
 Researchers from Google Research and UC Berkeley have developed a new model of self-attention that can outperform standard baseline models and even high-performance convolutional models.[[1](#references)]
@@ -24,28 +25,11 @@ Down Sampling：In order to reduce the amount of computation, each block is samp
   <em>Figure 2. Architecture of Down Sampling [<a href="#references">1</a>] </em>
 </p>
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
-## Results
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- ascend 910* with graph mode
-
-*coming soon*
-
-- ascend 910 with graph mode
-
-<div align="center">
-
-
-| model       | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                            | download                                                                                   |
-| ----------- | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| halonet_50t | 79.53     | 94.79     | 22.79      | 64         | 8     | 421.66  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/halonet/halonet_50t_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/halonet/halonet_50t-533da6be.ckpt) |
-
-</div>
-
-#### Notes
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -91,6 +75,21 @@ To validate the accuracy of the trained model, you can use `validate.py` and par
 ```shell
 python validate.py -c configs/halonet/halonet_50t_ascend.yaml  --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
+
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+*coming soon*
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+*coming soon*
+
+### Notes
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## References
 

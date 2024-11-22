@@ -2,6 +2,8 @@
 
 > [Selective Kernel Networks](https://arxiv.org/pdf/1903.06586)
 
+
+
 ## Introduction
 
 The local receptive fields (RFs) of neurons in the primary visual cortex (V1) of cats [[1](#references)] have inspired
@@ -22,35 +24,12 @@ multi-scale information from, e.g., 3×3, 5×5, 7×7 convolutional kernels insid
   <em>Figure 1. Selective Kernel Convolution.</em>
 </p>
 
-## Results
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- ascend 910* with graph mode
-
-<div align="center">
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 
-|   model    | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                         | download                                                                                              |
-| :--------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| skresnet18 |   72.85   |   90.83   |   11.97    | 64         | 8     | 49.83   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/sknet/skresnet18_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/sknet/skresnet18-9d8b1afc-910v2.ckpt) |
-
-</div>
-
-- ascend 910 with graph mode
-
-<div align="center">
-
-
-|   model    | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                         | download                                                                                |
-| :--------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| skresnet18 |   73.09   |   91.20   |   11.97    | 64         | 8     | 45.84   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/sknet/skresnet18_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/sknet/skresnet18-868228e5.ckpt) |
-
-</div>
-
-#### Notes
-
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -103,6 +82,36 @@ with `--ckpt_path`.
 ```
 python validate.py -c configs/sknet/skresnext50_32x4d_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
+
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+
+
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                                |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | -------- | -------- | -------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| skresnet18 | 11.97     | 8     | 64         | 224x224    | O2        | 134s          | 49.83   | 10274.93 | 72.85    | 90.83    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/sknet/skresnet18_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/sknet/skresnet18-9d8b1afc-910v2.ckpt) |
+
+
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+
+
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                  |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | -------- | -------- | -------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| skresnet18 | 11.97     | 8     | 64         | 224x224    | O2        | 60s           | 45.84   | 11169.28 | 73.09    | 91.20    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/sknet/skresnet18_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/sknet/skresnet18-868228e5.ckpt) |
+
+
+
+### Notes
+
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 
 ## References

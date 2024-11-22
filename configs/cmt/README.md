@@ -2,6 +2,7 @@
 
 > [CMT: Convolutional Neural Networks Meet Vision Transformers](https://arxiv.org/abs/2107.06263)
 
+
 ## Introduction
 
 CMT is a method to make full use of the advantages of CNN and transformers so that the model could capture long-range
@@ -9,29 +10,11 @@ dependencies and extract local information. In addition, to reduce computation c
 and depthwise convolution and pointwise convolution like MobileNet. By combing these parts, CMT could get a SOTA performance
 on ImageNet-1K dataset.
 
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
-## Results
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- ascend 910* with graph mode
-
-*coming soon*
-
-- ascend 910 with graph mode
-
-<div align="center">
-
-
-| model     | top-1 (%) | top-5 (%) | params(M) | batch size | cards | ms/step | jit_level | recipe                                                                                      | download                                                                             |
-| --------- | --------- | --------- | --------- | ---------- | ----- |---------| --------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| cmt_small | 83.24     | 96.41     | 26.09     | 128        | 8     | 500.64  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/cmt/cmt_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/cmt/cmt_small-6858ee22.ckpt) |
-
-
-</div>
-
-#### Notes
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -77,6 +60,23 @@ To validate the accuracy of the trained model, you can use `validate.py` and par
 ```
 python validate.py -c configs/cmt/cmt_small_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
+
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+*coming soon*
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                      | weight                                                                               |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| cmt_small  | 26.09     | 8     | 128        | 224x224    | O2        | 1268s         | 500.64  | 2048.01 | 83.24    | 96.41    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/cmt/cmt_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/cmt/cmt_small-6858ee22.ckpt) |
+
+### Notes
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## References
 

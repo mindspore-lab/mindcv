@@ -2,6 +2,8 @@
 
 > [Aggregated Residual Transformations for Deep Neural Networks](https://arxiv.org/abs/1611.05431)
 
+
+
 ## Introduction
 
 The authors present a simple, highly modularized network architecture for image classification. The network is
@@ -19,35 +21,12 @@ accuracy.[[1](#references)]
   <em>Figure 1. Architecture of ResNeXt [<a href="#references">1</a>] </em>
 </p>
 
-## Results
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- ascend 910* with graph mode
-
-<div align="center">
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 
-|      model      | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                | download                                                                                                     |
-| :-------------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| resnext50_32x4d |   78.64   |   94.18   |   25.10    | 32         | 8     | 44.61   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnext/resnext50_32x4d_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/resnext/resnext50_32x4d-988f75bc-910v2.ckpt) |
-
-</div>
-
-- ascend 910 with graph mode
-
-<div align="center">
-
-
-|      model      | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                | download                                                                                       |
-| :-------------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| resnext50_32x4d |   78.53   |   94.10   |   25.10    | 32         | 8     | 37.22   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnext/resnext50_32x4d_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnext/resnext50_32x4d-af8aba16.ckpt) |
-
-</div>
-
-#### Notes
-
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -101,6 +80,35 @@ with `--ckpt_path`.
 python validate.py -c configs/resnext/resnext50_32x4d_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+
+
+
+| model name      | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                | weight                                                                                                       |
+| --------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| resnext50_32x4d | 25.10     | 8     | 32         | 224x224    | O2        | 156s          | 44.61   | 5738.62 | 78.64    | 94.18    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnext/resnext50_32x4d_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/resnext/resnext50_32x4d-988f75bc-910v2.ckpt) |
+
+
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+
+
+
+| model name      | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                | weight                                                                                         |
+| --------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| resnext50_32x4d | 25.10     | 8     | 32         | 224x224    | O2        | 49s           | 37.22   | 6878.02 | 78.53    | 94.10    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnext/resnext50_32x4d_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnext/resnext50_32x4d-af8aba16.ckpt) |
+
+
+
+### Notes
+
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## References
 

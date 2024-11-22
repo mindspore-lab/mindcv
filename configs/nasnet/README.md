@@ -2,6 +2,7 @@
 <!--- Guideline: please use url linked to the paper abstract in ArXiv instead of PDF for fast loading.  -->
 > [Learning Transferable Architectures for Scalable Image Recognition](https://arxiv.org/abs/1707.07012)
 
+
 ## Introduction
 <!--- Guideline: Introduce the model and architectures. Please cite if you use/adopt paper explanation from others. -->
 <!--- Guideline: If an architecture table/figure is available in the paper, please put one here and cite for intuitive illustration. -->
@@ -18,42 +19,12 @@ compared with previous state-of-the-art methods on ImageNet-1K dataset.[[1](#ref
   <em>Figure 1. Architecture of Nasnet [<a href="#references">1</a>] </em>
 </p>
 
-## Results
-<!--- Guideline:
-Table Format:
-- Model: model name in lower case with _ seperator.
-- Top-1 and Top-5: Keep 2 digits after the decimal point.
-- Params (M): # of model parameters in millions (10^6). Keep 2 digits after the decimal point
-- Recipe: Training recipe/configuration linked to a yaml config file. Use absolute url path.
-- Download: url of the pretrained model weights. Use absolute url path.
--->
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- ascend 910* with graph mode
-
-<div align="center">
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 
-| model           | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                               | download                                                                                                     |
-| --------------- | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| nasnet_a_4x1056 | 74.12     | 91.36     | 5.33       | 256        | 8     | 364.35  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/nasnet/nasnet_a_4x1056_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/nasnet/nasnet_a_4x1056-015ba575c-910v2.ckpt) |
-
-</div>
-
-- ascend 910 with graph mode
-
-<div align="center">
-
-
-| model           | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                               | download                                                                                      |
-| --------------- | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| nasnet_a_4x1056 | 73.65     | 91.25     | 5.33       | 256        | 8     | 330.89  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/nasnet/nasnet_a_4x1056_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/nasnet/nasnet_a_4x1056-0fbb5cdd.ckpt) |
-
-</div>
-
-#### Notes
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -99,6 +70,28 @@ To validate the accuracy of the trained model, you can use `validate.py` and par
 ```
 python validate.py -c configs/nasnet/nasnet_a_4x1056_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
+
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+
+| model name      | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                               | weight                                                                                                       |
+| --------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| nasnet_a_4x1056 | 5.33      | 8     | 256        | 224x224    | O2        | 800s          | 364.35  | 5620.97 | 74.12    | 91.36    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/nasnet/nasnet_a_4x1056_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/nasnet/nasnet_a_4x1056-015ba575c-910v2.ckpt) |
+
+
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+| model name      | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                               | weight                                                                                        |
+| --------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| nasnet_a_4x1056 | 5.33      | 8     | 256        | 224x224    | O2        | 656s          | 330.89  | 6189.37 | 73.65    | 91.25    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/nasnet/nasnet_a_4x1056_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/nasnet/nasnet_a_4x1056-0fbb5cdd.ckpt) |
+
+### Notes
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 
 ## References

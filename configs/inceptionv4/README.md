@@ -15,34 +15,11 @@ performance with Inception-ResNet v2.[[1](#references)]
   <em>Figure 1. Architecture of InceptionV4 [<a href="#references">1</a>] </em>
 </p>
 
-## Results
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- ascend 910* with graph mode
-
-<div align="center">
-
-
-| model        | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                 | download                                                                                                       |
-| ------------ | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| inception_v4 | 80.98     | 95.25     | 42.74      | 32         | 8     | 80.97   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv4/inception_v4_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/inception_v4/inception_v4-56e798fc-910v2.ckpt) |
-
-</div>
-
-- ascend 910 with graph mode
-
-<div align="center">
-
-
-| model        | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                                 | download                                                                                         |
-| ------------ | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| inception_v4 | 80.88     | 95.34     | 42.74      | 32         | 8     | 76.19   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv4/inception_v4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/inception_v4/inception_v4-db9c45b3.ckpt) |
-
-</div>
-
-#### Notes
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -89,6 +66,25 @@ To validate the accuracy of the trained model, you can use `validate.py` and par
 python validate.py -c configs/inceptionv4/inception_v4_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+| model name   | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                 | weight                                                                                                         |
+| ------------ | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| inception_v4 | 42.74     | 8     | 32         | 299x299    | O2        | 263s          | 80.97   | 3161.66 | 80.98    | 95.25    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv4/inception_v4_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/inception_v4/inception_v4-56e798fc-910v2.ckpt) |
+
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+| model name   | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                 | weight                                                                                           |
+| ------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| inception_v4 | 42.74     | 8     | 32         | 299x299    | O2        | 177s          | 76.19   | 3360.02 | 80.88    | 95.34    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv4/inception_v4_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/inception_v4/inception_v4-db9c45b3.ckpt) |
+
+### Notes
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## References
 

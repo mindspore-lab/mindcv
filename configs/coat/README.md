@@ -6,28 +6,11 @@
 
 Co-Scale Conv-Attentional Image Transformer (CoaT) is a Transformer-based image classifier equipped with co-scale and conv-attentional mechanisms. First, the co-scale mechanism maintains the integrity of Transformers' encoder branches at individual scales, while allowing representations learned at different scales to effectively communicate with each other. Second, the conv-attentional mechanism is designed by realizing a relative position embedding formulation in the factorized attention module with an efficient convolution-like implementation. CoaT empowers image Transformers with enriched multi-scale and contextual modeling capabilities.
 
-## Results
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- ascend 910* with graph mode
-
-*coming soon*
-
-
-- ascend 910 with graph mode
-
-<div align="center">
-
-
-| model     | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                       | Weight                                                                                |
-| --------- | --------- | --------- | ---------- | ---------- | ----- |---------| --------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| coat_tiny | 79.67     | 94.88     | 5.50       | 32         | 8     | 254.95  | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_tiny-071cb792.ckpt) |
-
-</div>
-
-#### Notes
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 
 ## Quick Start
@@ -73,6 +56,30 @@ To validate the accuracy of the trained model, you can use `validate.py` and par
 ```shell
 python validate.py -c configs/coat/coat_lite_tiny_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
+
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+*coming soon*
+
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+
+
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                       | weight                                                                                |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| coat_tiny  | 5.50      | 8     | 32         | 224x224    | O2        | 543s          | 254.95  | 1003.92 | 79.67    | 94.88    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/coat/coat_tiny-071cb792.ckpt) |
+
+
+
+### Notes
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
+
 
 ## References
 

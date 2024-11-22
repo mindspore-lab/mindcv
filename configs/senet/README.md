@@ -2,6 +2,8 @@
 
 > [Squeeze-and-Excitation Networks](https://arxiv.org/abs/1709.01507)
 
+
+
 ## Introduction
 
 In this work, the authors focus instead on the channel relationship and propose a novel architectural unit, which the
@@ -18,35 +20,12 @@ additional computational cost.[[1](#references)]
   <em>Figure 1. Architecture of SENet [<a href="#references">1</a>] </em>
 </p>
 
-## Results
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- ascend 910* with graph mode
-
-<div align="center">
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 
-|   model    | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                         | download                                                                                              |
-| :--------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| seresnet18 |   72.05   |   90.59   |   11.80    | 64         | 8     | 51.09   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet18_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/senet/seresnet18-7b971c78-910v2.ckpt) |
-
-</div>
-
-- ascend 910 with graph mode
-
-<div align="center">
-
-
-|   model    | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                         | download                                                                                |
-| :--------: | :-------: | :-------: | :--------: | ---------- | ----- | ------- | --------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| seresnet18 |   71.81   |   90.49   |   11.80    | 64         | 8     | 44.40   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet18_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/senet/seresnet18-7880643b.ckpt) |
-
-</div>
-
-#### Notes
-
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -100,6 +79,35 @@ with `--ckpt_path`.
 python validate.py -c configs/senet/seresnet50_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
 
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+
+
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                                |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | -------- | -------- | -------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| seresnet18 | 11.80     | 8     | 64         | 224x224    | O2        | 90s           | 51.09   | 10021.53 | 72.05    | 90.59    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet18_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/senet/seresnet18-7b971c78-910v2.ckpt) |
+
+
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+
+
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                  |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | -------- | -------- | -------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| seresnet18 | 11.80     | 8     | 64         | 224x224    | O2        | 43s           | 44.40   | 11531.53 | 71.81    | 90.49    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/senet/seresnet18_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/senet/seresnet18-7880643b.ckpt) |
+
+
+
+### Notes
+
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## References
 

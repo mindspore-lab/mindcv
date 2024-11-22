@@ -17,36 +17,12 @@ fewer computation cost compared with ResNet and DenseNet on ImageNet-1K dataset.
   <em>Figure 1. Architecture of DPN [<a href="#references">1</a>] </em>
 </p>
 
-## Results
-<!--- Guideline:
-Table Format:
-- Model: model name in lower case with _ seperator.
-- Top-1 and Top-5: Keep 2 digits after the decimal point.
-- Params (M): # of model parameters in millions (10^6). Keep 2 digits after the decimal point
-- Recipe: Training recipe/configuration linked to a yaml config file. Use absolute url path.
-- Download: url of the pretrained model weights. Use absolute url path.
--->
-
-Our reproduced model performance on ImageNet-1K is reported as follows.
-
-- ascend 910* with graph mode
-
-*coming soon*
-
-- ascend 910 with graph mode
-
-<div align="center">
+## Requirements
+| mindspore | ascend driver |  firmware   | cann toolkit/kernel |
+| :-------: | :-----------: | :---------: | :-----------------: |
+|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
 
 
-| model | top-1 (%) | top-5 (%) | params (M) | batch size | cards | ms/step | jit_level | recipe                                                                                  | download                                                                        |
-| ----- | --------- | --------- | ---------- | ---------- | ----- | ------- | --------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| dpn92 | 79.46     | 94.49     | 37.79      | 32         | 8     | 78.22   | O2        | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/dpn/dpn92_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/dpn/dpn92-e3e0fca.ckpt) |
-
-
-</div>
-
-#### Notes
-- Top-1 and Top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## Quick Start
 
@@ -92,6 +68,24 @@ To validate the accuracy of the trained model, you can use `validate.py` and par
 ```
 python validate.py -c configs/dpn/dpn92_ascend.yaml --data_dir /path/to/imagenet --ckpt_path /path/to/ckpt
 ```
+
+## Performance
+
+Our reproduced model performance on ImageNet-1K is reported as follows.
+
+Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+
+*coming soon*
+
+Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+
+
+| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                  | weight                                                                          |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| dpn92      | 37.79     | 8     | 32         | 224x224    | O2        | 293s          | 78.22   | 3272.82 | 79.46    | 94.49    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/dpn/dpn92_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/dpn/dpn92-e3e0fca.ckpt) |
+
+### Notes
+- top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
 ## References
 <!--- Guideline: Citation format GB/T 7714 is suggested. -->
