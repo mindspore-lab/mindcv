@@ -6,7 +6,7 @@ Refer to ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Desi
 from typing import Tuple
 
 import mindspore.common.initializer as init
-from mindspore import Tensor, nn, ops
+from mindspore import Tensor, mint, nn
 
 from .helpers import load_pretrained
 from .layers.pooling import GlobalAvgPooling
@@ -65,30 +65,34 @@ class ShuffleV2Block(nn.Cell):
         out_channels = out_channels - in_channels
         branch_main = [
             # pw
-            nn.Conv2d(in_channels, mid_channels, kernel_size=1, stride=1),
-            nn.BatchNorm2d(mid_channels),
-            nn.ReLU(),
+            mint.nn.Conv2d(in_channels, mid_channels, kernel_size=1, stride=1, bias=False),
+            mint.nn.BatchNorm2d(mid_channels),
+            mint.nn.ReLU(),
             # dw
-            nn.Conv2d(mid_channels, mid_channels, kernel_size=kernel_size, stride=stride,
-                      pad_mode="pad", padding=pad, group=mid_channels),
-            nn.BatchNorm2d(mid_channels),
+            mint.nn.Conv2d(
+                mid_channels, mid_channels, kernel_size=kernel_size, stride=stride,
+                padding=pad, groups=mid_channels, bias=False
+            ),
+            mint.nn.BatchNorm2d(mid_channels),
             # pw-linear
-            nn.Conv2d(mid_channels, out_channels, kernel_size=1, stride=1),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(),
+            mint.nn.Conv2d(mid_channels, out_channels, kernel_size=1, stride=1, bias=False),
+            mint.nn.BatchNorm2d(out_channels),
+            mint.nn.ReLU(),
         ]
         self.branch_main = nn.SequentialCell(branch_main)
 
         if stride == 2:
             branch_proj = [
                 # dw
-                nn.Conv2d(in_channels, in_channels, kernel_size=kernel_size, stride=stride,
-                          pad_mode="pad", padding=pad, group=in_channels),
-                nn.BatchNorm2d(in_channels),
+                mint.nn.Conv2d(
+                    in_channels, in_channels, kernel_size=kernel_size, stride=stride,
+                    padding=pad, groups=in_channels, bias=False
+                ),
+                mint.nn.BatchNorm2d(in_channels),
                 # pw-linear
-                nn.Conv2d(in_channels, in_channels, kernel_size=1, stride=1),
-                nn.BatchNorm2d(in_channels),
-                nn.ReLU(),
+                mint.nn.Conv2d(in_channels, in_channels, kernel_size=1, stride=1, bias=False),
+                mint.nn.BatchNorm2d(in_channels),
+                mint.nn.ReLU(),
             ]
             self.branch_proj = nn.SequentialCell(branch_proj)
         else:
@@ -97,20 +101,20 @@ class ShuffleV2Block(nn.Cell):
     def construct(self, old_x: Tensor) -> Tensor:
         if self.stride == 1:
             x_proj, x = self.channel_shuffle(old_x)
-            return ops.concat((x_proj, self.branch_main(x)), axis=1)
+            return mint.concat((x_proj, self.branch_main(x)), dim=1)
 
         if self.stride == 2:
             x_proj = old_x
             x = old_x
-            return ops.concat((self.branch_proj(x_proj), self.branch_main(x)), axis=1)
+            return mint.concat((self.branch_proj(x_proj), self.branch_main(x)), dim=1)
         return None
 
     @staticmethod
     def channel_shuffle(x: Tensor) -> Tuple[Tensor, Tensor]:
         batch_size, num_channels, height, width = x.shape
-        x = ops.reshape(x, (batch_size * num_channels // 2, 2, height * width,))
-        x = ops.transpose(x, (1, 0, 2,))
-        x = ops.reshape(x, (2, -1, num_channels // 2, height, width,))
+        x = mint.reshape(x, (batch_size * num_channels // 2, 2, height * width,))
+        x = mint.permute(x, (1, 0, 2,))
+        x = mint.reshape(x, (2, -1, num_channels // 2, height, width,))
         return x[0], x[1]
 
 
@@ -148,12 +152,11 @@ class ShuffleNetV2(nn.Cell):
         # building first layer
         input_channel = self.stage_out_channels[1]
         self.first_conv = nn.SequentialCell([
-            nn.Conv2d(in_channels, input_channel, kernel_size=3, stride=2,
-                      pad_mode="pad", padding=1),
-            nn.BatchNorm2d(input_channel),
-            nn.ReLU(),
+            mint.nn.Conv2d(in_channels, input_channel, kernel_size=3, stride=2, padding=1, bias=False),
+            mint.nn.BatchNorm2d(input_channel),
+            mint.nn.ReLU(),
         ])
-        self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")
+        self.max_pool = mint.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         self.features = []
         for idxstage, numrepeat in enumerate(self.stage_repeats):
@@ -170,18 +173,18 @@ class ShuffleNetV2(nn.Cell):
         self.features = nn.SequentialCell(self.features)
 
         self.conv_last = nn.SequentialCell([
-            nn.Conv2d(input_channel, self.stage_out_channels[-1], kernel_size=1, stride=1),
-            nn.BatchNorm2d(self.stage_out_channels[-1]),
-            nn.ReLU()
+            mint.nn.Conv2d(input_channel, self.stage_out_channels[-1], kernel_size=1, stride=1, bias=False),
+            mint.nn.BatchNorm2d(self.stage_out_channels[-1]),
+            mint.nn.ReLU()
         ])
         self.pool = GlobalAvgPooling()
-        self.classifier = nn.Dense(self.stage_out_channels[-1], num_classes, has_bias=False)
+        self.classifier = mint.nn.Linear(self.stage_out_channels[-1], num_classes, bias=False)
         self._initialize_weights()
 
     def _initialize_weights(self):
         """Initialize weights for cells."""
         for name, cell in self.cells_and_names():
-            if isinstance(cell, nn.Conv2d):
+            if isinstance(cell, mint.nn.Conv2d):
                 if "first" in name:
                     cell.weight.set_data(
                         init.initializer(init.Normal(0.01, 0), cell.weight.shape, cell.weight.dtype))
@@ -192,7 +195,7 @@ class ShuffleNetV2(nn.Cell):
                 if cell.bias is not None:
                     cell.bias.set_data(
                         init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
-            elif isinstance(cell, nn.Dense):
+            elif isinstance(cell, mint.nn.Linear):
                 cell.weight.set_data(
                     init.initializer(init.Normal(0.01, 0), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:

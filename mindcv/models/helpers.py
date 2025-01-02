@@ -147,6 +147,24 @@ def load_model_checkpoint(model: nn.Cell, checkpoint_path: str = "", ema: bool =
     if os.path.exists(checkpoint_path):
         checkpoint_param = load_checkpoint(checkpoint_path)
 
+        rename_map = {
+            "beta": "bias",
+            "gamma": "weight",
+            "moving_mean": "running_mean",
+            "moving_variance": "running_var",
+        }
+
+        # Rename parameters in-place
+        keys_to_rename = list(checkpoint_param.keys())
+        for key in keys_to_rename:
+            for old_suffix, new_suffix in rename_map.items():
+                if key.endswith(old_suffix):
+                    # Replace the old suffix with the new one
+                    new_key = key[: -len(old_suffix)] + new_suffix
+                    print(f"Renaming {key} -> {new_key}")
+                    checkpoint_param[new_key] = checkpoint_param.pop(key)
+                    break  # Exit loop after renaming
+
         if auto_mapping:
             checkpoint_param = auto_map(model, checkpoint_param)
 

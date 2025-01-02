@@ -8,7 +8,7 @@ from collections import OrderedDict
 import numpy as np
 
 import mindspore.common.initializer as init
-from mindspore import Tensor, nn, ops
+from mindspore import Tensor, mint, nn, ops
 
 from .helpers import load_pretrained
 from .registry import register_model
@@ -48,7 +48,7 @@ def conv_bn(in_channels, out_channels, kernel_size, stride, padding, group=1, ha
     d = OrderedDict()
     conv1 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, stride=stride,
                       pad_mode="pad", padding=padding, group=group, has_bias=has_bias)
-    bn1 = nn.BatchNorm2d(num_features=out_channels)
+    bn1 = mint.nn.BatchNorm2d(num_features=out_channels)
     d["conv"] = conv1
     d["bn"] = bn1
     result = nn.SequentialCell(d)
@@ -59,7 +59,7 @@ def conv_bn_relu(in_channels, out_channels, kernel_size, stride, padding, group=
     d = OrderedDict()
     conv2 = conv_bn(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, stride=stride,
                     padding=padding, group=group, has_bias=False)
-    relu = nn.ReLU()
+    relu = mint.nn.ReLU()
     d["conv"] = conv2
     d["relu"] = relu
     result = nn.SequentialCell(d)
@@ -69,15 +69,15 @@ def conv_bn_relu(in_channels, out_channels, kernel_size, stride, padding, group=
 def fuse_bn(conv_or_fc, bn):
     std = (bn.running_var + bn.eps).sqrt()
     t = bn.weight / std
-    t = t.reshape(-1, 1, 1, 1)
+    t = mint.reshape(t, (-1, 1, 1, 1))
 
     if len(t) == conv_or_fc.weight.size(0):
         return conv_or_fc.weight * t, bn.bias - bn.running_mean * bn.weight / std
     else:
         repeat_times = conv_or_fc.weight.size(0) // len(t)
-        repeated = t.repeat_interleave(repeat_times, 0)
-        return conv_or_fc.weight * repeated, (bn.bias - bn.running_mean * bn.weight / std).repeat_interleave(
-            repeat_times, 0)
+        repeated = mint.repeat_interleave(t, repeat_times, 0)
+        return conv_or_fc.weight * repeated, mint.repeat_interleave((bn.bias - bn.running_mean * bn.weight / std),
+                                                                    repeat_times, 0)
 
 
 class GlobalPerceptron(nn.Cell):
@@ -90,14 +90,13 @@ class GlobalPerceptron(nn.Cell):
         self.fc2 = nn.Conv2d(in_channels=internal_neurons, out_channels=input_channels, kernel_size=(1, 1), stride=1,
                              has_bias=True)
 
-        self.relu = nn.ReLU()
+        self.relu = mint.nn.ReLU()
+        # todo
         self.sigmoid = nn.Sigmoid()
         self.input_channels = input_channels
-        self.shape = ops.Shape()
 
     def construct(self, x):
-        shape = self.shape(x)
-        pool = nn.AvgPool2d(kernel_size=(shape[2], shape[3]), stride=1)
+        pool = mint.nn.AvgPool2d(kernel_size=(x.shape[2], x.shape[3]), stride=1)
         x = pool(x)
         x = self.fc1(x)
         x = self.relu(x)
@@ -125,9 +124,6 @@ class RepMLPBlock(nn.Cell):
         self.h, self.w = h, w
 
         self.deploy = deploy
-        self.transpose = ops.Transpose()
-        self.shape = ops.Shape()
-        self.reshape = ops.Reshape()
 
         assert in_channels == out_channels
         self.gp = GlobalPerceptron(input_channels=in_channels, internal_neurons=in_channels // globalperceptron_reduce)
@@ -152,7 +148,7 @@ class RepMLPBlock(nn.Cell):
     def partition(self, x, h_parts, w_parts):
         x = x.reshape(-1, self.C, h_parts, self.h, w_parts, self.w)
         input_perm = (0, 2, 4, 1, 3, 5)
-        x = self.transpose(x, input_perm)
+        x = mint.permute(x, input_perm)
         return x
 
     def partition_affine(self, x, h_parts, w_parts):
@@ -167,7 +163,7 @@ class RepMLPBlock(nn.Cell):
         # Global Perceptron
         global_vec = self.gp(inputs)
 
-        origin_shape = self.shape(inputs)
+        origin_shape = inputs.shape
 
         h_parts = origin_shape[2] // self.h
         w_parts = origin_shape[3] // self.w
@@ -179,15 +175,15 @@ class RepMLPBlock(nn.Cell):
 
         #   Local Perceptron
         if self.reparam_conv_k is not None and not self.deploy:
-            conv_inputs = self.reshape(partitions, (-1, self.S, self.h, self.w))
+            conv_inputs = mint.reshape(partitions, (-1, self.S, self.h, self.w))
             conv_out = 0
             for k in self.conv_branch_k:
                 conv_out += k(conv_inputs)
-            conv_out = self.reshape(conv_out, (-1, h_parts, w_parts, self.S, self.h, self.w))
+            conv_out = mint.reshape(conv_out, (-1, h_parts, w_parts, self.S, self.h, self.w))
             fc3_out += conv_out
 
         input_perm = (0, 3, 1, 4, 2, 5)
-        fc3_out = self.transpose(fc3_out, input_perm)  # N, O, h_parts, out_h, w_parts, out_w
+        fc3_out = mint.permute(fc3_out, input_perm)  # N, O, h_parts, out_h, w_parts, out_w
         out = fc3_out.reshape(*origin_shape)
         out = out * global_vec
         return out
@@ -223,15 +219,17 @@ class RepMLPBlock(nn.Cell):
         self.__delattr__("fc3")
         self.__delattr__("fc3_bn")
         self.fc3 = nn.Conv2d(self.S * self.h * self.w, self.S * self.h * self.w, 1, 1, 0, has_bias=True, group=self.S)
+        # todo
         self.fc3_bn = ops.Identity()
         self.fc3.weight.data = fc3_weight
         self.fc3.bias.data = fc3_bias
 
     def _convert_conv_to_fc(self, conv_kernel, conv_bias):
-        I = ops.eye(self.h * self.w).repeat(1, self.S).reshape(self.h * self.w, self.S, self.h, self.w)  # noqa: E741
-        fc_k = ops.Conv2D(I, conv_kernel, pad=(conv_kernel.size(2) // 2, conv_kernel.size(3) // 2), group=self.S)
-        fc_k = fc_k.reshape(self.h * self.w, self.S * self.h * self.w).t()
-        fc_bias = conv_bias.repeat_interleave(self.h * self.w)
+        i = mint.reshape(mint.eye(self.h * self.w)
+                         .repeat(1, self.S), (self.h * self.w, self.S, self.h, self.w))  # noqa: E741
+        fc_k = ops.Conv2D(i, conv_kernel, pad=(conv_kernel.size(2) // 2, conv_kernel.size(3) // 2), group=self.S)
+        fc_k = mint.transpose(mint.reshape(fc_k, (self.h * self.w, self.S * self.h * self.w)), 1, 0)
+        fc_bias = mint.repeat_interleave(conv_bias, self.h * self.w)
         return fc_k, fc_bias
 
 
@@ -263,8 +261,8 @@ class RepMLPNetUnit(nn.Cell):
                                         reparam_conv_k=reparam_conv_k, globalperceptron_reduce=globalperceptron_reduce,
                                         num_sharesets=num_sharesets, deploy=deploy)
         self.ffn_block = FFNBlock(channels, channels * ffn_expand)
-        self.prebn1 = nn.BatchNorm2d(channels).set_train()
-        self.prebn2 = nn.BatchNorm2d(channels).set_train()
+        self.prebn1 = mint.nn.BatchNorm2d(channels).set_train()
+        self.prebn2 = mint.nn.BatchNorm2d(channels).set_train()
 
     def construct(self, x):
         y = x + self.repmlp_block(self.prebn1(x))
@@ -329,12 +327,10 @@ class RepMLPNet(nn.Cell):
                                  stride=2, padding=0))
         self.stages = nn.CellList(stages)
         self.embeds = nn.CellList(embeds)
-        self.head_norm = nn.BatchNorm2d(channels[-1]).set_train()
-        self.head = nn.Dense(channels[-1], num_class)
+        self.head_norm = mint.nn.BatchNorm2d(channels[-1]).set_train()
+        self.head = mint.nn.Linear(channels[-1], num_class)
 
         self.use_checkpoint = use_checkpoint
-        self.shape = ops.Shape()
-        self.reshape = ops.Reshape()
         self._initialize_weights()
 
     def _initialize_weights(self):
@@ -346,7 +342,7 @@ class RepMLPNet(nn.Cell):
                 cell.weight.set_data(init.initializer(init.Uniform(k), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(init.initializer(init.Uniform(k), cell.bias.shape, cell.bias.dtype))
-            elif isinstance(cell, nn.Dense):
+            elif isinstance(cell, mint.nn.Linear):
                 k = 1 / cell.in_channels
                 k = k ** 0.5
                 cell.weight.set_data(init.initializer(init.Uniform(k), cell.weight.shape, cell.weight.dtype))
@@ -364,8 +360,8 @@ class RepMLPNet(nn.Cell):
                 embed = self.embeds[i]
                 x = embed(x)
         x = self.head_norm(x)
-        shape = self.shape(x)
-        pool = nn.AvgPool2d(kernel_size=(shape[2], shape[3]))
+        shape = x.shape
+        pool = mint.nn.AvgPool2d(kernel_size=(shape[2], shape[3]))
         x = pool(x)
         return x.view(shape[0], -1)
 

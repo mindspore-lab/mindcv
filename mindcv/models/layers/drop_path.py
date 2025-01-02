@@ -3,10 +3,8 @@ Mindspore implementations of DropPath (Stochastic Depth) regularization layers.
 Papers:
 Deep Networks with Stochastic Depth (https://arxiv.org/abs/1603.09382)
 """
-from mindspore import Tensor, nn, ops
+from mindspore import Tensor, mint, nn
 from mindspore.numpy import ones
-
-from .compatibility import Dropout
 
 
 class DropPath(nn.Cell):
@@ -20,7 +18,7 @@ class DropPath(nn.Cell):
         super().__init__()
         self.keep_prob = 1.0 - drop_prob
         self.scale_by_keep = scale_by_keep
-        self.dropout = Dropout(p=drop_prob)
+        self.dropout = mint.nn.Dropout(p=drop_prob)
 
     def construct(self, x: Tensor) -> Tensor:
         if self.keep_prob == 1.0 or not self.training:
@@ -28,5 +26,5 @@ class DropPath(nn.Cell):
         shape = (x.shape[0],) + (1,) * (x.ndim - 1)
         random_tensor = self.dropout(ones(shape))
         if not self.scale_by_keep:
-            random_tensor = ops.mul(random_tensor, self.keep_prob)
+            random_tensor = mint.mul(random_tensor, self.keep_prob)
         return x * random_tensor

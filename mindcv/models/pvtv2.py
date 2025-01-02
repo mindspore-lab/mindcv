@@ -7,14 +7,14 @@ from functools import partial
 
 import numpy as np
 
+import mindspore.mint as mint
 import mindspore.nn as nn
-import mindspore.ops as ops
 from mindspore import Tensor
 from mindspore.common import initializer as weight_init
 
 from .helpers import load_pretrained
 from .layers import DropPath, Identity
-from .layers.compatibility import Dropout
+from .layers.extend_bmm import ExtendBatchMatMul
 from .registry import register_model
 
 __all__ = [
@@ -53,13 +53,13 @@ class DWConv(nn.Cell):
 
     def __init__(self, dim=768):
         super(DWConv, self).__init__()
-        self.dwconv = nn.Conv2d(dim, dim, 3, 1, has_bias=True, group=dim)
+        self.dwconv = mint.nn.Conv2d(dim, dim, 3, 1, 1, bias=True, groups=dim)
 
     def construct(self, x, H, W):
         B, N, C = x.shape
-        x = ops.transpose(x, (0, 2, 1)).view((B, C, H, W))
+        x = mint.permute(x, (0, 2, 1)).view((B, C, H, W))
         x = self.dwconv(x)
-        x = ops.transpose(x.view((B, C, H * W)), (0, 2, 1))
+        x = mint.permute(x.view((B, C, H * W)), (0, 2, 1))
 
         return x
 
@@ -67,18 +67,24 @@ class DWConv(nn.Cell):
 class Mlp(nn.Cell):
     """MLP with depthwise separable convolution"""
 
-    def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=0.0, linear=False):
+    def __init__(self,
+                 in_features,
+                 hidden_features=None,
+                 out_features=None,
+                 act_layer=mint.nn.GELU,
+                 drop=0.0,
+                 linear=False):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
-        self.fc1 = nn.Dense(in_features, hidden_features)
+        self.fc1 = mint.nn.Linear(in_features, hidden_features)
         self.dwconv = DWConv(hidden_features)
         self.act = act_layer()
-        self.fc2 = nn.Dense(hidden_features, out_features)
-        self.drop = Dropout(p=drop)
+        self.fc2 = mint.nn.Linear(hidden_features, out_features)
+        self.drop = mint.nn.Dropout(p=drop)
         self.linear = linear
         if self.linear:
-            self.relu = nn.ReLU()
+            self.relu = mint.nn.ReLU()
 
     def construct(self, x, H, W):
         x = self.fc1(x)
@@ -105,56 +111,56 @@ class Attention(nn.Cell):
         head_dim = dim // num_heads
         self.scale = qk_scale or head_dim**-0.5
 
-        self.q = nn.Dense(dim, dim, has_bias=qkv_bias)
-        self.kv = nn.Dense(dim, dim * 2, has_bias=qkv_bias)
-        self.attn_drop = Dropout(p=attn_drop)
-        self.proj = nn.Dense(dim, dim)
-        self.proj_drop = Dropout(p=proj_drop)
-        self.qk_batmatmul = ops.BatchMatMul(transpose_b=True)
-        self.batmatmul = ops.BatchMatMul()
-        self.softmax = nn.Softmax(axis=-1)
+        self.q = mint.nn.Linear(dim, dim, bias=qkv_bias)
+        self.kv = mint.nn.Linear(dim, dim * 2, bias=qkv_bias)
+        self.attn_drop = mint.nn.Dropout(p=attn_drop)
+        self.proj = mint.nn.Linear(dim, dim)
+        self.proj_drop = mint.nn.Dropout(p=proj_drop)
+        self.qk_batmatmul = ExtendBatchMatMul(transpose_b=True)
+        self.batmatmul = ExtendBatchMatMul()
+        self.softmax = mint.nn.Softmax(dim=-1)
 
         self.linear = linear
         self.sr_ratio = sr_ratio
         if not linear:
             if sr_ratio > 1:
-                self.sr = nn.Conv2d(dim, dim, kernel_size=sr_ratio, stride=sr_ratio, has_bias=True)
-                self.norm = nn.LayerNorm([dim])
+                self.sr = mint.nn.Conv2d(dim, dim, kernel_size=sr_ratio, stride=sr_ratio)
+                self.norm = mint.nn.LayerNorm([dim])
 
         else:
-            self.pool = nn.AdaptiveAvgPool2d(7)
-            self.sr = nn.Conv2d(dim, dim, kernel_size=1, stride=1, has_bias=True)
-            self.norm = nn.LayerNorm([dim])
-            self.act = nn.GELU()
+            self.pool = mint.nn.AdaptiveAvgPool2d(7)
+            self.sr = mint.nn.Conv2d(dim, dim, kernel_size=1, stride=1)
+            self.norm = mint.nn.LayerNorm([dim])
+            self.act = mint.nn.GELU()
 
     def construct(self, x, H, W):
         B, N, C = x.shape
         q = self.q(x)
-        q = ops.reshape(q, (B, N, self.num_heads, C // self.num_heads))
-        q = ops.transpose(q, (0, 2, 1, 3))
+        q = mint.reshape(q, (B, N, self.num_heads, C // self.num_heads))
+        q = mint.permute(q, (0, 2, 1, 3))
 
         if not self.linear:
             if self.sr_ratio > 1:
-                x_ = ops.reshape(ops.transpose(x, (0, 2, 1)), (B, C, H, W))
+                x_ = mint.reshape(mint.permute(x, (0, 2, 1)), (B, C, H, W))
 
                 x_ = self.sr(x_)
-                x_ = ops.transpose(ops.reshape(x_, (B, C, -1)), (0, 2, 1))
+                x_ = mint.permute(mint.reshape(x_, (B, C, -1)), (0, 2, 1))
                 x_ = self.norm(x_)
 
                 kv = self.kv(x_)
-                kv = ops.transpose(ops.reshape(kv, (B, -1, 2, self.num_heads, C // self.num_heads)), (2, 0, 3, 1, 4))
+                kv = mint.permute(mint.reshape(kv, (B, -1, 2, self.num_heads, C // self.num_heads)), (2, 0, 3, 1, 4))
             else:
                 kv = self.kv(x)
-                kv = ops.transpose(ops.reshape(kv, (B, -1, 2, self.num_heads, C // self.num_heads)), (2, 0, 3, 1, 4))
+                kv = mint.permute(mint.reshape(kv, (B, -1, 2, self.num_heads, C // self.num_heads)), (2, 0, 3, 1, 4))
 
         else:
-            x_ = ops.reshape(ops.transpose(x, (0, 2, 1)), (B, C, H, W))
+            x_ = mint.reshape(mint.permute(x, (0, 2, 1)), (B, C, H, W))
             x_ = self.sr(self.pool(x_))
-            x_ = ops.reshape(ops.transpose(x_, (0, 2, 1)), (B, C, -1))
+            x_ = mint.reshape(mint.permute(x_, (0, 2, 1)), (B, C, -1))
             x_ = self.norm(x_)
             x_ = self.act(x_)
-            kv = ops.transpose(ops.reshape(self.kv(x_), (B, -1, 2, self.num_heads, C // self.num_heads)),
-                               (2, 0, 3, 1, 4))
+            kv = mint.permute(mint.reshape(self.kv(x_), (B, -1, 2, self.num_heads, C // self.num_heads)),
+                              (2, 0, 3, 1, 4))
         k, v = kv[0], kv[1]
 
         attn = self.qk_batmatmul(q, k) * self.scale
@@ -162,7 +168,7 @@ class Attention(nn.Cell):
         attn = self.attn_drop(attn)
 
         x = self.batmatmul(attn, v)
-        x = ops.reshape(ops.transpose(x, (0, 2, 1, 3)), (B, N, C))
+        x = mint.reshape(mint.permute(x, (0, 2, 1, 3)), (B, N, C))
         x = self.proj(x)
         x = self.proj_drop(x)
 
@@ -172,8 +178,20 @@ class Attention(nn.Cell):
 class Block(nn.Cell):
     """Block with Linear Spatial Reduction Attention and Convolutional Feed-Forward"""
 
-    def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop=0., attn_drop=0.,
-                 drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm, sr_ratio=1, linear=False, block_id=0):
+    def __init__(self,
+                 dim,
+                 num_heads,
+                 mlp_ratio=4.,
+                 qkv_bias=False,
+                 qk_scale=None,
+                 drop=0.,
+                 attn_drop=0.,
+                 drop_path=0.,
+                 act_layer=mint.nn.GELU,
+                 norm_layer=mint.nn.LayerNorm,
+                 sr_ratio=1,
+                 linear=False,
+                 block_id=0):
         super().__init__()
         self.norm1 = norm_layer([dim])
 
@@ -212,13 +230,16 @@ class OverlapPatchEmbed(nn.Cell):
         self.patch_size = patch_size
         self.H, self.W = img_size[0] // stride, img_size[1] // stride
         self.num_patches = self.H * self.W
-        self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=stride, has_bias=True)
-        self.norm = nn.LayerNorm([embed_dim])
+        self.proj = mint.nn.Conv2d(
+            in_chans, embed_dim, kernel_size=patch_size, stride=stride,
+            padding=(patch_size[0] // 2, patch_size[1] // 2)
+        )
+        self.norm = mint.nn.LayerNorm([embed_dim])
 
     def construct(self, x):
         x = self.proj(x)
         B, C, H, W = x.shape
-        x = ops.transpose(ops.reshape(x, (B, C, H * W)), (0, 2, 1))
+        x = mint.permute(mint.reshape(x, (B, C, H * W)), (0, 2, 1))
         x = self.norm(x)
 
         return x, H, W
@@ -241,7 +262,7 @@ class PyramidVisionTransformerV2(nn.Cell):
         drop_rate(float) : The drop rate for each block. Default: 0.0.
         attn_drop_rate(float) : The drop rate for attention. Default: 0.0.
         drop_path_rate(float) : The drop rate for drop path. Default: 0.0.
-        norm_layer(nn.Cell) : Norm layer that will be used in blocks. Default: nn.LayerNorm.
+        norm_layer(nn.Cell) : Norm layer that will be used in blocks. Default: mint.nn.LayerNorm.
         depths (list) : number of Blocks.
         sr_ratios(list) : stride and kernel size of each attention.
         num_stages(int) : number of stage. Default: 4.
@@ -250,7 +271,7 @@ class PyramidVisionTransformerV2(nn.Cell):
 
     def __init__(self, img_size=224, patch_size=16, in_chans=3, num_classes=1000, embed_dims=[64, 128, 256, 512],
                  num_heads=[1, 2, 4, 8], mlp_ratios=[4, 4, 4, 4], qkv_bias=False, qk_scale=None, drop_rate=0.,
-                 attn_drop_rate=0., drop_path_rate=0., norm_layer=nn.LayerNorm,
+                 attn_drop_rate=0., drop_path_rate=0., norm_layer=mint.nn.LayerNorm,
                  depths=[3, 4, 6, 3], sr_ratios=[8, 4, 2, 1], num_stages=4, linear=False):
         super().__init__()
         self.num_classes = num_classes
@@ -289,7 +310,7 @@ class PyramidVisionTransformerV2(nn.Cell):
         self.block_list = nn.CellList(block_list)
         self.norm_list = nn.CellList(norm_list)
         # classification head
-        self.head = nn.Dense(embed_dims[3], num_classes) if num_classes > 0 else Identity()
+        self.head = mint.nn.Linear(embed_dims[3], num_classes) if num_classes > 0 else Identity()
         self._initialize_weights()
 
     def freeze_patch_emb(self):
@@ -297,17 +318,17 @@ class PyramidVisionTransformerV2(nn.Cell):
 
     def _initialize_weights(self):
         for _, cell in self.cells_and_names():
-            if isinstance(cell, nn.Dense):
+            if isinstance(cell, mint.nn.Linear):
                 cell.weight.set_data(weight_init.initializer(weight_init.TruncatedNormal(sigma=0.02),
                                                              cell.weight.shape, cell.weight.dtype))
-                if isinstance(cell, nn.Dense) and cell.bias is not None:
+                if isinstance(cell, mint.nn.Linear) and cell.bias is not None:
                     cell.bias.set_data(weight_init.initializer(weight_init.Zero(), cell.bias.shape, cell.bias.dtype))
-            elif isinstance(cell, nn.LayerNorm):
-                cell.gamma.set_data(weight_init.initializer(weight_init.One(), cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(weight_init.initializer(weight_init.Zero(), cell.beta.shape, cell.beta.dtype))
-            elif isinstance(cell, nn.Conv2d):
+            elif isinstance(cell, mint.nn.LayerNorm):
+                cell.weight.set_data(weight_init.initializer(weight_init.One(), cell.weight.shape, cell.weight.dtype))
+                cell.bias.set_data(weight_init.initializer(weight_init.Zero(), cell.bias.shape, cell.bias.dtype))
+            elif isinstance(cell, mint.nn.Conv2d):
                 fan_out = cell.kernel_size[0] * cell.kernel_size[1] * cell.out_channels
-                fan_out //= cell.group
+                fan_out //= cell.groups
                 cell.weight.set_data(weight_init.initializer(weight_init.Normal(sigma=math.sqrt(2.0 / fan_out)),
                                                              cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
@@ -318,7 +339,7 @@ class PyramidVisionTransformerV2(nn.Cell):
 
     def reset_classifier(self, num_classes, global_pool=""):
         self.num_classes = num_classes
-        self.head = nn.Dense(self.embed_dim, num_classes) if num_classes > 0 else Identity()
+        self.head = mint.nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else Identity()
 
     def forward_features(self, x):
         B = x.shape[0]
@@ -332,7 +353,7 @@ class PyramidVisionTransformerV2(nn.Cell):
                 x = blk(x, H, W)
             x = norm(x)
             if i != self.num_stages - 1:
-                x = ops.transpose(ops.reshape(x, (B, H, W, -1)), (0, 3, 1, 2))
+                x = mint.permute(mint.reshape(x, (B, H, W, -1)), (0, 3, 1, 2))
 
         return x.mean(axis=1)
 
@@ -348,7 +369,7 @@ class PyramidVisionTransformerV2(nn.Cell):
 
 @register_model
 def pvt_v2_b0(
-    pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
+        pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
 ) -> PyramidVisionTransformerV2:
     """Get PVTV2-b0 model
     Refer to the base class "models.PVTv2" for more details.
@@ -357,7 +378,7 @@ def pvt_v2_b0(
     model = PyramidVisionTransformerV2(
         in_chans=in_channels, num_classes=num_classes,
         patch_size=4, embed_dims=[32, 64, 160, 256], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[2, 2, 2, 2], sr_ratios=[8, 4, 2, 1], **kwargs)
+        norm_layer=partial(mint.nn.LayerNorm, eps=1e-6), depths=[2, 2, 2, 2], sr_ratios=[8, 4, 2, 1], **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -367,7 +388,7 @@ def pvt_v2_b0(
 
 @register_model
 def pvt_v2_b1(
-    pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
+        pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
 ) -> PyramidVisionTransformerV2:
     """Get PVTV2-b1 model
     Refer to the base class "models.PVTv2" for more details.
@@ -376,7 +397,7 @@ def pvt_v2_b1(
     model = PyramidVisionTransformerV2(
         in_chans=in_channels, num_classes=num_classes,
         patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[2, 2, 2, 2], sr_ratios=[8, 4, 2, 1], **kwargs)
+        norm_layer=partial(mint.nn.LayerNorm, eps=1e-6), depths=[2, 2, 2, 2], sr_ratios=[8, 4, 2, 1], **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -386,7 +407,7 @@ def pvt_v2_b1(
 
 @register_model
 def pvt_v2_b2(
-    pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
+        pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
 ) -> PyramidVisionTransformerV2:
     """Get PVTV2-b2 model
     Refer to the base class "models.PVTv2" for more details.
@@ -395,7 +416,7 @@ def pvt_v2_b2(
     model = PyramidVisionTransformerV2(
         in_chans=in_channels, num_classes=num_classes,
         patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 4, 6, 3], sr_ratios=[8, 4, 2, 1], **kwargs)
+        norm_layer=partial(mint.nn.LayerNorm, eps=1e-6), depths=[3, 4, 6, 3], sr_ratios=[8, 4, 2, 1], **kwargs)
 
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
@@ -405,7 +426,7 @@ def pvt_v2_b2(
 
 @register_model
 def pvt_v2_b3(
-    pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
+        pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
 ) -> PyramidVisionTransformerV2:
     """Get PVTV2-b3 model
     Refer to the base class "models.PVTv2" for more details.
@@ -414,7 +435,7 @@ def pvt_v2_b3(
     model = PyramidVisionTransformerV2(
         in_chans=in_channels, num_classes=num_classes,
         patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 4, 18, 3], sr_ratios=[8, 4, 2, 1], **kwargs)
+        norm_layer=partial(mint.nn.LayerNorm, eps=1e-6), depths=[3, 4, 18, 3], sr_ratios=[8, 4, 2, 1], **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
@@ -423,7 +444,7 @@ def pvt_v2_b3(
 
 @register_model
 def pvt_v2_b4(
-    pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
+        pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
 ) -> PyramidVisionTransformerV2:
     """Get PVTV2-b4 model
     Refer to the base class "models.PVTv2" for more details.
@@ -432,7 +453,7 @@ def pvt_v2_b4(
     model = PyramidVisionTransformerV2(
         in_chans=in_channels, num_classes=num_classes,
         patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 8, 27, 3], sr_ratios=[8, 4, 2, 1], **kwargs)
+        norm_layer=partial(mint.nn.LayerNorm, eps=1e-6), depths=[3, 8, 27, 3], sr_ratios=[8, 4, 2, 1], **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 
@@ -441,7 +462,7 @@ def pvt_v2_b4(
 
 @register_model
 def pvt_v2_b5(
-    pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
+        pretrained: bool = False, num_classes: int = 1000, in_channels: int = 3, **kwargs
 ) -> PyramidVisionTransformerV2:
     """Get PVTV2-b5 model
     Refer to the base class "models.PVTv2" for more details.
@@ -450,7 +471,7 @@ def pvt_v2_b5(
     model = PyramidVisionTransformerV2(
         in_chans=in_channels, num_classes=num_classes,
         patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[4, 4, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), depths=[3, 6, 40, 3], sr_ratios=[8, 4, 2, 1], **kwargs)
+        norm_layer=partial(mint.nn.LayerNorm, eps=1e-6), depths=[3, 6, 40, 3], sr_ratios=[8, 4, 2, 1], **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes=num_classes, in_channels=in_channels)
 

@@ -5,7 +5,7 @@ Refer to Selective Kernel Networks.
 
 from typing import Dict, List, Optional, Type, Union
 
-from mindspore import Tensor, nn
+from mindspore import Tensor, mint, nn
 
 from .helpers import load_pretrained
 from .layers.selective_kernel import SelectiveKernel
@@ -58,7 +58,7 @@ class SelectiveKernelBasic(nn.Cell):
     ):
         super().__init__()
         if norm is None:
-            norm = nn.BatchNorm2d
+            norm = mint.nn.BatchNorm2d
 
         if sk_kwargs is None:
             sk_kwargs = {}
@@ -69,11 +69,11 @@ class SelectiveKernelBasic(nn.Cell):
         self.conv1 = SelectiveKernel(
             in_channels, out_channels, stride=stride, **sk_kwargs)
         self.conv2 = nn.SequentialCell([
-            nn.Conv2d(out_channels, out_channels * self.expansion, kernel_size=3, padding=1, pad_mode="pad"),
+            mint.nn.Conv2d(out_channels, out_channels * self.expansion, kernel_size=3, padding=1, bias=False),
             norm(out_channels * self.expansion)
         ])
 
-        self.relu = nn.ReLU()
+        self.relu = mint.nn.ReLU()
         self.down_sample = down_sample
 
     def construct(self, x: Tensor) -> Tensor:
@@ -107,24 +107,24 @@ class SelectiveKernelBottleneck(nn.Cell):
     ):
         super().__init__()
         if norm is None:
-            norm = nn.BatchNorm2d
+            norm = mint.nn.BatchNorm2d
 
         if sk_kwargs is None:
             sk_kwargs = {}
 
         width = int(out_channels * (base_width / 64.0)) * groups
         self.conv1 = nn.SequentialCell([
-            nn.Conv2d(in_channels, width, kernel_size=1),
+            mint.nn.Conv2d(in_channels, width, kernel_size=1, bias=False),
             norm(width)
         ])
         self.conv2 = SelectiveKernel(
             width, width, stride=stride, groups=groups, **sk_kwargs)
         self.conv3 = nn.SequentialCell([
-            nn.Conv2d(width, out_channels * self.expansion, kernel_size=1),
+            mint.nn.Conv2d(width, out_channels * self.expansion, kernel_size=1, bias=False),
             norm(out_channels * self.expansion)
         ])
 
-        self.relu = nn.ReLU()
+        self.relu = mint.nn.ReLU()
         self.down_sample = down_sample
 
     def construct(self, x: Tensor) -> Tensor:
@@ -181,7 +181,9 @@ class SKNet(ResNet):
 
         if stride != 1 or self.input_channels != channels * block.expansion:
             down_sample = nn.SequentialCell([
-                nn.Conv2d(self.input_channels, channels * block.expansion, kernel_size=1, stride=stride),
+                mint.nn.Conv2d(
+                    self.input_channels, channels * block.expansion, kernel_size=1, stride=stride, bias=False
+                ),
                 self.norm(channels * block.expansion)
             ])
 

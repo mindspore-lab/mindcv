@@ -1,7 +1,7 @@
 import numpy as np
 
 import mindspore as ms
-from mindspore import nn, ops
+from mindspore import mint, nn
 
 
 class PatchDropout(nn.Cell):
@@ -21,7 +21,6 @@ class PatchDropout(nn.Cell):
         self.num_prefix_tokens = num_prefix_tokens  # exclude CLS token (or other prefix tokens)
         self.ordered = ordered
         self.return_indices = return_indices
-        self.sort = ops.Sort()
 
     def forward(self, x):
         if not self.training or self.prob == 0.:
@@ -37,17 +36,17 @@ class PatchDropout(nn.Cell):
         B = x.shape[0]
         L = x.shape[1]
         num_keep = max(1, int(L * (1. - self.prob)))
-        _, indices = self.sort(ms.Tensor(np.random.rand(B, L)).astype(ms.float32))
+        _, indices = mint.sort(ms.Tensor(np.random.rand(B, L)).astype(ms.float32))
         keep_indices = indices[:, :num_keep]
         if self.ordered:
             # NOTE does not need to maintain patch order in typical transformer use,
             # but possibly useful for debug / visualization
-            keep_indices, _ = self.sort(keep_indices)
-        keep_indices = ops.broadcast_to(ops.expand_dims(keep_indices, axis=-1), (-1, -1, x.shape[2]))
-        x = ops.gather_elements(x, dim=1, index=keep_indices)
+            keep_indices, _ = mint.sort(keep_indices)
+        keep_indices = mint.broadcast_to(mint.unsqueeze(keep_indices, dim=-1), (-1, -1, x.shape[2]))
+        x = mint.gather(x, dim=1, index=keep_indices)
 
         if prefix_tokens is not None:
-            x = ops.concat((prefix_tokens, x), axis=1)
+            x = mint.concat((prefix_tokens, x), dim=1)
 
         if self.return_indices:
             return x, keep_indices

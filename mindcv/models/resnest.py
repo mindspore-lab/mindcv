@@ -6,10 +6,9 @@ Refer to ResNeSt: Split-Attention Networks.
 from typing import List, Optional, Type
 
 import mindspore.common.initializer as init
-from mindspore import Tensor, nn, ops
+from mindspore import Tensor, mint, nn
 
 from .helpers import build_model_with_cfg, make_divisible
-from .layers.compatibility import Dropout
 from .layers.identity import Identity
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
@@ -54,18 +53,17 @@ class RadixSoftmax(nn.Cell):
         super(RadixSoftmax, self).__init__()
         self.radix = radix
         self.cardinality = cardinality
-        self.softmax = ops.Softmax(axis=1)
-        self.sigmoid = nn.Sigmoid()
+        self.softmax = mint.nn.Softmax(dim=1)
 
     def construct(self, x: Tensor) -> Tensor:
         batch = x.shape[0]
         if self.radix > 1:
-            x = ops.reshape(x, (batch, self.cardinality, self.radix, -1))
-            x = ops.transpose(x, (0, 2, 1, 3))
+            x = mint.reshape(x, (batch, self.cardinality, self.radix, -1))
+            x = mint.permute(x, (0, 2, 1, 3))
             x = self.softmax(x)
-            x = ops.reshape(x, (batch, -1))
+            x = mint.reshape(x, (batch, -1))
         else:
-            x = self.sigmoid()
+            x = mint.sigmoid(x)
 
         return x
 
@@ -87,7 +85,7 @@ class SplitAttn(nn.Cell):
         rd_ratio: float = 0.25,
         rd_channels: Optional[int] = None,
         rd_divisor: int = 8,
-        act_layer: nn.Cell = nn.ReLU,
+        act_layer: nn.Cell = mint.nn.ReLU,
         norm_layer: Optional[nn.Cell] = None,
     ) -> None:
         super(SplitAttn, self).__init__()
@@ -102,15 +100,16 @@ class SplitAttn(nn.Cell):
 
         padding = kernel_size // 2 if padding is None else padding
 
-        self.conv = nn.Conv2d(in_channels, mid_chs, kernel_size=kernel_size, stride=stride,
-                              pad_mode="pad", padding=padding, dilation=dilation,
-                              group=group * radix, has_bias=bias)
+        self.conv = mint.nn.Conv2d(
+            in_channels, mid_chs, kernel_size=kernel_size, stride=stride, padding=padding, dilation=dilation,
+            groups=group * radix, bias=bias
+        )
         self.bn0 = norm_layer(mid_chs) if norm_layer else Identity()
         self.act0 = act_layer()
-        self.fc1 = nn.Conv2d(out_channels, attn_chs, 1, group=group, has_bias=True)
+        self.fc1 = mint.nn.Conv2d(out_channels, attn_chs, 1, groups=group, bias=True)
         self.bn1 = norm_layer(attn_chs) if norm_layer else nn.Identity()
         self.act1 = act_layer()
-        self.fc2 = nn.Conv2d(attn_chs, mid_chs, 1, group=group, has_bias=True)
+        self.fc2 = mint.nn.Conv2d(attn_chs, mid_chs, 1, groups=group, bias=True)
         self.rsoftmax = RadixSoftmax(radix, group)
         self.pool = GlobalAvgPooling(keep_dims=True)
 
@@ -121,8 +120,8 @@ class SplitAttn(nn.Cell):
 
         B, RC, H, W = x.shape
         if self.radix > 1:
-            x = ops.reshape(x, (B, self.radix, RC // self.radix, H, W))
-            x_gap = x.sum(axis=1)
+            x = mint.reshape(x, (B, self.radix, RC // self.radix, H, W))
+            x_gap = mint.sum(x, dim=1)
         else:
             x_gap = x
         x_gap = self.pool(x_gap)
@@ -132,10 +131,10 @@ class SplitAttn(nn.Cell):
         x_attn = self.fc2(x_gap)
 
         x_attn = self.rsoftmax(x_attn)
-        x_attn = ops.reshape(x_attn, (B, -1, 1, 1))
+        x_attn = mint.reshape(x_attn, (B, -1, 1, 1))
         if self.radix > 1:
-            out = x * ops.reshape(x_attn, (B, self.radix, RC // self.radix, 1, 1))
-            out = out.sum(axis=1)
+            out = x * mint.reshape(x_attn, (B, self.radix, RC // self.radix, 1, 1))
+            out = mint.sum(out, dim=1)
         else:
             out = x * x_attn
 
@@ -164,14 +163,14 @@ class Bottleneck(nn.Cell):
     ) -> None:
         super(Bottleneck, self).__init__()
         group_width = int(planes * (bottleneck_width / 64.0)) * cardinality
-        self.conv1 = nn.Conv2d(inplanes, group_width, kernel_size=1, has_bias=False)
+        self.conv1 = mint.nn.Conv2d(inplanes, group_width, kernel_size=1, bias=False)
         self.bn1 = norm_layer(group_width)
         self.radix = radix
         self.avd = avd and (stride > 1 or is_first)
         self.avd_first = avd_first
 
         if self.avd:
-            self.avd_layer = nn.AvgPool2d(3, stride, pad_mode="same")
+            self.avd_layer = mint.nn.AvgPool2d(3, stride, padding=1)
             stride = 1
 
         if radix >= 1:
@@ -179,15 +178,16 @@ class Bottleneck(nn.Cell):
                                    padding=dilation, dilation=dilation, group=cardinality,
                                    bias=False, radix=radix, norm_layer=norm_layer)
         else:
-            self.conv2 = nn.Conv2d(group_width, group_width, kernel_size=3, stride=stride,
-                                   pad_mode="pad", padding=dilation, dilation=dilation,
-                                   group=cardinality, has_bias=False)
+            self.conv2 = mint.nn.Conv2d(
+                group_width, group_width, kernel_size=3, stride=stride, padding=dilation,
+                dilation=dilation, groups=cardinality, bias=False
+            )
             self.bn2 = norm_layer(group_width)
 
-        self.conv3 = nn.Conv2d(group_width, planes * 4, kernel_size=1, has_bias=False)
+        self.conv3 = mint.nn.Conv2d(group_width, planes * 4, kernel_size=1, bias=False)
         self.bn3 = norm_layer(planes * 4)
 
-        self.relu = nn.ReLU()
+        self.relu = mint.nn.ReLU()
         self.downsample = downsample
         self.dilation = dilation
         self.stride = stride
@@ -263,7 +263,7 @@ class ResNeSt(nn.Cell):
         avd: bool = False,
         avd_first: bool = False,
         drop_rate: float = 0.0,
-        norm_layer: nn.Cell = nn.BatchNorm2d,
+        norm_layer: nn.Cell = mint.nn.BatchNorm2d,
     ) -> None:
         super(ResNeSt, self).__init__()
         self.cardinality = group
@@ -278,25 +278,21 @@ class ResNeSt(nn.Cell):
 
         if deep_stem:
             self.conv1 = nn.SequentialCell([
-                nn.Conv2d(3, stem_width, kernel_size=3, stride=2, pad_mode="pad",
-                          padding=1, has_bias=False),
+                mint.nn.Conv2d(3, stem_width, kernel_size=3, stride=2, padding=1, bias=False),
                 norm_layer(stem_width),
-                nn.ReLU(),
-                nn.Conv2d(stem_width, stem_width, kernel_size=3, stride=1, pad_mode="pad",
-                          padding=1, has_bias=False),
+                mint.nn.ReLU(),
+                mint.nn.Conv2d(stem_width, stem_width, kernel_size=3, stride=1, padding=1, bias=False),
                 norm_layer(stem_width),
-                nn.ReLU(),
-                nn.Conv2d(stem_width, stem_width * 2, kernel_size=3, stride=1, pad_mode="pad",
-                          padding=1, has_bias=False),
+                mint.nn.ReLU(),
+                mint.nn.Conv2d(stem_width, stem_width * 2, kernel_size=3, stride=1, padding=1, bias=False),
             ])
         else:
-            self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, pad_mode="pad", padding=3,
-                                   has_bias=False)
+            self.conv1 = mint.nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
         self.bn1 = norm_layer(self.inplanes)
-        self.relu = nn.ReLU()
+        self.relu = mint.nn.ReLU()
         self.feature_info = [dict(chs=self.inplanes, reduction=2, name="relu")]
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")
+        self.maxpool = mint.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         self.layer1 = self._make_layer(block, 64, layers[0], norm_layer=norm_layer, is_first=False)
         self.feature_info.append(dict(chs=block.expansion * 64, reduction=4, name='layer1'))
@@ -320,15 +316,15 @@ class ResNeSt(nn.Cell):
             self.feature_info.append(dict(chs=block.expansion * 512, reduction=32, name='layer4'))
 
         self.avgpool = GlobalAvgPooling()
-        self.drop = Dropout(p=drop_rate) if drop_rate > 0.0 else None
-        self.fc = nn.Dense(512 * block.expansion, num_classes)
+        self.drop = mint.nn.Dropout(p=drop_rate) if drop_rate > 0.0 else None
+        self.fc = mint.nn.Linear(512 * block.expansion, num_classes)
 
         self._initialize_weights()
 
     def _initialize_weights(self) -> None:
         """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
-            if isinstance(cell, nn.Conv2d):
+            if isinstance(cell, mint.nn.Conv2d):
                 cell.weight.set_data(
                     init.initializer(
                         init.HeNormal(mode="fan_out", nonlinearity="relu"), cell.weight.shape, cell.weight.dtype
@@ -336,10 +332,10 @@ class ResNeSt(nn.Cell):
                 )
                 if cell.bias is not None:
                     cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
-            elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(init.initializer("ones", cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(init.initializer("zeros", cell.beta.shape, cell.beta.dtype))
-            elif isinstance(cell, nn.Dense):
+            elif isinstance(cell, mint.nn.BatchNorm2d):
+                cell.weight.set_data(init.initializer("ones", cell.weight.shape, cell.weight.dtype))
+                cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
+            elif isinstance(cell, mint.nn.Linear):
                 cell.weight.set_data(
                     init.initializer(
                         init.HeUniform(mode="fan_in", nonlinearity="sigmoid"), cell.weight.shape, cell.weight.dtype
@@ -363,16 +359,17 @@ class ResNeSt(nn.Cell):
             down_layers = []
             if self.avg_down:
                 if dilation == 1:
-                    down_layers.append(nn.AvgPool2d(kernel_size=stride, stride=stride, pad_mode="valid"))
+                    down_layers.append(mint.nn.AvgPool2d(kernel_size=stride, stride=stride, padding=0))
                 else:
-                    down_layers.append(nn.AvgPool2d(kernel_size=1, stride=1, pad_mode="valid"))
+                    down_layers.append(mint.nn.AvgPool2d(kernel_size=1, stride=1, padding=0))
 
-                down_layers.append(nn.Conv2d(self.inplanes, planes * block.expansion, kernel_size=1,
-                                             stride=1, has_bias=False))
+                down_layers.append(
+                    mint.nn.Conv2d(self.inplanes, planes * block.expansion, kernel_size=1, stride=1, bias=False)
+                )
             else:
                 down_layers.append(
-                    nn.Conv2d(self.inplanes, planes * block.expansion, kernel_size=1, stride=stride,
-                              has_bias=False))
+                    mint.nn.Conv2d(self.inplanes, planes * block.expansion, kernel_size=1, stride=stride, bias=False)
+                )
             down_layers.append(norm_layer(planes * block.expansion))
             downsample = nn.SequentialCell(down_layers)
 

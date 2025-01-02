@@ -6,10 +6,9 @@ Refer to Searching for MobileNetV3.
 import math
 
 import mindspore.common.initializer as init
-from mindspore import Tensor, nn
+from mindspore import Tensor, mint, nn
 
 from .helpers import build_model_with_cfg, make_divisible
-from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExcite
 from .registry import register_model
@@ -62,32 +61,32 @@ class Bottleneck(nn.Cell):
         self.use_se = use_se
         self.use_res_connect = stride == 1 and in_channels == out_channels
         assert activation in ["relu", "hswish"]
-        self.activation = nn.HSwish if activation == "hswish" else nn.ReLU
+        self.activation = mint.nn.Hardswish if activation == "hswish" else mint.nn.ReLU
 
         layers = []
         # Expand.
         if in_channels != mid_channels:
             layers.extend([
-                nn.Conv2d(in_channels, mid_channels, 1, 1, pad_mode="pad", padding=0, has_bias=False),
-                nn.BatchNorm2d(mid_channels),
+                mint.nn.Conv2d(in_channels, mid_channels, 1, 1, padding=0, bias=False),
+                mint.nn.BatchNorm2d(mid_channels),
                 self.activation(),
             ])
         # DepthWise.
         layers.extend([
-            nn.Conv2d(mid_channels, mid_channels, kernel_size, stride,
-                      pad_mode="same", group=mid_channels, has_bias=False),
-            nn.BatchNorm2d(mid_channels),
+            mint.nn.Conv2d(mid_channels, mid_channels, kernel_size, stride,
+                      padding=kernel_size // 2, groups=mid_channels, bias=False),
+            mint.nn.BatchNorm2d(mid_channels),
             self.activation(),
         ])
         # SqueezeExcitation.
         if use_se:
             layers.append(
-                SqueezeExcite(mid_channels, 1.0 / 4, act_layer=nn.ReLU, gate_layer=nn.HSigmoid)
+                SqueezeExcite(mid_channels, 1.0 / 4, act_layer=mint.nn.ReLU, gate_layer=mint.nn.Hardsigmoid)
             )
         # Project.
         layers.extend([
-            nn.Conv2d(mid_channels, out_channels, 1, 1, pad_mode="pad", padding=0, has_bias=False),
-            nn.BatchNorm2d(out_channels),
+            mint.nn.Conv2d(mid_channels, out_channels, 1, 1, padding=0, bias=False),
+            mint.nn.BatchNorm2d(out_channels),
         ])
         self.layers = nn.SequentialCell(layers)
 
@@ -165,9 +164,9 @@ class MobileNetV3(nn.Cell):
 
         # Building stem conv layer.
         features = [
-            nn.Conv2d(in_channels, input_channels, 3, 2, pad_mode="pad", padding=1, has_bias=False),
-            nn.BatchNorm2d(input_channels),
-            nn.HSwish(),
+            mint.nn.Conv2d(in_channels, input_channels, 3, 2, padding=1, bias=False),
+            mint.nn.BatchNorm2d(input_channels),
+            mint.nn.Hardswish(),
         ]
 
         total_reduction = 2
@@ -188,9 +187,9 @@ class MobileNetV3(nn.Cell):
         # Building last point-wise conv layers.
         output_channels = input_channels * 6
         features.extend([
-            nn.Conv2d(input_channels, output_channels, 1, 1, pad_mode="pad", padding=0, has_bias=False),
-            nn.BatchNorm2d(output_channels),
-            nn.HSwish(),
+            mint.nn.Conv2d(input_channels, output_channels, 1, 1, padding=0, bias=False),
+            mint.nn.BatchNorm2d(output_channels),
+            mint.nn.Hardswish(),
         ])
 
         self.feature_info.append(dict(chs=output_channels, reduction=total_reduction,
@@ -201,27 +200,27 @@ class MobileNetV3(nn.Cell):
 
         self.pool = GlobalAvgPooling()
         self.classifier = nn.SequentialCell([
-            nn.Dense(output_channels, last_channels),
-            nn.HSwish(),
-            Dropout(p=0.2),
-            nn.Dense(last_channels, num_classes),
+            mint.nn.Linear(output_channels, last_channels),
+            mint.nn.Hardswish(),
+            mint.nn.Dropout(p=0.2),
+            mint.nn.Linear(last_channels, num_classes),
         ])
         self._initialize_weights()
 
     def _initialize_weights(self) -> None:
         """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
-            if isinstance(cell, nn.Conv2d):
+            if isinstance(cell, mint.nn.Conv2d):
                 n = cell.kernel_size[0] * cell.kernel_size[1] * cell.out_channels
                 cell.weight.set_data(
                     init.initializer(init.Normal(sigma=math.sqrt(2. / n), mean=0.0),
                                      cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
-            elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(init.initializer("ones", cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(init.initializer("zeros", cell.beta.shape, cell.beta.dtype))
-            elif isinstance(cell, nn.Dense):
+            elif isinstance(cell, mint.nn.BatchNorm2d):
+                cell.weight.set_data(init.initializer("ones", cell.weight.shape, cell.weight.dtype))
+                cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
+            elif isinstance(cell, mint.nn.Linear):
                 cell.weight.set_data(
                     init.initializer(init.Normal(sigma=0.01, mean=0.0), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
