@@ -113,7 +113,7 @@ It is easy to train your model on a standard or customized dataset using `train.
 
     ```shell
     # distributed training
-    # assume you have 4 GPUs/NPUs
+    # assume you have 4 NPUs
     msrun --bind_core=True --worker_num 4 python train.py --distribute \
         --model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet
     ```
@@ -137,7 +137,7 @@ It is easy to train your model on a standard or customized dataset using `train.
     You can configure your model and other components either by specifying external parameters or by writing a yaml config file. Here is an example of training using a preset yaml file.
 
     ```shell
-    msrun --bind_core=True --worker_num 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml
+    msrun --bind_core=True --worker_num 4 python train.py -c configs/squeezenet/squeezenet_1.0_ascend.yaml
     ```
 
     !!! tip "Pre-defined Training Strategies"

@@ -113,7 +113,7 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
 
     ```shell
     # 分布式训练
-    # 假设你有4张GPU或者NPU卡
+    # 假设你有4张NPU卡
     msrun --bind_core=True --worker_num 4 python train.py --distribute \
         --model densenet121 --dataset imagenet --data_dir ./datasets/imagenet
     ```
@@ -137,7 +137,7 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
     您可以编写yaml文件或设置外部参数来指定配置数据、模型、优化器等组件及其超参。以下是使用预设的训练策略（yaml文件）进行模型训练的示例。
 
     ```shell
-    msrun --bind_core=True --worker_num 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml
+    msrun --bind_core=True --worker_num 4 python train.py -c configs/squeezenet/squeezenet_1.0_ascend.yaml
     ```
 
     !!! tip "预定义的训练策略"
