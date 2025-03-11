@@ -90,7 +90,7 @@ It is easy to reproduce the reported results with the pre-defined training recip
 Ascend 910 devices, please run
 
 ```shell
-# distrubted training on multiple GPU/Ascend devices
+# distrubted training on multiple Ascend devices
 msrun --bind_core=True --worker_num 8 python train.py --config configs/vgg/vgg16_ascend.yaml --data_dir /path/to/imagenet
 ```
 

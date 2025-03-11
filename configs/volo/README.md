@@ -67,12 +67,10 @@ It is easy to reproduce the reported results with the pre-defined training recip
 Ascend 910 devices, please run
 
 ```shell
-# distributed training on multiple GPU/Ascend devices
+# distributed training on multiple Ascend devices
 msrun --bind_core=True --worker_num 8 python train.py --config configs/volo/volo_d1_ascend.yaml --data_dir /path/to/imagenet
 ```
 
-
-Similarly, you can train the model on multiple GPU devices with the above `msrun` command.
 
 For detailed illustration of all hyper-parameters, please refer
 to [config.py](https://github.com/mindspore-lab/mindcv/blob/main/config.py).
