@@ -27,7 +27,7 @@ multi-scale information from, e.g., 3×3, 5×5, 7×7 convolutional kernels insid
 ## Requirements
 | mindspore | ascend driver |  firmware   | cann toolkit/kernel |
 | :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+|   2.5.0   |   24.1.0      | 7.5.0.3.220 |     8.0.0.beta1     |
 
 
 
@@ -87,7 +87,7 @@ python validate.py -c configs/sknet/skresnext50_32x4d_ascend.yaml --data_dir /pa
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 
 
@@ -98,7 +98,7 @@ Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
 
 
 
-Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
 
 
 

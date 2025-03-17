@@ -30,10 +30,11 @@ MindCV is an open-source toolbox for computer vision research and development ba
 The following is the corresponding `mindcv` versions and supported `mindspore` versions.
 
 | mindcv |  mindspore  |
-| :----: | :---------: |
+|:------:|:-----------:|
 |  main  |   master    |
-| v0.4.0 | 2.3.0/2.3.1 |
-| 0.3.0  |   2.2.10    |
+|  0.5   |   2.5.0     |
+|  0.4   | 2.3.0/2.3.1 |
+|  0.3   |   2.2.10    |
 |  0.2   |     2.0     |
 |  0.1   |     1.8     |
 
@@ -141,7 +142,7 @@ It is easy to train your model on a standard or customized dataset using `train.
     python train.py --distribute --model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet
     ```
 
-   > For more information, please refer to https://www.mindspore.cn/tutorials/experts/en/r2.3.1/parallel/startup_method.html
+   > For more information, please refer to https://www.mindspore.cn/docs/en/r2.5.0/model_train/parallel/startup_method.html
 
     Detailed parameter definitions can be seen in `config.py` and checked by running `python train.py --help'.
 

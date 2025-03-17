@@ -16,7 +16,7 @@ MobileViT, a light-weight and general-purpose vision transformer for mobile devi
 ## Requirements
 | mindspore | ascend driver |  firmware   | cann toolkit/kernel |
 | :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+|   2.5.0   |   24.1.0      | 7.5.0.3.220 |     8.0.0.beta1     |
 
 
 
@@ -68,7 +68,7 @@ python validate.py -c configs/mobilevit/mobilevit_xx_small_ascend.yaml --data_di
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 
 | model name         | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                     | weight                                                                                                            |
@@ -76,7 +76,7 @@ Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
 | mobilevit_xx_small | 1.27      | 8     | 64         | 256x256    | O2        | 437s          | 67.24   | 7614.52 | 67.11    | 87.85    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_xx_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilevit/mobilevit_xx_small-6f2745c3-910v2.ckpt) |
 
 
-Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
 
 
 | model name         | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                     | weight                                                                                              |

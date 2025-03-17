@@ -134,7 +134,7 @@ python infer.py --model=swin_tiny --image_path='./dog.jpg'
     python train.py --distribute --model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet
     ```
 
-   > 如需更多操作指导，请参考 https://www.mindspore.cn/tutorials/experts/zh-CN/r2.3.1/parallel/startup_method.html
+   > 如需更多操作指导，请参考 https://www.mindspore.cn/docs/zh-CN/r2.5.0/model_train/parallel/startup_method.html
 
     完整的参数列表及说明在`config.py`中定义，可运行`python train.py --help`快速查看。
 

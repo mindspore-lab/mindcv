@@ -17,7 +17,7 @@ Figure 2. (a) The overall framework of PoolFormer. (b) The architecture of PoolF
 ## Requirements
 | mindspore | ascend driver |  firmware   | cann toolkit/kernel |
 | :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+|   2.5.0   |   24.1.0      | 7.5.0.3.220 |     8.0.0.beta1     |
 
 
 
@@ -69,14 +69,14 @@ validation of poolformer has to be done in amp O3 mode which is not supported, c
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 
 | model name     | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                  | weight                                                                                                         |
 | -------------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | poolformer_s12 | 11.92     | 8     | 128        | 224x224    | O2        | 177s          | 211.81  | 4834.52 | 77.49    | 93.55    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/poolformer_s12_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/poolformer/poolformer_s12-c7e14eea-910v2.ckpt) |
 
-Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
 
 
 | model name     | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                  | weight                                                                                           |

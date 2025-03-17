@@ -21,7 +21,7 @@ High-resolution representations are essential for position-sensitive vision prob
 ## Requirements
 | mindspore | ascend driver |  firmware   | cann toolkit/kernel |
 | :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+|   2.5.0   |   24.1.0      | 7.5.0.3.220 |     8.0.0.beta1     |
 
 ## Quick Start
 ### Preparation
@@ -71,13 +71,13 @@ python validate.py -c configs/hrnet/hrnet_w32_ascend.yaml --data_dir /path/to/im
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 | model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                        | weight                                                                                               |
 | ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | hrnet_w32  | 41.30     | 8     | 128        | 224x224    | O2        | 1069s         | 238.03  | 4301.98 | 80.66    | 95.30    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w32_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/hrnet/hrnet_w32-e616cdcb-910v2.ckpt) |
 
-Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
 
 | model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                        | weight                                                                                 |
 | ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |

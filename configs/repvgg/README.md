@@ -27,7 +27,7 @@ previous methods.[[1](#references)]
 ## Requirements
 | mindspore | ascend driver |  firmware   | cann toolkit/kernel |
 | :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+|   2.5.0   |   24.1.0      | 7.5.0.3.220 |     8.0.0.beta1     |
 
 
 
@@ -89,7 +89,7 @@ python validate.py -c configs/repvgg/repvgg_a1_ascend.yaml --data_dir /path/to/i
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 
 | model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                                |
@@ -98,7 +98,7 @@ Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
 | repvgg_a1  | 14.12     | 8     | 32         | 224x224    | O2        | 81s           | 28.29   | 9096.13  | 73.68    | 91.51    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repvgg/repvgg_a1_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/repvgg/repvgg_a1-a40aa623-910v2.ckpt) |
 
 
-Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
 
 
 | model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                  |
