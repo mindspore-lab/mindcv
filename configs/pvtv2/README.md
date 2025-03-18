@@ -20,7 +20,7 @@ segmentation.[[1](#references)]
 ## Requirements
 | mindspore | ascend driver |  firmware   | cann toolkit/kernel |
 | :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+|   2.5.0   |   24.1.0      | 7.5.0.3.220 |     8.0.0.beta1     |
 
 ## Quick Start
 
@@ -43,7 +43,7 @@ It is easy to reproduce the reported results with the pre-defined training recip
 Ascend 910 devices, please run
 
 ```shell
-# distrubted training on multiple GPU/Ascend devices
+# distrubted training on multiple Ascend devices
 msrun --bind_core=True --worker_num 8 python train.py --config configs/pvtv2/pvt_v2_b0_ascend.yaml --data_dir /path/to/imagenet
 ```
 
@@ -78,7 +78,7 @@ python validate.py -c configs/pvtv2/pvt_v2_b0_ascend.yaml --data_dir /path/to/im
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 
 | model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                        | weight                                                                                                |
@@ -86,7 +86,7 @@ Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
 | pvt_v2_b0  | 3.67      | 8     | 128        | 224x224    | O2        | 323s          | 255.76  | 4003.75 | 71.25    | 90.50    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/pvt_v2/pvt_v2_b0-d9cd9d6a-910v2.ckpt) |
 
 
-Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
 
 
 | model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                        | weight                                                                                  |

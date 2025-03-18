@@ -17,7 +17,7 @@ PiT (Pooling-based Vision Transformer) is an improvement of Vision Transformer (
 ## Requirements
 | mindspore | ascend driver |  firmware   | cann toolkit/kernel |
 | :-------: | :-----------: | :---------: | :-----------------: |
-|   2.3.1   |   24.1.RC2    | 7.3.0.1.231 |    8.0.RC2.beta1    |
+|   2.5.0   |   24.1.0      | 7.5.0.3.220 |     8.0.0.beta1     |
 
 
 
@@ -70,7 +70,7 @@ python validate.py -c configs/pit/pit_xs_ascend.yaml --data_dir /path/to/imagene
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
+Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 
 
@@ -82,7 +82,7 @@ Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
 
 
 
-Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
+Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
 
 
 

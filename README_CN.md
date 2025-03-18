@@ -134,7 +134,7 @@ python infer.py --model=swin_tiny --image_path='./dog.jpg'
     python train.py --distribute --model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet
     ```
 
-   > 如需更多操作指导，请参考 https://www.mindspore.cn/tutorials/experts/zh-CN/r2.3.1/parallel/startup_method.html
+   > 如需更多操作指导，请参考 https://www.mindspore.cn/docs/zh-CN/r2.5.0/model_train/parallel/startup_method.html
 
     完整的参数列表及说明在`config.py`中定义，可运行`python train.py --help`快速查看。
 
@@ -145,7 +145,7 @@ python infer.py --model=swin_tiny --image_path='./dog.jpg'
     您可以编写yaml文件或设置外部参数来指定配置数据、模型、优化器等组件及其超参数。以下是使用预设的训练策略（yaml文件）进行模型训练的示例。
 
     ```shell
-    msrun --bind_core=True --worker_num 4 python train.py -c configs/squeezenet/squeezenet_1.0_gpu.yaml
+    msrun --bind_core=True --worker_num 4 python train.py -c configs/squeezenet/squeezenet_1.0_ascend.yaml
     ```
 
     **预定义的训练策略**
