@@ -53,6 +53,5 @@ warmup_epochs: 10
 opt: "adamw"
 momentum: 0.9
 weight_decay: 0.05
-loss_scale_type: "dynamic"
-drop_overflow_update: True
 use_nesterov: False
+loss_scale: 1024
