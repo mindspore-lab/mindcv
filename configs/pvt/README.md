@@ -85,14 +85,6 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 | pvt_tiny   | 13.23     | 8     | 128        | 224x224    | O2        | 212s          | 237.5   | 4311.58 | 74.88    | 92.12    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/pvt/pvt_tiny-6676051f-910v2.ckpt) |
 
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                     | weight                                                                              |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
-| pvt_tiny   | 13.23     | 8     | 128        | 224x224    | O2        | 192s          | 229.63  | 4459.35 | 74.81    | 92.18    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvt/pvt_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt/pvt_tiny-6abb953d.ckpt) |
-
-
 ### Notes
 
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

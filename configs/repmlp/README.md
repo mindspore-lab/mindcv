@@ -89,13 +89,6 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 *coming soon*
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-| model name  | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                           | weight                                                                                    |
-| ----------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| repmlp_t224 | 38.30     | 8     | 128        | 224x224    | O2        | 289s          | 578.23  | 1770.92 | 76.71    | 93.30    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/repmlp/repmlp_t224_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/repmlp/repmlp_t224-8dbedd00.ckpt) |
-
 ### Notes
 
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
