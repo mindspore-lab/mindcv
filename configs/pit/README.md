@@ -82,18 +82,6 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-
-
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                   | weight                                                                            |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| pit_ti     | 4.85      | 8     | 128        | 224x224    | O2        | 192s          | 271.50  | 3771.64 | 72.96    | 91.33    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_ti_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pit/pit_ti-e647a593.ckpt) |
-
-
-
-
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
