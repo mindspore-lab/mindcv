@@ -95,17 +95,6 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-
-
-| model name      | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                | weight                                                                                         |
-| --------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| resnext50_32x4d | 25.10     | 8     | 32         | 224x224    | O2        | 49s           | 37.22   | 6878.02 | 78.53    | 94.10    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnext/resnext50_32x4d_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnext/resnext50_32x4d-af8aba16.ckpt) |
-
-
-
 ### Notes
 
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

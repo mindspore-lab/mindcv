@@ -78,12 +78,6 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 | ------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | convnext_tiny | 28.59     | 8     | 16         | 224x224    | O2        | 137s          | 48.7    | 2612.24 | 81.28    | 95.61    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convnext/convnext_tiny-db11dc82-910v2.ckpt) |
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-| model name    | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                               | weight                                                                                        |
-| ------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| convnext_tiny | 28.59     | 8     | 16         | 224x224    | O2        | 127s          | 66.79   | 1910.45 | 81.91    | 95.79    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnext/convnext_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/convnext/convnext_tiny-ae5ff8d7.ckpt) |
-
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 

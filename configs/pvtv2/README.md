@@ -86,14 +86,6 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 | pvt_v2_b0  | 3.67      | 8     | 128        | 224x224    | O2        | 323s          | 255.76  | 4003.75 | 71.25    | 90.50    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b0_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/pvt_v2/pvt_v2_b0-d9cd9d6a-910v2.ckpt) |
 
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                        | weight                                                                                  |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| pvt_v2_b0  | 3.67      | 8     | 128        | 224x224    | O2        | 269s          | 269.38  | 3801.32 | 71.50    | 90.60    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pvtv2/pvt_v2_b0_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pvt_v2/pvt_v2_b0-1c4f6683.ckpt) |
-
-
 ### Notes
 
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

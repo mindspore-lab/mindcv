@@ -79,12 +79,6 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 | ----------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | edgenext_xx_small | 1.33      | 8     | 256        | 256x256    | O2        | 389s          | 239.38  | 8555.43 | 70.64    | 89.75    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/edgenext/edgenext_xx_small-cad13d2c-910v2.ckpt) |
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-| model name        | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                   | weight                                                                                          |
-| ----------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| edgenext_xx_small | 1.33      | 8     | 256        | 256x256    | O2        | 311s          | 191.24  | 10709.06 | 71.02    | 89.99    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/edgenext/edgenext_xx_small-afc971fb.ckpt) |
-
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 

@@ -100,17 +100,6 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-
-
-| model name         | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                       | weight                                                                                                            |
-| ------------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| shufflenet_v2_x0_5 | 1.37      | 8     | 64         | 224x224    | O2        | 62s           | 41.87   | 12228.33 | 60.53    | 82.11    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv2/shufflenet_v2_0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x0_5-8c841061.ckpt) |
-
-
-
 ### Notes
 
 - All models are trained on ImageNet-1K training set and the top-1 accuracy is reported on the validatoin set.
