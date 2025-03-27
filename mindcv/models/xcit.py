@@ -10,11 +10,11 @@ import mindspore
 import mindspore.common.initializer as weight_init
 from mindspore import Parameter, Tensor
 from mindspore import dtype as mstype
-from mindspore import nn, numpy, ops
+from mindspore import mint, nn, numpy, ops
 
 from .helpers import _ntuple, load_pretrained
-from .layers.compatibility import Dropout
 from .layers.drop_path import DropPath
+from .layers.extend_bmm import ExtendBatchMatMul
 from .layers.mlp import Mlp
 from .registry import register_model
 
@@ -55,8 +55,8 @@ class PositionalEncodingFourier(nn.Cell):
                  temperature=10000
                  ) -> None:
         super().__init__()
-        self.token_projection = nn.Conv2d(
-            hidden_dim * 2, dim, kernel_size=1, has_bias=True)
+        self.token_projection = mint.nn.Conv2d(
+            hidden_dim * 2, dim, kernel_size=1, bias=True)
         self.scale = 2 * np.pi
         self.temperature = temperature
         self.hidden_dim = hidden_dim
@@ -76,15 +76,15 @@ class PositionalEncodingFourier(nn.Cell):
 
         pos_x = x_embed[:, :, :, None] / dim_t
         pos_y = y_embed[:, :, :, None] / dim_t
-        pos_x = ops.stack((ops.sin(pos_x[:, :, :, 0::2]),
-                           ops.cos(pos_x[:, :, :, 1::2])), 4)
+        pos_x = mint.stack((mint.sin(pos_x[:, :, :, 0::2]),
+                           mint.cos(pos_x[:, :, :, 1::2])), 4)
         x1, x2, x3, x4, x5 = pos_x.shape
-        pos_x = ops.reshape(pos_x, (x1, x2, x3, x4 * x5))
-        pos_y = ops.stack((ops.sin(pos_y[:, :, :, 0::2]),
-                           ops.cos(pos_y[:, :, :, 1::2])), 4)
+        pos_x = mint.reshape(pos_x, (x1, x2, x3, x4 * x5))
+        pos_y = mint.stack((mint.sin(pos_y[:, :, :, 0::2]),
+                           mint.cos(pos_y[:, :, :, 1::2])), 4)
         y1, y2, y3, y4, y5 = pos_y.shape
-        pos_y = ops.reshape(pos_y, (y1, y2, y3, y4 * y5))
-        pos = ops.transpose(ops.concat((pos_y, pos_x), 3), (0, 3, 1, 2))
+        pos_y = mint.reshape(pos_y, (y1, y2, y3, y4 * y5))
+        pos = mint.permute(mint.concat((pos_y, pos_x), 3), (0, 3, 1, 2))
         pos = self.token_projection(pos)
         return pos
 
@@ -92,10 +92,10 @@ class PositionalEncodingFourier(nn.Cell):
 def conv3x3(in_planes, out_planes, stride=1):
     """3x3 convolution with padding"""
     return nn.SequentialCell([
-        nn.Conv2d(
-            in_planes, out_planes, kernel_size=3, stride=stride, padding=1, pad_mode='pad', has_bias=False
+        mint.nn.Conv2d(
+            in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False
         ),
-        nn.BatchNorm2d(out_planes)
+        mint.nn.BatchNorm2d(out_planes)
     ])
 
 
@@ -121,19 +121,19 @@ class ConvPatchEmbed(nn.Cell):
         if patch_size[0] == 16:
             self.proj = nn.SequentialCell([
                 conv3x3(3, embed_dim // 8, 2),
-                nn.GELU(),
+                mint.nn.GELU(),
                 conv3x3(embed_dim // 8, embed_dim // 4, 2),
-                nn.GELU(),
+                mint.nn.GELU(),
                 conv3x3(embed_dim // 4, embed_dim // 2, 2),
-                nn.GELU(),
+                mint.nn.GELU(),
                 conv3x3(embed_dim // 2, embed_dim, 2),
             ])
         elif patch_size[0] == 8:
             self.proj = nn.SequentialCell([
                 conv3x3(3, embed_dim // 4, 2),
-                nn.GELU(),
+                mint.nn.GELU(),
                 conv3x3(embed_dim // 4, embed_dim // 2, 2),
-                nn.GELU(),
+                mint.nn.GELU(),
                 conv3x3(embed_dim // 2, embed_dim, 2),
             ])
         else:
@@ -143,8 +143,8 @@ class ConvPatchEmbed(nn.Cell):
     def construct(self, x, padding_size=None) -> Tensor:
         x = self.proj(x)
         B, C, Hp, Wp = x.shape
-        x = ops.reshape(x, (B, C, Hp * Wp))
-        x = x.transpose(0, 2, 1)
+        x = mint.reshape(x, (B, C, Hp * Wp))
+        x = mint.permute(x, (0, 2, 1))
 
         return x, (Hp, Wp)
 
@@ -156,28 +156,30 @@ class LPI(nn.Cell):
     Implemented using 2 layers of separable 3x3 convolutions with GeLU and BatchNorm2d
     """
 
-    def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU,
+    def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=mint.nn.GELU,
                  drop=0., kernel_size=3) -> None:
         super().__init__()
         out_features = out_features or in_features
 
         padding = kernel_size // 2
 
-        self.conv1 = nn.Conv2d(in_features, out_features, kernel_size=kernel_size,
-                               padding=padding, pad_mode='pad', group=out_features, has_bias=True)
+        self.conv1 = mint.nn.Conv2d(
+            in_features, out_features, kernel_size=kernel_size, padding=padding, groups=out_features, bias=True
+        )
         self.act = act_layer()
-        self.bn = nn.BatchNorm2d(in_features)
-        self.conv2 = nn.Conv2d(in_features, out_features, kernel_size=kernel_size,
-                               padding=padding, pad_mode='pad', group=out_features, has_bias=True)
+        self.bn = mint.nn.BatchNorm2d(in_features)
+        self.conv2 = mint.nn.Conv2d(
+            in_features, out_features, kernel_size=kernel_size, padding=padding, groups=out_features, bias=True
+        )
 
     def construct(self, x, H, W) -> Tensor:
         B, N, C = x.shape
-        x = ops.reshape(ops.transpose(x, (0, 2, 1)), (B, C, H, W))
+        x = mint.reshape(mint.permute(x, (0, 2, 1)), (B, C, H, W))
         x = self.conv1(x)
         x = self.act(x)
         x = self.bn(x)
         x = self.conv2(x)
-        x = ops.transpose(ops.reshape(x, (B, C, N)), (0, 2, 1))
+        x = mint.permute(mint.reshape(x, (B, C, N)), (0, 2, 1))
 
         return x
 
@@ -192,33 +194,33 @@ class ClassAttention(nn.Cell):
         head_dim = dim // num_heads
         self.scale = qk_scale or head_dim ** -0.5
 
-        self.qkv = nn.Dense(
-            in_channels=dim, out_channels=dim * 3, has_bias=qkv_bias)
-        self.attn_drop = Dropout(p=attn_drop)
-        self.proj = nn.Dense(in_channels=dim, out_channels=dim)
-        self.proj_drop = Dropout(p=proj_drop)
-        self.softmax = nn.Softmax(axis=-1)
+        self.qkv = mint.nn.Linear(
+            in_features=dim, out_features=dim * 3, bias=qkv_bias)
+        self.attn_drop = mint.nn.Dropout(p=attn_drop)
+        self.proj = mint.nn.Linear(in_features=dim, out_features=dim)
+        self.proj_drop = mint.nn.Dropout(p=proj_drop)
+        self.softmax = mint.nn.Softmax(dim=-1)
 
-        self.attn_matmul_v = ops.BatchMatMul()
+        self.attn_matmul_v = ExtendBatchMatMul()
 
     def construct(self, x: Tensor) -> Tensor:
         B, N, C = x.shape
 
         qkv = self.qkv(x)
-        qkv = ops.reshape(qkv, (B, N, 3, self.num_heads, C // self.num_heads))
-        qkv = ops.transpose(qkv, (2, 0, 3, 1, 4))
+        qkv = mint.reshape(qkv, (B, N, 3, self.num_heads, C // self.num_heads))
+        qkv = mint.permute(qkv, (2, 0, 3, 1, 4))
         q, k, v = ops.unstack(qkv, axis=0)
         qc = q[:, :, 0:1]
         attn_cls = (qc * k).sum(-1) * self.scale
         attn_cls = self.softmax(attn_cls)
         attn_cls = self.attn_drop(attn_cls)
 
-        attn_cls = ops.expand_dims(attn_cls, 2)
+        attn_cls = mint.unsqueeze(attn_cls, 2)
         cls_tkn = self.attn_matmul_v(attn_cls, v)
-        cls_tkn = ops.transpose(cls_tkn, (0, 2, 1, 3))
-        cls_tkn = ops.reshape(cls_tkn, (B, 1, C))
+        cls_tkn = mint.permute(cls_tkn, (0, 2, 1, 3))
+        cls_tkn = mint.reshape(cls_tkn, (B, 1, C))
         cls_tkn = self.proj(cls_tkn)
-        x = ops.concat((self.proj_drop(cls_tkn), x[:, 1:]), axis=1)
+        x = mint.concat((self.proj_drop(cls_tkn), x[:, 1:]), dim=1)
         return x
 
 
@@ -227,7 +229,7 @@ class ClassAttentionBlock(nn.Cell):
     """
 
     def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop=0.,
-                 attn_drop=0., drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm, eta=None,
+                 attn_drop=0., drop_path=0., act_layer=mint.nn.GELU, norm_layer=mint.nn.LayerNorm, eta=None,
                  tokens_norm=False):
         super().__init__()
         self.norm1 = norm_layer([dim])
@@ -237,7 +239,7 @@ class ClassAttentionBlock(nn.Cell):
         )
 
         self.drop_path = DropPath(
-            drop_path) if drop_path > 0. else ops.Identity()
+            drop_path) if drop_path > 0. else mint.nn.Identity()
         self.norm2 = norm_layer([dim])
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer,
@@ -246,9 +248,9 @@ class ClassAttentionBlock(nn.Cell):
         # LayerScale Initialization (no layerscale when None)
         if eta is not None:
             self.gamma1 = Parameter(
-                eta * ops.Ones()((dim), mstype.float32), requires_grad=True)
+                eta * mint.ones((dim), dtype=mstype.float32), requires_grad=True)
             self.gamma2 = Parameter(
-                eta * ops.Ones()((dim), mstype.float32), requires_grad=True)
+                eta * mint.ones((dim), dtype=mstype.float32), requires_grad=True)
         else:
             self.gamma1, self.gamma2 = 1.0, 1.0
 
@@ -266,7 +268,7 @@ class ClassAttentionBlock(nn.Cell):
         x_res = x
         cls_token = x[:, 0:1]
         cls_token = self.gamma2 * self.mlp(cls_token)
-        x = ops.concat((cls_token, x[:, 1:]), axis=1)
+        x = mint.concat((cls_token.to(x.dtype), x[:, 1:]), dim=1)
         x = x_res + self.drop_path(x)
         return x
 
@@ -282,34 +284,34 @@ class XCA(nn.Cell):
         super().__init__()
         self.num_heads = num_heads
         self.temperature = Parameter(
-            ops.Ones()((num_heads, 1, 1), mstype.float32))
-        self.qkv = nn.Dense(
-            in_channels=dim, out_channels=dim * 3, has_bias=qkv_bias)
-        self.q_matmul_k = ops.BatchMatMul(transpose_b=True)
-        self.softmax = nn.Softmax(axis=-1)
-        self.attn_drop = Dropout(p=attn_drop)
-        self.attn_matmul_v = ops.BatchMatMul()
-        self.proj = nn.Dense(in_channels=dim, out_channels=dim)
-        self.proj_drop = Dropout(p=proj_drop)
+            mint.ones((num_heads, 1, 1), dtype=mstype.float32))
+        self.qkv = mint.nn.Linear(
+            in_features=dim, out_features=dim * 3, bias=qkv_bias)
+        self.q_matmul_k = ExtendBatchMatMul(transpose_b=True)
+        self.softmax = mint.nn.Softmax(dim=-1)
+        self.attn_drop = mint.nn.Dropout(p=attn_drop)
+        self.attn_matmul_v = ExtendBatchMatMul()
+        self.proj = mint.nn.Linear(in_features=dim, out_features=dim)
+        self.proj_drop = mint.nn.Dropout(p=proj_drop)
 
     def construct(self, x):
         B, N, C = x.shape
 
-        qkv = ops.reshape(
+        qkv = mint.reshape(
             self.qkv(x), (B, N, 3, self.num_heads, C // self.num_heads))
-        qkv = ops.transpose(qkv, (2, 0, 3, 1, 4))
+        qkv = mint.permute(qkv, (2, 0, 3, 1, 4))
         q, k, v = ops.unstack(qkv, axis=0)
 
-        q = ops.transpose(q, (0, 1, 3, 2))
-        k = ops.transpose(k, (0, 1, 3, 2))
-        v = ops.transpose(v, (0, 1, 3, 2))
+        q = mint.permute(q, (0, 1, 3, 2))
+        k = mint.permute(k, (0, 1, 3, 2))
+        v = mint.permute(v, (0, 1, 3, 2))
 
         attn = self.q_matmul_k(q, k) * self.temperature
         attn = self.softmax(attn)
         attn = self.attn_drop(attn)
         x = self.attn_matmul_v(attn, v)
-        x = ops.transpose(x, (0, 3, 1, 2))
-        x = ops.reshape(x, (B, N, C))
+        x = mint.permute(x, (0, 3, 1, 2))
+        x = mint.reshape(x, (B, N, C))
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
@@ -317,7 +319,7 @@ class XCA(nn.Cell):
 
 class XCABlock(nn.Cell):
     def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop=0.,
-                 attn_drop=0., drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm,
+                 attn_drop=0., drop_path=0., act_layer=mint.nn.GELU, norm_layer=mint.nn.LayerNorm,
                  num_tokens=196, eta=None):
         super().__init__()
         self.norm1 = norm_layer([dim])
@@ -326,7 +328,7 @@ class XCABlock(nn.Cell):
             proj_drop=drop
         )
         self.drop_path = DropPath(
-            drop_path) if drop_path > 0. else nn.Identity()
+            drop_path) if drop_path > 0. else mint.nn.Identity()
         self.norm2 = norm_layer([dim])
 
         mlp_hidden_dim = int(dim * mlp_ratio)
@@ -337,11 +339,11 @@ class XCABlock(nn.Cell):
         self.local_mp = LPI(in_features=dim, act_layer=act_layer)
 
         self.gamma1 = Parameter(
-            eta * ops.ones(dim, mstype.float32), requires_grad=True)
+            eta * mint.ones(dim, dtype=mstype.float32), requires_grad=True)
         self.gamma2 = Parameter(
-            eta * ops.ones(dim, mstype.float32), requires_grad=True)
+            eta * mint.ones(dim, dtype=mstype.float32), requires_grad=True)
         self.gamma3 = Parameter(
-            eta * ops.ones(dim, mstype.float32), requires_grad=True)
+            eta * mint.ones(dim, dtype=mstype.float32), requires_grad=True)
 
     def construct(self, x, H, W):
         x = x + self.drop_path(self.gamma1 * self.attn(self.norm1(x)))
@@ -399,7 +401,7 @@ class XCiT(nn.Cell):
 
         self.num_classes = num_classes
         self.num_features = self.embed_dim = embed_dim
-        norm_layer = norm_layer or partial(nn.LayerNorm, epsilon=1e-6)
+        norm_layer = norm_layer or partial(mint.nn.LayerNorm, eps=1e-6)
 
         self.patch_embed = ConvPatchEmbed(img_size=img_size, embed_dim=embed_dim,
                                           patch_size=patch_size)
@@ -407,8 +409,8 @@ class XCiT(nn.Cell):
         num_patches = self.patch_embed.num_patches
 
         self.cls_token = Parameter(
-            ops.zeros((1, 1, embed_dim), mstype.float32))
-        self.pos_drop = Dropout(p=drop_rate)
+            mint.zeros((1, 1, embed_dim), dtype=mstype.float32))
+        self.pos_drop = mint.nn.Dropout(p=drop_rate)
 
         dpr = [drop_path_rate for i in range(depth)]
         self.blocks = nn.CellList([
@@ -425,8 +427,8 @@ class XCiT(nn.Cell):
                 eta=eta, tokens_norm=tokens_norm)
             for i in range(cls_attn_layers)])
         self.norm = norm_layer([embed_dim])
-        self.head = nn.Dense(
-            in_channels=embed_dim, out_channels=num_classes) if num_classes > 0 else ops.Identity()
+        self.head = mint.nn.Linear(
+            in_features=embed_dim, out_features=num_classes) if num_classes > 0 else mint.nn.Identity()
 
         self.pos_embeder = PositionalEncodingFourier(dim=embed_dim)
         self.use_pos = use_pos
@@ -439,31 +441,30 @@ class XCiT(nn.Cell):
 
     def _init_weights(self) -> None:
         for name, m in self.cells_and_names():
-            if isinstance(m, nn.Dense):
+            if isinstance(m, mint.nn.Linear):
                 m.weight = weight_init.initializer(weight_init.TruncatedNormal(
                     sigma=0.02), m.weight.shape, mindspore.float32)
                 if m.bias is not None:
                     m.bias.set_data(weight_init.initializer(
                         weight_init.Constant(0), m.bias.shape))
-            elif isinstance(m, nn.LayerNorm):
-                m.beta.set_data(weight_init.initializer(
-                    weight_init.Constant(0), m.beta.shape))
-                m.gamma.set_data(weight_init.initializer(
-                    weight_init.Constant(1), m.gamma.shape))
+            elif isinstance(m, mint.nn.LayerNorm):
+                m.bias.set_data(weight_init.initializer(
+                    weight_init.Constant(0), m.bias.shape))
+                m.weight.set_data(weight_init.initializer(
+                    weight_init.Constant(1), m.weight.shape))
 
     def forward_features(self, x):
         B, C, H, W = x.shape
         x, (Hp, Wp) = self.patch_embed(x)
         if self.use_pos:
-            pos_encoding = self.pos_embeder(B, Hp, Wp).reshape(
-                B, -1, x.shape[1]).transpose(0, 2, 1)
+            pos_encoding = mint.permute(mint.reshape(
+                self.pos_embeder(B, Hp, Wp), (B, -1, x.shape[1])), (0, 2, 1))
             x = x + pos_encoding
         x = self.pos_drop(x)
         for blk in self.blocks:
             x = blk(x, Hp, Wp)
-        cls_tokens = ops.broadcast_to(self.cls_token, (B, -1, -1))
-        cls_tokens = ops.cast(cls_tokens, x.dtype)
-        x = ops.concat((cls_tokens, x), 1)
+        cls_tokens = mint.broadcast_to(self.cls_token, (B, -1, -1))
+        x = mint.concat((cls_tokens.to(x.dtype), x), 1)
 
         for blk in self.cls_attn_blocks:
             x = blk(x, Hp, Wp)
@@ -483,7 +484,7 @@ def xcit_tiny_12_p16_224(pretrained: bool = False, num_classes: int = 1000, in_c
     default_cfg = default_cfgs['xcit_tiny_12_p16_224']
     model = XCiT(
         patch_size=16, num_classes=num_classes, embed_dim=192, depth=12, num_heads=4, mlp_ratio=4, qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, epsilon=1e-6), eta=1.0, tokens_norm=True, **kwargs)
+        norm_layer=partial(mint.nn.LayerNorm, eps=1e-6), eta=1.0, tokens_norm=True, **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg,
                         num_classes=num_classes, in_channels=in_channels)

@@ -8,12 +8,11 @@ from typing import List
 import numpy as np
 
 import mindspore
-from mindspore import Tensor, nn, ops
+from mindspore import Tensor, mint, nn
 from mindspore.common.initializer import Constant, HeNormal, TruncatedNormal, initializer
 
 from .helpers import _ntuple, load_pretrained
 from .layers import DropPath, GlobalAvgPooling, Identity
-from .layers.compatibility import Dropout
 from .registry import register_model
 
 __all__ = [
@@ -56,7 +55,7 @@ class Mlp(nn.Cell):
         in_features: int,
         hidden_features: int = None,
         out_features: int = None,
-        act_layer: nn.Cell = nn.GELU,
+        act_layer: nn.Cell = mint.nn.GELU,
         drop: float = 0.0,
         group: int = 8,
         spatial_conv: bool = False,
@@ -74,13 +73,15 @@ class Mlp(nn.Cell):
                 hidden_features = in_features * 2
         self.hidden_features = hidden_features
         self.group = group
-        self.drop = Dropout(p=drop)
-        self.conv1 = nn.Conv2d(in_features, hidden_features, 1, 1, pad_mode="pad", padding=0)
+        self.drop = mint.nn.Dropout(p=drop)
+        self.conv1 = mint.nn.Conv2d(in_features, hidden_features, 1, 1, padding=0, bias=False)
         self.act1 = act_layer()
         if self.spatial_conv:
-            self.conv2 = nn.Conv2d(hidden_features, hidden_features, 3, 1, pad_mode="pad", padding=1, group=self.group)
+            self.conv2 = mint.nn.Conv2d(
+                hidden_features, hidden_features, 3, 1, padding=1, groups=self.group, bias=False
+            )
             self.act2 = act_layer()
-        self.conv3 = nn.Conv2d(hidden_features, out_features, 1, 1, pad_mode="pad", padding=0)
+        self.conv3 = mint.nn.Conv2d(hidden_features, out_features, 1, 1, padding=0, bias=False)
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.conv1(x)
@@ -118,23 +119,24 @@ class Attention(nn.Cell):
         qk_scale_factor = qk_scale if qk_scale is not None else -0.25
         self.scale = head_dim**qk_scale_factor
 
-        self.qkv = nn.Conv2d(dim, head_dim * num_heads * 3, 1, 1, pad_mode="pad", padding=0, has_bias=qkv_bias)
-        self.attn_drop = Dropout(p=attn_drop)
-        self.proj = nn.Conv2d(self.head_dim * self.num_heads, dim, 1, 1, pad_mode="pad", padding=0)
-        self.proj_drop = Dropout(p=proj_drop)
+        self.qkv = mint.nn.Conv2d(dim, head_dim * num_heads * 3, 1, 1, padding=0, bias=qkv_bias)
+        self.attn_drop = mint.nn.Dropout(p=attn_drop)
+        self.proj = mint.nn.Conv2d(self.head_dim * self.num_heads, dim, 1, 1, padding=0, bias=False)
+        self.proj_drop = mint.nn.Dropout(p=proj_drop)
 
     def construct(self, x: Tensor) -> Tensor:
         B, C, H, W = x.shape
         x = self.qkv(x)
-        qkv = ops.reshape(x, (B, 3, self.num_heads, self.head_dim, H * W))
-        qkv = qkv.transpose((1, 0, 2, 4, 3))
+        qkv = mint.reshape(x, (B, 3, self.num_heads, self.head_dim, H * W))
+        qkv = mint.permute(qkv, (1, 0, 2, 4, 3))
         q, k, v = qkv[0], qkv[1], qkv[2]
-        attn = ops.matmul(q * self.scale, k.transpose(0, 1, 3, 2) * self.scale)
-        attn = ops.Softmax(axis=-1)(attn)
+        attn = mint.matmul(q * self.scale, mint.permute(k, (0, 1, 3, 2)) * self.scale)
+        attn = mint.nn.Softmax(dim=-1)(attn)
         attn = self.attn_drop(attn)
-        x = ops.matmul(attn, v)
+        x = mint.matmul(attn, v)
 
-        x = x.transpose((0, 1, 3, 2)).reshape((B, -1, H, W))
+        x = mint.permute(x, (0, 1, 3, 2))
+        x = mint.reshape(x, (B, -1, H, W))
         x = self.proj(x)
         x = self.proj_drop(x)
 
@@ -155,7 +157,7 @@ class Block(nn.Cell):
         drop: float = 0.0,
         attn_drop: float = 0.0,
         drop_path: float = 0.0,
-        act_layer: nn.Cell = nn.GELU,
+        act_layer: nn.Cell = mint.nn.GELU,
         group: int = 8,
         attn_disabled: bool = False,
         spatial_conv: bool = False,
@@ -165,11 +167,11 @@ class Block(nn.Cell):
         self.spatial_conv = spatial_conv
         self.drop_path = DropPath(drop_path) if drop_path > 0.0 else Identity()
         if not attn_disabled:
-            self.norm1 = nn.BatchNorm2d(dim)
+            self.norm1 = mint.nn.BatchNorm2d(dim)
             self.attn = Attention(dim, num_heads=num_heads, head_dim_ratio=head_dim_ratio, qkv_bias=qkv_bias,
                                   qk_scale=qk_scale, attn_drop=attn_drop, proj_drop=drop)
 
-        self.norm2 = nn.BatchNorm2d(dim)
+        self.norm2 = mint.nn.BatchNorm2d(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop,
                        group=group, spatial_conv=spatial_conv)
@@ -197,9 +199,10 @@ class PatchEmbed(nn.Cell):
         self.img_size = img_size
         self.patch_size = patch_size
         self.num_patches = num_patches
-        self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size, pad_mode="pad", padding=0,
-                              has_bias=True)
-        self.norm = nn.BatchNorm2d(embed_dim)
+        self.proj = mint.nn.Conv2d(
+            in_chans, embed_dim, kernel_size=patch_size, stride=patch_size, padding=0, bias=True
+        )
+        self.norm = mint.nn.BatchNorm2d(embed_dim)
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.proj(x)
@@ -270,13 +273,13 @@ class Visformer(nn.Cell):
         dpr = np.linspace(0, drop_path_rate, sum(depth)).tolist()
 
         self.stem = nn.SequentialCell([
-            nn.Conv2d(3, self.init_channels, 7, 2, pad_mode="pad", padding=3),
-            nn.BatchNorm2d(self.init_channels),
-            nn.ReLU()
+            mint.nn.Conv2d(3, self.init_channels, 7, 2, padding=3, bias=False),
+            mint.nn.BatchNorm2d(self.init_channels),
+            mint.nn.ReLU()
         ])
         img_size //= 2
 
-        self.pos_drop = Dropout(p=drop_rate)
+        self.pos_drop = mint.nn.Dropout(p=drop_rate)
         # stage0
         if depth[0]:
             self.patch_embed0 = PatchEmbed(img_size=img_size, patch_size=2, in_chans=self.init_channels,
@@ -284,7 +287,7 @@ class Visformer(nn.Cell):
             img_size //= 2
             if self.pos_embed:
                 self.pos_embed0 = mindspore.Parameter(
-                    ops.zeros((1, embed_dim // 4, img_size, img_size), mindspore.float32))
+                    mint.zeros((1, embed_dim // 4, img_size, img_size), dtype=mindspore.float32))
             self.stage0 = nn.CellList([
                 Block(dim=embed_dim // 4, num_heads=num_heads[0], head_dim_ratio=0.25, mlp_ratio=mlp_ratio,
                       qkv_bias=qkv_bias, qk_scale=qk_scale, drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i],
@@ -303,7 +306,9 @@ class Visformer(nn.Cell):
             img_size //= 4
 
         if self.pos_embed:
-            self.pos_embed1 = mindspore.Parameter(ops.zeros((1, embed_dim // 2, img_size, img_size), mindspore.float32))
+            self.pos_embed1 = mindspore.Parameter(
+                mint.zeros((1, embed_dim // 2, img_size, img_size), dtype=mindspore.float32)
+            )
 
         self.stage1 = nn.CellList([
             Block(
@@ -318,7 +323,9 @@ class Visformer(nn.Cell):
         self.patch_embed2 = PatchEmbed(img_size=img_size, patch_size=2, in_chans=embed_dim // 2, embed_dim=embed_dim)
         img_size //= 2
         if self.pos_embed:
-            self.pos_embed2 = mindspore.Parameter(ops.zeros((1, embed_dim, img_size, img_size), mindspore.float32))
+            self.pos_embed2 = mindspore.Parameter(
+                mint.zeros((1, embed_dim, img_size, img_size), dtype=mindspore.float32)
+            )
         self.stage2 = nn.CellList([
             Block(
                 dim=embed_dim, num_heads=num_heads[2], head_dim_ratio=1.0, mlp_ratio=mlp_ratio,
@@ -332,7 +339,8 @@ class Visformer(nn.Cell):
         self.patch_embed3 = PatchEmbed(img_size=img_size, patch_size=2, in_chans=embed_dim, embed_dim=embed_dim * 2)
         img_size //= 2
         if self.pos_embed:
-            self.pos_embed3 = mindspore.Parameter(ops.zeros((1, embed_dim * 2, img_size, img_size), mindspore.float32))
+            self.pos_embed3 = mindspore.Parameter(
+                mint.zeros((1, embed_dim * 2, img_size, img_size), dtype=mindspore.float32))
         self.stage3 = nn.CellList([
             Block(
                 dim=embed_dim * 2, num_heads=num_heads[3], head_dim_ratio=1.0, mlp_ratio=mlp_ratio,
@@ -346,8 +354,8 @@ class Visformer(nn.Cell):
         if self.pool:
             self.global_pooling = GlobalAvgPooling()
 
-        self.norm = nn.BatchNorm2d(embed_dim * 2)
-        self.head = nn.Dense(embed_dim * 2, num_classes)
+        self.norm = mint.nn.BatchNorm2d(embed_dim * 2)
+        self.head = mint.nn.Linear(embed_dim * 2, num_classes)
 
         # weight init
         if self.pos_embed:
@@ -364,17 +372,17 @@ class Visformer(nn.Cell):
 
     def _initialize_weights(self) -> None:
         for _, cell in self.cells_and_names():
-            if isinstance(cell, nn.Dense):
+            if isinstance(cell, mint.nn.Linear):
                 cell.weight.set_data(initializer(TruncatedNormal(0.02), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(initializer(Constant(0), cell.bias.shape, cell.bias.dtype))
-            elif isinstance(cell, nn.LayerNorm):
-                cell.beta.set_data(initializer(Constant(0), cell.beta.shape, cell.beta.dtype))
-                cell.gamma.set_data(initializer(Constant(1), cell.gamma.shape, cell.gamma.dtype))
-            elif isinstance(cell, nn.BatchNorm2d):
-                cell.beta.set_data(initializer(Constant(0), cell.beta.shape, cell.beta.dtype))
-                cell.gamma.set_data(initializer(Constant(1), cell.gamma.shape, cell.gamma.dtype))
-            elif isinstance(cell, nn.Conv2d):
+            elif isinstance(cell, mint.nn.LayerNorm):
+                cell.bias.set_data(initializer(Constant(0), cell.bias.shape, cell.bias.dtype))
+                cell.weight.set_data(initializer(Constant(1), cell.weight.shape, cell.weight.dtype))
+            elif isinstance(cell, mint.nn.BatchNorm2d):
+                cell.bias.set_data(initializer(Constant(0), cell.bias.shape, cell.bias.dtype))
+                cell.weight.set_data(initializer(Constant(1), cell.weight.shape, cell.weight.dtype))
+            elif isinstance(cell, mint.nn.Conv2d):
                 if self.conv_init:
                     cell.weight.set_data(initializer(HeNormal(mode="fan_out", nonlinearity="relu"), cell.weight.shape,
                                                      cell.weight.dtype))

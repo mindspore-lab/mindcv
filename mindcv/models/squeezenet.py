@@ -4,10 +4,9 @@ Refer to SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB
 """
 
 import mindspore.common.initializer as init
-from mindspore import Tensor, nn, ops
+from mindspore import Tensor, mint, nn
 
 from .helpers import load_pretrained
-from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
 
@@ -46,16 +45,16 @@ class Fire(nn.Cell):
     ) -> None:
         super().__init__()
         self.squeeze = nn.Conv2d(in_channels, squeeze_channels, kernel_size=1, has_bias=True)
-        self.squeeze_activation = nn.ReLU()
+        self.squeeze_activation = mint.nn.ReLU()
         self.expand1x1 = nn.Conv2d(squeeze_channels, expand1x1_channels, kernel_size=1, has_bias=True)
-        self.expand1x1_activation = nn.ReLU()
+        self.expand1x1_activation = mint.nn.ReLU()
         self.expand3x3 = nn.Conv2d(squeeze_channels, expand3x3_channels, kernel_size=3, pad_mode="same", has_bias=True)
-        self.expand3x3_activation = nn.ReLU()
+        self.expand3x3_activation = mint.nn.ReLU()
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.squeeze_activation(self.squeeze(x))
-        return ops.concat((self.expand1x1_activation(self.expand1x1(x)),
-                           self.expand3x3_activation(self.expand3x3(x))), axis=1)
+        return mint.concat((self.expand1x1_activation(self.expand1x1(x)),
+                           self.expand3x3_activation(self.expand3x3(x))), dim=1)
 
 
 class SqueezeNet(nn.Cell):
@@ -84,30 +83,30 @@ class SqueezeNet(nn.Cell):
         if version == "1_0":
             self.features = nn.SequentialCell([
                 nn.Conv2d(in_channels, 96, kernel_size=7, stride=2, pad_mode="valid", has_bias=True),
-                nn.ReLU(),
-                nn.MaxPool2d(kernel_size=3, stride=2),
+                mint.nn.ReLU(),
+                mint.nn.MaxPool2d(kernel_size=3, stride=2),
                 Fire(96, 16, 64, 64),
                 Fire(128, 16, 64, 64),
                 Fire(128, 32, 128, 128),
-                nn.MaxPool2d(kernel_size=3, stride=2),
+                mint.nn.MaxPool2d(kernel_size=3, stride=2),
                 Fire(256, 32, 128, 128),
                 Fire(256, 48, 192, 192),
                 Fire(384, 48, 192, 192),
                 Fire(384, 64, 256, 256),
-                nn.MaxPool2d(kernel_size=3, stride=2),
+                mint.nn.MaxPool2d(kernel_size=3, stride=2),
                 Fire(512, 64, 256, 256),
             ])
         elif version == "1_1":
             self.features = nn.SequentialCell([
                 nn.Conv2d(in_channels, 64, kernel_size=3, stride=2, padding=1, pad_mode="pad", has_bias=True),
-                nn.ReLU(),
-                nn.MaxPool2d(kernel_size=3, stride=2),
+                mint.nn.ReLU(),
+                mint.nn.MaxPool2d(kernel_size=3, stride=2),
                 Fire(64, 16, 64, 64),
                 Fire(128, 16, 64, 64),
-                nn.MaxPool2d(kernel_size=3, stride=2),
+                mint.nn.MaxPool2d(kernel_size=3, stride=2),
                 Fire(128, 32, 128, 128),
                 Fire(256, 32, 128, 128),
-                nn.MaxPool2d(kernel_size=3, stride=2),
+                mint.nn.MaxPool2d(kernel_size=3, stride=2),
                 Fire(256, 48, 192, 192),
                 Fire(384, 48, 192, 192),
                 Fire(384, 64, 256, 256),
@@ -118,9 +117,9 @@ class SqueezeNet(nn.Cell):
 
         self.final_conv = nn.Conv2d(512, num_classes, kernel_size=1, has_bias=True)
         self.classifier = nn.SequentialCell([
-            Dropout(p=drop_rate),
+            mint.nn.Dropout(p=drop_rate),
             self.final_conv,
-            nn.ReLU(),
+            mint.nn.ReLU(),
             GlobalAvgPooling()
         ])
         self._initialize_weights()

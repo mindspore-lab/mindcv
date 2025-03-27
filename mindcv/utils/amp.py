@@ -1,6 +1,6 @@
 """ auto mixed precision related functions """
 from mindspore import dtype as mstype
-from mindspore import nn
+from mindspore import mint, nn
 from mindspore.ops import functional as F
 
 AMP_WHITE_LIST = (
@@ -11,6 +11,10 @@ AMP_WHITE_LIST = (
     nn.Conv1dTranspose,
     nn.Conv2dTranspose,
     nn.Conv3dTranspose,
+    mint.nn.Linear,
+    mint.nn.Conv2d,
+    mint.nn.Conv3d,
+    mint.nn.ConvTranspose2d,
 )
 
 AMP_BLACK_LIST = (
@@ -18,6 +22,10 @@ AMP_BLACK_LIST = (
     nn.BatchNorm2d,
     nn.BatchNorm3d,
     nn.LayerNorm,
+    mint.nn.BatchNorm1d,
+    mint.nn.BatchNorm2d,
+    mint.nn.BatchNorm3d,
+    mint.nn.LayerNorm,
 )
 
 

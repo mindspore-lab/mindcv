@@ -3,10 +3,9 @@ Paper: Selective Kernel Networks (https://arxiv.org/abs/1903.06586)
 """
 from typing import List, Optional, Union
 
-from mindspore import Tensor, nn, ops
+from mindspore import Tensor, mint, nn
 
 from ..helpers import make_divisible
-from .compatibility import Split
 from .conv_norm_act import Conv2dNormActivation
 from .pooling import GlobalAvgPooling
 
@@ -31,17 +30,17 @@ class SelectiveKernelAttn(nn.Cell):
         channels: int,
         num_paths: int = 2,
         attn_channels: int = 32,
-        activation: Optional[nn.Cell] = nn.ReLU,
-        norm: Optional[nn.Cell] = nn.BatchNorm2d,
+        activation: Optional[nn.Cell] = mint.nn.ReLU,
+        norm: Optional[nn.Cell] = mint.nn.BatchNorm2d,
     ):
         super().__init__()
         self.num_paths = num_paths
         self.mean = GlobalAvgPooling(keep_dims=True)
-        self.fc_reduce = nn.Conv2d(channels, attn_channels, kernel_size=1, has_bias=False)
+        self.fc_reduce = mint.nn.Conv2d(channels, attn_channels, kernel_size=1, bias=False)
         self.bn = norm(attn_channels)
         self.act = activation()
-        self.fc_select = nn.Conv2d(attn_channels, channels * num_paths, kernel_size=1)
-        self.softmax = nn.Softmax(axis=1)
+        self.fc_select = mint.nn.Conv2d(attn_channels, channels * num_paths, kernel_size=1, bias=False)
+        self.softmax = mint.nn.Softmax(dim=1)
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.mean((x.sum(1)))
@@ -92,8 +91,8 @@ class SelectiveKernel(nn.Cell):
         rd_divisor: int = 8,
         keep_3x3: bool = True,
         split_input: bool = True,
-        activation: Optional[nn.Cell] = nn.ReLU,
-        norm: Optional[nn.Cell] = nn.BatchNorm2d,
+        activation: Optional[nn.Cell] = mint.nn.ReLU,
+        norm: Optional[nn.Cell] = mint.nn.BatchNorm2d,
     ):
         super().__init__()
         out_channels = out_channels or in_channels
@@ -114,8 +113,6 @@ class SelectiveKernel(nn.Cell):
             assert in_channels % self.num_paths == 0
             in_channels = in_channels // self.num_paths
         groups = min(out_channels, groups)
-        self.split = Split(split_size_or_sections=self.in_channels // self.num_paths, output_num=self.num_paths, axis=1)
-
         self.paths = nn.CellList([
             Conv2dNormActivation(in_channels, out_channels, kernel_size=k, stride=stride, groups=groups,
                                  dilation=d, activation=activation, norm=norm)
@@ -128,14 +125,14 @@ class SelectiveKernel(nn.Cell):
     def construct(self, x: Tensor) -> Tensor:
         x_paths = []
         if self.split_input:
-            x_split = self.split(x)
+            x_split = mint.split(x, split_size_or_sections=self.in_channels // self.num_paths, dim=1)
             for i, op in enumerate(self.paths):
                 x_paths.append(op(x_split[i]))
         else:
             for op in self.paths:
                 x_paths.append(op(x))
 
-        x = ops.stack(x_paths, axis=1)
+        x = mint.stack(x_paths, dim=1)
         x_attn = self.attn(x)
         x = x * x_attn
         x = x.sum(1)

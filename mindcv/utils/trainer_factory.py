@@ -2,13 +2,13 @@ import logging
 from typing import Optional, Union
 
 import mindspore as ms
-from mindspore import Tensor, context
+from mindspore import Tensor, amp, context
 from mindspore import dtype as mstype
 from mindspore import nn
 from mindspore.ops import functional as F
 from mindspore.train import DynamicLossScaleManager, FixedLossScaleManager, Model
 
-from .amp import auto_mixed_precision
+from .amp import AMP_BLACK_LIST, auto_mixed_precision
 from .train_step import TrainStep
 
 __all__ = [
@@ -121,12 +121,13 @@ def create_trainer(
         raise ValueError("`gradient_accumulation_steps` must be >= 1!")
 
     if not require_customized_train_step(ema, clip_grad, gradient_accumulation_steps, amp_cast_list):
+        network = amp.custom_mixed_precision(network, black_list=list(AMP_BLACK_LIST))
         mindspore_kwargs = dict(
             network=network,
             loss_fn=loss,
             optimizer=optimizer,
             metrics=metrics,
-            amp_level=amp_level,
+            amp_level="O0",
         )
         if loss_scale_type.lower() == "fixed":
             mindspore_kwargs["loss_scale_manager"] = FixedLossScaleManager(

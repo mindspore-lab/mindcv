@@ -5,7 +5,8 @@ from typing import List, Optional, Tuple
 import numpy as np
 
 import mindspore as ms
-from mindspore import Parameter, Tensor, nn, ops
+import mindspore.mint.nn.functional as F
+from mindspore import Parameter, Tensor, mint, nn
 
 from .compatibility import Interpolate
 
@@ -36,15 +37,15 @@ def resample_abs_pos_embed(
     # do the interpolation
     embed_dim = posemb.shape[-1]
     orig_dtype = posemb.dtype
-    posemb = posemb.reshape(1, old_size[0], old_size[1], -1).permute(0, 3, 1, 2)
+    posemb = mint.permute(mint.reshape(posemb, (1, old_size[0], old_size[1], -1)), (0, 3, 1, 2))
     interpolate = Interpolate(mode=interpolation, align_corners=True)
     posemb = interpolate(posemb, size=new_size)
-    posemb = posemb.permute(0, 2, 3, 1).reshape(1, -1, embed_dim)
+    posemb = mint.reshape(mint.permute(posemb, (0, 2, 3, 1)), (1, -1, embed_dim))
     posemb = posemb.astype(orig_dtype)
 
     # add back extra (class, etc) prefix tokens
     if posemb_prefix is not None:
-        posemb = ops.concatcat((posemb_prefix, posemb), axis=1)
+        posemb = mint.concat((posemb_prefix, posemb), axis=1)
 
     return posemb
 
@@ -82,12 +83,12 @@ class RelativePositionBiasWithCLS(nn.Cell):
         relative_position_index[0, 0] = num_relative_distance - 1
         relative_position_index = Tensor(relative_position_index.reshape(-1))
 
-        self.one_hot = nn.OneHot(axis=-1, depth=num_relative_distance, dtype=ms.float16)
-        self.relative_position_index = Parameter(self.one_hot(relative_position_index), requires_grad=False)
+        self.relative_position_index = Parameter(
+            F.one_hot(relative_position_index, num_relative_distance), requires_grad=False)
 
     def construct(self):
-        out = ops.matmul(self.relative_position_index, self.relative_position_bias_table)
-        out = ops.reshape(out, (self.num_tokens + 1, self.num_tokens + 1, -1))
-        out = ops.transpose(out, (2, 0, 1))
-        out = ops.expand_dims(out, 0)
+        out = mint.matmul(self.relative_position_index, self.relative_position_bias_table)
+        out = mint.reshape(out, (self.num_tokens + 1, self.num_tokens + 1, -1))
+        out = mint.permute(out, (2, 0, 1))
+        out = mint.unsqueeze(out, 0)
         return out
