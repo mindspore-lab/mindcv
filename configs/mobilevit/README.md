@@ -76,12 +76,5 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 | mobilevit_xx_small | 1.27      | 8     | 64         | 256x256    | O2        | 437s          | 67.24   | 7614.52 | 67.11    | 87.85    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_xx_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilevit/mobilevit_xx_small-6f2745c3-910v2.ckpt) |
 
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-| model name         | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                     | weight                                                                                              |
-| ------------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| mobilevit_xx_small | 1.27      | 64    | 8          | 256x256    | O2        | 301s          | 53.52   | 9566.52 | 68.91    | 88.91    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilevit/mobilevit_xx_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilevit/mobilevit_xx_small-af9da8a0.ckpt) |
-
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

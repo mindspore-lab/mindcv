@@ -83,10 +83,6 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 *coming soon*
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-*coming soon*
-
 ### Notes
 
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

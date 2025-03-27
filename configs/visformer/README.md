@@ -85,15 +85,6 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 *coming soon*
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-| model name     | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                 | weight                                                                                          |
-| -------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| visformer_tiny | 10.33     | 8     | 128        | 224x224    | O2        | 137s          | 217.92  | 4698.97 | 78.28    | 94.15    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/visformer/visformer_tiny-daee0322.ckpt) |
-
-
-
 ### Notes
 
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
