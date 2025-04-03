@@ -83,8 +83,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 | model name  | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | recipe                                                                                           | weight                                                                                      | acc@top1 | acc@top5 |
-| ----------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- | -------- | -------- |
-| halonet     | 8     | 64         | 224x224    | O3        | 351s          | 134.72  | 3800.48 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/halonet/halonet_50t_ascend.yaml)     | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/halonet/halonet_50t-533da6be.ckpt)     | 0.10     | 0.10     |
+| ----------- | ----- | ---------- | ---------- |-----------| ------------- | ------- | ------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- | -------- | -------- |
+| halonet     | 8     | 64         | 224x224    | O2        | 351s          | 134.72  | 3800.48 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/halonet/halonet_50t_ascend.yaml)     | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/halonet/halonet_50t-533da6be.ckpt)     | 0.10     | 0.10     |
 
 
 ### Notes
