@@ -76,13 +76,6 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 | -------------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | poolformer_s12 | 11.92     | 8     | 128        | 224x224    | O2        | 177s          | 211.81  | 4834.52 | 77.49    | 93.55    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/poolformer_s12_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/poolformer/poolformer_s12-c7e14eea-910v2.ckpt) |
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-| model name     | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                  | weight                                                                                           |
-| -------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| poolformer_s12 | 11.92     | 8     | 128        | 224x224    | O2        | 118s          | 220.13  | 4651.80 | 77.33    | 93.34    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/poolformer/poolformer_s12_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/poolformer/poolformer_s12-5be5c4e4.ckpt) |
-
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 

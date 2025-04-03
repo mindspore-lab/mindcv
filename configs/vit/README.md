@@ -102,11 +102,10 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
-*coming soon*
+| model name  | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | recipe                                                                                           | weight                                                                                                  | acc@top1 | acc@top5 |
+| ----------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- | -------- | -------- |
+| vit         | 8     | 256        | 224x224    | O2        | 225s          | 425.36  | 4814.75 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l32_224_ascend.yaml)             | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/vit/vit_l_32_224-e0039f16-910v2.ckpt)             | 74.63    | 92.21    |
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-*coming soon*
 
 ### Notes
 

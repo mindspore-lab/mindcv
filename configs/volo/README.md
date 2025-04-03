@@ -84,7 +84,10 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 performance tested on ascend 910*(8p) with graph mode
 
-*coming soon*
+| model name  | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | recipe                                                                                     | weight                                                                                                  | acc@top1 | acc@top5 |
+| ----------- | ----- | ---------- | ---------- |-----------| ------------- | ------- | ------- |--------------------------------------------------------------------------------------------| ------------------------------------------------------------------------------------------------------- | -------- | -------- |
+| volo        | 8     | 128        | 224x224    | O2        | 368s          | 230.05  | 4451.21 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/volo/volo_d4_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/volo/volo_d4-6c88cd33.ckpt)           | 82.97    | 96.21    |
+
 
 performance tested on ascend 910(8p) with graph mode
 

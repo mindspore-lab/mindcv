@@ -77,13 +77,10 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
-*coming soon*
+| model name  | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | recipe                                                                                           | weight                                                                                     | acc@top1 | acc@top5 |
+| ----------- | ----- | ---------- | ---------- |-----------| ------------- | ------- | ------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | -------- | -------- |
+| ghostnet    | 8     | 128        | 224x224    | O2        | 125s          | 201.46  | 5082.89 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/ghostnet/ghostnet_050_ascend.yaml)   | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/ghostnet/ghostnet_050-ae7771cb-910v2.ckpt)   | 65.93    | 86.65    |
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-| model name   | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                              | weight                                                                                       |
-| ------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| ghostnet_050 | 2.60      | 8     | 128        | 224x224    | O2        | 383s          | 211.13  | 4850.09 | 66.03    | 86.64    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/ghostnet/ghostnet_050_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/ghostnet/ghostnet_050-85b91860.ckpt) |
 
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

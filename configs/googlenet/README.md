@@ -77,12 +77,6 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 | ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | googlenet  | 6.99      | 8     | 32         | 224x224    | O2        | 113s          | 23.5    | 10893.62 | 72.89    | 90.89    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/googlenet/googlenet_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/googlenet/googlenet-de74c31d-910v2.ckpt) |
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                            | weight                                                                                     |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| googlenet  | 6.99      | 8     | 32         | 224x224    | O2        | 72s           | 21.40   | 11962.62 | 72.68    | 90.89    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/googlenet/googlenet_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/googlenet/googlenet-5552fcd3.ckpt) |
-
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
 
