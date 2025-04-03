@@ -91,20 +91,8 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 
 | model name          | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                              | weight                                                                                                          |
-| ------------------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| swinv2_tiny_window8 | 28.78     | 8     | 128        | 256x256    | O2        | 385s          | 335.18  | 3055.07 | 81.38    | 95.46    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformerv2/swinv2_tiny_window8_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/swinv2/swinv2_tiny_window8-70c5e903-910v2.ckpt) |
-
-
-
-Experiments are tested on ascend 910 with mindspore 2.3.1 graph mode.
-
-
-
-
-| model name          | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                              | weight                                                                                            |
-| ------------------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| swinv2_tiny_window8 | 28.78     | 8     | 128        | 256x256    | O2        | 273s          | 317.19  | 3228.35 | 81.42    | 95.43    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformerv2/swinv2_tiny_window8_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/swinv2/swinv2_tiny_window8-3ef8b787.ckpt) |
-
+| ------------------- | --------- | ----- | ---------- | ---------- | --------- |---------------|---------| ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| swinv2_tiny_window8 | 28.78     | 8     | 128        | 256x256    | O2        | 385s          | 326.16  | 3139.56 | 81.38    | 95.46    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/swintransformerv2/swinv2_tiny_window8_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/swinv2/swinv2_tiny_window8-70c5e903-910v2.ckpt) |
 
 
 ### Notes

@@ -33,20 +33,20 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
 
 - **高易用性** MindCV将视觉任务分解为各种可配置的组件，用户可以轻松地构建自己的数据处理和模型训练流程。
 
-    ```pycon
-    >>> import mindcv
-    # 创建数据集
-    >>> dataset = mindcv.create_dataset('cifar10', download=True)
-    # 创建模型
-    >>> network = mindcv.create_model('resnet50', pretrained=True)
-    ```
+  ```pycon
+  >>> import mindcv
+  # 创建数据集
+  >>> dataset = mindcv.create_dataset('cifar10', download=True)
+  # 创建模型
+  >>> network = mindcv.create_model('resnet50', pretrained=True)
+  ```
 
-    用户可通过预定义的训练和微调脚本，快速配置并完成训练或迁移学习任务。
+  用户可通过预定义的训练和微调脚本，快速配置并完成训练或迁移学习任务。
 
-    ```shell
-    # 配置和启动迁移学习任务
-    python train.py --model swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir=/path/to/dataset
-    ```
+  ```shell
+  # 配置和启动迁移学习任务
+  python train.py --model swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir=/path/to/dataset
+  ```
 
 - **高性能** MindCV集成了大量基于CNN和Transformer的高性能模型, 如SwinTransformer，并提供预训练权重、训练策略和性能报告，帮助用户快速选型并将其应用于视觉模型。
 
@@ -108,61 +108,61 @@ python infer.py --model=swin_tiny --image_path='./dog.jpg'
 
 - 单卡训练
 
-    ```shell
-    # 单卡训练
-    python train.py --model resnet50 --dataset cifar10 --dataset_download
-    ```
+  ```shell
+  # 单卡训练
+  python train.py --model resnet50 --dataset cifar10 --dataset_download
+  ```
 
-    以上代码是在CIFAR10数据集上单卡（CPU/GPU/Ascend）训练ResNet的示例，通过`model`和`dataset`参数分别指定需要训练的模型和数据集。
+  以上代码是在CIFAR10数据集上单卡（CPU/GPU/Ascend）训练ResNet的示例，通过`model`和`dataset`参数分别指定需要训练的模型和数据集。
 
 - 分布式训练
 
-    对于像ImageNet这样的大型数据集，有必要在多个设备上以分布式模式进行训练。基于MindSpore对分布式相关功能的良好支持，用户可以使用`msrun`来进行模型的分布式训练。
+  对于像ImageNet这样的大型数据集，有必要在多个设备上以分布式模式进行训练。基于MindSpore对分布式相关功能的良好支持，用户可以使用`msrun`来进行模型的分布式训练。
 
-    ```shell
-    # 分布式训练
-    # 假设你有4张NPU卡
-    msrun --bind_core=True --worker_num 4 python train.py --distribute \
-        --model densenet121 --dataset imagenet --data_dir ./datasets/imagenet
-    ```
+  ```shell
+  # 分布式训练
+  # 假设你有4张NPU卡
+  msrun --bind_core=True --worker_num 4 python train.py --distribute \
+      --model densenet121 --dataset imagenet --data_dir ./datasets/imagenet
+  ```
 
-    注意，如果在两卡环境下选用msrun作为启动方式，请添加配置项 `--bind_core=True` 增加绑核操作以优化两卡性能，范例代码如下：
+  注意，如果在两卡环境下选用msrun作为启动方式，请添加配置项 `--bind_core=True` 增加绑核操作以优化两卡性能，范例代码如下：
 
-    ```shell
-    msrun --bind_core=True --worker_num=2--local_worker_num=2 --master_port=8118 \
-    --log_dir=msrun_log --join=True --cluster_time_out=300 \
-    python train.py --distribute --model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet
-    ```
+  ```shell
+  msrun --bind_core=True --worker_num=2--local_worker_num=2 --master_port=8118 \
+  --log_dir=msrun_log --join=True --cluster_time_out=300 \
+  python train.py --distribute --model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet
+  ```
 
-   > 如需更多操作指导，请参考 https://www.mindspore.cn/docs/zh-CN/r2.5.0/model_train/parallel/startup_method.html
+  > 如需更多操作指导，请参考 https://www.mindspore.cn/docs/zh-CN/r2.5.0/model_train/parallel/startup_method.html
 
-    完整的参数列表及说明在`config.py`中定义，可运行`python train.py --help`快速查看。
+  完整的参数列表及说明在`config.py`中定义，可运行`python train.py --help`快速查看。
 
-    如需恢复训练，请指定`--ckpt_path`和`--ckpt_save_dir`参数，脚本将加载路径中的模型权重和优化器状态，并恢复中断的训练进程。
+  如需恢复训练，请指定`--ckpt_path`和`--ckpt_save_dir`参数，脚本将加载路径中的模型权重和优化器状态，并恢复中断的训练进程。
 
 - 超参配置和预训练策略
 
-    您可以编写yaml文件或设置外部参数来指定配置数据、模型、优化器等组件及其超参数。以下是使用预设的训练策略（yaml文件）进行模型训练的示例。
+  您可以编写yaml文件或设置外部参数来指定配置数据、模型、优化器等组件及其超参数。以下是使用预设的训练策略（yaml文件）进行模型训练的示例。
 
-    ```shell
-    msrun --bind_core=True --worker_num 4 python train.py -c configs/squeezenet/squeezenet_1.0_ascend.yaml
-    ```
+  ```shell
+  msrun --bind_core=True --worker_num 4 python train.py -c configs/squeezenet/squeezenet_1.0_ascend.yaml
+  ```
 
-    **预定义的训练策略**
-    MindCV目前提供了超过20种模型训练策略，在ImageNet取得SoTA性能。
-    具体的参数配置和详细精度性能汇总请见[`configs`](configs)文件夹。
-    您可以便捷地将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）。
+  **预定义的训练策略**
+  MindCV目前提供了超过20种模型训练策略，在ImageNet取得SoTA性能。
+  具体的参数配置和详细精度性能汇总请见[`configs`](configs)文件夹。
+  您可以便捷地将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）。
 
 - 在ModelArts/OpenI平台上训练
 
-    在[ModelArts](https://www.huaweicloud.com/intl/en-us/product/modelarts.html)或[OpenI](https://openi.pcl.ac.cn/)云平台上进行训练，需要执行以下操作：
+  在[ModelArts](https://www.huaweicloud.com/intl/en-us/product/modelarts.html)或[OpenI](https://openi.pcl.ac.cn/)云平台上进行训练，需要执行以下操作：
 
-    ```text
-    1、在云平台上创建新的训练任务。
-    2、在网站UI界面添加运行参数`config`，并指定yaml配置文件的路径。
-    3、在网站UI界面添加运行参数`enable_modelarts`并设置为True。
-    4、在网站上填写其他训练信息并启动训练任务。
-    ```
+  ```text
+  1、在云平台上创建新的训练任务。
+  2、在网站UI界面添加运行参数`config`，并指定yaml配置文件的路径。
+  3、在网站UI界面添加运行参数`enable_modelarts`并设置为True。
+  4、在网站上填写其他训练信息并启动训练任务。
+  ```
 
 **静态图和动态图模式**
 
@@ -219,41 +219,41 @@ python train.py --model=resnet50 --dataset=cifar10 \
 <details open markdown>
 <summary> 支持模型 </summary>
 
-* Big Transfer ResNetV2 (BiT) - https://arxiv.org/abs/1912.11370
-* ConvNeXt - https://arxiv.org/abs/2201.03545
-* ConViT (Soft Convolutional Inductive Biases Vision Transformers)- https://arxiv.org/abs/2103.10697
-* DenseNet - https://arxiv.org/abs/1608.06993
-* DPN (Dual-Path Network) - https://arxiv.org/abs/1707.01629
-* EfficientNet (MBConvNet Family) https://arxiv.org/abs/1905.11946
-* EfficientNet V2 - https://arxiv.org/abs/2104.00298
-* GhostNet - https://arxiv.org/abs/1911.11907
-* GoogLeNet - https://arxiv.org/abs/1409.4842
-* Inception-V3 - https://arxiv.org/abs/1512.00567
-* Inception-ResNet-V2 and Inception-V4 - https://arxiv.org/abs/1602.07261
-* MNASNet - https://arxiv.org/abs/1807.11626
-* MobileNet-V1 - https://arxiv.org/abs/1704.04861
-* MobileNet-V2 - https://arxiv.org/abs/1801.04381
-* MobileNet-V3 (MBConvNet w/ Efficient Head) - https://arxiv.org/abs/1905.02244
-* NASNet - https://arxiv.org/abs/1707.07012
-* PNasNet - https://arxiv.org/abs/1712.00559
-* PVT (Pyramid Vision Transformer) - https://arxiv.org/abs/2102.12122
-* PoolFormer models - https://github.com/sail-sg/poolformer
-* RegNet - https://arxiv.org/abs/2003.13678
-* RepMLP https://arxiv.org/abs/2105.01883
-* RepVGG - https://arxiv.org/abs/2101.03697
-* ResNet (v1b/v1.5) - https://arxiv.org/abs/1512.03385
-* ResNeXt - https://arxiv.org/abs/1611.05431
-* Res2Net - https://arxiv.org/abs/1904.01169
-* ReXNet - https://arxiv.org/abs/2007.00992
-* ShuffleNet v1 - https://arxiv.org/abs/1707.01083
-* ShuffleNet v2 - https://arxiv.org/abs/1807.11164
-* SKNet - https://arxiv.org/abs/1903.06586
-* SqueezeNet - https://arxiv.org/abs/1602.07360
-* Swin Transformer - https://arxiv.org/abs/2103.14030
-* VGG - https://arxiv.org/abs/1409.1556
-* Visformer - https://arxiv.org/abs/2104.12533
-* Vision Transformer (ViT) - https://arxiv.org/abs/2010.11929
-* Xception - https://arxiv.org/abs/1610.02357
+- Big Transfer ResNetV2 (BiT) - https://arxiv.org/abs/1912.11370
+- ConvNeXt - https://arxiv.org/abs/2201.03545
+- ConViT (Soft Convolutional Inductive Biases Vision Transformers)- https://arxiv.org/abs/2103.10697
+- DenseNet - https://arxiv.org/abs/1608.06993
+- DPN (Dual-Path Network) - https://arxiv.org/abs/1707.01629
+- EfficientNet (MBConvNet Family) https://arxiv.org/abs/1905.11946
+- EfficientNet V2 - https://arxiv.org/abs/2104.00298
+- GhostNet - https://arxiv.org/abs/1911.11907
+- GoogLeNet - https://arxiv.org/abs/1409.4842
+- Inception-V3 - https://arxiv.org/abs/1512.00567
+- Inception-ResNet-V2 and Inception-V4 - https://arxiv.org/abs/1602.07261
+- MNASNet - https://arxiv.org/abs/1807.11626
+- MobileNet-V1 - https://arxiv.org/abs/1704.04861
+- MobileNet-V2 - https://arxiv.org/abs/1801.04381
+- MobileNet-V3 (MBConvNet w/ Efficient Head) - https://arxiv.org/abs/1905.02244
+- NASNet - https://arxiv.org/abs/1707.07012
+- PNasNet - https://arxiv.org/abs/1712.00559
+- PVT (Pyramid Vision Transformer) - https://arxiv.org/abs/2102.12122
+- PoolFormer models - https://github.com/sail-sg/poolformer
+- RegNet - https://arxiv.org/abs/2003.13678
+- RepMLP https://arxiv.org/abs/2105.01883
+- RepVGG - https://arxiv.org/abs/2101.03697
+- ResNet (v1b/v1.5) - https://arxiv.org/abs/1512.03385
+- ResNeXt - https://arxiv.org/abs/1611.05431
+- Res2Net - https://arxiv.org/abs/1904.01169
+- ReXNet - https://arxiv.org/abs/2007.00992
+- ShuffleNet v1 - https://arxiv.org/abs/1707.01083
+- ShuffleNet v2 - https://arxiv.org/abs/1807.11164
+- SKNet - https://arxiv.org/abs/1903.06586
+- SqueezeNet - https://arxiv.org/abs/1602.07360
+- Swin Transformer - https://arxiv.org/abs/2103.14030
+- VGG - https://arxiv.org/abs/1409.1556
+- Visformer - https://arxiv.org/abs/2104.12533
+- Vision Transformer (ViT) - https://arxiv.org/abs/2010.11929
+- Xception - https://arxiv.org/abs/1610.02357
 
 关于模型性能和预训练权重的信息请查看 [configs](./configs) 文件夹。
 
@@ -266,43 +266,43 @@ python train.py --model=resnet50 --dataset=cifar10 \
 <details open markdown>
 <summary> 支持算法列表 </summary>
 
-* 数据增强
-    * [AutoAugment](https://arxiv.org/abs/1805.09501)
-    * [RandAugment](https://arxiv.org/abs/1909.13719)
-    * [Repeated Augmentation](https://openaccess.thecvf.com/content_CVPR_2020/papers/Hoffer_Augment_Your_Batch_Improving_Generalization_Through_Instance_Repetition_CVPR_2020_paper.pdf)
-    * RandErasing (Cutout)
-    * CutMix
-    * MixUp
-    * RandomResizeCrop
-    * Color Jitter, Flip, etc
-* 优化器
-    * Adam
-    * AdamW
-    * [Lion](https://arxiv.org/abs/2302.06675)
-    * Adan (experimental)
-    * AdaGrad
-    * LAMB
-    * Momentum
-    * RMSProp
-    * SGD
-    * NAdam
-* 学习率调度器
-    * Warmup Cosine Decay
-    * Step LR
-    * Polynomial Decay
-    * Exponential Decay
-* 正则化
-    * Weight Decay
-    * Label Smoothing
-    * Stochastic Depth (depends on networks)
-    * Dropout (depends on networks)
-* 损失函数
-    * Cross Entropy (w/ class weight and auxiliary  logit support)
-    * Binary Cross Entropy  (w/ class weight and auxiliary  logit support)
-    * Soft Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
-    * Soft Binary Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
-* 模型融合
-    * Warmup EMA (Exponential Moving Average)
+- 数据增强
+  - [AutoAugment](https://arxiv.org/abs/1805.09501)
+  - [RandAugment](https://arxiv.org/abs/1909.13719)
+  - [Repeated Augmentation](https://openaccess.thecvf.com/content_CVPR_2020/papers/Hoffer_Augment_Your_Batch_Improving_Generalization_Through_Instance_Repetition_CVPR_2020_paper.pdf)
+  - RandErasing (Cutout)
+  - CutMix
+  - MixUp
+  - RandomResizeCrop
+  - Color Jitter, Flip, etc
+- 优化器
+  - Adam
+  - AdamW
+  - [Lion](https://arxiv.org/abs/2302.06675)
+  - Adan (experimental)
+  - AdaGrad
+  - LAMB
+  - Momentum
+  - RMSProp
+  - SGD
+  - NAdam
+- 学习率调度器
+  - Warmup Cosine Decay
+  - Step LR
+  - Polynomial Decay
+  - Exponential Decay
+- 正则化
+  - Weight Decay
+  - Label Smoothing
+  - Stochastic Depth (depends on networks)
+  - Dropout (depends on networks)
+- 损失函数
+  - Cross Entropy (w/ class weight and auxiliary logit support)
+  - Binary Cross Entropy (w/ class weight and auxiliary logit support)
+  - Soft Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
+  - Soft Binary Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
+- 模型融合
+  - Warmup EMA (Exponential Moving Average)
 
 </details>
 
@@ -337,9 +337,10 @@ python train.py --model=resnet50 --dataset=cifar10 \
 6. BREAKING CHANGES:
    - 我们将在此小版本的未来发布中丢弃对MindSpore1.x的支持。
    - 配置项`filter_bias_and_bn`将被移除并更名为`weight_decay_filter`。
-   我们会对已有训练策略进行迁移，但函数`create_optimizer`的签名变更将是不兼容的，且未迁移旧版本的训练策略也将变得不兼容。详见[PR/752](https://github.com/mindspore-lab/mindcv/pull/752)。
+     我们会对已有训练策略进行迁移，但函数`create_optimizer`的签名变更将是不兼容的，且未迁移旧版本的训练策略也将变得不兼容。详见[PR/752](https://github.com/mindspore-lab/mindcv/pull/752)。
 
 - 2023/6/16
+
 1. 新版本 `0.2.2` 发布啦！我们将`MindSpore`升级到了2.0版本，同时保持了对1.8版本的兼容
 2. 新模型:
    - [ConvNextV2](configs/convnextv2)
@@ -357,90 +358,101 @@ python train.py --model=resnet50 --dataset=cifar10 \
    - 文档网站上的损坏链接
 
 - 2023/6/2
+
 1. 新版本：`0.2.1` 发布
 2. 新[文档](https://mindspore-lab.github.io/mindcv/zh/)上线
 
 - 2023/5/30
+
 1. 新模型:
-    - [VGG](configs/vgg)混合精度(O2)版本
-    - [GhostNet](configs/ghostnet)
-    - [MobileNetV2](configs/mobilenetv2) 和 [MobileNetV3](configs/mobilenetv3)混合精度(O3)版本
-    - [RegNet](configs/regnet)的(x,y)_(200,400,600,800)mf版本
-    - [RepVGG](configs/repvgg)的b1g2, b1g4 & b2g4版本
-    - [MnasNet](configs/mnasnet)的0.5版本
-    - [PVTv2](configs/pvtv2)的b3 & b4版本
+   - [VGG](configs/vgg)混合精度(O2)版本
+   - [GhostNet](configs/ghostnet)
+   - [MobileNetV2](configs/mobilenetv2) 和 [MobileNetV3](configs/mobilenetv3)混合精度(O3)版本
+   - [RegNet](configs/regnet)的(x,y)\_(200,400,600,800)mf版本
+   - [RepVGG](configs/repvgg)的b1g2, b1g4 & b2g4版本
+   - [MnasNet](configs/mnasnet)的0.5版本
+   - [PVTv2](configs/pvtv2)的b3 & b4版本
 2. 新特性:
-    - 3-Augment, Augmix, TrivialAugmentWide
+   - 3-Augment, Augmix, TrivialAugmentWide
 3. 错误修复:
-    - ViT 池化模式
+   - ViT 池化模式
 
 - 2023/04/28
+
 1. 增添了一些新模型，列出如下：
-    - [VGG](configs/vgg)
-    - [DPN](configs/dpn)
-    - [ResNet v2](configs/resnetv2)
-    - [MnasNet](configs/mnasnet)
-    - [MixNet](configs/mixnet)
-    - [RepVGG](configs/repvgg)
-    - [ConvNeXt](configs/convnext)
-    - [Swin Transformer](configs/swintransformer)
-    - [EdgeNeXt](configs/edgenext)
-    - [CrossViT](configs/crossvit)
-    - [XCiT](configs/xcit)
-    - [CoAT](configs/coat)
-    - [PiT](configs/pit)
-    - [PVT v2](configs/pvtv2)
-    - [MobileViT](configs/mobilevit)
+   - [VGG](configs/vgg)
+   - [DPN](configs/dpn)
+   - [ResNet v2](configs/resnetv2)
+   - [MnasNet](configs/mnasnet)
+   - [MixNet](configs/mixnet)
+   - [RepVGG](configs/repvgg)
+   - [ConvNeXt](configs/convnext)
+   - [Swin Transformer](configs/swintransformer)
+   - [EdgeNeXt](configs/edgenext)
+   - [CrossViT](configs/crossvit)
+   - [XCiT](configs/xcit)
+   - [CoAT](configs/coat)
+   - [PiT](configs/pit)
+   - [PVT v2](configs/pvtv2)
+   - [MobileViT](configs/mobilevit)
 2. 错误修正:
-    - 分布式训练时，需对每个进程设置相同的随机数种子
-    - 检查YAML配置文件中的选项是否存在于命令行解析器
-    - 修正了优化器`Adan`中标志变量不为`Tensor`的错误
+   - 分布式训练时，需对每个进程设置相同的随机数种子
+   - 检查YAML配置文件中的选项是否存在于命令行解析器
+   - 修正了优化器`Adan`中标志变量不为`Tensor`的错误
 
 - 2023/03/25
+
 1. 更新ResNet网络预训练权重，现在预训练权重有更高Top1精度
-    - ResNet18精度从70.09提升到70.31
-    - ResNet34精度从73.69提升到74.15
-    - ResNet50精度从76.64提升到76.69
-    - ResNet101精度从77.63提升到78.24
-    - ResNet152精度从78.63提升到78.72
+   - ResNet18精度从70.09提升到70.31
+   - ResNet34精度从73.69提升到74.15
+   - ResNet50精度从76.64提升到76.69
+   - ResNet101精度从77.63提升到78.24
+   - ResNet152精度从78.63提升到78.72
 2. 按照规则(model_scale-sha256sum.ckpt)更新预训练权重名字和相应下载URL链接
 
 - 2023/03/05
+
 1. 增加Lion (EvoLved Sign Momentum)优化器，论文 https://arxiv.org/abs/2302.06675
-    - Lion所使用的学习率一般比Adamw小3到10倍，而权重衰减(weigt_decay)要大3到10倍
+   - Lion所使用的学习率一般比Adamw小3到10倍，而权重衰减(weigt_decay)要大3到10倍
 2. 增加6个模型及其训练策略、预训练权重：
-    - [HRNet](configs/hrnet)
-    - [SENet](configs/senet)
-    - [GoogLeNet](configs/googlenet)
-    - [Inception V3](configs/inceptionv3)
-    - [Inception V4](configs/inceptionv4)
-    - [Xception](configs/xception)
+   - [HRNet](configs/hrnet)
+   - [SENet](configs/senet)
+   - [GoogLeNet](configs/googlenet)
+   - [Inception V3](configs/inceptionv3)
+   - [Inception V4](configs/inceptionv4)
+   - [Xception](configs/xception)
 3. 支持梯度裁剪
 
 - 2023/01/10
+
 1. MindCV v0.1发布! 支持通过PyPI安装 (`pip install mindcv`)
 2. 新增4个模型的预训练权重及其策略： googlenet, inception_v3, inception_v4, xception
 
 - 2022/12/09
+
 1. 支持在所有学习率策略中添加学习率预热操作，除cosine decay策略外
 2. 支持`Repeated Augmenation`操作，可以通过`--aug_repeats`对其进行设置，设置值应大于1(通常为3或4)
 3. 支持EMA
 4. 通过支持mixup和cutmix操作进一步优化BCE损失函数
 
 - 2022/11/21
+
 1. 支持模型损失和正确率的可视化
 2. 支持轮次维度的cosine decay策略的学习率预热操作（之前仅支持步维度）
 
 - 2022/11/09
+
 1. 支持2个ViT预训练模型
 2. 支持RandAugment augmentation操作
 3. 提高了CutMix操作的可用性，CutMix和Mixup目前可以一起使用
 4. 解决了学习率画图的bug
 
 - 2022/10/12
+
 1. BCE和CE损失函数目前都支持class-weight config操作、label smoothing操作、auxilary logit input操作（适用于类似Inception模型）
 
 - 2022/09/13
+
 1. 支持Adan优化器(试用版)
 
 ## 贡献方式

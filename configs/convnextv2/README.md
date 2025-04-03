@@ -74,14 +74,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 | model name      | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                   | weight                                                                                                          |
-| --------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| convnextv2_tiny | 28.64     | 8     | 128        | 224x224    | O2        | 268s          | 257.2   | 3984.44 | 82.39    | 95.95    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnextv2/convnextv2_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convnextv2/convnextv2_tiny-a35b79ce-910v2.ckpt) |
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-| model name      | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                   | weight                                                                                            |
-| --------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| convnextv2_tiny | 28.64     | 8     | 128        | 224x224    | O2        | 237s          | 400.20  | 2560.00 | 82.43    | 95.98    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnextv2/convnextv2_tiny_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/convnextv2/convnextv2_tiny-d441ba2c.ckpt) |
+| --------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- |---------| ------- | -------- | -------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| convnextv2_tiny | 28.64     | 8     | 128        | 224x224    | O2        | 268s          | 280.47  | 3651.01 | 82.39    | 95.95    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convnextv2/convnextv2_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convnextv2/convnextv2_tiny-a35b79ce-910v2.ckpt) |
 
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
