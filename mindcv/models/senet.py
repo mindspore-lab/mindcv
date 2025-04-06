@@ -7,10 +7,9 @@ import math
 from typing import List, Optional, Type, Union
 
 import mindspore.common.initializer as init
-from mindspore import Tensor, nn
+from mindspore import Tensor, mint, nn
 
 from .helpers import load_pretrained
-from .layers.compatibility import Dropout
 from .layers.pooling import GlobalAvgPooling
 from .layers.squeeze_excite import SqueezeExciteV2
 from .registry import register_model
@@ -102,16 +101,15 @@ class SEBottleneck(Bottleneck):
         downsample: Optional[nn.SequentialCell] = None,
     ) -> None:
         super(SEBottleneck, self).__init__()
-        self.conv1 = nn.Conv2d(in_channels, channels * 2, kernel_size=1, pad_mode="pad",
-                               padding=0, has_bias=False)
-        self.bn1 = nn.BatchNorm2d(channels * 2)
-        self.conv2 = nn.Conv2d(channels * 2, channels * 4, kernel_size=3, stride=stride,
-                               pad_mode="pad", padding=1, group=group, has_bias=False)
-        self.bn2 = nn.BatchNorm2d(channels * 4)
-        self.conv3 = nn.Conv2d(channels * 4, channels * 4, kernel_size=1, pad_mode="pad",
-                               padding=0, has_bias=False)
-        self.bn3 = nn.BatchNorm2d(channels * 4)
-        self.relu = nn.ReLU()
+        self.conv1 = mint.nn.Conv2d(in_channels, channels * 2, kernel_size=1, padding=0, bias=False)
+        self.bn1 = mint.nn.BatchNorm2d(channels * 2)
+        self.conv2 = mint.nn.Conv2d(
+            channels * 2, channels * 4, kernel_size=3, stride=stride, padding=1, groups=group, bias=False
+        )
+        self.bn2 = mint.nn.BatchNorm2d(channels * 4)
+        self.conv3 = mint.nn.Conv2d(channels * 4, channels * 4, kernel_size=1, padding=0, bias=False)
+        self.bn3 = mint.nn.BatchNorm2d(channels * 4)
+        self.relu = mint.nn.ReLU()
         self.se_module = SqueezeExciteV2(channels * 4, rd_ratio=1.0 / reduction)
         self.downsample = downsample
         self.stride = stride
@@ -135,16 +133,15 @@ class SEResNetBottleneck(Bottleneck):
         downsample: Optional[nn.SequentialCell] = None,
     ) -> None:
         super(SEResNetBottleneck, self).__init__()
-        self.conv1 = nn.Conv2d(in_channels, channels, kernel_size=1, pad_mode="pad",
-                               padding=0, has_bias=False)
-        self.bn1 = nn.BatchNorm2d(channels)
-        self.conv2 = nn.Conv2d(channels, channels, kernel_size=3, stride=stride, pad_mode="pad",
-                               padding=1, group=group, has_bias=False)
-        self.bn2 = nn.BatchNorm2d(channels)
-        self.conv3 = nn.Conv2d(channels, channels * 4, kernel_size=1, pad_mode="pad", padding=0,
-                               has_bias=False)
-        self.bn3 = nn.BatchNorm2d(channels * 4)
-        self.relu = nn.ReLU()
+        self.conv1 = mint.nn.Conv2d(in_channels, channels, kernel_size=1, padding=0, bias=False)
+        self.bn1 = mint.nn.BatchNorm2d(channels)
+        self.conv2 = mint.nn.Conv2d(
+            channels, channels, kernel_size=3, stride=stride, padding=1, groups=group, bias=False
+        )
+        self.bn2 = mint.nn.BatchNorm2d(channels)
+        self.conv3 = mint.nn.Conv2d(channels, channels * 4, kernel_size=1, padding=0, bias=False)
+        self.bn3 = mint.nn.BatchNorm2d(channels * 4)
+        self.relu = mint.nn.ReLU()
         self.se_module = SqueezeExciteV2(channels * 4, rd_ratio=1.0 / reduction)
         self.downsample = downsample
         self.stride = stride
@@ -169,16 +166,13 @@ class SEResNeXtBottleneck(Bottleneck):
     ) -> None:
         super(SEResNeXtBottleneck, self).__init__()
         width = math.floor(channels * (base_width / 64)) * group
-        self.conv1 = nn.Conv2d(in_channels, width, kernel_size=1, stride=1, pad_mode="pad",
-                               padding=0, has_bias=False)
-        self.bn1 = nn.BatchNorm2d(width)
-        self.conv2 = nn.Conv2d(width, width, kernel_size=3, stride=stride, pad_mode="pad",
-                               padding=1, group=group, has_bias=False)
-        self.bn2 = nn.BatchNorm2d(width)
-        self.conv3 = nn.Conv2d(width, channels * 4, kernel_size=1, pad_mode="pad", padding=0,
-                               has_bias=False)
-        self.bn3 = nn.BatchNorm2d(channels * 4)
-        self.relu = nn.ReLU()
+        self.conv1 = mint.nn.Conv2d(in_channels, width, kernel_size=1, stride=1, padding=0, bias=False)
+        self.bn1 = mint.nn.BatchNorm2d(width)
+        self.conv2 = mint.nn.Conv2d(width, width, kernel_size=3, stride=stride, padding=1, groups=group, bias=False)
+        self.bn2 = mint.nn.BatchNorm2d(width)
+        self.conv3 = mint.nn.Conv2d(width, channels * 4, kernel_size=1, padding=0, bias=False)
+        self.bn3 = mint.nn.BatchNorm2d(channels * 4)
+        self.relu = mint.nn.ReLU()
         self.se_module = SqueezeExciteV2(channels * 4, rd_ratio=1.0 / reduction)
         self.downsample = downsample
         self.stride = stride
@@ -201,13 +195,11 @@ class SEResNetBlock(nn.Cell):
         downsample: Optional[nn.SequentialCell] = None,
     ) -> None:
         super(SEResNetBlock, self).__init__()
-        self.conv1 = nn.Conv2d(in_channels, channels, kernel_size=3, stride=stride, pad_mode="pad",
-                               padding=1, has_bias=False)
-        self.bn1 = nn.BatchNorm2d(channels)
-        self.conv2 = nn.Conv2d(channels, channels, kernel_size=3, pad_mode="pad", padding=1,
-                               group=group, has_bias=False)
-        self.bn2 = nn.BatchNorm2d(channels)
-        self.relu = nn.ReLU()
+        self.conv1 = mint.nn.Conv2d(in_channels, channels, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.bn1 = mint.nn.BatchNorm2d(channels)
+        self.conv2 = mint.nn.Conv2d(channels, channels, kernel_size=3, padding=1, groups=group, has_bias=False)
+        self.bn2 = mint.nn.BatchNorm2d(channels)
+        self.relu = mint.nn.ReLU()
         self.se_module = SqueezeExciteV2(channels, rd_ratio=1.0 / reduction)
         self.downsample = downsample
         self.stride = stride
@@ -269,24 +261,23 @@ class SENet(nn.Cell):
         self.drop_rate = drop_rate
         if input3x3:
             self.layer0 = nn.SequentialCell([
-                nn.Conv2d(in_channels, 64, 3, stride=2, pad_mode="pad", padding=1, has_bias=False),
-                nn.BatchNorm2d(64),
-                nn.ReLU(),
-                nn.Conv2d(64, 64, 3, stride=1, pad_mode="pad", padding=1, has_bias=False),
-                nn.BatchNorm2d(64),
-                nn.ReLU(),
-                nn.Conv2d(64, inplanes, 3, stride=1, pad_mode="pad", padding=1, has_bias=False),
-                nn.BatchNorm2d(inplanes),
-                nn.ReLU()
+                mint.nn.Conv2d(in_channels, 64, 3, stride=2, padding=1, bias=False),
+                mint.nn.BatchNorm2d(64),
+                mint.nn.ReLU(),
+                mint.nn.Conv2d(64, 64, 3, stride=1, padding=1, bias=False),
+                mint.nn.BatchNorm2d(64),
+                mint.nn.ReLU(),
+                mint.nn.Conv2d(64, inplanes, 3, stride=1, padding=1, bias=False),
+                mint.nn.BatchNorm2d(inplanes),
+                mint.nn.ReLU()
             ])
         else:
             self.layer0 = nn.SequentialCell([
-                nn.Conv2d(in_channels, inplanes, kernel_size=7, stride=2, pad_mode="pad",
-                          padding=3, has_bias=False),
-                nn.BatchNorm2d(inplanes),
-                nn.ReLU()
+                mint.nn.Conv2d(in_channels, inplanes, kernel_size=7, stride=2, padding=3, bias=False),
+                mint.nn.BatchNorm2d(inplanes),
+                mint.nn.ReLU()
             ])
-        self.pool0 = nn.MaxPool2d(3, stride=2, pad_mode="same")
+        self.pool0 = mint.nn.MaxPool2d(3, stride=2, padding=1)
 
         self.layer1 = self._make_layer(block, planes=64, blocks=layers[0], group=group,
                                        reduction=reduction, downsample_kernel_size=1,
@@ -311,8 +302,8 @@ class SENet(nn.Cell):
 
         self.pool = GlobalAvgPooling()
         if self.drop_rate > 0.:
-            self.dropout = Dropout(p=self.drop_rate)
-        self.classifier = nn.Dense(self.num_features, self.num_classes)
+            self.dropout = mint.nn.Dropout(p=self.drop_rate)
+        self.classifier = mint.nn.Linear(self.num_features, self.num_classes)
 
         self._initialize_weights()
 
@@ -330,9 +321,11 @@ class SENet(nn.Cell):
         downsample = None
         if stride != 1 or self.inplanes != planes * block.expansion:
             downsample = nn.SequentialCell([
-                nn.Conv2d(self.inplanes, planes * block.expansion, kernel_size=downsample_kernel_size,
-                          stride=stride, pad_mode="pad", padding=downsample_padding, has_bias=False),
-                nn.BatchNorm2d(planes * block.expansion)
+                mint.nn.Conv2d(
+                    self.inplanes, planes * block.expansion, kernel_size=downsample_kernel_size,
+                    stride=stride, padding=downsample_padding, bias=False
+                ),
+                mint.nn.BatchNorm2d(planes * block.expansion)
             ])
 
         layers = [block(self.inplanes, planes, group, reduction, stride, downsample)]
@@ -345,17 +338,17 @@ class SENet(nn.Cell):
     def _initialize_weights(self) -> None:
         """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
-            if isinstance(cell, nn.Conv2d):
+            if isinstance(cell, mint.nn.Conv2d):
                 cell.weight.set_data(
                     init.initializer(init.HeNormal(mode="fan_out", nonlinearity="relu"),
                                      cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(
                         init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
-            elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(init.initializer("ones", cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(init.initializer("zeros", cell.beta.shape, cell.beta.dtype))
-            elif isinstance(cell, nn.Dense):
+            elif isinstance(cell, mint.nn.BatchNorm2d):
+                cell.weight.set_data(init.initializer("ones", cell.weight.shape, cell.weight.dtype))
+                cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
+            elif isinstance(cell, mint.nn.Linear):
                 cell.weight.set_data(
                     init.initializer(init.HeUniform(mode="fan_in", nonlinearity="sigmoid"),
                                      cell.weight.shape, cell.weight.dtype))

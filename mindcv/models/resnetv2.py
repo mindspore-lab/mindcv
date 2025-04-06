@@ -5,7 +5,7 @@ Refer to Identity Mappings in Deep Residual Networks.
 
 from typing import Optional
 
-from mindspore import Tensor, nn
+from mindspore import Tensor, mint, nn
 
 from .helpers import load_pretrained
 from .registry import register_model
@@ -47,22 +47,20 @@ class PreActBottleneck(nn.Cell):
                  ) -> None:
         super().__init__()
         if norm is None:
-            norm = nn.BatchNorm2d
+            norm = mint.nn.BatchNorm2d
 
         width = int(channels * (base_width / 64.0)) * groups
 
         self.bn1 = norm(in_channels)
-        self.conv1 = nn.Conv2d(in_channels, width, kernel_size=1, stride=1)
+        self.conv1 = mint.nn.Conv2d(in_channels, width, kernel_size=1, stride=1, bias=False)
 
         self.bn2 = norm(width)
-        self.conv2 = nn.Conv2d(width, width, kernel_size=3, stride=stride,
-                               padding=1, pad_mode='pad', group=groups)
+        self.conv2 = mint.nn.Conv2d(width, width, kernel_size=3, stride=stride, padding=1, groups=groups, bias=False)
 
         self.bn3 = norm(width)
-        self.conv3 = nn.Conv2d(width, channels * self.expansion,
-                               kernel_size=1, stride=1)
+        self.conv3 = mint.nn.Conv2d(width, channels * self.expansion, kernel_size=1, stride=1, bias=False)
 
-        self.relu = nn.ReLU()
+        self.relu = mint.nn.ReLU()
         self.down_sample = down_sample
 
     def construct(self, x: Tensor) -> Tensor:

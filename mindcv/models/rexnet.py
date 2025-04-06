@@ -7,11 +7,11 @@ from math import ceil
 from typing import Any
 
 import mindspore.common.initializer as init
+import mindspore.mint as mint
 import mindspore.nn as nn
 
 from .helpers import build_model_with_cfg, make_divisible
 from .layers import Conv2dNormActivation, DropPath, GlobalAvgPooling, SqueezeExcite
-from .layers.compatibility import Dropout
 from .registry import register_model
 
 __all__ = [
@@ -56,7 +56,8 @@ class LinearBottleneck(nn.Cell):
         use_se=True,
         se_ratio=1 / 12,
         ch_div=1,
-        act_layer=nn.SiLU,
+        act_layer=mint.nn.SiLU,
+        # todo
         dw_act_layer=nn.ReLU6,
         drop_path=None,
         **kwargs,
@@ -79,7 +80,7 @@ class LinearBottleneck(nn.Cell):
         if use_se:
             self.se = SqueezeExcite(dw_channels,
                                     rd_channels=make_divisible(int(dw_channels * se_ratio), ch_div),
-                                    norm=nn.BatchNorm2d)
+                                    norm=mint.nn.BatchNorm2d)
         else:
             self.se = None
         self.act_dw = dw_act_layer()
@@ -136,7 +137,8 @@ class ReXNetV1(nn.Cell):
         drop_rate=0.2,
         drop_path_rate=0.0,
         ch_div=1,
-        act_layer=nn.SiLU,
+        act_layer=mint.nn.SiLU,
+        # todo
         dw_act_layer=nn.ReLU6,
         cls_useconv=False,
     ):
@@ -213,18 +215,18 @@ class ReXNetV1(nn.Cell):
         self.features = nn.SequentialCell(*features)
         if self.useconv:
             self.cls = nn.SequentialCell(
-                Dropout(p=drop_rate),
-                nn.Conv2d(pen_channels, num_classes, 1, has_bias=True))
+                mint.nn.Dropout(p=drop_rate),
+                mint.nn.Conv2d(pen_channels, num_classes, 1, has_bias=True))
         else:
             self.cls = nn.SequentialCell(
-                Dropout(p=drop_rate),
-                nn.Dense(pen_channels, num_classes))
+                mint.nn.Dropout(p=drop_rate),
+                mint.nn.Linear(pen_channels, num_classes))
         self._initialize_weights()
 
     def _initialize_weights(self) -> None:
         """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
-            if isinstance(cell, (nn.Conv2d, nn.Dense)):
+            if isinstance(cell, (mint.nn.Conv2d, mint.nn.Linear)):
                 cell.weight.set_data(
                     init.initializer(init.HeUniform(math.sqrt(5), mode="fan_in", nonlinearity="relu"),
                                      cell.weight.shape, cell.weight.dtype))
@@ -240,10 +242,10 @@ class ReXNetV1(nn.Cell):
 
     def forward_head(self, x):
         if not self.useconv:
-            x = x.reshape((x.shape[0], -1))
+            x = mint.reshape(x, (x.shape[0], -1))
             x = self.cls(x)
         else:
-            x = self.cls(x).reshape((x.shape[0], -1))
+            x = mint.reshape(self.cls(x), (x.shape[0], -1))
         return x
 
     def construct(self, x):

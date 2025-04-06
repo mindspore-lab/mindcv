@@ -6,14 +6,16 @@ import numpy as np
 
 import mindspore as ms
 import mindspore.common.initializer as init
+import mindspore.mint as mint
+import mindspore.mint.nn.functional as F
 import mindspore.nn as nn
 from mindspore import Parameter, Tensor
 from mindspore import dtype as mstype
 from mindspore import ops
 
 from .helpers import load_pretrained
-from .layers.compatibility import Dropout
 from .layers.drop_path import DropPath
+from .layers.extend_bmm import ExtendBatchMatMul
 from .layers.identity import Identity
 from .registry import register_model
 
@@ -84,6 +86,7 @@ class Fold(nn.Cell):
             init_weight[i, 0, x, y] = 1
 
         self.weight = ms.Tensor(init_weight, ms.float16)
+        # todo
         self.conv_transpose2d = ops.Conv2DTranspose(
                                     self.ck, self.kernel_size, pad_mode="pad",
                                     pad=(self.padding[0], self.padding[0], self.padding[1], self.padding[1]),
@@ -96,7 +99,7 @@ class Fold(nn.Cell):
         # assert l == self.h * self.w
         # print("construct-b", b, "construct-ck", ck, "construct-l", l)
         # print("self.h", self.h, "self.w", self.w)
-        x = ops.reshape(x, (b, ck, self.h, self.w))
+        x = mint.reshape(x, (b, ck, self.h, self.w))
         out = self.conv_transpose2d(x, self.weight, (b, self.c, self.output_size[0], self.output_size[1]))
 
         return out
@@ -131,45 +134,44 @@ class OutlookAttention(nn.Cell):
         self.stride = stride
         self.scale = qk_scale or head_dim**-0.5
 
-        self.v = nn.Dense(dim, dim, has_bias=qkv_bias)
-        self.attn = nn.Dense(dim, kernel_size**4 * num_heads)
+        self.v = mint.nn.Linear(dim, dim, bias=qkv_bias)
+        self.attn = mint.nn.Linear(dim, kernel_size**4 * num_heads)
 
-        self.attn_drop = Dropout(p=attn_drop)
-        self.proj = nn.Dense(dim, dim)
-        self.proj_drop = Dropout(p=proj_drop)
+        self.attn_drop = mint.nn.Dropout(p=attn_drop)
+        self.proj = mint.nn.Linear(dim, dim)
+        self.proj_drop = mint.nn.Dropout(p=proj_drop)
 
-        self.unfold = nn.Unfold(ksizes=[1, kernel_size, kernel_size, 1], strides=[1, stride, stride, 1],
-                                rates=[1, 1, 1, 1])
-        self.pool = nn.AvgPool2d(kernel_size=stride, stride=stride)
-        self.softmax = nn.Softmax(axis=-1)
-        self.batch_mat_mul = ops.BatchMatMul()
+        self.unfold = mint.nn.Unfold(kernel_size=kernel_size, stride=stride, dilation=1, padding=0)
+        self.pool = mint.nn.AvgPool2d(kernel_size=stride, stride=stride)
+        self.softmax = mint.nn.Softmax(dim=-1)
+        self.batch_mat_mul = ExtendBatchMatMul()
 
     def construct(self, x: Tensor) -> Tensor:
         B, H, W, C = x.shape
 
-        v = ops.transpose(self.v(x), (0, 3, 1, 2))  # B, C, H, W
+        v = mint.permute(self.v(x), (0, 3, 1, 2))  # B, C, H, W
 
         h = int((H - 1) / self.stride + 1)
         w = int((W - 1) / self.stride + 1)
-        v = ops.pad(v, (1, 1, 1, 1))
+        v = F.pad(v, (1, 1, 1, 1))
         v = self.unfold(v)
-        v = ops.reshape(v, (B, self.num_heads, C // self.num_heads, self.kernel_size * self.kernel_size, h * w))
-        v = ops.transpose(v, (0, 1, 4, 3, 2))  # B,H,N,kxk,C/H
+        v = mint.reshape(v, (B, self.num_heads, C // self.num_heads, self.kernel_size * self.kernel_size, h * w))
+        v = mint.permute(v, (0, 1, 4, 3, 2))  # B,H,N,kxk,C/H
 
-        attn = self.pool(ops.transpose(x, (0, 3, 1, 2)))
-        attn = ops.transpose(attn, (0, 2, 3, 1))
-        attn = ops.reshape(self.attn(attn), (B, h * w, self.num_heads, self.kernel_size * self.kernel_size,
-                           self.kernel_size * self.kernel_size))
-        attn = ops.transpose(attn, (0, 2, 1, 3, 4))  # B,H,N,kxk,kxk
+        attn = self.pool(mint.permute(x, (0, 3, 1, 2)))
+        attn = mint.permute(attn, (0, 2, 3, 1))
+        attn = mint.reshape(self.attn(attn), (B, h * w, self.num_heads, self.kernel_size * self.kernel_size,
+                            self.kernel_size * self.kernel_size))
+        attn = mint.permute(attn, (0, 2, 1, 3, 4))  # B,H,N,kxk,kxk
         attn = attn * self.scale
         attn = self.softmax(attn)
         attn = self.attn_drop(attn)
 
-        x = ops.transpose(self.batch_mat_mul(attn, v), (0, 1, 4, 3, 2))
-        x = ops.reshape(x, (B, C * self.kernel_size * self.kernel_size, h * w))
+        x = mint.permute(self.batch_mat_mul(attn, v), (0, 1, 4, 3, 2))
+        x = mint.reshape(x, (B, C * self.kernel_size * self.kernel_size, h * w))
         fold = Fold(C, (H, W), self.kernel_size, padding=self.padding, stride=self.stride)
         x = fold(x)
-        x = self.proj(ops.transpose(x, (0, 2, 3, 1)))
+        x = self.proj(mint.permute(x, (0, 2, 3, 1)))
         x = self.proj_drop(x)
 
         return x
@@ -195,8 +197,8 @@ class Outlooker(nn.Cell):
         mlp_ratio=3.,
         attn_drop=0.0,
         drop_path=0.0,
-        act_layer=nn.GELU,
-        norm_layer=nn.LayerNorm,
+        act_layer=mint.nn.GELU,
+        norm_layer=mint.nn.LayerNorm,
         qkv_bias=False,
         qk_scale=None,
     ) -> None:
@@ -230,16 +232,16 @@ class Mlp(nn.Cell):
         in_features,
         hidden_features=None,
         out_features=None,
-        act_layer=nn.GELU,
+        act_layer=mint.nn.GELU,
         drop=0.0,
     ) -> None:
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
-        self.fc1 = nn.Dense(in_features, hidden_features)
+        self.fc1 = mint.nn.Linear(in_features, hidden_features)
         self.act = act_layer()
-        self.fc2 = nn.Dense(hidden_features, out_features)
-        self.drop = Dropout(p=drop)
+        self.fc2 = mint.nn.Linear(hidden_features, out_features)
+        self.drop = mint.nn.Dropout(p=drop)
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.fc1(x)
@@ -267,28 +269,28 @@ class Attention(nn.Cell):
         head_dim = dim // num_heads
         self.scale = qk_scale or head_dim**-0.5
 
-        self.qkv = nn.Dense(dim, dim * 3, has_bias=qkv_bias)
-        self.attn_drop = Dropout(p=attn_drop)
-        self.proj = nn.Dense(dim, dim)
-        self.proj_drop = Dropout(p=proj_drop)
-        self.softmax = nn.Softmax(axis=-1)
-        self.batch_mat_mul_transpose = ops.BatchMatMul(transpose_b=True)
-        self.batch_mat_mul = ops.BatchMatMul()
+        self.qkv = mint.nn.Linear(dim, dim * 3, bias=qkv_bias)
+        self.attn_drop = mint.nn.Dropout(p=attn_drop)
+        self.proj = mint.nn.Linear(dim, dim)
+        self.proj_drop = mint.nn.Dropout(p=proj_drop)
+        self.softmax = mint.nn.Softmax(dim=-1)
+        self.batch_mat_mul_transpose = ExtendBatchMatMul(transpose_b=True)
+        self.batch_mat_mul = ExtendBatchMatMul()
 
     def construct(self, x: Tensor) -> Tensor:
         B, H, W, C = x.shape
 
         qkv = self.qkv(x)
-        qkv = ops.reshape(qkv, (B, H * W, 3, self.num_heads, C // self.num_heads))
-        qkv = ops.transpose(qkv, (2, 0, 3, 1, 4))
+        qkv = mint.reshape(qkv, (B, H * W, 3, self.num_heads, C // self.num_heads))
+        qkv = mint.permute(qkv, (2, 0, 3, 1, 4))
         q, k, v = qkv[0], qkv[1], qkv[2]
 
         attn = self.batch_mat_mul_transpose(q, k) * self.scale
         attn = self.softmax(attn)
         attn = self.attn_drop(attn)
 
-        x = ops.transpose(self.batch_mat_mul(attn, v), (0, 2, 1, 3))
-        x = ops.reshape(x, (B, H, W, C))
+        x = mint.permute(self.batch_mat_mul(attn, v), (0, 2, 1, 3))
+        x = mint.reshape(x, (B, H, W, C))
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
@@ -308,8 +310,8 @@ class Transformer(nn.Cell):
         qk_scale=None,
         attn_drop=0.0,
         drop_path=0.0,
-        act_layer=nn.GELU,
-        norm_layer=nn.LayerNorm,
+        act_layer=mint.nn.GELU,
+        norm_layer=mint.nn.LayerNorm,
     ) -> None:
         super().__init__()
         self.norm1 = norm_layer([dim])
@@ -356,31 +358,31 @@ class ClassAttention(nn.Cell):
             self.head_dim = head_dim
         self.scale = qk_scale or head_dim**-0.5
 
-        self.kv = nn.Dense(dim, self.head_dim * self.num_heads * 2, has_bias=qkv_bias)
-        self.q = nn.Dense(dim, self.head_dim * self.num_heads, has_bias=qkv_bias)
-        self.attn_drop = Dropout(p=attn_drop)
-        self.proj = nn.Dense(self.head_dim * self.num_heads, dim)
-        self.proj_drop = Dropout(p=proj_drop)
-        self.batch_mat_mul_transpose = ops.BatchMatMul(transpose_b=True)
-        self.batch_mat_mul = ops.BatchMatMul()
-        self.softmax = nn.Softmax(axis=-1)
+        self.kv = mint.nn.Linear(dim, self.head_dim * self.num_heads * 2, bias=qkv_bias)
+        self.q = mint.nn.Linear(dim, self.head_dim * self.num_heads, bias=qkv_bias)
+        self.attn_drop = mint.nn.Dropout(p=attn_drop)
+        self.proj = mint.nn.Linear(self.head_dim * self.num_heads, dim)
+        self.proj_drop = mint.nn.Dropout(p=proj_drop)
+        self.batch_mat_mul_transpose = ExtendBatchMatMul(transpose_b=True)
+        self.batch_mat_mul = ExtendBatchMatMul()
+        self.softmax = mint.nn.Softmax(dim=-1)
 
     def construct(self, x: Tensor) -> Tensor:
         B, N, C = x.shape
 
         kv = self.kv(x)
-        kv = ops.reshape(kv, (B, N, 2, self.num_heads,
-                         self.head_dim))
-        kv = ops.transpose(kv, (2, 0, 3, 1, 4))
+        kv = mint.reshape(kv, (B, N, 2, self.num_heads,
+                          self.head_dim))
+        kv = mint.permute(kv, (2, 0, 3, 1, 4))
         k, v = kv[0], kv[1]
         q = self.q(x[:, :1, :])
-        q = ops.reshape(q, (B, self.num_heads, 1, self.head_dim))
+        q = mint.reshape(q, (B, self.num_heads, 1, self.head_dim))
         attn = self.batch_mat_mul_transpose(q * self.scale, k)
         attn = self.softmax(attn)
         attn = self.attn_drop(attn)
 
-        cls_embed = ops.transpose(self.batch_mat_mul(attn, v), (0, 2, 1, 3))
-        cls_embed = ops.reshape(cls_embed, (B, 1, self.head_dim * self.num_heads))
+        cls_embed = mint.permute(self.batch_mat_mul(attn, v), (0, 2, 1, 3))
+        cls_embed = mint.reshape(cls_embed, (B, 1, self.head_dim * self.num_heads))
         cls_embed = self.proj(cls_embed)
         cls_embed = self.proj_drop(cls_embed)
         return cls_embed
@@ -403,8 +405,8 @@ class ClassBlock(nn.Cell):
         drop=0.0,
         attn_drop=0.0,
         drop_path=0.0,
-        act_layer=nn.GELU,
-        norm_layer=nn.LayerNorm,
+        act_layer=mint.nn.GELU,
+        norm_layer=mint.nn.LayerNorm,
     ) -> None:
         super().__init__()
         self.norm1 = norm_layer([dim])
@@ -425,7 +427,7 @@ class ClassBlock(nn.Cell):
         cls_embed = x[:, :1]
         cls_embed = cls_embed + self.drop_path(self.attn(self.norm1(x)))
         cls_embed = cls_embed + self.drop_path(self.mlp(self.norm2(cls_embed)))
-        x = ops.concat([cls_embed, x[:, 1:]], 1)
+        x = mint.concat([cls_embed, x[:, 1:]], 1)
         return x
 
 
@@ -459,24 +461,20 @@ class PatchEmbed(nn.Cell):
         self.stem_conv = stem_conv
         if stem_conv:
             self.conv = nn.SequentialCell(
-                nn.Conv2d(in_channels, hidden_dim, 7, stem_stride,
-                          pad_mode='pad', padding=3),  # 112x112
-                nn.BatchNorm2d(hidden_dim),
-                nn.ReLU(),
-                nn.Conv2d(hidden_dim, hidden_dim, 3, 1,
-                          pad_mode='pad', padding=1),  # 112x112
-                nn.BatchNorm2d(hidden_dim),
-                nn.ReLU(),
-                nn.Conv2d(hidden_dim, hidden_dim, 3, 1,
-                          pad_mode='pad', padding=1),  # 112x112
-                nn.BatchNorm2d(hidden_dim),
-                nn.ReLU(),
+                mint.nn.Conv2d(in_channels, hidden_dim, 7, stem_stride, padding=3, bias=False),  # 112x112
+                mint.nn.BatchNorm2d(hidden_dim),
+                mint.nn.ReLU(),
+                mint.nn.Conv2d(hidden_dim, hidden_dim, 3, 1, padding=1, bias=False),  # 112x112
+                mint.nn.BatchNorm2d(hidden_dim),
+                mint.nn.ReLU(),
+                mint.nn.Conv2d(hidden_dim, hidden_dim, 3, 1, padding=1, bias=False),  # 112x112
+                mint.nn.BatchNorm2d(hidden_dim),
+                mint.nn.ReLU(),
             )
-
-        self.proj = nn.Conv2d(hidden_dim,
-                              embed_dim,
-                              kernel_size=patch_size // stem_stride,
-                              stride=patch_size // stem_stride, has_bias=True)
+        else:
+            self.conv = None
+        self.proj = mint.nn.Conv2d(
+            hidden_dim, embed_dim, kernel_size=patch_size // stem_stride, stride=patch_size // stem_stride)
         self.num_patches = (img_size // patch_size) * (img_size // patch_size)
 
     def construct(self, x: Tensor) -> Tensor:
@@ -492,13 +490,12 @@ class Downsample(nn.Cell):
     """
     def __init__(self, in_embed_dim, out_embed_dim, patch_size,) -> None:
         super().__init__()
-        self.proj = nn.Conv2d(in_embed_dim, out_embed_dim,
-                              kernel_size=patch_size, stride=patch_size, has_bias=True)
+        self.proj = nn.Conv2d(in_embed_dim, out_embed_dim, kernel_size=patch_size, stride=patch_size)
 
     def construct(self, x: Tensor) -> Tensor:
-        x = ops.transpose(x, (0, 3, 1, 2))
+        x = mint.permute(x, (0, 3, 1, 2))
         x = self.proj(x)  # B, C, H, W
-        x = ops.transpose(x, (0, 2, 3, 1))
+        x = mint.permute(x, (0, 2, 3, 1))
         return x
 
 
@@ -590,7 +587,7 @@ class VOLO(nn.Cell):
         drop_rate=0.0,
         attn_drop_rate=0.0,
         drop_path_rate=0.0,
-        norm_layer=nn.LayerNorm,
+        norm_layer=mint.nn.LayerNorm,
         post_layers=None,
         return_mean=False,
         return_dense=True,
@@ -608,11 +605,11 @@ class VOLO(nn.Cell):
                                       embed_dim=embed_dims[0])
         # inital positional encoding, we add positional encoding after outlooker blocks
         self.pos_embed = Parameter(
-            ops.zeros((1, img_size // patch_size // pooling_scale,
-                      img_size // patch_size // pooling_scale,
-                      embed_dims[-1]), mstype.float32))
+            mint.zeros((1, img_size // patch_size // pooling_scale,
+                       img_size // patch_size // pooling_scale,
+                       embed_dims[-1]), dtype=mstype.float32))
 
-        self.pos_drop = Dropout(p=drop_rate)
+        self.pos_drop = mint.nn.Dropout(p=drop_rate)
 
         # set the main block in network
         network = []
@@ -657,7 +654,7 @@ class VOLO(nn.Cell):
                           norm_layer=norm_layer)
                 for i in range(len(post_layers))
             ])
-            self.cls_token = Parameter(ops.zeros((1, 1, embed_dims[-1]), mstype.float32))
+            self.cls_token = Parameter(mint.zeros((1, 1, embed_dims[-1]), dtype=mstype.float32))
             self.cls_token.set_data(init.initializer(init.TruncatedNormal(sigma=.02), self.cls_token.data.shape))
 
         # set output type
@@ -671,13 +668,13 @@ class VOLO(nn.Cell):
             self.beta = 1.0
             assert return_dense, "return all tokens if mix_token is enabled"
         if return_dense:
-            self.aux_head = nn.Dense(
+            self.aux_head = mint.nn.Linear(
                 embed_dims[-1],
                 num_classes) if num_classes > 0 else Identity()
         self.norm = norm_layer([embed_dims[-1]])
 
         # Classifier head
-        self.head = nn.Dense(
+        self.head = mint.nn.Linear(
             embed_dims[-1], num_classes) if num_classes > 0 else Identity()
 
         self.pos_embed.set_data(init.initializer(init.TruncatedNormal(sigma=.02), self.pos_embed.data.shape))
@@ -685,19 +682,19 @@ class VOLO(nn.Cell):
 
     def _init_weights(self) -> None:
         for name, m in self.cells_and_names():
-            if isinstance(m, nn.Dense):
+            if isinstance(m, mint.nn.Linear):
                 m.weight.set_data(init.initializer(init.TruncatedNormal(sigma=.02), m.weight.data.shape))
                 if m.bias is not None:
                     m.bias.set_data(init.initializer(init.Constant(0), m.bias.shape))
-            elif isinstance(m, nn.LayerNorm):
-                m.gamma.set_data(init.initializer(init.Constant(1), m.gamma.shape))
-                m.beta.set_data(init.initializer(init.Constant(0), m.beta.shape))
+            elif isinstance(m, mint.nn.LayerNorm):
+                m.weight.set_data(init.initializer(init.Constant(1), m.weight.shape))
+                m.bias.set_data(init.initializer(init.Constant(0), m.bias.shape))
 
     def forward_embeddings(self, x: Tensor) -> Tensor:
         # patch embedding
         x = self.patch_embed(x)
         # B,C,H,W-> B,H,W,C
-        x = ops.transpose(x, (0, 2, 3, 1))
+        x = mint.permute(x, (0, 2, 3, 1))
         return x
 
     def forward_tokens(self, x: Tensor) -> Tensor:
@@ -708,14 +705,14 @@ class VOLO(nn.Cell):
             x = block(x)
 
         B, H, W, C = x.shape
-        x = ops.reshape(x, (B, -1, C))
+        x = mint.reshape(x, (B, -1, C))
         return x
 
     def forward_cls(self, x: Tensor) -> Tensor:
         # B, N, C = x.shape
-        cls_tokens = ops.broadcast_to(self.cls_token, (x.shape[0], -1, -1))
-        x = ops.Cast()(x, cls_tokens.dtype)
-        x = ops.concat([cls_tokens, x], 1)
+        cls_tokens = mint.broadcast_to(self.cls_token, (x.shape[0], -1, -1))
+        x = x.to(cls_tokens.dtype)
+        x = mint.concat([cls_tokens, x], 1)
         for block in self.post_network:
             x = block(x)
         return x
@@ -733,7 +730,7 @@ class VOLO(nn.Cell):
         x = self.norm(x)
 
         if self.return_mean:  # if no class token, return mean
-            return self.head(ops.mean(x, 1))
+            return self.head(mint.mean(x, 1))
 
         x_cls = self.head(x[:, 0])
         if not self.return_dense:

@@ -4,10 +4,9 @@ Refer to ShuffleNet: An Extremely Efficient Convolutional Neural Network for Mob
 """
 
 import mindspore.common.initializer as init
-from mindspore import Tensor, nn, ops
+from mindspore import Tensor, mint, nn
 
 from .helpers import load_pretrained
-from .layers.compatibility import Split
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
 
@@ -61,37 +60,35 @@ class GroupConv(nn.Cell):
         out_channels (int): Output channels of feature map.
         kernel_size (int): Size of convolution kernel.
         stride (int): Stride size for the group convolution layer.
-        pad_mode (str): Specifies padding mode.
         pad (int): The number of padding on the height and width directions of the input.
         groups (int): Splits filter into groups, `in_channels` and `out_channels` must be divisible by `group`.
         has_bias (bool): Whether the Conv2d layer has a bias parameter.
     """
 
-    def __init__(self, in_channels, out_channels, kernel_size, stride, pad_mode="pad", pad=0, groups=1, has_bias=False):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, pad=0, groups=1, has_bias=False):
         super(GroupConv, self).__init__()
         assert in_channels % groups == 0 and out_channels % groups == 0
+        self.in_channels = in_channels
         self.groups = groups
         self.convs = nn.CellList()
-        self.split = Split(split_size_or_sections=in_channels // groups, output_num=self.groups, axis=1)
         for _ in range(groups):
             self.convs.append(
-                nn.Conv2d(
+                mint.nn.Conv2d(
                     in_channels // groups,
                     out_channels // groups,
                     kernel_size=kernel_size,
                     stride=stride,
-                    has_bias=has_bias,
-                    padding=pad,
-                    pad_mode=pad_mode,
+                    bias=has_bias,
+                    padding=pad
                 )
             )
 
     def construct(self, x):
-        features = self.split(x)
+        features = mint.split(x, split_size_or_sections=self.in_channels // self.groups, dim=1)
         outputs = ()
         for i in range(self.groups):
             outputs = outputs + (self.convs[i](features[i]),)
-        out = ops.concat(outputs, axis=1)
+        out = mint.concat(outputs, dim=1)
         return out
 
 
@@ -122,37 +119,36 @@ class ShuffleV1Block(nn.Cell):
                 out_channels=mid_channels,
                 kernel_size=1,
                 stride=1,
-                pad_mode="pad",
                 pad=0,
                 groups=1 if first_group else group,
             ),
-            nn.BatchNorm2d(mid_channels),
-            nn.ReLU(),
+            mint.nn.BatchNorm2d(mid_channels),
+            mint.nn.ReLU(),
         ]
 
         branch_main_2 = [
             # dw
-            nn.Conv2d(mid_channels, mid_channels, kernel_size=3, stride=stride, pad_mode="pad", padding=1,
-                      group=mid_channels),
-            nn.BatchNorm2d(mid_channels),
+            mint.nn.Conv2d(
+                mid_channels, mid_channels, kernel_size=3, stride=stride, padding=1, groups=mid_channels, bias=False
+            ),
+            mint.nn.BatchNorm2d(mid_channels),
             # pw-linear
             GroupConv(
                 in_channels=mid_channels,
                 out_channels=out_channels,
                 kernel_size=1,
                 stride=1,
-                pad_mode="pad",
                 pad=0,
                 groups=group,
             ),
-            nn.BatchNorm2d(out_channels),
+            mint.nn.BatchNorm2d(out_channels),
         ]
         self.branch_main_1 = nn.SequentialCell(branch_main_1)
         self.branch_main_2 = nn.SequentialCell(branch_main_2)
         if stride == 2:
-            self.branch_proj = nn.AvgPool2d(kernel_size=3, stride=2, pad_mode="same")
+            self.branch_proj = mint.nn.AvgPool2d(kernel_size=3, stride=2, padding=1)
 
-        self.relu = nn.ReLU()
+        self.relu = mint.nn.ReLU()
 
     def construct(self, x: Tensor) -> Tensor:
         identify = x
@@ -163,7 +159,7 @@ class ShuffleV1Block(nn.Cell):
         if self.stride == 1:
             out = self.relu(identify + x)
         else:
-            out = self.relu(ops.concat((self.branch_proj(identify), x), axis=1))
+            out = self.relu(mint.concat((self.branch_proj(identify), x), dim=1))
 
         return out
 
@@ -171,9 +167,9 @@ class ShuffleV1Block(nn.Cell):
         batch_size, num_channels, height, width = x.shape
 
         group_channels = num_channels // self.group
-        x = ops.reshape(x, (batch_size, group_channels, self.group, height, width))
-        x = ops.transpose(x, (0, 2, 1, 3, 4))
-        x = ops.reshape(x, (batch_size, num_channels, height, width))
+        x = mint.reshape(x, (batch_size, group_channels, self.group, height, width))
+        x = mint.permute(x, (0, 2, 1, 3, 4))
+        x = mint.reshape(x, (batch_size, num_channels, height, width))
         return x
 
 
@@ -224,11 +220,11 @@ class ShuffleNetV1(nn.Cell):
         # building first layer
         input_channel = self.stage_out_channels[1]
         self.first_conv = nn.SequentialCell(
-            nn.Conv2d(in_channels, input_channel, kernel_size=3, stride=2, pad_mode="pad", padding=1),
-            nn.BatchNorm2d(input_channel),
-            nn.ReLU(),
+            mint.nn.Conv2d(in_channels, input_channel, kernel_size=3, stride=2, padding=1, bias=False),
+            mint.nn.BatchNorm2d(input_channel),
+            mint.nn.ReLU(),
         )
-        self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")
+        self.max_pool = mint.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         features = []
         for idxstage, numrepeat in enumerate(self.stage_repeats):
@@ -243,13 +239,13 @@ class ShuffleNetV1(nn.Cell):
 
         self.features = nn.SequentialCell(features)
         self.global_pool = GlobalAvgPooling()
-        self.classifier = nn.Dense(self.stage_out_channels[-1], num_classes, has_bias=False)
+        self.classifier = mint.nn.Linear(self.stage_out_channels[-1], num_classes, bias=False)
         self._initialize_weights()
 
     def _initialize_weights(self):
         """Initialize weights for cells."""
         for name, cell in self.cells_and_names():
-            if isinstance(cell, nn.Conv2d):
+            if isinstance(cell, mint.nn.Conv2d):
                 if "first" in name:
                     cell.weight.set_data(
                         init.initializer(init.Normal(0.01, 0), cell.weight.shape, cell.weight.dtype))
@@ -260,7 +256,7 @@ class ShuffleNetV1(nn.Cell):
                 if cell.bias is not None:
                     cell.bias.set_data(
                         init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
-            elif isinstance(cell, nn.Dense):
+            elif isinstance(cell, mint.nn.Linear):
                 cell.weight.set_data(
                     init.initializer(init.Normal(0.01, 0), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:

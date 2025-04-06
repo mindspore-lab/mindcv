@@ -8,7 +8,7 @@ import math
 import numpy as np
 
 import mindspore.common.initializer as init
-from mindspore import nn
+from mindspore import mint, nn
 
 from .helpers import load_pretrained
 from .layers.pooling import GlobalAvgPooling
@@ -85,21 +85,18 @@ def conv2d(w_in, w_out, k, *, stride=1, groups=1, bias=False):
     """Helper for building a conv2d layer."""
     assert k % 2 == 1, "Only odd size kernels supported to avoid padding issues."
     s, p, g, b = stride, (k - 1) // 2, groups, bias
-    return nn.Conv2d(w_in, w_out, k, stride=s, pad_mode="pad", padding=p, group=g, has_bias=b)
+    return mint.nn.Conv2d(w_in, w_out, k, stride=s, padding=p, groups=g, bias=b)
 
 
 def norm2d(w_in, eps=1e-5, mom=0.9):
     """Helper for building a norm2d layer."""
-    return nn.BatchNorm2d(num_features=w_in, eps=eps, momentum=mom)
+    return mint.nn.BatchNorm2d(num_features=w_in, eps=eps, momentum=mom)
 
 
 def pool2d(_w_in, k, *, stride=1):
     """Helper for building a pool2d layer."""
     assert k % 2 == 1, "Only odd size kernels supported to avoid padding issues."
-    padding = (k - 1) // 2
-    pad2d = nn.Pad(((0, 0), (0, 0), (padding, padding), (padding, padding)), mode="CONSTANT")
-    max_pool = nn.MaxPool2d(kernel_size=k, stride=stride, pad_mode="valid")
-    return nn.SequentialCell([pad2d, max_pool])
+    return nn.MaxPool2d(k, stride=stride, padding=(k - 1) // 2)
 
 
 def gap2d(keep_dims=False):
@@ -109,12 +106,12 @@ def gap2d(keep_dims=False):
 
 def linear(w_in, w_out, *, bias=False):
     """Helper for building a linear layer."""
-    return nn.Dense(w_in, w_out, has_bias=bias)
+    return mint.nn.Linear(w_in, w_out, bias=bias)
 
 
 def activation():
     """Helper for building an activation layer."""
-    return nn.ReLU()
+    return mint.nn.ReLU()
 
 
 class ResStemCifar(nn.Cell):
@@ -394,15 +391,15 @@ class AnyNet(nn.Cell):
     def _initialize_weights(self) -> None:
         """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
-            if isinstance(cell, nn.Conv2d):
+            if isinstance(cell, mint.nn.Conv2d):
                 fan_out = cell.kernel_size[0] * cell.kernel_size[1] * cell.out_channels
                 cell.weight.set_data(
                     init.initializer(init.Normal(sigma=math.sqrt(2.0 / fan_out), mean=0.0),
                                      cell.weight.shape, cell.weight.dtype))
-            elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(init.initializer("ones", cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(init.initializer("zeros", cell.beta.shape, cell.beta.dtype))
-            elif isinstance(cell, nn.Dense):
+            elif isinstance(cell, mint.nn.BatchNorm2d):
+                cell.weight.set_data(init.initializer("ones", cell.weight.shape, cell.weight.dtype))
+                cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
+            elif isinstance(cell, mint.nn.Linear):
                 cell.weight.set_data(
                     init.initializer(init.Normal(sigma=0.01, mean=0.0), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:

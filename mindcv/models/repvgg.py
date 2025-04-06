@@ -8,7 +8,8 @@ import copy
 import numpy as np
 
 import mindspore.common.initializer as init
-from mindspore import Tensor, nn, ops, save_checkpoint
+import mindspore.mint.nn.functional as F
+from mindspore import Tensor, mint, nn, save_checkpoint
 
 from .helpers import build_model_with_cfg
 from .layers import GlobalAvgPooling, Identity, SqueezeExcite
@@ -54,12 +55,13 @@ default_cfgs = {
 
 
 def conv_bn(in_channels: int, out_channels: int, kernel_size: int,
-            stride: int, padding: int, group: int = 1) -> nn.SequentialCell:
+            stride: int, padding: int, groups: int = 1) -> nn.SequentialCell:
     cell = nn.SequentialCell([
-        nn.Conv2d(in_channels=in_channels, out_channels=out_channels,
-                  kernel_size=kernel_size, stride=stride, padding=padding, group=group, pad_mode="pad",
-                  has_bias=False),
-        nn.BatchNorm2d(num_features=out_channels)
+        mint.nn.Conv2d(
+            in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size,
+            stride=stride, padding=padding, groups=groups, bias=False
+        ),
+        mint.nn.BatchNorm2d(num_features=out_channels)
     ])
     return cell
 
@@ -69,11 +71,11 @@ class RepVGGBlock(nn.Cell):
 
     def __init__(self, in_channels: int, out_channels: int, kernel_size: int,
                  stride: int = 1, padding: int = 0, dilation: int = 1,
-                 group: int = 1, padding_mode: str = "zeros",
+                 groups: int = 1, padding_mode: str = "zeros",
                  deploy: bool = False, use_se: bool = False) -> None:
         super().__init__()
         self.deploy = deploy
-        self.group = group
+        self.groups = groups
         self.in_channels = in_channels
 
         assert kernel_size == 3
@@ -81,7 +83,7 @@ class RepVGGBlock(nn.Cell):
 
         padding_11 = padding - kernel_size // 2
 
-        self.nonlinearity = nn.ReLU()
+        self.nonlinearity = mint.nn.ReLU()
 
         if use_se:
             self.se = SqueezeExcite(
@@ -90,18 +92,19 @@ class RepVGGBlock(nn.Cell):
             self.se = Identity()
 
         if deploy:
-            self.rbr_reparam = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size,
-                                         stride=stride, padding=padding, dilation=dilation, group=group, has_bias=True,
-                                         pad_mode=padding_mode)
+            self.rbr_reparam = mint.nn.Conv2d(
+                in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, stride=stride,
+                padding=padding, dilation=dilation, groups=groups, bias=True, padding_mode=padding_mode
+            )
         else:
             self.rbr_reparam = None
-            self.rbr_identity = nn.BatchNorm2d(
+            self.rbr_identity = mint.nn.BatchNorm2d(
                 num_features=in_channels) if out_channels == in_channels and stride == 1 else None
 
             self.rbr_dense = conv_bn(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size,
-                                     stride=stride, padding=padding, group=group)
+                                     stride=stride, padding=padding, groups=groups)
             self.rbr_1x1 = conv_bn(in_channels=in_channels, out_channels=out_channels, kernel_size=1, stride=stride,
-                                   padding=padding_11, group=group)
+                                   padding=padding_11, groups=groups)
 
     def construct(self, inputs: Tensor) -> Tensor:
         if self.rbr_reparam is not None:
@@ -120,16 +123,16 @@ class RepVGGBlock(nn.Cell):
         k1 = self.rbr_1x1.conv.weight
 
         t3 = self.rbr_dense.bn.weight / (
-            ops.sqrt((self.rbr_dense.bn.moving_variance + self.rbr_dense.bn.eps)))
-        t3 = ops.reshape(t3, (-1, 1, 1, 1))
+            mint.sqrt((self.rbr_dense.bn.moving_variance + self.rbr_dense.bn.eps)))
+        t3 = mint.reshape(t3, (-1, 1, 1, 1))
 
         t1 = (self.rbr_1x1.bn.weight /
               ((self.rbr_1x1.bn.moving_variance + self.rbr_1x1.bn.eps).sqrt()))
-        t1 = ops.reshape(t1, (-1, 1, 1, 1))
+        t1 = mint.reshape(t1, (-1, 1, 1, 1))
 
-        l2_loss_circle = ops.reduce_sum(k3 ** 2) - ops.reduce_sum(k3[:, :, 1:2, 1:2] ** 2)
+        l2_loss_circle = mint.sum(k3 ** 2) - mint.sum(k3[:, :, 1:2, 1:2] ** 2)
         eq_kernel = k3[:, :, 1:2, 1:2] * t3 + k1 * t1
-        l2_loss_eq_kernel = ops.reduce_sum(eq_kernel ** 2 / (t3 ** 2 + t1 ** 2))
+        l2_loss_eq_kernel = mint.sum(eq_kernel ** 2 / (t3 ** 2 + t1 ** 2))
         return l2_loss_eq_kernel + l2_loss_circle
 
     #   This func derives the equivalent kernel and bias in a DIFFERENTIABLE way.
@@ -145,7 +148,7 @@ class RepVGGBlock(nn.Cell):
     def _pad_1x1_to_3x3_tensor(self, kernel1x1):
         if kernel1x1 is None:
             return 0
-        return ops.pad(kernel1x1, (1, 1, 1, 1))
+        return F.pad(kernel1x1, (1, 1, 1, 1))
 
     def _fuse_bn_tensor(self, branch):
         if branch is None:
@@ -158,9 +161,9 @@ class RepVGGBlock(nn.Cell):
             beta = branch.bn.beta
             eps = branch.bn.eps
         else:
-            assert isinstance(branch, (nn.BatchNorm2d, nn.SyncBatchNorm))
+            assert isinstance(branch, (mint.nn.BatchNorm2d, mint.nn.SyncBatchNorm))
             if not hasattr(self, "id_tensor"):
-                input_dim = self.in_channels // self.group
+                input_dim = self.in_channels // self.groups
                 kernel_value = np.zeros((self.in_channels, input_dim, 3, 3), dtype=np.float32)
                 for i in range(self.in_channels):
                     kernel_value[i, i % input_dim, 1, 1] = 1
@@ -171,8 +174,8 @@ class RepVGGBlock(nn.Cell):
             gamma = branch.gamma
             beta = branch.beta
             eps = branch.eps
-        std = ops.sqrt(moving_variance + eps)
-        t = ops.reshape(gamma / std, (-1, 1, 1, 1))
+        std = mint.sqrt(moving_variance + eps)
+        t = mint.reshape(gamma / std, (-1, 1, 1, 1))
         return kernel * t, beta - moving_mean * gamma / std
 
     def switch_to_deploy(self):
@@ -180,11 +183,12 @@ class RepVGGBlock(nn.Cell):
         if self.rbr_reparam is not None:
             return
         kernel, bias = self.get_equivalent_kernel_bias()
-        self.rbr_reparam = nn.Conv2d(in_channels=self.rbr_dense.conv.in_channels,
-                                     out_channels=self.rbr_dense.conv.out_channels,
-                                     kernel_size=self.rbr_dense.conv.kernel_size, stride=self.rbr_dense.conv.stride,
-                                     padding=self.rbr_dense.conv.padding, dilation=self.rbr_dense.conv.dilation,
-                                     group=self.rbr_dense.conv.group, has_bias=True, pad_mode="pad")
+        self.rbr_reparam = mint.nn.Conv2d(
+            in_channels=self.rbr_dense.conv.in_channels, out_channels=self.rbr_dense.conv.out_channels,
+            kernel_size=self.rbr_dense.conv.kernel_size, stride=self.rbr_dense.conv.stride,
+            padding=self.rbr_dense.conv.padding, dilation=self.rbr_dense.conv.dilation,
+            groups=self.rbr_dense.conv.groups, bias=True
+        )
         self.rbr_reparam.weight.data = kernel
         self.rbr_reparam.bias.data = bias
         for para in self.parameters():
@@ -244,7 +248,7 @@ class RepVGG(nn.Cell):
             int(512 * width_multiplier[3]), num_blocks[3], stride=2)
         self.feature_info.append(dict(chs=int(512 * width_multiplier[3]), reduction=32, name="stage4"))
         self.gap = GlobalAvgPooling()
-        self.linear = nn.Dense(int(512 * width_multiplier[3]), num_classes)
+        self.linear = mint.nn.Linear(int(512 * width_multiplier[3]), num_classes)
         self._initialize_weights()
 
     def _make_stage(self, planes, num_blocks, stride):
@@ -253,7 +257,7 @@ class RepVGG(nn.Cell):
         for s in strides:
             cur_group = self.override_group_map.get(self.cur_layer_idx, 1)
             blocks.append(RepVGGBlock(in_channels=self.in_planes, out_channels=planes, kernel_size=3,
-                                      stride=s, padding=1, group=cur_group, deploy=self.deploy,
+                                      stride=s, padding=1, groups=cur_group, deploy=self.deploy,
                                       use_se=self.use_se))
             self.in_planes = planes
             self.cur_layer_idx += 1
@@ -263,17 +267,17 @@ class RepVGG(nn.Cell):
     def _initialize_weights(self) -> None:
         """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
-            if isinstance(cell, nn.Conv2d):
+            if isinstance(cell, mint.nn.Conv2d):
                 cell.weight.set_data(
                     init.initializer(init.HeNormal(mode='fan_out', nonlinearity='relu'),
                                      cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(
                         init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
-            elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(init.initializer('ones', cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(init.initializer('zeros', cell.beta.shape, cell.beta.dtype))
-            elif isinstance(cell, nn.Dense):
+            elif isinstance(cell, mint.nn.BatchNorm2d):
+                cell.weight.set_data(init.initializer('ones', cell.weight.shape, cell.weight.dtype))
+                cell.bias.set_data(init.initializer('zeros', cell.bias.shape, cell.bias.dtype))
+            elif isinstance(cell, mint.nn.Linear):
                 cell.weight.set_data(
                     init.initializer(init.HeUniform(mode='fan_in', nonlinearity='sigmoid'),
                                      cell.weight.shape, cell.weight.dtype))
