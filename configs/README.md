@@ -1,6 +1,6 @@
 ### File Structure and Naming
-This folder contains training recipes and model readme files for each model. The folder structure and naming rule of model configurations are as follows.
 
+This folder contains training recipes and model readme files for each model. The folder structure and naming rule of model configurations are as follows.
 
 ```
     ├── configs
@@ -25,22 +25,20 @@ This folder contains training recipes and model readme files for each model. The
 > generalization across different hardware.
 
 ### Model Readme Writing Guideline
+
 The model readme file in each sub-folder provides the introduction, reproduced results, and running guideline for each model.
 
 Please follow the outline structure and **table format** shown in [densenet/README.md](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/README.md) when contributing your models :)
 
 #### Table Format
 
-
-
 | model name  | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                              | weight                                                                                                    |
 | ----------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | densenet121 | 8.06      | 8     | 32         | 224x224    | O2        | 300s          | 47,34   | 5446.81 | 75.67    | 92.77    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/densenet/densenet_121_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/densenet/densenet121-bf4ab27f-910v2.ckpt) |
 
-
-
 Illustration:
-- model name: model name in lower case with _ seperator.
+
+- model name: model name in lower case with \_ seperator.
 - top-1 and top-5: Accuracy reported on the validatoin set of ImageNet-1K. Keep 2 digits after the decimal point.
 - params(M): # of model parameters in millions (10^6). Keep **2 digits** after the decimal point
 - batch size: Training batch size
@@ -51,27 +49,28 @@ Illustration:
 - weight: url of the pretrained model weights
 
 ### Model Checkpoint Format
- The checkpoint (i.e., model weight) name should follow this format:  **{model_name}_{specification}-{sha256sum}.ckpt**, e.g., `poolformer_s12-5be5c4e4.ckpt`.
 
- You can run the following command and take the first 8 characters of the computing result as the sha256sum value in the checkpoint name.
+The checkpoint (i.e., model weight) name should follow this format: **{model*name}*{specification}-{sha256sum}.ckpt**, e.g., `poolformer_s12-5be5c4e4.ckpt`.
 
- ```shell
- sha256sum your_model.ckpt
- ```
+You can run the following command and take the first 8 characters of the computing result as the sha256sum value in the checkpoint name.
 
+```shell
+sha256sum your_model.ckpt
+```
 
 #### Training Script Format
 
 For consistency, it is recommended to provide distributed training commands based on `msrun --bind_core=True --worker_num {num_devices} python train.py`, instead of using shell script such as `distrubuted_train.sh`.
 
-  ```shell
-  # standalone training on single NPU device
-  python train.py --config configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/dataset --distribute False
+```shell
+# standalone training on single NPU device
+python train.py --config configs/densenet/densenet_121_gpu.yaml --data_dir /path/to/dataset --distribute False
 
-  # distributed training on NPU divices
-  msrun --bind_core=True --worker_num 8 python train.py --config configs/densenet/densenet_121_ascend.yaml --data_dir /path/to/imagenet
+# distributed training on NPU divices
+msrun --bind_core=True --worker_num 8 python train.py --config configs/densenet/densenet_121_ascend.yaml --data_dir /path/to/imagenet
 
-  ```
+```
 
 #### URL and Hyperlink Format
+
 Please use **absolute path** in the hyperlink or url for linking the target resource in the readme file and table.
