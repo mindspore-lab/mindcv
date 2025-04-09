@@ -1,7 +1,5 @@
-
 <details open markdown>
 <summary><b>performance tested on Ascend 910(8p) with graph mode</b></summary>
-
 
 | model name             | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                              | weight                                                                                                              |
 | ---------------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
@@ -63,9 +61,6 @@
 <details open markdown>
 <summary><b>performance tested on Ascend 910*(8p) with graph mode</b></summary>
 
-
-
-
 | model name             | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                              | weight                                                                                                                            |
 | ---------------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | convit_tiny            | 5.71      | 8     | 256        | 224x224    | O2        | 153s          | 226.51  | 9022.03  | 73.79    | 91.70    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/convit/convit_tiny_ascend.yaml)                    | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/convit/convit_tiny-1961717e-910v2.ckpt)                           |
@@ -115,4 +110,5 @@
 </details>
 
 ### Notes
+
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.
