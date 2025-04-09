@@ -69,16 +69,9 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 
 Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
-*coming soon*
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-| model name   | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                         | weight                                                                                  |
-| ------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| bit_resnet50 | 25.55     | 8     | 32         | 224x224    | O2        | 146s          | 74.52   | 3413.33 | 76.81    | 93.17    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/bit/BiT_resnet50-1e4795a4.ckpt) |
-
-
+| model name  | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | recipe                                                                                           | weight                                                                                                  | acc@top1 | acc@top5 |
+| ----------- | ----- | ---------- | ---------- |-----------| ------------- | ------- | ------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- | -------- | -------- |
+| bit         | 8     | 32         | 224x224    | O2        | 171s          | 60.48   | 4232.80 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/bit/bit_resnet50_ascend.yaml)             | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/bit/BiT_resnet50_best_v2.ckpt)             | 76.72    | 93.25    |
 
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

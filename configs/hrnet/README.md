@@ -74,14 +74,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 | model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                        | weight                                                                                               |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| hrnet_w32  | 41.30     | 8     | 128        | 224x224    | O2        | 1069s         | 238.03  | 4301.98 | 80.66    | 95.30    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w32_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/hrnet/hrnet_w32-e616cdcb-910v2.ckpt) |
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                        | weight                                                                                 |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| hrnet_w32  | 41.30     | 128   | 8          | 224x224    | O2        | 1312s         | 279.10  | 3668.94 | 80.64    | 95.44    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w32_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/hrnet/hrnet_w32-cc4fbd91.ckpt) |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- |---------| ------- | -------- | -------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| hrnet_w32  | 41.30     | 8     | 128        | 224x224    | O2        | 1069s         | 244.02  | 4196.37 | 80.66    | 95.30    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/hrnet/hrnet_w32_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/hrnet/hrnet_w32-e616cdcb-910v2.ckpt) |
 
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

@@ -85,20 +85,9 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 
 
-| model name  | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                             | weight                                                                                                    |
-| ----------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | ------- | -------- | -------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| resnetv2_50 | 25.60     | 8     | 32         | 224x224    | O2        | 120s          | 32.19   | 7781.16 | 77.03    | 93.29    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/resnetv2/resnetv2_50-a0b9f7f8-910v2.ckpt) |
-
-
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-
-
-| model name  | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                             | weight                                                                                      |
-| ----------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| resnetv2_50 | 25.60     | 8     | 32         | 224x224    | O2        | 52s           | 32.66   | 7838.33 | 76.90    | 93.37    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnetv2/resnetv2_50-3c2f143b.ckpt) |
+| model name  | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s | acc@top1 | acc@top5 | recipe                                                                                             | weight                                                                                                    |
+| ----------- | --------- | ----- | ---------- | ---------- | --------- |---------------|---------| ---- | -------- | -------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| resnetv2_50 | 25.60     | 8     | 32         | 224x224    | O2        | 120s          | 33.2    | 7710.84 | 77.03    | 93.29    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnetv2/resnetv2_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/resnetv2/resnetv2_50-a0b9f7f8-910v2.ckpt) |
 
 
 

@@ -89,19 +89,8 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 
 | model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                           | weight                                                                                                 |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| res2net50  | 25.76     | 8     | 32         | 224x224    | O2        | 174s          | 39.6    | 6464.65 | 79.33    | 94.64    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/res2net/res2net_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/res2net/res2net50-aa758355-910v2.ckpt) |
-
-
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-
-
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                           | weight                                                                                   |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| res2net50  | 25.76     | 8     | 32         | 224x224    | O2        | 119s          | 39.68   | 6451.61 | 79.35    | 94.64    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/res2net/res2net_50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/res2net/res2net50-f42cf71b.ckpt) |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- |---------|---------| -------- | -------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| res2net50  | 25.76     | 8     | 32         | 224x224    | O2        | 174s          | 40.63   | 6300.76 | 79.33    | 94.64    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/res2net/res2net_50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/res2net/res2net50-aa758355-910v2.ckpt) |
 
 
 

@@ -92,21 +92,9 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 
 | model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                  | weight                                                                                         |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| vgg13      | 133.04    | 8     | 32         | 224x224    | O2        | 41s           | 30.52   | 8387.94 | 72.81    | 91.02    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg13_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/vgg/vgg13-7756f33c-910v2.ckpt) |
-| vgg19      | 143.66    | 8     | 32         | 224x224    | O2        | 53s           | 39.17   | 6535.61 | 75.24    | 92.55    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg19_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/vgg/vgg19-5104d1ea-910v2.ckpt) |
-
-
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-
-
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                  | weight                                                                           |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- |---------------| ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| vgg13      | 133.04    | 8     | 32         | 224x224    | O2        | 23s           | 55.20   | 4637.68 | 72.87    | 91.02    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg13_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vgg/vgg13-da805e6e.ckpt) |
-| vgg19      | 143.66    | 8     | 32         | 224x224    | O2        | 22s           | 67.42   | 3797.09 | 75.21    | 92.56    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg19_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/vgg/vgg19-bedee7b6.ckpt) |
+| ---------- | --------- | ----- | ---------- | ---------- | --------- |---------------|---------| ------- | -------- | -------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| vgg13      | 133.04    | 8     | 32         | 224x224    | O2        | 41s           | 30.15   | 8490.87 | 72.81    | 91.02    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg13_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/vgg/vgg13-7756f33c-910v2.ckpt) |
+| vgg19      | 143.66    | 8     | 32         | 224x224    | O2        | 53s           | 38.72   | 6611.57 | 75.24    | 92.55    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg19_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/vgg/vgg19-5104d1ea-910v2.ckpt) |
 
 
 
