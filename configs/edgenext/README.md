@@ -76,8 +76,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 | model name        | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                   | weight                                                                                                        |
-| ----------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| edgenext_xx_small | 1.33      | 8     | 256        | 256x256    | O2        | 389s          | 239.38  | 8555.43 | 70.64    | 89.75    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/edgenext/edgenext_xx_small-cad13d2c-910v2.ckpt) |
+| ----------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- |--------| ------- | -------- | -------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| edgenext_xx_small | 1.33      | 8     | 256        | 256x256    | O2        | 389s          | 225.09 | 9098.58 | 70.64    | 89.75    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/edgenext/edgenext_xx_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/edgenext/edgenext_xx_small-cad13d2c-910v2.ckpt) |
 
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

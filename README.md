@@ -30,33 +30,32 @@ MindCV is an open-source toolbox for computer vision research and development ba
 The following is the corresponding `mindcv` versions and supported `mindspore` versions.
 
 | mindcv |  mindspore  |
-|:------:|:-----------:|
+| :----: | :---------: |
 |  main  |   master    |
-|  0.5   |   2.5.0     |
+|  0.5   |    2.5.0    |
 |  0.4   | 2.3.0/2.3.1 |
 |  0.3   |   2.2.10    |
 |  0.2   |     2.0     |
 |  0.1   |     1.8     |
 
-
 ### Major Features
 
 - **Easy-to-Use.** MindCV decomposes the vision framework into various configurable components. It is easy to customize your data pipeline, models, and learning pipeline with MindCV:
 
-    ```pycon
-    >>> import mindcv
-    # create a dataset
-    >>> dataset = mindcv.create_dataset('cifar10', download=True)
-    # create a model
-    >>> network = mindcv.create_model('resnet50', pretrained=True)
-    ```
+  ```pycon
+  >>> import mindcv
+  # create a dataset
+  >>> dataset = mindcv.create_dataset('cifar10', download=True)
+  # create a model
+  >>> network = mindcv.create_model('resnet50', pretrained=True)
+  ```
 
-    Users can customize and launch their transfer learning or training task in one command line.
+  Users can customize and launch their transfer learning or training task in one command line.
 
-    ```shell
-    # transfer learning in one command line
-    python train.py --model=swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir=/path/to/data
-    ```
+  ```shell
+  # transfer learning in one command line
+  python train.py --model=swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir=/path/to/data
+  ```
 
 - **State-of-The-Art.** MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model:
 
@@ -88,6 +87,7 @@ Below are a few code snippets for your taste.
 # Create the model object
 >>> network = mindcv.create_model('swin_tiny', pretrained=True)
 ```
+
 ```shell
 # Validate its accuracy
 python validate.py --model=swin_tiny --pretrained --dataset=imagenet --val_split=validation
@@ -108,6 +108,7 @@ Classify the downloaded image with a pretrained SoTA model:
 python infer.py --model=swin_tiny --image_path='./dog.jpg'
 # {'Labrador retriever': 0.5700152, 'golden retriever': 0.034551315, 'kelpie': 0.010108651, 'Chesapeake Bay retriever': 0.008229004, 'Walker hound, Walker foxhound': 0.007791956}
 ```
+
 The top-1 prediction result is labrador retriever, which is the breed of this cut dog.
 
 ### Training
@@ -116,61 +117,61 @@ It is easy to train your model on a standard or customized dataset using `train.
 
 - Standalone Training
 
-    ```shell
-    # standalone training
-    python train.py --model=resnet50 --dataset=cifar10 --dataset_download
-    ```
+  ```shell
+  # standalone training
+  python train.py --model=resnet50 --dataset=cifar10 --dataset_download
+  ```
 
-    Above is an example for training ResNet50 on CIFAR10 dataset on a CPU/GPU/Ascend device
+  Above is an example for training ResNet50 on CIFAR10 dataset on a CPU/GPU/Ascend device
 
 - Distributed Training
 
-    For large datasets like ImageNet, it is necessary to do training in distributed mode on multiple devices. This can be achieved with `msrun` and parallel features supported by MindSpore.
+  For large datasets like ImageNet, it is necessary to do training in distributed mode on multiple devices. This can be achieved with `msrun` and parallel features supported by MindSpore.
 
-    ```shell
-    # distributed training
-    # assume you have 4 NPUs
-    msrun --bind_core=True --worker_num 4 python train.py --distribute \
-        --model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet
-    ```
+  ```shell
+  # distributed training
+  # assume you have 4 NPUs
+  msrun --bind_core=True --worker_num 4 python train.py --distribute \
+      --model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet
+  ```
 
-    Notice that if you are using msrun startup with 2 devices, please add `--bind_core=True` to improve performance. For example:
+  Notice that if you are using msrun startup with 2 devices, please add `--bind_core=True` to improve performance. For example:
 
-    ```shell
-    msrun --bind_core=True --worker_num=2--local_worker_num=2 --master_port=8118 \
-    --log_dir=msrun_log --join=True --cluster_time_out=300 \
-    python train.py --distribute --model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet
-    ```
+  ```shell
+  msrun --bind_core=True --worker_num=2--local_worker_num=2 --master_port=8118 \
+  --log_dir=msrun_log --join=True --cluster_time_out=300 \
+  python train.py --distribute --model=densenet121 --dataset=imagenet --data_dir=/path/to/imagenet
+  ```
 
-   > For more information, please refer to https://www.mindspore.cn/docs/en/r2.5.0/model_train/parallel/startup_method.html
+  > For more information, please refer to https://www.mindspore.cn/docs/en/r2.5.0/model_train/parallel/startup_method.html
 
-    Detailed parameter definitions can be seen in `config.py` and checked by running `python train.py --help'.
+  Detailed parameter definitions can be seen in `config.py` and checked by running `python train.py --help'.
 
-    To resume training, please set the `--ckpt_path` and `--ckpt_save_dir` arguments. The optimizer state including the learning rate of the last stopped epoch will also be recovered.
+  To resume training, please set the `--ckpt_path` and `--ckpt_save_dir` arguments. The optimizer state including the learning rate of the last stopped epoch will also be recovered.
 
 - Config and Training Strategy
 
-    You can configure your model and other components either by specifying external parameters or by writing a yaml config file. Here is an example of training using a preset yaml file.
+  You can configure your model and other components either by specifying external parameters or by writing a yaml config file. Here is an example of training using a preset yaml file.
 
-    ```shell
-    msrun --bind_core=True --worker_num 4 python train.py -c configs/squeezenet/squeezenet_1.0_ascend.yaml
-    ```
+  ```shell
+  msrun --bind_core=True --worker_num 4 python train.py -c configs/squeezenet/squeezenet_1.0_ascend.yaml
+  ```
 
-    **Pre-defined Training Strategies:**
-    We provide more than 20 training recipes that achieve SoTA results on ImageNet currently.
-    Please look into the [`configs`](configs) folder for details.
-    Please feel free to adapt these training strategies to your own model for performance improvement, which can be easily done by modifying the yaml file.
+  **Pre-defined Training Strategies:**
+  We provide more than 20 training recipes that achieve SoTA results on ImageNet currently.
+  Please look into the [`configs`](configs) folder for details.
+  Please feel free to adapt these training strategies to your own model for performance improvement, which can be easily done by modifying the yaml file.
 
 - Train on ModelArts/OpenI Platform
 
-    To run training on the [ModelArts](https://www.huaweicloud.com/intl/en-us/product/modelarts.html) or [OpenI](https://openi.pcl.ac.cn/) cloud platform:
+  To run training on the [ModelArts](https://www.huaweicloud.com/intl/en-us/product/modelarts.html) or [OpenI](https://openi.pcl.ac.cn/) cloud platform:
 
-    ```text
-    1. Create a new training task on the cloud platform.
-    2. Add run parameter `config` and specify the path to the yaml config file on the website UI interface.
-    3. Add run parameter `enable_modelarts` and set True on the website UI interface.
-    4. Fill in other blanks on the website and launch the training task.
-    ```
+  ```text
+  1. Create a new training task on the cloud platform.
+  2. Add run parameter `config` and specify the path to the yaml config file on the website UI interface.
+  3. Add run parameter `enable_modelarts` and set True on the website UI interface.
+  4. Fill in other blanks on the website and launch the training task.
+  ```
 
 **Graph Mode and PyNative Mode**:
 
@@ -226,41 +227,41 @@ Currently, MindCV supports the model families listed below. More models with pre
 <details open markdown>
 <summary> Supported models </summary>
 
-* Big Transfer ResNetV2 (BiT) - https://arxiv.org/abs/1912.11370
-* ConvNeXt - https://arxiv.org/abs/2201.03545
-* ConViT (Soft Convolutional Inductive Biases Vision Transformers)- https://arxiv.org/abs/2103.10697
-* DenseNet - https://arxiv.org/abs/1608.06993
-* DPN (Dual-Path Network) - https://arxiv.org/abs/1707.01629
-* EfficientNet (MBConvNet Family) https://arxiv.org/abs/1905.11946
-* EfficientNet V2 - https://arxiv.org/abs/2104.00298
-* GhostNet - https://arxiv.org/abs/1911.11907
-* GoogLeNet - https://arxiv.org/abs/1409.4842
-* Inception-V3 - https://arxiv.org/abs/1512.00567
-* Inception-ResNet-V2 and Inception-V4 - https://arxiv.org/abs/1602.07261
-* MNASNet - https://arxiv.org/abs/1807.11626
-* MobileNet-V1 - https://arxiv.org/abs/1704.04861
-* MobileNet-V2 - https://arxiv.org/abs/1801.04381
-* MobileNet-V3 (MBConvNet w/ Efficient Head) - https://arxiv.org/abs/1905.02244
-* NASNet - https://arxiv.org/abs/1707.07012
-* PNasNet - https://arxiv.org/abs/1712.00559
-* PVT (Pyramid Vision Transformer) - https://arxiv.org/abs/2102.12122
-* PoolFormer models - https://github.com/sail-sg/poolformer
-* RegNet - https://arxiv.org/abs/2003.13678
-* RepMLP https://arxiv.org/abs/2105.01883
-* RepVGG - https://arxiv.org/abs/2101.03697
-* ResNet (v1b/v1.5) - https://arxiv.org/abs/1512.03385
-* ResNeXt - https://arxiv.org/abs/1611.05431
-* Res2Net - https://arxiv.org/abs/1904.01169
-* ReXNet - https://arxiv.org/abs/2007.00992
-* ShuffleNet v1 - https://arxiv.org/abs/1707.01083
-* ShuffleNet v2 - https://arxiv.org/abs/1807.11164
-* SKNet - https://arxiv.org/abs/1903.06586
-* SqueezeNet - https://arxiv.org/abs/1602.07360
-* Swin Transformer - https://arxiv.org/abs/2103.14030
-* VGG - https://arxiv.org/abs/1409.1556
-* Visformer - https://arxiv.org/abs/2104.12533
-* Vision Transformer (ViT) - https://arxiv.org/abs/2010.11929
-* Xception - https://arxiv.org/abs/1610.02357
+- Big Transfer ResNetV2 (BiT) - https://arxiv.org/abs/1912.11370
+- ConvNeXt - https://arxiv.org/abs/2201.03545
+- ConViT (Soft Convolutional Inductive Biases Vision Transformers)- https://arxiv.org/abs/2103.10697
+- DenseNet - https://arxiv.org/abs/1608.06993
+- DPN (Dual-Path Network) - https://arxiv.org/abs/1707.01629
+- EfficientNet (MBConvNet Family) https://arxiv.org/abs/1905.11946
+- EfficientNet V2 - https://arxiv.org/abs/2104.00298
+- GhostNet - https://arxiv.org/abs/1911.11907
+- GoogLeNet - https://arxiv.org/abs/1409.4842
+- Inception-V3 - https://arxiv.org/abs/1512.00567
+- Inception-ResNet-V2 and Inception-V4 - https://arxiv.org/abs/1602.07261
+- MNASNet - https://arxiv.org/abs/1807.11626
+- MobileNet-V1 - https://arxiv.org/abs/1704.04861
+- MobileNet-V2 - https://arxiv.org/abs/1801.04381
+- MobileNet-V3 (MBConvNet w/ Efficient Head) - https://arxiv.org/abs/1905.02244
+- NASNet - https://arxiv.org/abs/1707.07012
+- PNasNet - https://arxiv.org/abs/1712.00559
+- PVT (Pyramid Vision Transformer) - https://arxiv.org/abs/2102.12122
+- PoolFormer models - https://github.com/sail-sg/poolformer
+- RegNet - https://arxiv.org/abs/2003.13678
+- RepMLP https://arxiv.org/abs/2105.01883
+- RepVGG - https://arxiv.org/abs/2101.03697
+- ResNet (v1b/v1.5) - https://arxiv.org/abs/1512.03385
+- ResNeXt - https://arxiv.org/abs/1611.05431
+- Res2Net - https://arxiv.org/abs/1904.01169
+- ReXNet - https://arxiv.org/abs/2007.00992
+- ShuffleNet v1 - https://arxiv.org/abs/1707.01083
+- ShuffleNet v2 - https://arxiv.org/abs/1807.11164
+- SKNet - https://arxiv.org/abs/1903.06586
+- SqueezeNet - https://arxiv.org/abs/1602.07360
+- Swin Transformer - https://arxiv.org/abs/2103.14030
+- VGG - https://arxiv.org/abs/1409.1556
+- Visformer - https://arxiv.org/abs/2104.12533
+- Vision Transformer (ViT) - https://arxiv.org/abs/2010.11929
+- Xception - https://arxiv.org/abs/1610.02357
 
 Please see [configs](./configs) for the details about model performance and pretrained weights.
 
@@ -271,43 +272,43 @@ Please see [configs](./configs) for the details about model performance and pret
 <details open markdown>
 <summary> Supported algorithms </summary>
 
-* Augmentation
-    * [AutoAugment](https://arxiv.org/abs/1805.09501)
-    * [RandAugment](https://arxiv.org/abs/1909.13719)
-    * [Repeated Augmentation](https://openaccess.thecvf.com/content_CVPR_2020/papers/Hoffer_Augment_Your_Batch_Improving_Generalization_Through_Instance_Repetition_CVPR_2020_paper.pdf)
-    * RandErasing (Cutout)
-    * CutMix
-    * MixUp
-    * RandomResizeCrop
-    * Color Jitter, Flip, etc
-* Optimizer
-    * Adam
-    * AdamW
-    * [Lion](https://arxiv.org/abs/2302.06675)
-    * Adan (experimental)
-    * AdaGrad
-    * LAMB
-    * Momentum
-    * RMSProp
-    * SGD
-    * NAdam
-* LR Scheduler
-    * Warmup Cosine Decay
-    * Step LR
-    * Polynomial Decay
-    * Exponential Decay
-* Regularization
-    * Weight Decay
-    * Label Smoothing
-    * Stochastic Depth (depends on networks)
-    * Dropout (depends on networks)
-* Loss
-    * Cross Entropy (w/ class weight and auxiliary logit support)
-    * Binary Cross Entropy  (w/ class weight and auxiliary logit support)
-    * Soft Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
-    * Soft Binary Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
-* Ensemble
-    * Warmup EMA (Exponential Moving Average)
+- Augmentation
+  - [AutoAugment](https://arxiv.org/abs/1805.09501)
+  - [RandAugment](https://arxiv.org/abs/1909.13719)
+  - [Repeated Augmentation](https://openaccess.thecvf.com/content_CVPR_2020/papers/Hoffer_Augment_Your_Batch_Improving_Generalization_Through_Instance_Repetition_CVPR_2020_paper.pdf)
+  - RandErasing (Cutout)
+  - CutMix
+  - MixUp
+  - RandomResizeCrop
+  - Color Jitter, Flip, etc
+- Optimizer
+  - Adam
+  - AdamW
+  - [Lion](https://arxiv.org/abs/2302.06675)
+  - Adan (experimental)
+  - AdaGrad
+  - LAMB
+  - Momentum
+  - RMSProp
+  - SGD
+  - NAdam
+- LR Scheduler
+  - Warmup Cosine Decay
+  - Step LR
+  - Polynomial Decay
+  - Exponential Decay
+- Regularization
+  - Weight Decay
+  - Label Smoothing
+  - Stochastic Depth (depends on networks)
+  - Dropout (depends on networks)
+- Loss
+  - Cross Entropy (w/ class weight and auxiliary logit support)
+  - Binary Cross Entropy (w/ class weight and auxiliary logit support)
+  - Soft Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
+  - Soft Binary Cross Entropy Loss (automatically enabled if mixup or label smoothing is used)
+- Ensemble
+  - Warmup EMA (Exponential Moving Average)
 
 </details>
 
@@ -342,9 +343,9 @@ Release `0.3.0` is published. We will drop MindSpore 1.x in the future release.
 6. BREAKING CHANGES:
    - We are going to drop support of MindSpore 1.x for it's EOL.
    - Configuration `filter_bias_and_bn` will be removed and renamed as `weight_decay_filter`,
-   due to a prolonged misunderstanding of the MindSpore optimizer.
-   We will migrate the existing training recipes, but the signature change of function `create_optimizer` will be incompatible
-   and the old version training recipes will also be incompatible. See [PR/752](https://github.com/mindspore-lab/mindcv/pull/752) for details.
+     due to a prolonged misunderstanding of the MindSpore optimizer.
+     We will migrate the existing training recipes, but the signature change of function `create_optimizer` will be incompatible
+     and the old version training recipes will also be incompatible. See [PR/752](https://github.com/mindspore-lab/mindcv/pull/752) for details.
 
 See [RELEASE](RELEASE.md) for detailed history.
 

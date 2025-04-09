@@ -84,8 +84,8 @@ Our reproduced model performance on ImageNet-1K is reported as follows.
 Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 | model name  | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | recipe                                                                       | weight                                                                                                  | acc@top1 | acc@top5 |
-| ----------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | -------- | -------- |
-| visformer   | 8     | 128        | 224x224    | O3        | 141s          | 207.35  | 4938.51 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/visformer/visformer_tiny-df995ba4-910v2.ckpt) | 74.93    | 92.55    |
+| ----------- | ----- | ---------- | ---------- |-----------| ------------- | ------- | ------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | -------- | -------- |
+| visformer   | 8     | 128        | 224x224    | O2        | 141s          | 207.35  | 4938.51 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/visformer/visformer_tiny_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/visformer/visformer_tiny-df995ba4-910v2.ckpt) | 74.93    | 92.55    |
 
 
 ### Notes

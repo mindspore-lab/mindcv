@@ -79,8 +79,8 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 
 | model name      | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                               | weight                                                                                                       |
-| --------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| nasnet_a_4x1056 | 5.33      | 8     | 256        | 224x224    | O2        | 800s          | 364.35  | 5620.97 | 74.12    | 91.36    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/nasnet/nasnet_a_4x1056_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/nasnet/nasnet_a_4x1056-015ba575c-910v2.ckpt) |
+| --------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- |---------| ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| nasnet_a_4x1056 | 5.33      | 8     | 256        | 224x224    | O2        | 800s          | 364.55  | 5617.88 | 74.12    | 91.36    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/nasnet/nasnet_a_4x1056_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/nasnet/nasnet_a_4x1056-015ba575c-910v2.ckpt) |
 
 
 

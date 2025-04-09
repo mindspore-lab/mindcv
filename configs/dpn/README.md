@@ -77,7 +77,7 @@ Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
 
 | model name  | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | recipe                                                                                           | weight                                                                                          | acc@top1 | acc@top5 |
 | ----------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- | -------- | -------- |
-| dpn         | 8     | 32         | 224x224    | O2        | 336s          | 76.23   | 3358.26 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/dpn/dpn131_ascend.yaml)             | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/dpn/dpn131-47f084b3.ckpt)             | 76.00    | 92.45    |
+| dpn         | 8     | 32         | 224x224    | O2        | 336s          | 76.23   | 3358.26 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/dpn/dpn131_ascend.yaml)             | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/dpn/dpn92-189_5004_v2.ckpt)             | 76.00    | 92.45    |
 
 
 ### Notes
