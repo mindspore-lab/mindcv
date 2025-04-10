@@ -80,11 +80,11 @@ python validate.py -c configs/halonet/halonet_50t_ascend.yaml  --data_dir /path/
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
-| model name  | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | recipe                                                                                           | weight                                                                                      | acc@top1 | acc@top5 |
-| ----------- | ----- | ---------- | ---------- |-----------| ------------- | ------- | ------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- | -------- | -------- |
-| halonet     | 8     | 64         | 224x224    | O2        | 351s          | 134.72  | 3800.48 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/halonet/halonet_50t_ascend.yaml)     | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/halonet/halonet_50t-533da6be.ckpt)     | 0.10     | 0.10     |
+| model name  | params(M) | cards |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:-----------:|:---------:|:-----:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
+| halonet_50t |   22.79   |   8   | 64         | 224x224    | O2        | 351s          | 134.72  | 3800.48 | 0.10     | 0.10     | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/halonet/halonet_50t_ascend.yaml)     | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/halonet/halonet_50t-189_2502_v2.ckpt)     |
 
 
 ### Notes

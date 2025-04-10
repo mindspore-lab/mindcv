@@ -68,11 +68,11 @@ python validate.py -c configs/mnasnet/mnasnet_0.75_ascend.yaml --data_dir /path/
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
 
-| model name  | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                             | weight                                                                                                   |
-| ----------- | --------- | ----- | ---------- | ---------- | --------- | ------------- |---------| -------- | -------- | -------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+|  model name  |  params(M)   |  cards  |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:------------:|:------------:|:-------:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
 | mnasnet_075 | 3.20      | 8     | 256        | 224x224    | O2        | 144s          | 175.6   | 11662.87 | 71.77    | 90.52    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mnasnet/mnasnet_0.75_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mnasnet/mnasnet_075-083b2bc4-910v2.ckpt) |
 
 

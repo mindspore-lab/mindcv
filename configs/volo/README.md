@@ -82,16 +82,11 @@ python validate.py -c configs/volo/volo_d1_ascend.yaml --data_dir /path/to/image
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-performance tested on ascend 910*(8p) with graph mode
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
-| model name  | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | recipe                                                                                     | weight                                                                                                  | acc@top1 | acc@top5 |
-| ----------- | ----- | ---------- | ---------- |-----------| ------------- | ------- | ------- |--------------------------------------------------------------------------------------------| ------------------------------------------------------------------------------------------------------- | -------- | -------- |
-| volo        | 8     | 128        | 224x224    | O2        | 368s          | 230.05  | 4451.21 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/volo/volo_d1_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/volo/volo_d1-177_1251_v2.ckpt)           | 82.97    | 96.21    |
-
-
-performance tested on ascend 910(8p) with graph mode
-
-*coming soon*
+| model name | params(M) | cards |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:----------:|:---------:|:-----:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
+|  volo_d1   |   26.63   |   8   | 128        | 224x224    | O2        | 368s          | 230.05  | 4451.21 | 82.97    | 96.21    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/volo/volo_d1_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/volo/volo_d1-177_1251_v2.ckpt)           |
 
 ### Notes
 

@@ -134,19 +134,11 @@ python examples/det/ssd/eval.py --config examples/det/ssd/ssd_mobilenetv2.yaml
 
 ## Performance
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
-*coming soon*
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-
-| model name       | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | mAP  | recipe                                                                                           | weight                                                                                      |
-| ---------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | ---- | ------------------------------------------------------------------------------------------------ |---------------------------------------------------------------------------------------------|
-| ssd_mobilenetv2  | 4.45      | 8     | 32         | 300x300    | O2        | 202s          | 60.14   | 4256.73 | 23.2 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_mobilenetv2.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_mobilenetv2-5bbd7411.ckpt)  |
-| ssd_resnet50_fpn | 33.37     | 8     | 32         | 640x640    | O2        | 130s          | 269.82  | 948.78  | 38.3 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_resnet50_fpn.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_resnet50_fpn-ac87ddac.ckpt) |
-
+| model name       | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | mAP   | recipe                                                                                           | weight                                                                                      |
+| ---------------- | --------- | ----- | ---------- | ---------- | --------- |---------------|---------|---------|-------| ------------------------------------------------------------------------------------------------ |---------------------------------------------------------------------------------------------|
+| ssd_mobilenetv2  | 4.45      | 8     | 32         | 300x300    | O2        | 347s          | 69.63   | 3676.58 | 23.39 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/det/ssd/ssd_mobilenetv2.yaml)  | [weights](https://download.mindspore.cn/toolkits/mindcv/ssd/ssd_mobilenetv2-dc7035ec-910v2.ckpt)  |
 
 ## References
 

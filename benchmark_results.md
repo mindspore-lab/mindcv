@@ -59,7 +59,7 @@
 </details>
 
 <details open markdown>
-<summary><b>performance tested on Ascend 910*(8p) with graph mode</b></summary>
+<summary><b>performance tested on Ascend Atlas 800T A2 machines with graph mode</b></summary>
 
 | model name             | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                              | weight                                                                                                                            |
 | ---------------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |

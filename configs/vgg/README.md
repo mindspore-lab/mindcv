@@ -86,13 +86,12 @@ python validate.py -c configs/vgg/vgg16_ascend.yaml --data_dir /path/to/imagenet
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
 
 
-
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                  | weight                                                                                         |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- |---------------|---------| ------- | -------- | -------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+|  model name  |  params(M)   |  cards  |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:------------:|:------------:|:-------:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
 | vgg13      | 133.04    | 8     | 32         | 224x224    | O2        | 41s           | 30.15   | 8490.87 | 72.81    | 91.02    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg13_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/vgg/vgg13-7756f33c-910v2.ckpt) |
 | vgg19      | 143.66    | 8     | 32         | 224x224    | O2        | 53s           | 38.72   | 6611.57 | 75.24    | 92.55    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vgg/vgg19_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/vgg/vgg19-5104d1ea-910v2.ckpt) |
 

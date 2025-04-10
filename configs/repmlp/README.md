@@ -85,7 +85,7 @@ python validate.py --model=repmlp_t224 --data_dir /path/to/imagenet --ckpt_path 
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
 *coming soon*
 

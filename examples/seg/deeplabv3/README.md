@@ -149,22 +149,17 @@ python examples/seg/deeplabv3/eval.py --config examples/seg/deeplabv3/config/dee
 ```
 
 ## Performance
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
+
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
 
+| model name        | params(M) | cards | batch size | jit level | graph compile | ms/step | img/s  | mIoU  | recipe                                                                                                                           | weight                                                                                                      |
+| ----------------- | --------- | ----- | ---------- | --------- |---------------|---------|--------|-------| -------------------------------------------------------------------------------------------------------------------------------- |-------------------------------------------------------------------------------------------------------------|
+| deeplabv3_s16     | 58.15     | 8     | 32         | O2        | 203s          | 280.79  | 911.71 | 79.26 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3_s16_dilated_resnet101.yaml)     | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/deeplabv3/deeplabv3-s16-best-910v2.ckpt)       |
+| deeplabv3_s8      | 58.15     | 8     | 16         | O2        | 215s          | 396.89  | 322.51 | 80.63 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3_s8_dilated_resnet101.yaml)      | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/deeplabv3/deeplabv3-s8-best-910v2.ckpt)        |
+| deeplabv3plus_s16 | 59.45     | 8     | 32         | O2        | 220s          | 319.97  | 800.07 | 79.05 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3plus_s16_dilated_resnet101.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/deeplabv3/deeplabv3plus-s16-best-910v2.ckpt)   |
+| deeplabv3plus_s8  | 59.45     | 8     | 16         | O2        | 189s          | 417.88  | 306.31 | 80.42 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3plus_s8_dilated_resnet101.yaml)  | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/deeplabv3/deeplabv3plus-s8-best-910v2.ckpt) |
 
-| model name        | params(M) | cards | batch size | jit level | graph compile | ms/step | img/s  | mIoU                | recipe                                                                                                                           | weight      |
-| ----------------- | --------- | ----- | ---------- | --------- | ------------- | ------- | ------ | ------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| deeplabv3_s16     | 58.15     | 8     | 32         | O2        | 122s          | 267.91  | 955.54 | 77.33               | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3_s16_dilated_resnet101.yaml)     | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/deeplabv3/deeplabv3-s16-best.ckpt) |
-| deeplabv3_s8      | 58.15     | 8     | 16         | O2        | 180s          | 390.81  | 327.52 | 79.16\|79.93\|80.14 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3_s8_dilated_resnet101.yaml)      | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/deeplabv3/deeplabv3-s8-best.ckpt) |
-| deeplabv3plus_s16 | 59.45     | 8     | 32         | O2        | 207s          | 312.15  | 820.12 | 78.99               | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3plus_s16_dilated_resnet101.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/deeplabv3/deeplabv3plus-s16-best.ckpt) |
-| deeplabv3plus_s8  | 59.45     | 8     | 16         | O2        | 170s          | 403.43  | 217.28 | 80.31\|80.99\|81.10 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/examples/seg/deeplabv3/config/deeplabv3plus_s8_dilated_resnet101.yaml)  | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/deeplabv3/deeplabv3plus-s8-best.ckpt) |
-
-
-
-Experiments are tested on ascend 910* with mindspore 2.3.1 graph mode.
-
-*coming soon*
 
 ### Notes
 - mIoU: mIoU of model "deeplabv3_s8" and "deeplabv3plus_s8" contains 3 results which tested respectively under conditions of no enhance/with MS/with MS and FLIP.

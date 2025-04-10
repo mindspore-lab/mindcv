@@ -100,11 +100,11 @@ python validate.py -c configs/vit/vit_b32_224_ascend.yaml --data_dir /path/to/im
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
-| model name  | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | recipe                                                                                           | weight                                                                                                  | acc@top1 | acc@top5 |
-| ----------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- | -------- | -------- |
-| vit         | 8     | 256        | 224x224    | O2        | 225s          | 425.36  | 4814.75 | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l32_224_ascend.yaml)             | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/vit/vit_l_32_224-e0039f16-910v2.ckpt)             | 74.63    | 92.21    |
+| model name |  params(M)   |  cards  |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:----------:|:------------:|:-------:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
+|  vit_l32   | 8     | 256        | 224x224    | O2        | 225s          | 425.36  | 4814.75 | 74.63    | 92.21    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/vit/vit_l32_224_ascend.yaml)             | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/vit/vit_l_32_224-e0039f16-910v2.ckpt)             |
 
 
 ### Notes

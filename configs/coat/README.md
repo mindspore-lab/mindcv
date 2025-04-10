@@ -61,11 +61,11 @@ python validate.py -c configs/coat/coat_lite_tiny_ascend.yaml --data_dir /path/t
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
-| model name  | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | recipe                                                                                           | weight                                                                                         | acc@top1 | acc@top5 |
-| ----------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- | -------- | -------- |
-| coat        | 8     | 32         | 224x224    | O2        | 644s          | 373.00  | 686.33  | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_tiny_ascend.yaml)           | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/coat/coat_tiny-dcca16b1-910v2.ckpt)           | 79.27    | 94.29    |
+|   model name   | params(M) | cards |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:--------------:|:---------:|:-----:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
+| coat_tiny   |   5.50    |   8   | 32         | 224x224    | O2        | 644s          | 373.00  | 686.33  | 79.27    | 94.29    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/coat/coat_lite_tiny_ascend.yaml)           |[weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/coat/coat_tiny-dcca16b1-910v2.ckpt) |
 
 
 
