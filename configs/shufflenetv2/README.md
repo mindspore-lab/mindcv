@@ -89,25 +89,14 @@ python validate.py -c configs/shufflenetv2/shufflenet_v2_0.5_ascend.yaml --data_
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
 
 
 
-| model name         | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                       | weight                                                                                                                          |
-| ------------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| shufflenet_v2_x0_5 | 1.37      | 8     | 64         | 224x224    | O2        | 100s          | 47.32   | 10819.95 | 60.65    | 82.26    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv2/shufflenet_v2_0.5_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x0_5-39d05bb6-910v2.ckpt) |
-
-
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-
-
-| model name         | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                       | weight                                                                                                            |
-| ------------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| shufflenet_v2_x0_5 | 1.37      | 8     | 64         | 224x224    | O2        | 62s           | 41.87   | 12228.33 | 60.53    | 82.11    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv2/shufflenet_v2_0.5_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x0_5-8c841061.ckpt) |
+|  model name  |  params(M)   |  cards  |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:------------:|:------------:|:-------:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
+| shufflenet_v2_x0_5 | 1.37      | 8     | 64         | 224x224    | O2        | 100s          | 48.15   | 10633.43 | 60.65    | 82.26    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/shufflenetv2/shufflenet_v2_0.5_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/shufflenet/shufflenetv2/shufflenet_v2_x0_5-39d05bb6-910v2.ckpt) |
 
 
 

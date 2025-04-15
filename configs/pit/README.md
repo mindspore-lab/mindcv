@@ -70,26 +70,11 @@ python validate.py -c configs/pit/pit_xs_ascend.yaml --data_dir /path/to/imagene
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
-
-
-
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                   | weight                                                                                          |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| pit_ti     | 4.85      | 8     | 128        | 224x224    | O2        | 212s          | 266.47  | 3842.83 | 73.26    | 91.57    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_ti_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/pit/pit_ti-33466a0d-910v2.ckpt) |
-
-
-
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-
-
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                   | weight                                                                            |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| pit_ti     | 4.85      | 8     | 128        | 224x224    | O2        | 192s          | 271.50  | 3771.64 | 72.96    | 91.33    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_ti_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/pit/pit_ti-e647a593.ckpt) |
+|  model name  |  params(M)   |  cards  |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:------------:|:------------:|:-------:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
+| pit_ti     | 4.85      | 8     | 128        | 224x224    | O2        | 212s          | 257.31  | 3979.63 | 73.26    | 91.57    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/pit/pit_ti_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/pit/pit_ti-33466a0d-910v2.ckpt) |
 
 
 

@@ -79,13 +79,11 @@ python validate.py -c configs/xcit/xcit_tiny_12_p16_224_ascend.yaml --data_dir /
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
-*coming soon*
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-*coming soon*
+| model name | params(M) | cards |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:----------:|:---------:|:-----:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
+| xcit_tiny  |   6.72    |   8   | 128        | 224x224    | O2        | 329s          | 233.86  | 4378.69 | 77.16    | 93.57    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/xcit/xcit_tiny_12_p16_224_ascend.yaml)           | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/xcit/xcit_tiny_12_p16_224-bd90776e-910v2.ckpt)           |
 
 ### Notes
 

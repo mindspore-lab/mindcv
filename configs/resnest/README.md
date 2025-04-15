@@ -82,19 +82,11 @@ python validate.py -c configs/resnest/resnest50_ascend.yaml --data_dir /path/to/
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
-*coming soon*
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-
-
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                          | weight                                                                                   |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| resnest50  | 27.55     | 8     | 128        | 224x224    | O2        | 83s           | 244.92  | 4552.73 | 80.81    | 95.16    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnest/resnest50_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/resnest/resnest50-f2e7fc9c.ckpt) |
-
+| model name | params(M) | cards |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:----------:|:---------:|:-----:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
+| resnest50  |   27.55   |   8   | 128        | 224x224    | O2        | 279s          | 243.77  | 4200.68 | 80.88    | 95.32    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/resnest/resnest50_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/resnest/resnest50-180_1251_v2.ckpt)     |
 
 
 ### Notes

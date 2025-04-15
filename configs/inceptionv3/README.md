@@ -74,17 +74,11 @@ python validate.py -c configs/inceptionv3/inception_v3_ascend.yaml --data_dir /p
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
-| model name   | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                 | weight                                                                                                         |
-| ------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| inception_v3 | 27.20     | 8     | 32         | 299x299    | O2        | 172s          | 70.83   | 3614.29 | 79.25    | 94.47    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv3/inception_v3_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/inception_v3/inception_v3-61a8e9ed-910v2.ckpt) |
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-| model name   | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                                 | weight                                                                                           |
-| ------------ | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| inception_v3 | 27.20     | 8     | 32         | 299x299    | O2        | 120s          | 76.42   | 3349.91 | 79.11    | 94.40    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv3/inception_v3_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/inception_v3/inception_v3-38f67890.ckpt) |
+|  model name  |  params(M)   |  cards  |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:------------:|:------------:|:-------:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
+| inception_v3 | 27.20     | 8     | 32         | 299x299    | O2        | 172s          | 73.43   | 3486.31 | 79.25    | 94.47    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/inceptionv3/inception_v3_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/inception_v3/inception_v3-61a8e9ed-910v2.ckpt) |
 
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

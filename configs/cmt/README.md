@@ -65,15 +65,12 @@ python validate.py -c configs/cmt/cmt_small_ascend.yaml --data_dir /path/to/imag
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
-*coming soon*
+|  model name  | params(M) | cards |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:------------:|:---------:|:-----:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
+| cmt_small  |   26.09   |    8  |     128     |   224x224   |     O2     |     1210s      |  324.95  | 3151.25  | 83.15       | 96.48    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/cmt/cmt_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/cmt/cmt_small-184_1251_v2.ckpt) |
 
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                      | weight                                                                               |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| cmt_small  | 26.09     | 8     | 128        | 224x224    | O2        | 1268s         | 500.64  | 2048.01 | 83.24    | 96.41    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/cmt/cmt_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/cmt/cmt_small-6858ee22.ckpt) |
 
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

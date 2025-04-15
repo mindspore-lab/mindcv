@@ -72,21 +72,13 @@ python validate.py -c configs/mobilenetv3/mobilenet_v3_small_ascend.yaml --data_
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
 
-| model name             | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                       | weight                                                                                                                            |
-| ---------------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| mobilenet_v3_small_100 | 2.55      | 8     | 75         | 224x224    | O2        | 184s          | 52.38   | 11454.75 | 68.07    | 87.77    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-6fa3c17d-910v2.ckpt) |
-| mobilenet_v3_large_100 | 5.51      | 8     | 75         | 224x224    | O2        | 354s          | 55.89   | 10735.37 | 75.59    | 92.57    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_large_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-bd4e7bdc-910v2.ckpt) |
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-
-| model name             | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s    | acc@top1 | acc@top5 | recipe                                                                                                       | weight                                                                                                              |
-| ---------------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | -------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| mobilenet_v3_small_100 | 2.55      | 8     | 75         | 224x224    | O2        | 145s          | 48.14   | 12463.65 | 68.10    | 87.86    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_small_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-509c6047.ckpt) |
-| mobilenet_v3_large_100 | 5.51      | 8     | 75         | 224x224    | O2        | 271s          | 47.49   | 12634.24 | 75.23    | 92.31    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_large_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-1279ad5f.ckpt) |
+|  model name  |  params(M)   |  cards  |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:------------:|:------------:|:-------:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
+| mobilenet_v3_small_100 | 2.55      | 8     | 75         | 224x224    | O2        | 184s          | 54.21   | 11068.06 | 68.07    | 87.77    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_small_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_small_100-6fa3c17d-910v2.ckpt) |
+| mobilenet_v3_large_100 | 5.51      | 8     | 75         | 224x224    | O2        | 354s          | 56.87   | 10550.37 | 75.59    | 92.57    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mobilenetv3/mobilenet_v3_large_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mobilenet/mobilenetv3/mobilenet_v3_large_100-bd4e7bdc-910v2.ckpt) |
 
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

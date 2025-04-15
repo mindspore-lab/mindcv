@@ -75,20 +75,14 @@ python validate.py -c configs/nasnet/nasnet_a_4x1056_ascend.yaml --data_dir /pat
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
 
-| model name      | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                               | weight                                                                                                       |
-| --------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| nasnet_a_4x1056 | 5.33      | 8     | 256        | 224x224    | O2        | 800s          | 364.35  | 5620.97 | 74.12    | 91.36    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/nasnet/nasnet_a_4x1056_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/nasnet/nasnet_a_4x1056-015ba575c-910v2.ckpt) |
+|  model name  |  params(M)   |  cards  |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:------------:|:------------:|:-------:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
+| nasnet_a_4x1056 | 5.33      | 8     | 256        | 224x224    | O2        | 800s          | 364.55  | 5617.88 | 74.12    | 91.36    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/nasnet/nasnet_a_4x1056_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/nasnet/nasnet_a_4x1056-015ba575c-910v2.ckpt) |
 
 
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-| model name      | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                               | weight                                                                                        |
-| --------------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| nasnet_a_4x1056 | 5.33      | 8     | 256        | 224x224    | O2        | 656s          | 330.89  | 6189.37 | 73.65    | 91.25    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/nasnet/nasnet_a_4x1056_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/nasnet/nasnet_a_4x1056-0fbb5cdd.ckpt) |
 
 ### Notes
 - top-1 and top-5: Accuracy reported on the validation set of ImageNet-1K.

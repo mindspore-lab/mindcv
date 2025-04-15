@@ -73,19 +73,12 @@ python validate.py -c configs/mixnet/mixnet_s_ascend.yaml --data_dir /path/to/im
 
 Our reproduced model performance on ImageNet-1K is reported as follows.
 
-Experiments are tested on ascend 910* with mindspore 2.5.0 graph mode.
+Experiments are tested on Ascend Atlas 800T A2 machines with mindspore 2.5.0 graph mode.
 
 
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                        | weight                                                                                               |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| mixnet_s   | 4.17      | 8     | 128        | 224x224    | O2        | 706s          | 228.03  | 4490.64 | 75.58    | 95.54    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_s_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mixnet/mixnet_s-fe4fcc63-910v2.ckpt) |
-
-
-Experiments are tested on ascend 910 with mindspore 2.5.0 graph mode.
-
-| model name | params(M) | cards | batch size | resolution | jit level | graph compile | ms/step | img/s   | acc@top1 | acc@top5 | recipe                                                                                        | weight                                                                                 |
-| ---------- | --------- | ----- | ---------- | ---------- | --------- | ------------- | ------- | ------- | -------- | -------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| mixnet_s   | 4.17      | 8     | 128        | 224x224    | O2        | 556s          | 252.49  | 4055.61 | 75.52    | 92.52    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_s_ascend.yaml) | [weights](https://download.mindspore.cn/toolkits/mindcv/mixnet/mixnet_s-2a5ef3a3.ckpt) |
+|  model name  |  params(M)   |  cards  |  batch size  |  resolution  |  jit level  |  graph compile  |  ms/step  |   img/s   |  acc@top1  |  acc@top5  |                                               recipe                                               |                                                  weight                                                   |
+|:------------:|:------------:|:-------:|:------------:|:------------:|:-----------:|:---------------:|:---------:|:---------:|:----------:|:----------:|:--------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
+| mixnet_s   | 4.17      | 8     | 128        | 224x224    | O2        | 706s          | 223.55  | 4580.63 | 75.58    | 95.54    | [yaml](https://github.com/mindspore-lab/mindcv/blob/main/configs/mixnet/mixnet_s_ascend.yaml) | [weights](https://download-mindspore.osinfra.cn/toolkits/mindcv/mixnet/mixnet_s-fe4fcc63-910v2.ckpt) |
 
 
 ### Notes
