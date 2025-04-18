@@ -7,6 +7,7 @@ from .asymmetric import AsymmetricLossMultilabel, AsymmetricLossSingleLabel
 from .binary_cross_entropy_smooth import BinaryCrossEntropySmooth
 from .cross_entropy_smooth import CrossEntropySmooth
 from .jsd import JSDCrossEntropy
+from .per_token_cross_entropy_smooth import PerTokenCrossEntropySmooth
 
 __all__ = ["create_loss"]
 
@@ -48,6 +49,8 @@ def create_loss(
 
     if name == "ce":
         loss = CrossEntropySmooth(smoothing=label_smoothing, aux_factor=aux_factor, reduction=reduction, weight=weight)
+    elif name == "token_ce":
+        loss = PerTokenCrossEntropySmooth(smoothing=label_smoothing, reduction=reduction)
     elif name == "bce":
         loss = BinaryCrossEntropySmooth(
             smoothing=label_smoothing, aux_factor=aux_factor, reduction=reduction, weight=weight, pos_weight=None
