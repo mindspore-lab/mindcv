@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/installation/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/installation/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/installation/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/modelzoo/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/modelzoo/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/modelzoo/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/how_to_guides/feature_extraction/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/how_to_guides/feature_extraction/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/how_to_guides/feature_extraction/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/how_to_guides/finetune_with_a_custom_dataset/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/how_to_guides/finetune_with_a_custom_dataset/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/how_to_guides/finetune_with_a_custom_dataset/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/how_to_guides/write_a_new_model/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/how_to_guides/write_a_new_model/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/how_to_guides/write_a_new_model/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/notes/changelog/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/notes/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/notes/changelog/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/notes/code_of_conduct/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/notes/code_of_conduct/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/notes/code_of_conduct/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/notes/contributing/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/notes/contributing/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/notes/contributing/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/notes/faq/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/notes/faq/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/notes/faq/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/reference/data/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/reference/data/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/reference/data/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/reference/loss/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/reference/loss/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/reference/loss/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/reference/models.layers/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/reference/models.layers/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/reference/models.layers/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/reference/models/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/reference/models/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/reference/models/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/reference/optim/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/reference/optim/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/reference/optim/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/reference/scheduler/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/reference/scheduler/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/reference/scheduler/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/reference/utils/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/reference/utils/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/reference/utils/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/tutorials/configuration/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/tutorials/configuration/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/tutorials/configuration/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/tutorials/finetune/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/tutorials/finetune/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/tutorials/finetune/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/tutorials/inference/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/tutorials/inference/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/tutorials/inference/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/tutorials/quick_start/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/tutorials/quick_start/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/tutorials/quick_start/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/installation/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/installation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/installation/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/modelzoo/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/modelzoo/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/modelzoo/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/how_to_guides/feature_extraction/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/how_to_guides/feature_extraction/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/how_to_guides/feature_extraction/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/how_to_guides/finetune_with_a_custom_dataset/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/how_to_guides/finetune_with_a_custom_dataset/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/how_to_guides/finetune_with_a_custom_dataset/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/how_to_guides/write_a_new_model/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/how_to_guides/write_a_new_model/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/how_to_guides/write_a_new_model/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/notes/changelog/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/notes/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/notes/changelog/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/notes/code_of_conduct/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/notes/code_of_conduct/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/notes/code_of_conduct/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/notes/contributing/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/notes/contributing/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/notes/contributing/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/notes/faq/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/notes/faq/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/notes/faq/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/reference/data/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/reference/data/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/reference/data/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/reference/loss/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/reference/loss/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/reference/loss/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/reference/models.layers/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/reference/models.layers/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/reference/models.layers/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/reference/models/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/reference/models/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/reference/models/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/reference/optim/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/reference/optim/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/reference/optim/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/reference/scheduler/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/reference/scheduler/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/reference/scheduler/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/reference/utils/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/reference/utils/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/reference/utils/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/tutorials/configuration/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/tutorials/configuration/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/tutorials/configuration/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/tutorials/finetune/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/tutorials/finetune/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/tutorials/finetune/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/tutorials/inference/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/tutorials/inference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/tutorials/inference/"/>
+    </url>
+    <url>
+        <loc>https://mindspore-lab.github.io/mindcv/zh/tutorials/quick_start/</loc>
+        <lastmod>2025-04-18</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://mindspore-lab.github.io/mindcv/zh/tutorials/quick_start/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mindspore-lab.github.io/mindcv/tutorials/quick_start/"/>
+    </url>
+</urlset>
