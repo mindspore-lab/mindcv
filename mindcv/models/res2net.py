@@ -7,10 +7,10 @@ import math
 from typing import List, Optional, Type
 
 import mindspore.common.initializer as init
-from mindspore import Tensor, nn, ops
+from mindspore import Tensor, mint, nn
 
 from .helpers import load_pretrained
-from .layers.compatibility import Split
+from .layers.pad import Pad
 from .layers.pooling import GlobalAvgPooling
 from .registry import register_model
 
@@ -62,11 +62,11 @@ class Bottle2neck(nn.Cell):
     ) -> None:
         super().__init__()
         if norm is None:
-            norm = nn.BatchNorm2d
+            norm = mint.nn.BatchNorm2d
 
         width = int(math.floor(out_channels * (base_width / 64.0))) * groups
 
-        self.conv1 = nn.Conv2d(in_channels, width * scale, kernel_size=1)
+        self.conv1 = mint.nn.Conv2d(in_channels, width * scale, kernel_size=1, bias=False)
         self.bn1 = norm(width * scale)
 
         if scale == 1:
@@ -75,26 +75,24 @@ class Bottle2neck(nn.Cell):
             self.nums = scale - 1
         if stype == "stage":
             self.pool = nn.SequentialCell([
-                nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)), mode="CONSTANT"),
-                nn.AvgPool2d(kernel_size=3, stride=stride),
+                Pad(pad=(1, 1, 1, 1), mode="constant"),
+                mint.nn.AvgPool2d(kernel_size=3, stride=stride),
             ])
 
         self.convs = nn.CellList()
         self.bns = nn.CellList()
         for _ in range(self.nums):
-            self.convs.append(nn.Conv2d(width, width, kernel_size=3, stride=stride, padding=1, pad_mode="pad"))
+            self.convs.append(mint.nn.Conv2d(width, width, kernel_size=3, stride=stride, padding=1, bias=False))
             self.bns.append(norm(width))
 
-        self.conv3 = nn.Conv2d(width * scale, out_channels * self.expansion,
-                               kernel_size=1, stride=1)
+        self.conv3 = mint.nn.Conv2d(width * scale, out_channels * self.expansion, kernel_size=1, stride=1, bias=False)
         self.bn3 = norm(out_channels * self.expansion)
 
-        self.relu = nn.ReLU()
+        self.relu = mint.nn.ReLU()
         self.down_sample = down_sample
         self.stype = stype
         self.scale = scale
         self.width = width
-        self.split = Split(split_size_or_sections=self.width, output_num=self.scale, axis=1)
 
     def construct(self, x: Tensor) -> Tensor:
         identity = x
@@ -103,7 +101,7 @@ class Bottle2neck(nn.Cell):
         out = self.bn1(out)
         out = self.relu(out)
 
-        spx = self.split(out)
+        spx = mint.split(out, split_size_or_sections=self.width, dim=1)
 
         sp = self.convs[0](spx[0])
         sp = self.bns[0](sp)
@@ -120,12 +118,12 @@ class Bottle2neck(nn.Cell):
             sp = self.bns[i](sp)
             sp = self.relu(sp)
 
-            out = ops.concat((out, sp), axis=1)
+            out = mint.concat((out, sp), dim=1)
 
         if self.scale != 1 and self.stype == "normal":
-            out = ops.concat((out, spx[self.nums]), axis=1)
+            out = mint.concat((out, spx[self.nums]), dim=1)
         elif self.scale != 1 and self.stype == "stage":
-            out = ops.concat((out, self.pool(spx[self.nums])), axis=1)
+            out = mint.concat((out, self.pool(spx[self.nums])), dim=1)
 
         out = self.conv3(out)
         out = self.bn3(out)
@@ -172,7 +170,7 @@ class Res2Net(nn.Cell):
         self.version = version
 
         if norm is None:
-            norm = nn.BatchNorm2d
+            norm = mint.nn.BatchNorm2d
         self.norm = norm
 
         self.num_classes = num_classes
@@ -181,27 +179,51 @@ class Res2Net(nn.Cell):
         self.base_width = base_width
         self.scale = scale
         if self.version == "res2net":
-            self.conv1 = nn.Conv2d(in_channels, self.input_channels, kernel_size=7,
-                                   stride=2, padding=3, pad_mode="pad")
+            self.conv1 = mint.nn.Conv2d(
+                in_channels,
+                self.input_channels,
+                kernel_size=7,
+                stride=2,
+                padding=3,
+                bias=False
+            )
         elif self.version == "res2net_v1b":
             self.conv1 = nn.SequentialCell([
-                nn.Conv2d(in_channels, self.input_channels // 2, kernel_size=3,
-                          stride=2, padding=1, pad_mode="pad"),
+                mint.nn.Conv2d(
+                    in_channels,
+                    self.input_channels // 2,
+                    kernel_size=3,
+                    stride=2,
+                    padding=1,
+                    bias=False
+                ),
                 norm(self.input_channels // 2),
-                nn.ReLU(),
-                nn.Conv2d(self.input_channels // 2, self.input_channels // 2, kernel_size=3,
-                          stride=1, padding=1, pad_mode="pad"),
+                mint.nn.ReLU(),
+                mint.nn.Conv2d(
+                    self.input_channels // 2,
+                    self.input_channels // 2,
+                    kernel_size=3,
+                    stride=1,
+                    padding=1,
+                    bias=False
+                ),
                 norm(self.input_channels // 2),
-                nn.ReLU(),
-                nn.Conv2d(self.input_channels // 2, self.input_channels, kernel_size=3,
-                          stride=1, padding=1, pad_mode="pad"),
+                mint.nn.ReLU(),
+                mint.nn.Conv2d(
+                    self.input_channels // 2,
+                    self.input_channels,
+                    kernel_size=3,
+                    stride=1,
+                    padding=1,
+                    bias=False
+                ),
             ])
 
         self.bn1 = norm(self.input_channels)
-        self.relu = nn.ReLU()
+        self.relu = mint.nn.ReLU()
         self.max_pool = nn.SequentialCell([
-            nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)), mode="CONSTANT"),
-            nn.MaxPool2d(kernel_size=3, stride=2)
+            Pad(pad=(1, 1, 1, 1), mode="constant"),
+            mint.nn.MaxPool2d(kernel_size=3, stride=2)
         ])
         self.layer1 = self._make_layer(block, 64, layer_nums[0])
         self.layer2 = self._make_layer(block, 128, layer_nums[1], stride=2)
@@ -210,13 +232,13 @@ class Res2Net(nn.Cell):
 
         self.pool = GlobalAvgPooling()
         self.num_features = 512 * block.expansion
-        self.classifier = nn.Dense(self.num_features, num_classes)
+        self.classifier = mint.nn.Linear(self.num_features, num_classes)
         self._initialize_weights()
 
     def _initialize_weights(self) -> None:
         """Initialize weights for cells."""
         for _, cell in self.cells_and_names():
-            if isinstance(cell, nn.Conv2d):
+            if isinstance(cell, mint.nn.Conv2d):
                 cell.weight.set_data(
                     init.initializer(init.HeNormal(math.sqrt(5), mode="fan_out", nonlinearity="relu"),
                                      cell.weight.shape, cell.weight.dtype))
@@ -224,10 +246,10 @@ class Res2Net(nn.Cell):
                     cell.bias.set_data(
                         init.initializer(init.HeUniform(math.sqrt(5), mode="fan_in", nonlinearity="leaky_relu"),
                                          cell.bias.shape, cell.bias.dtype))
-            elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.set_data(init.initializer("ones", cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(init.initializer("zeros", cell.beta.shape, cell.beta.dtype))
-            elif isinstance(cell, nn.Dense):
+            elif isinstance(cell, mint.nn.BatchNorm2d):
+                cell.weight.set_data(init.initializer("ones", cell.weight.shape, cell.weight.dtype))
+                cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
+            elif isinstance(cell, mint.nn.Linear):
                 cell.weight.set_data(
                     init.initializer(init.HeUniform(math.sqrt(5), mode="fan_in", nonlinearity="leaky_relu"),
                                      cell.weight.shape, cell.weight.dtype))
@@ -246,13 +268,29 @@ class Res2Net(nn.Cell):
         if stride != 1 or self.input_channels != channels * block.expansion:
             if stride == 1 or self.version == "res2net":
                 down_sample = nn.SequentialCell([
-                    nn.Conv2d(self.input_channels, channels * block.expansion, kernel_size=1, stride=stride),
+                    mint.nn.Conv2d(
+                        self.input_channels,
+                        channels * block.expansion,
+                        kernel_size=1,
+                        stride=stride,
+                        bias=False
+                    ),
                     self.norm(channels * block.expansion)
                 ])
             else:
                 down_sample = nn.SequentialCell([
-                    nn.AvgPool2d(kernel_size=stride, stride=stride, pad_mode="same"),
-                    nn.Conv2d(self.input_channels, channels * block.expansion, kernel_size=1, stride=1),
+                    mint.nn.AvgPool2d(
+                        kernel_size=stride,
+                        stride=stride,
+                        padding=0
+                    ),
+                    mint.nn.Conv2d(
+                        self.input_channels,
+                        channels * block.expansion,
+                        kernel_size=1,
+                        stride=1,
+                        bias=False
+                    ),
                     self.norm(channels * block.expansion)
                 ])
 

@@ -11,11 +11,11 @@ import mindspore as ms
 import mindspore.common.initializer as init
 from mindspore import Parameter, Tensor
 from mindspore import dtype as mstype
-from mindspore import nn, ops
+from mindspore import mint, nn, ops
 
 from .helpers import _ntuple, load_pretrained
-from .layers import DropPath, Identity
-from .layers.compatibility import Dropout
+from .layers import DropPath, Identity, Sigmoid
+from .layers.extend_bmm import ExtendBatchMatMul
 from .registry import register_model
 
 __all__ = [
@@ -72,9 +72,9 @@ class WindowPartition(nn.Cell):
 
     def construct(self, x: Tensor) -> Tensor:
         b, h, w, c = x.shape
-        x = x.reshape(b, h // self.window_size, self.window_size, w // self.window_size, self.window_size, c)
-        x = x.transpose(0, 1, 3, 2, 4, 5)
-        x = x.reshape(b * h * w // (self.window_size**2), self.window_size, self.window_size, c)
+        x = mint.reshape(x, (b, h // self.window_size, self.window_size, w // self.window_size, self.window_size, c))
+        x = mint.permute(x, (0, 1, 3, 2, 4, 5))
+        x = mint.reshape(x, (b * h * w // (self.window_size**2), self.window_size, self.window_size, c))
 
         return x
 
@@ -92,9 +92,9 @@ class WindowReverse(nn.Cell):
 
     def construct(self, windows: Tensor, window_size: int, h: int, w: int) -> Tensor:
         b = windows.shape[0] // (h * w // window_size // window_size)
-        x = windows.reshape(b, h // window_size, w // window_size, window_size, window_size, -1)
-        x = x.transpose(0, 1, 3, 2, 4, 5)
-        x = x.reshape(b, h, w, -1)
+        x = mint.reshape(windows, (b, h // window_size, w // window_size, window_size, window_size, -1))
+        x = mint.permute(x, (0, 1, 3, 2, 4, 5))
+        x = mint.reshape(x, (b, h, w, -1))
         return x
 
 
@@ -109,9 +109,9 @@ class LogSpacedCPB(nn.Cell):
         self.window_size = window_size  # Wh, Ww
         # mlp to generate continuous relative position bias
         self.num_heads = num_heads
-        self.cpb_mlp0 = nn.Dense(2, 512, has_bias=True)
-        self.cpb_act1 = nn.ReLU()
-        self.cpb_mlp2 = nn.Dense(512, num_heads, has_bias=False)
+        self.cpb_mlp0 = mint.nn.Linear(2, 512, bias=True)
+        self.cpb_act1 = mint.nn.ReLU()
+        self.cpb_mlp2 = mint.nn.Linear(512, num_heads, bias=False)
 
         relative_coords_h = np.arange(-(self.window_size[0] - 1), self.window_size[0], dtype=float)
         relative_coords_w = np.arange(-(self.window_size[1] - 1), self.window_size[1], dtype=float)
@@ -151,20 +151,21 @@ class LogSpacedCPB(nn.Cell):
             Tensor(relative_position_index, mstype.int32), requires_grad=False
         )
 
-        self.sigmoid = ops.Sigmoid()
+        # todo
+        self.sigmoid = Sigmoid()
 
     def construct(self) -> Tensor:
         x = self.cpb_mlp0(self.relative_coords_table)
         x = self.cpb_act1(x)
         x = self.cpb_mlp2(x)
         x = x.reshape(-1, self.num_heads)
-        relative_position_bias = x[ops.reshape(self.relative_position_index, (-1,))]
-        relative_position_bias = ops.reshape(relative_position_bias, (
+        relative_position_bias = x[mint.reshape(self.relative_position_index, (-1,))]
+        relative_position_bias = mint.reshape(relative_position_bias, (
             self.window_size[0] * self.window_size[1], self.window_size[0] * self.window_size[1], -1))
         relative_position_bias = relative_position_bias.transpose(2, 0, 1)
         relative_position_bias = 16 * self.sigmoid(relative_position_bias)
 
-        relative_position_bias = ops.expand_dims(relative_position_bias, axis=0)
+        relative_position_bias = mint.unsqueeze(relative_position_bias, dim=0)
         return relative_position_bias
 
 
@@ -186,47 +187,48 @@ class WindowCosineAttention(nn.Cell):
         self.window_size = window_size  # Wh, Ww
         self.num_heads = num_heads
 
-        self.matmul = ops.BatchMatMul()
+        self.matmul = ExtendBatchMatMul()
 
-        logit_scale = Tensor((ops.log(10 * ops.ones((num_heads, 1, 1), mstype.float32))))
+        logit_scale = Tensor((mint.log(10 * mint.ones((num_heads, 1, 1), dtype=mstype.float32))))
         self.logit_scale = Parameter(logit_scale, requires_grad=True)
 
         max = Tensor(100, mstype.float32)
-        self.value_max = ops.log(max)
+        self.value_max = mint.log(max)
         self.value_min = Tensor((-1000), mstype.float32)
 
-        self.q = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
-        self.k = nn.Dense(in_channels=dim, out_channels=dim, has_bias=False)
-        self.v = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
+        self.q = mint.nn.Linear(in_features=dim, out_features=dim, bias=qkv_bias)
+        self.k = mint.nn.Linear(in_features=dim, out_features=dim, bias=False)
+        self.v = mint.nn.Linear(in_features=dim, out_features=dim, bias=qkv_bias)
 
+        # todo
         self.Normalize = ops.L2Normalize(axis=-1, epsilon=1e-12)
 
         # get pair-wise relative position index for each token inside the window
         self.relative_position_bias = LogSpacedCPB(self.window_size, num_heads, pretrained_window_size)
 
-        self.attn_drop = Dropout(p=attn_drop)
-        self.proj = nn.Dense(in_channels=dim, out_channels=dim, has_bias=True)
-        self.softmax = nn.Softmax(axis=-1)
-        self.proj_drop = Dropout(p=proj_drop)
+        self.attn_drop = mint.nn.Dropout(p=attn_drop)
+        self.proj = mint.nn.Linear(in_features=dim, out_features=dim, bias=True)
+        self.softmax = mint.nn.Softmax(dim=-1)
+        self.proj_drop = mint.nn.Dropout(p=proj_drop)
 
     def construct(self, x: Tensor, mask=None) -> Tensor:
         B_, N, C = x.shape
 
-        q = ops.reshape(self.q(x), (B_, N, self.num_heads, C // self.num_heads))
+        q = mint.reshape(self.q(x), (B_, N, self.num_heads, C // self.num_heads))
         q = self.Normalize(q)
-        q = ops.transpose(q, (0, 2, 1, 3))
+        q = mint.permute(q, (0, 2, 1, 3))
 
-        k = ops.reshape(self.k(x), (B_, N, self.num_heads, C // self.num_heads))
+        k = mint.reshape(self.k(x), (B_, N, self.num_heads, C // self.num_heads))
         k = self.Normalize(k)
-        k = ops.transpose(k, (0, 2, 3, 1))
+        k = mint.permute(k, (0, 2, 3, 1))
 
-        v = ops.reshape(self.v(x), (B_, N, self.num_heads, C // self.num_heads))
-        v = ops.transpose(v, (0, 2, 1, 3))
+        v = mint.reshape(self.v(x), (B_, N, self.num_heads, C // self.num_heads))
+        v = mint.permute(v, (0, 2, 1, 3))
 
         attn = self.matmul(q, k)
 
-        logit_scale = ops.clip_by_value(self.logit_scale, clip_value_min=self.value_min, clip_value_max=self.value_max)
-        logit_scale = ops.exp(logit_scale)
+        logit_scale = mint.clamp(self.logit_scale, min=self.value_min, max=self.value_max)
+        logit_scale = mint.exp(logit_scale)
 
         attn = attn * logit_scale
 
@@ -234,16 +236,16 @@ class WindowCosineAttention(nn.Cell):
 
         if mask is not None:
             nW, ws2, _ = mask.shape
-            mask = ops.reshape(mask, (1, -1, 1, ws2, ws2))
-            attn = ops.reshape(attn, (B_ // nW, nW, self.num_heads, N, N,)) + mask
-            attn = ops.reshape(attn, (-1, self.num_heads, N, N,))
+            mask = mint.reshape(mask, (1, -1, 1, ws2, ws2))
+            attn = mint.reshape(attn, (B_ // nW, nW, self.num_heads, N, N,)) + mask
+            attn = mint.reshape(attn, (-1, self.num_heads, N, N,))
             attn = self.softmax(attn)
         else:
             attn = self.softmax(attn)
 
         attn = self.attn_drop(attn)
 
-        x = ops.reshape(ops.transpose(self.matmul(attn, v), (0, 2, 1, 3)), (B_, N, C))
+        x = mint.reshape(mint.permute(self.matmul(attn, v), (0, 2, 1, 3)), (B_, N, C))
         x = self.proj(x)
         x = self.proj_drop(x)
 
@@ -256,16 +258,16 @@ class Mlp(nn.Cell):
         in_features: int,
         hidden_features: Optional[int] = None,
         out_features: Optional[int] = None,
-        act_layer: Optional[nn.Cell] = nn.GELU,
+        act_layer: Optional[nn.Cell] = mint.nn.GELU,
         drop: float = 0.0,
     ) -> None:
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
-        self.fc1 = nn.Dense(in_channels=in_features, out_channels=hidden_features, has_bias=True)
+        self.fc1 = mint.nn.Linear(in_features=in_features, out_features=hidden_features, bias=True)
         self.act = act_layer()
-        self.fc2 = nn.Dense(in_channels=hidden_features, out_channels=out_features, has_bias=True)
-        self.drop = Dropout(p=drop)
+        self.fc2 = mint.nn.Linear(in_features=hidden_features, out_features=out_features, bias=True)
+        self.drop = mint.nn.Dropout(p=drop)
 
     def construct(self, x: Tensor) -> Tensor:
         x = self.fc1(x)
@@ -289,8 +291,8 @@ class SwinTransformerBlock(nn.Cell):
         drop: float = 0.0,
         attn_drop: float = 0.0,
         drop_path: float = 0.0,
-        act_layer: nn.Cell = nn.GELU,
-        norm_layer: nn.Cell = nn.LayerNorm,
+        act_layer: nn.Cell = mint.nn.GELU,
+        norm_layer: nn.Cell = mint.nn.LayerNorm,
         pretrained_window_size: int = 0,
     ) -> None:
         super(SwinTransformerBlock, self).__init__()
@@ -308,7 +310,7 @@ class SwinTransformerBlock(nn.Cell):
         if isinstance(dim, int):
             dim = (dim,)
 
-        self.norm1 = norm_layer(dim, epsilon=1e-6)
+        self.norm1 = norm_layer(dim, eps=1e-6)
 
         self.attn = WindowCosineAttention(
             dim, window_size=to_2tuple(self.window_size), num_heads=num_heads,
@@ -316,7 +318,7 @@ class SwinTransformerBlock(nn.Cell):
             pretrained_window_size=to_2tuple(pretrained_window_size))
 
         self.drop_path = DropPath(drop_path) if drop_path > 0. else Identity()
-        self.norm2 = norm_layer(dim, epsilon=1e-6)
+        self.norm2 = norm_layer(dim, eps=1e-6)
         mlp_hidden_dim = int((dim[0] if isinstance(dim, tuple) else dim) * mlp_ratio)
         self.mlp = Mlp(in_features=dim[0] if isinstance(dim, tuple) else dim, hidden_features=mlp_hidden_dim,
                        act_layer=act_layer, drop=drop)
@@ -360,7 +362,7 @@ class SwinTransformerBlock(nn.Cell):
 
         shortcut = x
         # x = self.norm1(x)
-        x = ops.reshape(x, (B, H, W, C,))
+        x = mint.reshape(x, (B, H, W, C,))
 
         # cyclic shift
         if self.shift_size > 0:
@@ -372,13 +374,13 @@ class SwinTransformerBlock(nn.Cell):
         # nW*B, window_size, window_size, C
         x_windows = self.window_partition(shifted_x)
         # nW*B, window_size*window_size, C
-        x_windows = ops.reshape(x_windows, (-1, self.window_size * self.window_size, C,))
+        x_windows = mint.reshape(x_windows, (-1, self.window_size * self.window_size, C,))
 
         # W-MSA/SW-MSA
         attn_windows = self.attn(x_windows, mask=self.attn_mask)  # nW*B, window_size*window_size, C
 
         # merge windows
-        attn_windows = ops.reshape(attn_windows, (-1, self.window_size, self.window_size, C,))
+        attn_windows = mint.reshape(attn_windows, (-1, self.window_size, self.window_size, C,))
         shifted_x = self.window_reverse(attn_windows, self.window_size, H, W)  # B H' W' C
 
         # reverse cyclic shift
@@ -387,7 +389,7 @@ class SwinTransformerBlock(nn.Cell):
         else:
             x = shifted_x
 
-        x = ops.reshape(x, (B, H * W, C,))
+        x = mint.reshape(x, (B, H * W, C,))
 
         # FFN post-res-norm
         x = shortcut + self.drop_path(self.norm1(x))
@@ -402,14 +404,14 @@ class PatchMerging(nn.Cell):
         self,
         input_resolution: Tuple[int, int],
         dim: int,
-        norm_layer: nn.Cell = nn.LayerNorm,
+        norm_layer: nn.Cell = mint.nn.LayerNorm,
     ) -> None:
         super().__init__()
         self.input_resolution = input_resolution
         self.dim = dim[0] if isinstance(dim, tuple) and len(dim) == 1 else dim
         # Default False
-        self.reduction = nn.Dense(in_channels=4 * dim, out_channels=2 * dim, has_bias=False)
-        self.norm = norm_layer([dim * 2], epsilon=1e-5)
+        self.reduction = mint.nn.Linear(in_features=4 * dim, out_features=2 * dim, bias=False)
+        self.norm = norm_layer([dim * 2], eps=1e-5)
         self.H, self.W = self.input_resolution
         self.H_2, self.W_2 = self.H // 2, self.W // 2
         self.H2W2 = int(self.H * self.W // 4)
@@ -418,9 +420,9 @@ class PatchMerging(nn.Cell):
 
     def construct(self, x: Tensor) -> Tensor:
         B = x.shape[0]
-        x = ops.reshape(x, (B, self.H_2, 2, self.W_2, 2, self.dim))
-        x = ops.transpose(x, (0, 1, 3, 4, 2, 5))
-        x = ops.reshape(x, (B, self.H2W2, self.dim_mul_4))
+        x = mint.reshape(x, (B, self.H_2, 2, self.W_2, 2, self.dim))
+        x = mint.permute(x, (0, 1, 3, 4, 2, 5))
+        x = mint.reshape(x, (B, self.H2W2, self.dim_mul_4))
         x = self.reduction(x)
         x = self.norm(x)
 
@@ -440,7 +442,7 @@ class BasicLayer(nn.Cell):
         drop: float = 0.0,
         attn_drop: float = 0.0,
         drop_path: List[float] = 0.0,
-        norm_layer: nn.Cell = nn.LayerNorm,
+        norm_layer: nn.Cell = mint.nn.LayerNorm,
         downsample: Optional[nn.Cell] = None,
         pretrained_window_size: int = 0,
     ) -> None:
@@ -497,20 +499,21 @@ class PatchEmbed(nn.Cell):
         self.in_chans = in_chans
         self.embed_dim = embed_dim
 
-        self.proj = nn.Conv2d(in_channels=in_chans, out_channels=embed_dim, kernel_size=patch_size, stride=patch_size,
-                              pad_mode='pad', has_bias=True)
+        self.proj = mint.nn.Conv2d(
+            in_channels=in_chans, out_channels=embed_dim, kernel_size=patch_size, stride=patch_size, bias=True
+        )
 
         if norm_layer is not None:
             if isinstance(embed_dim, int):
                 embed_dim = (embed_dim,)
-            self.norm = norm_layer(embed_dim, epsilon=1e-6)
+            self.norm = norm_layer(embed_dim, eps=1e-6)
         else:
             self.norm = None
 
     def construct(self, x: Tensor) -> Tensor:
         B = x.shape[0]
-        x = ops.reshape(self.proj(x), (B, self.embed_dim, -1))
-        x = ops.transpose(x, (0, 2, 1))  # B Ph*Pw C
+        x = mint.reshape(self.proj(x), (B, self.embed_dim, -1))
+        x = mint.permute(x, (0, 2, 1))  # B Ph*Pw C
 
         if self.norm is not None:
             x = self.norm(x)
@@ -555,7 +558,7 @@ class SwinTransformerV2(nn.Cell):
         drop_rate: float = 0.0,
         attn_drop_rate: float = 0.0,
         drop_path_rate: float = 0.1,
-        norm_layer: nn.Cell = nn.LayerNorm,
+        norm_layer: nn.Cell = mint.nn.LayerNorm,
         patch_norm: bool = True,
         pretrained_window_sizes: List[int] = [0, 0, 0, 0],
     ) -> None:
@@ -578,7 +581,7 @@ class SwinTransformerV2(nn.Cell):
         patches_resolution = self.patch_embed.patches_resolution
         self.patches_resolution = patches_resolution
 
-        self.pos_drop = Dropout(p=drop_rate)
+        self.pos_drop = mint.nn.Dropout(p=drop_rate)
 
         # stochastic depth
         dpr = [x for x in np.linspace(0, drop_path_rate, sum(depths))]  # stochastic depth decay rule
@@ -606,23 +609,21 @@ class SwinTransformerV2(nn.Cell):
             if i_layer < self.num_layers - 1:
                 self.final_seq = self.final_seq // 4
             self.layers.append(layer)
-        self.head = nn.Dense(self.num_features, self.num_classes)
-
-        self.norm = norm_layer([self.num_features, ], epsilon=1e-6)
-        self.avgpool = ops.ReduceMean(keep_dims=False)
+        self.head = mint.nn.Linear(self.num_features, self.num_classes)
+        self.norm = norm_layer([self.num_features, ], eps=1e-6)
 
         self._initialize_weights()
 
     def _initialize_weights(self):
         for _, cell in self.cells_and_names():
-            if isinstance(cell, nn.Conv2d):
+            if isinstance(cell, mint.nn.Conv2d):
                 cell.weight.set_data(init.initializer(init.HeUniform(), cell.weight.shape, cell.weight.dtype))
                 if cell.bias is not None:
                     cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
-            elif isinstance(cell, nn.LayerNorm):
-                cell.gamma.set_data(init.initializer("ones", cell.gamma.shape, cell.gamma.dtype))
-                cell.beta.set_data(init.initializer("zeros", cell.beta.shape, cell.beta.dtype))
-            elif isinstance(cell, nn.Dense):
+            elif isinstance(cell, mint.nn.LayerNorm):
+                cell.weight.set_data(init.initializer("ones", cell.weight.shape, cell.weight.dtype))
+                cell.bias.set_data(init.initializer("zeros", cell.bias.shape, cell.bias.dtype))
+            elif isinstance(cell, mint.nn.Linear):
                 cell.weight.set_data(
                     init.initializer(init.TruncatedNormal(sigma=0.02), cell.weight.shape, cell.weight.dtype)
                 )
@@ -635,7 +636,7 @@ class SwinTransformerV2(nn.Cell):
         for layer in self.layers:
             x = layer(x)
         x = self.norm(x)  # B L C
-        x = self.avgpool(ops.transpose(x, (0, 2, 1)), 2)  # B C 1
+        x = mint.mean(mint.permute(x, (0, 2, 1)), 2)  # B C 1
         return x
 
     def forward_head(self, x: Tensor) -> Tensor:

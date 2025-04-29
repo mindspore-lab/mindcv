@@ -1,5 +1,5 @@
 """ GlobalAvgPooling Module"""
-from mindspore import nn, ops
+from mindspore import mint, nn
 
 
 class GlobalAvgPooling(nn.Cell):
@@ -12,5 +12,5 @@ class GlobalAvgPooling(nn.Cell):
         self.keep_dims = keep_dims
 
     def construct(self, x):
-        x = ops.mean(x, axis=(2, 3), keep_dims=self.keep_dims)
+        x = mint.mean(x, dim=(2, 3), keepdim=self.keep_dims)
         return x

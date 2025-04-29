@@ -5,10 +5,11 @@ Paper: `Squeeze-and-Excitation Networks` - https://arxiv.org/abs/1709.01507
 """
 from typing import Optional
 
-from mindspore import Tensor, nn, ops
+from mindspore import Tensor, mint, nn
 
 from ..helpers import make_divisible
 from .pooling import GlobalAvgPooling
+from .sigmoid import Sigmoid
 
 
 class SqueezeExcite(nn.Cell):
@@ -27,8 +28,8 @@ class SqueezeExcite(nn.Cell):
         rd_channels: Optional[int] = None,
         rd_divisor: int = 8,
         norm: Optional[nn.Cell] = None,
-        act_layer: nn.Cell = nn.ReLU,
-        gate_layer: nn.Cell = nn.Sigmoid,
+        act_layer: nn.Cell = mint.nn.ReLU,
+        gate_layer: nn.Cell = Sigmoid,
     ) -> None:
         super().__init__()
         self.norm = norm
@@ -37,19 +38,19 @@ class SqueezeExcite(nn.Cell):
         if not rd_channels:
             rd_channels = make_divisible(in_channels * rd_ratio, rd_divisor)
 
-        self.conv_reduce = nn.Conv2d(
+        self.conv_reduce = mint.nn.Conv2d(
             in_channels=in_channels,
             out_channels=rd_channels,
             kernel_size=1,
-            has_bias=True,
+            bias=True,
         )
         if self.norm:
-            self.bn = nn.BatchNorm2d(rd_channels)
-        self.conv_expand = nn.Conv2d(
+            self.bn = mint.nn.BatchNorm2d(rd_channels)
+        self.conv_expand = mint.nn.Conv2d(
             in_channels=rd_channels,
             out_channels=in_channels,
             kernel_size=1,
-            has_bias=True,
+            bias=True,
         )
         self.pool = GlobalAvgPooling(keep_dims=True)
 
@@ -77,8 +78,8 @@ class SqueezeExciteV2(nn.Cell):
         rd_channels: Optional[int] = None,
         rd_divisor: int = 8,
         norm: Optional[nn.Cell] = None,
-        act_layer: nn.Cell = nn.ReLU,
-        gate_layer: nn.Cell = nn.Sigmoid,
+        act_layer: nn.Cell = mint.nn.ReLU,
+        gate_layer: nn.Cell = Sigmoid,
     ) -> None:
         super().__init__()
         self.norm = norm
@@ -87,17 +88,17 @@ class SqueezeExciteV2(nn.Cell):
         if not rd_channels:
             rd_channels = make_divisible(in_channels * rd_ratio, rd_divisor)
 
-        self.conv_reduce = nn.Dense(
-            in_channels=in_channels,
-            out_channels=rd_channels,
-            has_bias=True,
+        self.conv_reduce = mint.nn.Linear(
+            in_features=in_channels,
+            out_features=rd_channels,
+            bias=True,
         )
         if self.norm:
-            self.bn = nn.BatchNorm2d(rd_channels)
-        self.conv_expand = nn.Dense(
-            in_channels=rd_channels,
-            out_channels=in_channels,
-            has_bias=True,
+            self.bn = mint.nn.BatchNorm2d(rd_channels)
+        self.conv_expand = mint.nn.Linear(
+            in_features=rd_channels,
+            out_features=in_channels,
+            bias=True,
         )
         self.pool = GlobalAvgPooling(keep_dims=False)
 
@@ -109,7 +110,7 @@ class SqueezeExciteV2(nn.Cell):
         x_se = self.act(x_se)
         x_se = self.conv_expand(x_se)
         x_se = self.gate(x_se)
-        x_se = ops.expand_dims(x_se, -1)
-        x_se = ops.expand_dims(x_se, -1)
+        x_se = mint.unsqueeze(x_se, -1)
+        x_se = mint.unsqueeze(x_se, -1)
         x = x * x_se
         return x

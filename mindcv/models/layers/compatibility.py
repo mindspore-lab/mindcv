@@ -1,7 +1,7 @@
 import inspect
 
 import mindspore as ms
-from mindspore import nn, ops
+from mindspore import mint, nn, ops
 
 __all__ = [
     "Dropout",
@@ -83,7 +83,7 @@ class Split(nn.Cell):
             )
 
     def construct(self, x):
-        return ops.split(x, **self.kwargs)
+        return mint.split(x, **self.kwargs)
 
 
 class ResizeBilinear(nn.Cell):

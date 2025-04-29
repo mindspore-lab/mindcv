@@ -42,5 +42,7 @@ def create_model(
 
     if checkpoint_path:
         load_model_checkpoint(model, checkpoint_path, ema, auto_mapping)
+        from mindspore import mint
+        mint.randn()
 
     return model

@@ -2,7 +2,8 @@
 A convolution based approach to patchifying a 2D image w/ embedding projection."""
 from typing import Optional
 
-from mindspore import Tensor, nn, ops
+import mindspore.mint.nn.functional as F
+from mindspore import Tensor, mint, nn
 
 from .format import Format, nchw_to
 from .helpers import to_2tuple
@@ -55,8 +56,9 @@ class PatchEmbed(nn.Cell):
         self.dynamic_img_pad = dynamic_img_pad
         self.embed_dim = embed_dim
 
-        self.proj = nn.Conv2d(in_channels=in_chans, out_channels=embed_dim, kernel_size=patch_size, stride=patch_size,
-                              pad_mode='pad', has_bias=bias, weight_init="TruncatedNormal")
+        self.proj = mint.nn.Conv2d(
+            in_channels=in_chans, out_channels=embed_dim, kernel_size=patch_size, stride=patch_size, bias=bias
+        )
 
         if norm_layer is not None:
             if isinstance(embed_dim, int):
@@ -81,13 +83,13 @@ class PatchEmbed(nn.Cell):
         if self.dynamic_img_pad:
             pad_h = (self.patch_size[0] - H % self.patch_size[0]) % self.patch_size[0]
             pad_w = (self.patch_size[1] - W % self.patch_size[1]) % self.patch_size[1]
-            x = ops.pad(x, (0, pad_w, 0, pad_h))
+            x = F.pad(x, (0, pad_w, 0, pad_h))
 
         # FIXME look at relaxing size constraints
         x = self.proj(x)
         if self.flatten:
-            x = ops.Reshape()(x, (B, self.embed_dim, -1))  # B Ph*Pw C
-            x = ops.Transpose()(x, (0, 2, 1))
+            x = mint.reshape(x, (B, self.embed_dim, -1))  # B Ph*Pw C
+            x = mint.permute(x, (0, 2, 1))
         elif self.output_fmt != "NCHW":
             x = nchw_to(x, self.output_fmt)
         if self.norm is not None:
