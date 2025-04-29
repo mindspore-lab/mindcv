@@ -11,11 +11,11 @@ from .compatibility import Interpolate
 
 
 def resample_abs_pos_embed(
-        posemb,
-        new_size: List[int],
-        old_size: Optional[List[int]] = None,
-        num_prefix_tokens: int = 1,
-        interpolation: str = 'nearest',
+    posemb,
+    new_size: List[int],
+    old_size: Optional[List[int]] = None,
+    num_prefix_tokens: int = 1,
+    interpolation: str = 'nearest',
 ):
     # sort out sizes, assume square if old size not provided
     num_pos_tokens = posemb.shape[1]

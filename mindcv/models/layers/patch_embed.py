@@ -18,6 +18,7 @@ class PatchEmbed(nn.Cell):
         embed_dim (int): Number of linear projection output channels. Default: 96.
         norm_layer (nn.Cell, optional): Normalization layer. Default: None
     """
+
     output_fmt: Format
 
     def __init__(
@@ -37,11 +38,11 @@ class PatchEmbed(nn.Cell):
         self.patch_size = to_2tuple(patch_size)
         if image_size is not None:
             self.image_size = to_2tuple(image_size)
-            self.patches_resolution = tuple([s // p for s, p in zip(self.image_size, self.patch_size)])
-            self.num_patches = self.patches_resolution[0] * self.patches_resolution[1]
+            self.grid_size = tuple([s // p for s, p in zip(self.image_size, self.patch_size)])
+            self.num_patches = self.grid_size[0] * self.grid_size[1]
         else:
             self.image_size = None
-            self.patches_resolution = None
+            self.grid_size = None
             self.num_patches = None
 
         if output_fmt is not None:
@@ -86,8 +87,8 @@ class PatchEmbed(nn.Cell):
         # FIXME look at relaxing size constraints
         x = self.proj(x)
         if self.flatten:
-            x = ops.Reshape()(x, (B, self.embed_dim, -1))  # B Ph*Pw C
-            x = ops.Transpose()(x, (0, 2, 1))
+            x = ops.reshape(x, (B, self.embed_dim, -1))  # B Ph*Pw C
+            x = ops.transpose(x, (0, 2, 1))
         elif self.output_fmt != "NCHW":
             x = nchw_to(x, self.output_fmt)
         if self.norm is not None:
