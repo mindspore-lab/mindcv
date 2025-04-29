@@ -1,6 +1,6 @@
 # 自定义数据集的模型微调指南
 
-本文档提供了使用MindCV在自定义数据集上微调的参考流程以及在线读取数据集、分层设置学习率、冻结部分特征网络等微调技巧的实现方法，主要代码实现集成在./example/finetune.py中，您可以基于此教程根据需要自行改动。
+本文档提供了在自定义数据集上微调MindCV预训练模型的参考流程以及在线读取数据集、分层设置学习率、冻结部分特征网络等微调技巧的实现方法，主要代码实现集成在./example/finetune.py中，您可以基于此教程根据需要自行改动。
 
 接下来将以FGVC-Aircraft数据集为例展示如何对预训练模型mobilenet v3-small进行微调。[Fine-Grained Visual Classification of Aircraft](https://www.robots.ox.ac.uk/~vgg/data/fgvc-aircraft/)是常用的细粒度图像分类基准数据集，包含 10000 张飞机图片，100 种不同的飞机型号(variant)，其中每种飞机型号均有 100 张图片。
 
@@ -210,10 +210,10 @@ MindCV使用`create_loader`函数对上一章节读取的数据集进行图像�
 
 参考[Stanford University CS231n](https://cs231n.github.io/transfer-learning/#tf)，**整体微调**、**冻结特征网络微调**、与**分层设置学习率微调**是常用的微调模式。模型的整体微调使用预训练权重初始化目标模型的参数并在此基础上针对新数据集继续训练、更新所有参数，因此计算量较大，耗时较长但一般精度较高；冻结特征网络则分为冻结所有特征网络与冻结部分特征网络两种，前者将预训练模型作为特征提取器，仅更新全连接层参数，耗时短但精度低，后者一般固定学习基础特征的浅层参数，只更新学习精细特征的深层网络参数与全连接层参数；分层设置学习率与之相似，但是更加精细地指定了网络内部某些特定层在训练中更新参数所使用的学习率。
 
-对于实际微调训练中所使用的的超参数配置，可以参考./configs中基于ImageNet-1k数据集预训练的配置文件。注意对模型微调而言，应事先<font color=DarkRed>将超参数`pretrained`设置为`True`</font>以加载预训练权重，<font color=DarkRed>将`num_classes`设置为自定义数据集的标签个数</font>（比如Aircfrat数据集是100），还可以基于自定义数据集规模，<font color=DarkRed>适当调小`batch_size`与`epoch_size`</font>。此外，由于预训练权重中已经包含了许多识别图像的初始信息，为了不过分破坏这些信息，还需<font color=DarkRed>将学习率`lr`调小</font>，建议至多从预训练学习率的十分之一或0.0001开始训练、调参。这些参数都可以在配置文件中修改，也可以如下所示在shell命令中添加，训练结果可在./ckpt/results.txt文件中查看。
+对于实际微调训练中所使用的的超参数配置，可以参考./configs中基于ImageNet-1k数据集预训练的配置文件。注意应事先<font color=DarkRed>将`num_classes`设置为自定义数据集的标签个数</font>（比如Aircfrat数据集是100）；<font color=DarkRed>将超参数`pretrained`设置为`True`以自动下载与加载预训练权重</font>，过程中由于`num_classes`并非默认的1000，分类层的参数将会被自动去除（此时无需设置`ckpt_path`,但如果您需要加载来自本地的checkpoint文件，则需要保持`pretrained`为`False`并自行指定`ckpt_path`参数，注意务必提前自行将checkpoint文件中分类层的参数剔除）。此外，还可以基于自定义数据集规模，<font color=DarkRed>适当调小`batch_size`与`epoch_size`</font>，由于预训练权重中已经包含了许多识别图像的初始信息，为了不过分破坏这些信息，还需<font color=DarkRed>将学习率`lr`调小</font>，建议至多从预训练学习率的十分之一或0.0001开始训练、调参。这些参数都可以在配置文件中修改，也可以如下所示在shell命令中添加，训练结果可在./ckpt/results.txt文件中查看。
 
 ```bash
-python .examples/finetune/finetune.py --config=./configs/mobilenetv3/mobilnet_v3_small_ascend.yaml --data_dir=./aircraft/data --pretrained=True
+python .examples/finetune/finetune.py --config=./configs/mobilenetv3/mobilnet_v3_small_ascend.yaml --data_dir=./aircraft/data --num_classes=100 --pretrained=True ...
 ```
 
 本文在基于Aircraft数据集对mobilenet v3-small微调时主要对超参数做了如下改动：
