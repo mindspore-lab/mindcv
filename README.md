@@ -1,6 +1,6 @@
 <div align="center" markdown>
 
-# MindCV
+# MindSpore CV
 
 [![CI](https://github.com/mindspore-lab/mindcv/actions/workflows/ci.yml/badge.svg)](https://github.com/mindspore-lab/mindcv/actions/workflows/ci.yml)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/mindcv)](https://pypi.org/project/mindcv)
@@ -25,7 +25,7 @@ English | [中文](README_CN.md)
 
 ## Introduction
 
-MindCV is an open-source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pre-trained weights and training strategies. SoTA methods such as auto augmentation are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindCV to your own CV tasks.
+MindSpore CV is an open-source toolbox for computer vision research and development based on [MindSpore](https://www.mindspore.cn/en). It collects a series of classic and SoTA vision models, such as ResNet and SwinTransformer, along with their pre-trained weights and training strategies. SoTA methods such as auto augmentation are also provided for performance improvement. With the decoupled module design, it is easy to apply or adapt MindSpore CV to your own CV tasks.
 
 The following is the corresponding `mindcv` versions and supported `mindspore` versions.
 
@@ -40,7 +40,7 @@ The following is the corresponding `mindcv` versions and supported `mindspore` v
 
 ### Major Features
 
-- **Easy-to-Use.** MindCV decomposes the vision framework into various configurable components. It is easy to customize your data pipeline, models, and learning pipeline with MindCV:
+- **Easy-to-Use.** MindSpore CV decomposes the vision framework into various configurable components. It is easy to customize your data pipeline, models, and learning pipeline with MindSpore CV:
 
   ```pycon
   >>> import mindcv
@@ -57,13 +57,13 @@ The following is the corresponding `mindcv` versions and supported `mindspore` v
   python train.py --model=swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir=/path/to/data
   ```
 
-- **State-of-The-Art.** MindCV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model:
+- **State-of-The-Art.** MindSpore CV provides various CNN-based and Transformer-based vision models including SwinTransformer. Their pretrained weights and performance reports are provided to help users select and reuse the right model:
 
-- **Flexibility and efficiency.** MindCV is built on MindSpore which is an efficient DL framework that can be run on different hardware platforms (GPU/CPU/Ascend). It supports both graph mode for high efficiency and pynative mode for flexibility.
+- **Flexibility and efficiency.** MindSpore CV is built on MindSpore which is an efficient DL framework that can be run on different hardware platforms (GPU/CPU/Ascend). It supports both graph mode for high efficiency and pynative mode for flexibility.
 
 ## Model Zoo
 
-The performance of the models trained with MindCV is summarized in [here](https://mindspore-lab.github.io/mindcv/modelzoo/), where the training recipes and weights are both available.
+The performance of the models trained with MindSpore CV is summarized in [here](https://mindspore-lab.github.io/mindcv/modelzoo/), where the training recipes and weights are both available.
 
 Model introduction and training details can be viewed in each sub-folder under [configs](configs).
 
@@ -75,7 +75,7 @@ See [Installation](https://mindspore-lab.github.io/mindcv/installation/) for det
 
 ### Hands-on Tutorial
 
-To get started with MindCV, please see the [Quick Start](docs/en/tutorials/quick_start.md), which will give you a quick tour on each key component and the train/validate/predict pipelines.
+To get started with MindSpore CV, please see the [Quick Start](docs/en/tutorials/quick_start.md), which will give you a quick tour on each key component and the train/validate/predict pipelines.
 
 Below are a few code snippets for your taste.
 
@@ -212,7 +212,7 @@ More examples about training and validation can be seen in [examples](examples/s
 
 ## Tutorials
 
-We provide the following jupyter notebook tutorials to help users learn to use MindCV.
+We provide the following jupyter notebook tutorials to help users learn to use MindSpore CV.
 
 - [Learn about configs](docs/en/tutorials/configuration.md)
 - [Inference with a pretrained model](docs/en/tutorials/inference.md)
@@ -222,7 +222,7 @@ We provide the following jupyter notebook tutorials to help users learn to use M
 
 ## Model List
 
-Currently, MindCV supports the model families listed below. More models with pre-trained weights are under development and will be released soon.
+Currently, MindSpore CV supports the model families listed below. More models with pre-trained weights are under development and will be released soon.
 
 <details open markdown>
 <summary> Supported models </summary>
@@ -351,7 +351,7 @@ See [RELEASE](RELEASE.md) for detailed history.
 
 ## How to Contribute
 
-We appreciate all kinds of contributions including issues and PRs to make MindCV better.
+We appreciate all kinds of contributions including issues and PRs to make MindSpore CV better.
 
 Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the contributing guideline.
 Please follow the [Model Template and Guideline](docs/en/how_to_guides/write_a_new_model.md) for contributing a model that fits the overall interface :)
@@ -362,7 +362,7 @@ This project follows the [Apache License 2.0](LICENSE.md) open-source license.
 
 ## Acknowledgement
 
-MindCV is an open-source project jointly developed by the MindSpore team, Xidian University, and Xi'an Jiaotong University.
+MindSpore CV is an open-source project jointly developed by the MindSpore team, Xidian University, and Xi'an Jiaotong University.
 Sincere thanks to all participating researchers and developers for their hard work on this project.
 We also acknowledge the computing resources provided by [OpenI](https://openi.pcl.ac.cn/).
 
