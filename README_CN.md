@@ -1,6 +1,6 @@
 <div align="center" markdown>
 
-# MindCV
+# MindSpore CV
 
 [![CI](https://github.com/mindspore-lab/mindcv/actions/workflows/ci.yml/badge.svg)](https://github.com/mindspore-lab/mindcv/actions/workflows/ci.yml)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/mindcv)](https://pypi.org/project/mindcv)
@@ -25,13 +25,13 @@
 
 ## 简介
 
-MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力于计算机视觉相关技术研发的开源工具箱。它提供大量的计算机视觉领域的经典模型和SoTA模型以及它们的预训练权重和训练策略。同时，还提供了自动增强等SoTA算法来提高模型性能。通过解耦的模块设计，您可以轻松地将MindCV应用到您自己的CV任务中。
+MindSpore CV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力于计算机视觉相关技术研发的开源工具箱。它提供大量的计算机视觉领域的经典模型和SoTA模型以及它们的预训练权重和训练策略。同时，还提供了自动增强等SoTA算法来提高模型性能。通过解耦的模块设计，您可以轻松地将MindSpore CV应用到您自己的CV任务中。
 
 主分支代码目前支持 **MindSpore 1.8+** 以上的版本，包含 **MindSpore 2.0🔥** 版本。
 
 ### 主要特性
 
-- **高易用性** MindCV将视觉任务分解为各种可配置的组件，用户可以轻松地构建自己的数据处理和模型训练流程。
+- **高易用性** MindSpore CV将视觉任务分解为各种可配置的组件，用户可以轻松地构建自己的数据处理和模型训练流程。
 
   ```pycon
   >>> import mindcv
@@ -48,13 +48,13 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
   python train.py --model swin_tiny --pretrained --opt=adamw --lr=0.001 --data_dir=/path/to/dataset
   ```
 
-- **高性能** MindCV集成了大量基于CNN和Transformer的高性能模型, 如SwinTransformer，并提供预训练权重、训练策略和性能报告，帮助用户快速选型并将其应用于视觉模型。
+- **高性能** MindSpore CV集成了大量基于CNN和Transformer的高性能模型, 如SwinTransformer，并提供预训练权重、训练策略和性能报告，帮助用户快速选型并将其应用于视觉模型。
 
-- **灵活高效** MindCV基于高效的深度学习框架MindSpore开发，具有自动并行和自动微分等特性，支持不同硬件平台上（CPU/GPU/Ascend），同时支持效率优化的静态图模式和调试灵活的动态图模式。
+- **灵活高效** MindSpore CV基于高效的深度学习框架MindSpore开发，具有自动并行和自动微分等特性，支持不同硬件平台上（CPU/GPU/Ascend），同时支持效率优化的静态图模式和调试灵活的动态图模式。
 
 ## 模型支持
 
-基于MindCV进行模型实现和重训练的汇总结果详见[模型仓库](https://mindspore-lab.github.io/mindcv/zh/modelzoo/), 所用到的训练策略和训练后的模型权重均可通过表中链接获取。
+基于MindSpore CV进行模型实现和重训练的汇总结果详见[模型仓库](https://mindspore-lab.github.io/mindcv/zh/modelzoo/), 所用到的训练策略和训练后的模型权重均可通过表中链接获取。
 
 各模型讲解和训练说明详见[configs](configs)目录。
 
@@ -66,7 +66,7 @@ MindCV是一个基于 [MindSpore](https://www.mindspore.cn/) 开发的，致力�
 
 ### 上手教程
 
-在开始上手MindCV前，可以阅读MindCV的[快速开始](docs/en/tutorials/quick_start.md)，该教程可以帮助用户快速了解MindCV的各个重要组件以及训练、验证、测试流程。
+在开始上手MindSpore CV前，可以阅读MindSpore CV的[快速开始](docs/en/tutorials/quick_start.md)，该教程可以帮助用户快速了解MindSpore CV的各个重要组件以及训练、验证、测试流程。
 
 以下是一些供您快速体验的代码样例。
 
@@ -149,7 +149,7 @@ python infer.py --model=swin_tiny --image_path='./dog.jpg'
   ```
 
   **预定义的训练策略**
-  MindCV目前提供了超过20种模型训练策略，在ImageNet取得SoTA性能。
+  MindSpore CV目前提供了超过20种模型训练策略，在ImageNet取得SoTA性能。
   具体的参数配置和详细精度性能汇总请见[`configs`](configs)文件夹。
   您可以便捷地将这些训练策略用于您的模型训练中以提高性能（复用或修改相应的yaml文件即可）。
 
@@ -203,7 +203,7 @@ python train.py --model=resnet50 --dataset=cifar10 \
 
 ## 教程
 
-我们提供了系列教程，帮助用户学习如何使用MindCV.
+我们提供了系列教程，帮助用户学习如何使用MindSpore CV.
 
 - [了解模型配置](docs/zh/tutorials/configuration.md)
 - [模型推理](docs/zh/tutorials/inference.md)
@@ -214,7 +214,7 @@ python train.py --model=resnet50 --dataset=cifar10 \
 
 ## 模型列表
 
-目前，MindCV支持以下模型。
+目前，MindSpore CV支持以下模型。
 
 <details open markdown>
 <summary> 支持模型 </summary>
@@ -425,7 +425,7 @@ python train.py --model=resnet50 --dataset=cifar10 \
 
 - 2023/01/10
 
-1. MindCV v0.1发布! 支持通过PyPI安装 (`pip install mindcv`)
+1. MindSpore CV v0.1发布! 支持通过PyPI安装 (`pip install mindcv`)
 2. 新增4个模型的预训练权重及其策略： googlenet, inception_v3, inception_v4, xception
 
 - 2022/12/09
@@ -457,7 +457,7 @@ python train.py --model=resnet50 --dataset=cifar10 \
 
 ## 贡献方式
 
-欢迎开发者用户提issue或提交代码PR，或贡献更多的算法和模型，一起让MindCV变得更好。
+欢迎开发者用户提issue或提交代码PR，或贡献更多的算法和模型，一起让MindSpore CV变得更好。
 
 有关贡献指南，请参阅[CONTRIBUTING.md](CONTRIBUTING.md)。
 请遵循[模型编写指南](docs/zh/how_to_guides/write_a_new_model.md)所规定的规则来贡献模型接口：)
@@ -468,13 +468,13 @@ python train.py --model=resnet50 --dataset=cifar10 \
 
 ## 致谢
 
-MindCV是由MindSpore团队、西安电子科技大学、西安交通大学联合开发的开源项目。
+MindSpore CV是由MindSpore团队、西安电子科技大学、西安交通大学联合开发的开源项目。
 衷心感谢所有参与的研究人员和开发人员为这个项目所付出的努力。
 十分感谢 [OpenI](https://openi.pcl.ac.cn/) 平台所提供的算力资源。
 
 ## 引用
 
-如果你觉得MindCV对你的项目有帮助，请考虑引用：
+如果你觉得MindSpore CV对你的项目有帮助，请考虑引用：
 
 ```latex
 @misc{MindSpore Computer Vision 2022,
