@@ -1,7 +1,31 @@
+""" CrossViT Model
+
+@inproceedings{
+    chen2021crossvit,
+    title={{CrossViT: Cross-Attention Multi-Scale Vision Transformer for Image Classification}},
+    author={Chun-Fu (Richard) Chen and Quanfu Fan and Rameswar Panda},
+    booktitle={International Conference on Computer Vision (ICCV)},
+    year={2021}
+}
+
+Paper link: https://arxiv.org/abs/2103.14899
+Original code: https://github.com/IBM/CrossViT/blob/main/models/crossvit.py
+
+NOTE: model names have been renamed from originals to represent actual input res all *_224 -> *_240 and *_384 -> *_408
+
+Modifications and additions for timm hacked together by / Copyright 2021, Ross Wightman
+Modified from Timm. https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/vision_transformer.py
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/crossvit.py
+
 """
-MindSpore implementation of `crossvit`.
-Refer to crossvit: Cross-Attention Multi-Scale Vision Transformer for Image Classification
-"""
+
+# Copyright IBM All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
 
 import numpy as np
 

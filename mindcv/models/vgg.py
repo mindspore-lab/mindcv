@@ -1,6 +1,15 @@
-"""
-MindSpore implementation of `VGGNet`.
-Refer to SqueezeNet: Very Deep Convolutional Networks for Large-Scale Image Recognition.
+"""VGG
+
+Adapted from https://github.com/pytorch/vision 'vgg.py' (BSD-3-Clause) with a few changes for
+timm functionality.
+
+Copyright 2021 Ross Wightman
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/vgg.py
 """
 
 import math

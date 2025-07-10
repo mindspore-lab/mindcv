@@ -1,4 +1,5 @@
-""" distributed sampler """
+""" MindSpore Distributed Sampler """
+
 import logging
 import math
 

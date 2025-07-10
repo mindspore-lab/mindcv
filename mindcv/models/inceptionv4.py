@@ -1,6 +1,11 @@
 """
+Sourced from https://github.com/Cadene/tensorflow-model-zoo.torch (MIT License) which is
+based upon Google's Tensorflow implementation and pretrained weights (Apache 2.0 License)
+
+
 MindSpore implementation of `InceptionV4`.
 Refer to Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/inception_v4.py
 """
 
 from typing import Tuple, Union

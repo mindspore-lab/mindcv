@@ -2,6 +2,9 @@
 Mindspore implementations of DropPath (Stochastic Depth) regularization layers.
 Papers:
 Deep Networks with Stochastic Depth (https://arxiv.org/abs/1603.09382)
+
+Adapted from https://github.com/huggingface/pytorch-image-models/tree/main/timm/layers
+
 """
 from mindspore import Tensor, nn, ops
 from mindspore.numpy import ones

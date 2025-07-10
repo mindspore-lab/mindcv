@@ -1,5 +1,5 @@
 """
-Create dataloader
+Create dataloader on MindSpore
 """
 
 import inspect

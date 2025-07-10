@@ -1,6 +1,15 @@
 """
+Copied from https://github.com/HRNet/HRNet-Image-Classification
+
+Original header:
+  Copyright (c) Microsoft
+  Licensed under the MIT License.
+  Written by Bin Xiao (Bin.Xiao@microsoft.com)
+  Modified by Ke Sun (sunk@mail.ustc.edu.cn)
+
+------------------------------------------------------------------------
 MindSpore implementation of `HRNet`.
-Refer to Deep High-Resolution Representation Learning for Visual Recognition
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/hrnet.py
 """
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 

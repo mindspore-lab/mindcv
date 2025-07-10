@@ -1,7 +1,22 @@
+""" ReXNet
+
+`ReXNet: Diminishing Representational Bottleneck on Convolutional Neural Network` -
+https://arxiv.org/abs/2007.00992
+
+Adapted from original impl at https://github.com/clovaai/rexnet
+Copyright (c) 2020-present NAVER Corp. MIT license
+
+Changes for timm, feature extraction, and rounded channel variant hacked together by Ross Wightman
+Copyright 2020 Ross Wightman
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/rexnet.py
+
 """
-MindSpore implementation of `ReXNet`.
-Refer to ReXNet: Rethinking Channel Dimensions for Efficient Model Design.
-"""
+
 import math
 from math import ceil
 from typing import Any

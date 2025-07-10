@@ -1,6 +1,11 @@
 """
+Hacked together by / Copyright 2020 Ross Wightman
+
+------------------------------------------------------------------------
 MindSpore implementation of `RegNet`.
-Refer to: Designing Network Design Spaces
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/regnet.py
+
 """
 
 import math

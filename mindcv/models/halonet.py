@@ -1,6 +1,7 @@
 """
 MindSpore implementation of `HaloNet`.
 Refer to Scaling Local Self-Attention for Parameter Effificient Visual Backbones.
+Adapted from https://github.com/maurbe/halo-net
 """
 import mindspore as ms
 import mindspore.common.initializer as init

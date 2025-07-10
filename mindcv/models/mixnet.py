@@ -1,6 +1,7 @@
 """
 MindSpore implementation of `MixNet`.
 Refer to MixConv: Mixed Depthwise Convolutional Kernels
+Adpted from https://github.com/TUMFTM/MixNet.
 """
 
 import math

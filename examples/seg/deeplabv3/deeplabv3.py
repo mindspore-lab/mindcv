@@ -1,4 +1,7 @@
-"""DeeplabV3, DeeplabV3+ implement with replaceable backbones"""
+"""
+DeeplabV3, DeeplabV3+ implement with replaceable backbones
+Adapted from https://github.com/pytorch/vision/blob/main/torchvision/models/segmentation/deeplabv3.py
+"""
 
 from typing import List
 

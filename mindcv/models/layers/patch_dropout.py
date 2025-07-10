@@ -1,3 +1,5 @@
+# Adapted from https://github.com/huggingface/pytorch-image-models/tree/main/timm/layers
+
 import numpy as np
 
 import mindspore as ms

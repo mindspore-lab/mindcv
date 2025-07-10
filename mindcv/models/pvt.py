@@ -1,6 +1,15 @@
 """
-MindSpore implementation of `PVT`.
-Refer to PVT: Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions
+@inproceedings{wang2021pyramid,
+  title={Pyramid vision transformer: A versatile backbone for dense prediction without convolutions},
+  author={Wang, Wenhai and Xie, Enze and Li, Xiang and Fan, Deng-Ping and Song,
+  Kaitao and Liang, Ding and Lu, Tong and Luo, Ping and Shao, Ling},
+  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+  pages={568--578},
+  year={2021}
+}
+Based on Apache 2.0 licensed code at https://github.com/whai362/PVT
+
+Modified for use with the MindSpore framework.
 """
 import math
 from functools import partial

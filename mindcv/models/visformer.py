@@ -1,6 +1,16 @@
-"""
-MindSpore implementation of `Visformer`.
-Refer to: Visformer: The Vision-friendly Transformer
+""" Visformer
+
+Paper: Visformer: The Vision-friendly Transformer - https://arxiv.org/abs/2104.12533
+
+From original at https://github.com/danczs/Visformer
+
+Modifications and additions for timm hacked together by / Copyright 2021, Ross Wightman
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/visformer.py
 """
 
 from typing import List

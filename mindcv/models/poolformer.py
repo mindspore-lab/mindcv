@@ -1,6 +1,7 @@
 """
 MindSpore implementation of `poolformer`.
 Refer to PoolFormer: MetaFormer Is Actually What You Need for Vision.
+Adapted from https://github.com/sail-sg/poolformer.
 """
 
 import collections.abc

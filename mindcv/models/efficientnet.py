@@ -1,4 +1,13 @@
-"""EfficientNet Architecture."""
+"""EfficientNet Architecture.
+Hacked together by / Copyright 2019, Ross Wightman
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/efficientnet.py
+
+"""
 
 import copy
 import math

@@ -1,7 +1,22 @@
+""" Pooling-based Vision Transformer (PiT) in PyTorch
+
+A PyTorch implement of Pooling-based Vision Transformers as described in
+'Rethinking Spatial Dimensions of Vision Transformers' - https://arxiv.org/abs/2103.16302
+
+This code was adapted from the original version at https://github.com/naver-ai/pit, original copyright below.
+
+Modifications for timm by / Copyright 2020 Ross Wightman
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/pit.py
+
 """
-MindSpore implementation of `PiT`.
-Refer to Rethinking Spatial Dimensions of Vision Transformers.
-"""
+# PiT
+# Copyright 2021-present NAVER Corp.
+# Apache License v2.0
 
 import math
 from typing import List

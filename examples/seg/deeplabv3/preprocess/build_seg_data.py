@@ -1,3 +1,5 @@
+# Copy from https://github.com/mindspore-ai/models/blob/master/official/cv/DeepLabv3/src/data/build_seg_data.py
+
 import argparse
 import os
 

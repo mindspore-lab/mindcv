@@ -1,6 +1,7 @@
 """
 MindSpore implementation of `MnasNet`.
 Refer to MnasNet: Platform-Aware Neural Architecture Search for Mobile.
+Adapted from https://github.com/pytorch/vision/blob/main/torchvision/models/mnasnet.py
 """
 
 from typing import List

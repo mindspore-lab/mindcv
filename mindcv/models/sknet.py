@@ -1,6 +1,18 @@
-"""
-MindSpore implementation of `SKNet`.
-Refer to Selective Kernel Networks.
+""" Selective Kernel Networks (ResNet base)
+Paper: Selective Kernel Networks (https://arxiv.org/abs/1903.06586)
+
+This was inspired by reading 'Compounding the Performance Improvements...' (https://arxiv.org/abs/2001.06268)
+and a streamlined impl at https://github.com/clovaai/assembled-cnn but I ended up building something closer
+to the original paper with some modifications of my own to better balance param count vs accuracy.
+
+Hacked together by / Copyright 2020 Ross Wightman
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/sknet.py
+
 """
 
 from typing import Dict, List, Optional, Type, Union

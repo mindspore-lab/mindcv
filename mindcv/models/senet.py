@@ -1,6 +1,6 @@
 """
 MindSpore implementation of `SENet`.
-Refer to Squeeze-and-Excitation Networks.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/senet.py
 """
 
 import math

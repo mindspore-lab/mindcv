@@ -1,6 +1,7 @@
 """
 MindSpore implementation of `SqueezeNet`.
 Refer to SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size.
+Adapted from https://github.com/pytorch/vision/blob/main/torchvision/models/squeezenet.py
 """
 
 import mindspore.common.initializer as init

@@ -1,7 +1,32 @@
+""" ConViT Model
+
+@article{d2021convit,
+  title={ConViT: Improving Vision Transformers with Soft Convolutional Inductive Biases},
+  author={d'Ascoli, St{\'e}phane and Touvron, Hugo and Leavitt, Matthew and Morcos,
+  Ari and Biroli, Giulio and Sagun, Levent},
+  journal={arXiv preprint arXiv:2103.10697},
+  year={2021}
+}
+
+Paper link: https://arxiv.org/abs/2103.10697
+Original code: https://github.com/facebookresearch/convit, original copyright below
+
+Modifications and additions for timm hacked together by / Copyright 2021, Ross Wightman
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/convit.py
+
 """
-MindSpore implementation of `ConViT`.
-Refer to ConViT: Improving Vision Transformers with Soft Convolutional Inductive Biases
-"""
+
+# Copyright (c) 2015-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the CC-by-NC license found in the
+# LICENSE file in the root directory of this source tree.
+#
 
 import numpy as np
 

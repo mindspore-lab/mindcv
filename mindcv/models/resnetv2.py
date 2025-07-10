@@ -1,7 +1,40 @@
+"""Pre-Activation ResNet v2 with GroupNorm and Weight Standardization.
+
+A PyTorch implementation of ResNetV2 adapted from the Google Big-Transfer (BiT) source code
+at https://github.com/google-research/big_transfer to match timm interfaces. The BiT weights have
+been included here as pretrained models from their original .NPZ checkpoints.
+
+Additionally, supports non pre-activation bottleneck for use as a backbone for Vision Transformers (ViT) and
+extra padding support to allow porting of official Hybrid ResNet pretrained weights from
+https://github.com/google-research/vision_transformer
+
+Thanks to the Google team for the above two repositories and associated papers:
+* Big Transfer (BiT): General Visual Representation Learning - https://arxiv.org/abs/1912.11370
+* An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale - https://arxiv.org/abs/2010.11929
+* Knowledge distillation: A good teacher is patient and consistent - https://arxiv.org/abs/2106.05237
+
+Original copyright of Google code below, modifications by Ross Wightman, Copyright 2020.
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/resnetv2.py
+
 """
-MindSpore implementation of `ResNetV2`.
-Refer to Identity Mappings in Deep Residual Networks.
-"""
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from typing import Optional
 

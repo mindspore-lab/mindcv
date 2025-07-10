@@ -1,6 +1,17 @@
 """
-MindSpore implementation of `edgenext`.
-Refer to EdgeNeXt: Efficiently Amalgamated CNN-Transformer Architecture for Mobile Vision Applications.
+Paper: `EdgeNeXt: Efficiently Amalgamated CNN-Transformer Architecture for Mobile Vision Applications`
+ - https://arxiv.org/abs/2206.10589
+
+Original code and weights from https://github.com/mmaaz60/EdgeNeXt
+
+Modifications and additions for timm by / Copyright 2022, Ross Wightman
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/edgenext.py
+
 """
 
 import math

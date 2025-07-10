@@ -1,6 +1,18 @@
-"""
-MindSpore implementation of XCiT
-Refer to: XCiT: Cross-Covariance Image Transformers
+""" Cross-Covariance Image Transformer (XCiT) in PyTorch
+
+Paper:
+    - https://arxiv.org/abs/2106.09681
+
+Same as the official implementation, with some minor adaptations, original copyright below
+    - https://github.com/facebookresearch/xcit/blob/master/xcit.py
+
+Modifications and additions for timm hacked together by / Copyright 2021, Ross Wightman
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/xcit.py
 """
 from functools import partial
 
