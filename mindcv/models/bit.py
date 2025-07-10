@@ -1,6 +1,7 @@
 """
 MindSpore implementation of `BiT_ResNet`.
 Refer to Big Transfer (BiT): General Visual Representation Learning.
+Adapted from https://github.com/google-research/big_transfer.
 """
 
 from typing import List, Optional, Type, Union

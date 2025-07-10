@@ -1,7 +1,26 @@
+""" MobileViT
+
+Paper:
+V1: `MobileViT: Light-weight, General-purpose, and Mobile-friendly Vision Transformer`
+    - https://arxiv.org/abs/2110.02178
+V2: `Separable Self-attention for Mobile Vision Transformers`
+    - https://arxiv.org/abs/2206.02680
+
+MobileVitBlock and checkpoints adapted from https://github.com/apple/ml-cvnets (original copyright below)
+License: https://github.com/apple/ml-cvnets/blob/main/LICENSE (Apple open source)
+
+Rest of code, ByobNet, and Transformer block hacked together by / Copyright 2022, Ross Wightman
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/mobilevit.py
 """
-MindSpore implementation of `MobileViT`.
-Refer to MobileViT：Light-weight, General-purpose, and Mobile-friendly Vision Transformer.
-"""
+#
+# For licensing see accompanying LICENSE file.
+# Copyright (C) 2020 Apple Inc. All Rights Reserved.
+#
 
 import math
 from typing import Dict, Optional, Tuple, Union

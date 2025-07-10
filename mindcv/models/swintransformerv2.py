@@ -1,7 +1,23 @@
+""" Swin Transformer V2
+`Swin Transformer V2: Scaling Up Capacity and Resolution`
+    - https://arxiv.org/abs/2111.09883
+
+Code/weights from https://github.com/microsoft/Swin-Transformer, original copyright/license info below
+
+Modifications and additions for timm hacked together by / Copyright 2022, Ross Wightman
+
+--------------------------------------------------------
+MindSpore adaptation:
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/swin_transformer_v2.py
+
 """
-MindSpore implementation of `SwinTransformer V2`.
-Refer to Swin Transformer V2: Scaling Up Capacity and Resolution.
-"""
+# --------------------------------------------------------
+# Swin Transformer V2
+# Copyright (c) 2022 Microsoft
+# Licensed under The MIT License [see LICENSE for details]
+# Written by Ze Liu
+# --------------------------------------------------------
 
 from typing import List, Optional, Tuple, Union
 

@@ -1,6 +1,6 @@
 """
 MindSpore implementation of `Res2Net`.
-Refer to Res2Net: A New Multi-scale Backbone Architecture.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/res2net.py
 """
 
 import math

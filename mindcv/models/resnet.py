@@ -1,6 +1,16 @@
-"""
-MindSpore implementation of `ResNet`.
-Refer to Deep Residual Learning for Image Recognition.
+"""ResNet
+This started as a copy of https://github.com/pytorch/vision 'resnet.py' (BSD-3-Clause) with
+additional dropout and dynamic global avg/max pool.
+
+ResNeXt, SE-ResNeXt, SENet, and MXNet Gluon stem/downsample variants, tiered stems added by Ross Wightman
+
+Copyright 2019, Ross Wightman
+
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/resnet.py
+
 """
 
 from typing import List, Optional, Type, Union

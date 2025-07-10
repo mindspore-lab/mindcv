@@ -1,6 +1,7 @@
 """
 MindSpore implementation of `RepMLPNet`.
 Refer to RepMLPNet: Hierarchical Vision MLP with Re-parameterized Locality.
+Adapted from https://github.com/DingXiaoH/RepMLP
 """
 
 from collections import OrderedDict

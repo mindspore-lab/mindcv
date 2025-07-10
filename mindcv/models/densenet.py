@@ -1,6 +1,6 @@
 """
 MindSpore implementation of `DenseNet`.
-Refer to: Densely Connected Convolutional Networks
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/densenet.py
 """
 
 import math

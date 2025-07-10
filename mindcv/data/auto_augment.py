@@ -1,8 +1,14 @@
 """
-AutoAugment and RandAugment for mindspore.
 
+Copyright 2019, Ross Wightman
+
+Modifications made by MindSpore team in 2023 to support the MindSpore framework.
 Adapted from:
-    https://github.com/rwightman/pytorch-image-models/blob/main/timm/data/auto_augment.py
+    https://github.com/rwightman/pytorch-image-models/blob/main/timm/data/auto_augment.py.
+
+
+
+AutoAugment and RandAugment for mindspore.
 
 Papers:
     AutoAugment: Learning Augmentation Policies from Data - https://arxiv.org/abs/1805.09501

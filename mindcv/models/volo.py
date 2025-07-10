@@ -1,6 +1,31 @@
-"""
-Vision OutLOoker (VOLO) implementation
-Modified from timm/models/vision_transformer.py
+""" Vision OutLOoker (VOLO) implementation
+
+Paper: `VOLO: Vision Outlooker for Visual Recognition` - https://arxiv.org/abs/2106.13112
+
+Code adapted from official impl at https://github.com/sail-sg/volo, original copyright in comment below
+
+Modifications and additions for timm by / Copyright 2022, Ross Wightman
+
+# --------------------------------------------------------
+# Copyright 2021 Sea Limited.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# --------------------------------------------------------
+
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/volo.py
 """
 import numpy as np
 

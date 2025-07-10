@@ -1,5 +1,5 @@
 """
-Create dataset by name
+Create dataset by name on MindSpore
 """
 
 import logging

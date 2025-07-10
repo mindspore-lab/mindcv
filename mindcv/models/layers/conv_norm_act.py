@@ -1,4 +1,6 @@
-""" Conv2d + BN + Act"""
+""" Conv2d + BN + Act
+Adapted from https://github.com/huggingface/pytorch-image-models/tree/main/timm/layers
+"""
 from typing import Optional
 
 from mindspore import nn

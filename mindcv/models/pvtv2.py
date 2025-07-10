@@ -1,6 +1,24 @@
 """
-MindSpore implementation of `PVTv2`.
-Refer to PVTv2: PVTv2: Improved Baselines with Pyramid Vision Transformer
+@misc{wang2021pvtv2,
+      title={PVTv2: Improved Baselines with Pyramid Vision Transformer},
+      author={Wenhai Wang and Enze Xie and Xiang Li and Deng-Ping Fan and Kaitao Song and Ding Liang and
+        Tong Lu and Ping Luo and Ling Shao},
+      year={2021},
+      eprint={2106.13797},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+Based on Apache 2.0 licensed code at https://github.com/whai362/PVT
+
+Modifications and timm support by / Copyright 2022, Ross Wightman
+
+------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/pvt_v2.py
+
 """
 import math
 from functools import partial

@@ -1,6 +1,7 @@
 """
 MindSpore implementation of `RepVGG`.
 Refer to RepVGG: Making VGG_style ConvNets Great Again
+Adapted from https://github.com/DingXiaoH/RepVGG
 """
 
 import copy

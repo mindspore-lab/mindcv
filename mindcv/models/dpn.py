@@ -1,6 +1,16 @@
 """
-MindSpore implementation of `DPN`.
-Refer to: Dual Path Networks
+Based on original MXNet implementation https://github.com/cypw/DPNs with
+many ideas from another PyTorch implementation https://github.com/oyam/pytorch-DPNs.
+
+This implementation is compatible with the pretrained weights from cypw's MXNet implementation.
+
+Hacked together by / Copyright 2020 Ross Wightman
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/dpn.py
 """
 
 import math

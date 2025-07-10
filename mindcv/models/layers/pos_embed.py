@@ -1,4 +1,6 @@
-"""positional embedding"""
+"""positional embedding
+Adapted from https://github.com/huggingface/pytorch-image-models/tree/main/timm/layers
+"""
 import math
 from typing import List, Optional, Tuple
 

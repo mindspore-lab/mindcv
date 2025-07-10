@@ -1,5 +1,5 @@
 """MindSpore implementation of `GhostNet`.
-Refer to GhostNet: More Features from Cheap Operations.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/ghostnet.py
 """
 
 import math

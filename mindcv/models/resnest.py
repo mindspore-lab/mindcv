@@ -1,6 +1,15 @@
-"""
+"""ResNeSt Models
+
+Paper: `ResNeSt: Split-Attention Networks` - https://arxiv.org/abs/2004.08955
+
+Adapted from original PyTorch impl w/ weights at https://github.com/zhanghang1989/ResNeSt by Hang Zhang
+
+Modified for torchscript compat, and consistency with timm by Ross Wightman
+
+------------------------------------------------------------------------
 MindSpore implementation of `ResNeSt`.
-Refer to ResNeSt: Split-Attention Networks.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/resnest.py
 """
 
 from typing import List, Optional, Type

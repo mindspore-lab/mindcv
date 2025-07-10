@@ -1,3 +1,8 @@
+"""
+MindSpore implementation of `MAE`.
+Adpted from https://github.com/facebookresearch/mae.
+"""
+
 from functools import partial
 from typing import Callable, Optional
 

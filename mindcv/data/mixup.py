@@ -9,6 +9,10 @@ Code Reference:
 CutMix: https://github.com/clovaai/CutMix-PyTorch
 
 Hacked together by / Copyright 2020 Ross Wightman
+
+Modifications made to support the MindSpore framework.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/data/mixup.py
+
 """
 import numpy as np
 

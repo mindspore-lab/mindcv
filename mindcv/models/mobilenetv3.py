@@ -1,6 +1,13 @@
-"""
-MindSpore implementation of `MobileNetV3`.
-Refer to Searching for MobileNetV3.
+""" MobileNet V3
+Paper: Searching for MobileNetV3 - https://arxiv.org/abs/1905.02244
+
+Hacked together by / Copyright 2019, Ross Wightman
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/mobilenetv3.py
 """
 
 import math

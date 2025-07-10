@@ -1,6 +1,7 @@
 """
 MindSpore implementation of `ShuffleNetV2`.
 Refer to ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design
+Adapted from https://github.com/pytorch/vision/blob/main/torchvision/models/shufflenetv2.py
 """
 
 from typing import Tuple

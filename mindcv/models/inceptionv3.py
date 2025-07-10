@@ -1,6 +1,10 @@
 """
+Originally from torchvision Inception3 model
+Licensed BSD-Clause 3 https://github.com/pytorch/vision/blob/master/LICENSE
+
 MindSpore implementation of `InceptionV3`.
 Refer to Rethinking the Inception Architecture for Computer Vision.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/inception_v3.py
 """
 
 from typing import Tuple, Union

@@ -1,8 +1,50 @@
+""" ConvNeXt
+
+Papers:
+* `A ConvNet for the 2020s` - https://arxiv.org/pdf/2201.03545.pdf
+@Article{liu2022convnet,
+  author  = {Zhuang Liu and Hanzi Mao and Chao-Yuan Wu and Christoph Feichtenhofer and Trevor Darrell and Saining Xie},
+  title   = {A ConvNet for the 2020s},
+  journal = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year    = {2022},
+}
+
+* `ConvNeXt-V2 - Co-designing and Scaling ConvNets with Masked Autoencoders` - https://arxiv.org/abs/2301.00808
+@article{Woo2023ConvNeXtV2,
+  title={ConvNeXt V2: Co-designing and Scaling ConvNets with Masked Autoencoders},
+  author={Sanghyun Woo, Shoubhik Debnath, Ronghang Hu, Xinlei Chen, Zhuang Liu, In So Kweon and Saining Xie},
+  year={2023},
+  journal={arXiv preprint arXiv:2301.00808},
+}
+
+Original code and weights from:
+* https://github.com/facebookresearch/ConvNeXt, original copyright below
+* https://github.com/facebookresearch/ConvNeXt-V2, original copyright below
+
+Model defs atto, femto, pico, nano and _ols / _hnf variants are timm originals.
+
+Modifications and additions for timm hacked together by / Copyright 2022, Ross Wightman
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/convnext.py
+
 """
-MindSpore implementation of `ConvNeXt` and `ConvNeXt V2`.
-Refer to: A ConvNet for the 2020s
-          ConvNeXt V2: Co-designing and Scaling ConvNets with Masked Autoencoders
-"""
+# ConvNeXt
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+# All rights reserved.
+# This source code is licensed under the MIT license
+
+# ConvNeXt-V2
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+# All rights reserved.
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree (Attribution-NonCommercial 4.0 International (CC BY-NC 4.0))
+# No code was used directly from ConvNeXt-V2, however the weights are CC BY-NC 4.0 so beware if using commercially.
+
+
 from typing import List, Tuple
 
 import numpy as np

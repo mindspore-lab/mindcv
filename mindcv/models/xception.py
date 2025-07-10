@@ -1,6 +1,12 @@
 """
+Ported to pytorch thanks to [tstandley](https://github.com/tstandley/Xception-PyTorch)
+
+@author: tstandley
+Adapted by cadene
+
+------------------------------------------------
 MindSpore implementation of Xception.
-Refer to Xception: Deep Learning with Depthwise Separable Convolutions.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/xception.py
 """
 
 import mindspore.common.initializer as init

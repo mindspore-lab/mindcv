@@ -1,6 +1,11 @@
 """
-MindSpore implementation of `MLP-Mixer`.
-Refer to MLP-Mixer: An all-MLP Architecture for Vision.
+Hacked together by / Copyright 2021 Ross Wightman
+
+--------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/mlp_mixer.py
 """
 
 import mindspore.nn as nn

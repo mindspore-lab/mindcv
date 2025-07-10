@@ -1,6 +1,6 @@
 """
 MindSpore implementation of pnasnet.
-Refer to Progressive Neural Architecture Search.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/pnasnet.py
 """
 
 import math

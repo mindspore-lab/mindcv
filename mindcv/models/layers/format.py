@@ -1,3 +1,5 @@
+# Adapted from https://github.com/huggingface/pytorch-image-models/tree/main/timm/layers
+
 from enum import Enum
 from typing import Union
 

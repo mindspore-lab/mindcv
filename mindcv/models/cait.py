@@ -1,7 +1,21 @@
+""" Class-Attention in Image Transformers (CaiT)
+
+Paper: 'Going deeper with Image Transformers' - https://arxiv.org/abs/2103.17239
+
+Original code and weights from https://github.com/facebookresearch/deit, copyright below
+
+Modifications and additions for timm hacked together by / Copyright 2021, Ross Wightman
+
+------------------------------------------------------------------------
+MindSpore adaptation:
+Modified for use with the MindSpore framework.
+This file is part of a derivative work and remains under the original license.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/cait.py
 """
-MindSpore implementation of `CaiT`.
-Refer to Going deeper with Image Transformers.
-"""
+
+# Copyright (c) 2015-present, Facebook, Inc.
+# All rights reserved.
+
 
 from functools import partial
 

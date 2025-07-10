@@ -1,5 +1,6 @@
 """ Selective Kernel Convolution/Attention
 Paper: Selective Kernel Networks (https://arxiv.org/abs/1903.06586)
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/layers/selective_kernel.py
 """
 from typing import List, Optional, Union
 

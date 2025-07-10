@@ -1,3 +1,7 @@
+"""
+MindSpore implementation of `CMT`.
+Adapted from https://github.com/junjie18/CMT
+"""
 import numpy as np
 
 import mindspore

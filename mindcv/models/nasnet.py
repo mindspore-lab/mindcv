@@ -1,6 +1,6 @@
 """
 MindSpore implementation of `NasNet`.
-Refer to: Learning Transferable Architectures for Scalable Image Recognition
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/nasnet.py
 """
 import math
 

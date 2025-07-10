@@ -1,5 +1,10 @@
 """
 Transform operation list
+
+Hacked together by / Copyright 2019, Ross Wightman
+Modifications made to support the MindSpore framework.
+Adapted from https://github.com/huggingface/pytorch-image-models/blob/main/timm/data/transforms_factory.py
+
 """
 
 import math
