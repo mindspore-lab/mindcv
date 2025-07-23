@@ -33,18 +33,8 @@ def parse_args(args):
 
 
 def difference(a_file, b_file):
-    file = open(a_file, "r")
-    a_variable = eval(file.read())
-    file.close()
-
-    file = open(b_file, "r")
-    b_variable = eval(file.read())
-    file.close()
-
-    if not isinstance(b_variable, np.ndarray):
-        b_variable = np.array(b_variable)
-    if not isinstance(a_variable, np.ndarray):
-        a_variable = np.array(a_variable)
+    a_variable = np.load(a_file)
+    b_variable = np.load(b_file)
 
     if b_variable.shape != a_variable.shape:
         raise ValueError(
